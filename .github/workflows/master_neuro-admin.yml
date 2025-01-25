@@ -14,7 +14,7 @@ jobs:
       # Checkout the repository
       - uses: actions/checkout@v4
 
-      # Set up Node.js version
+      # Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -57,7 +57,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'Neuro-Admin'
+          app-name: 'Neuro-Shop'
           slot-name: 'Production'
           package: release.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3EEF8E8ED6AE4AC699E0F66A50A79DC2 }}
