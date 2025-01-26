@@ -48,6 +48,7 @@ jobs:
         with:
           name: app-release
           path: release.zip
+          include-hidden-files: true
 
   deploy:
     runs-on: ubuntu-latest
