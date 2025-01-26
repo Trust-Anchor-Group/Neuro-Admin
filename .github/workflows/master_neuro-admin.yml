@@ -1,4 +1,4 @@
-name: Build and deploy Next.js app to Azure Web App - Neuro-Admin
+name: Build and deploy Next.js 15 app to Azure Web App - Neuro-Admin
 
 on:
   push:
@@ -25,27 +25,24 @@ jobs:
         run: |
           npm install
           npm run build
-          # Debug: Inspect `.next` directory
-          echo "Contents of .next directory after build:"
-          tree .next
-
-      # Validate the standalone build
-      - name: Validate standalone build
-        run: |
-          if [ ! -f ".next/standalone/server.js" ]; then
-            echo "Standalone build failed! server.js is missing in .next/standalone"
-            exit 1
-          fi
+          # Debug: Verify standalone directory
+          echo "Contents of .next/standalone:"
+          ls -la .next/standalone
 
       # Prepare deployment package
       - name: Prepare deployment package
         run: |
+          # Create output directory
           mkdir -p out
+          # Copy standalone files
           cp -r .next/standalone/* out/
-          cp -r .next/static out/static
+          # Copy static assets
+          cp -r .next/static out/.next/static
           cp -r public out/public
-          echo "Contents of deployment package:"
-          tree out
+          # Debug: Verify out directory
+          echo "Contents of out directory:"
+          ls -la out
+          # Create deployment zip
           cd out && zip -r ../release.zip .
 
       # Upload artifact
@@ -77,5 +74,11 @@ jobs:
           app-name: 'Neuro-Admin'
           slot-name: 'Production'
           package: release.zip
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3EEF8E8ED6AE4AC699E0F66A50A79DC2 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
 
+      # Debug deployed files
+      - name: Debug deployed files
+        run: |
+          curl -u ${{ secrets.KUDU_USER }}:${{ secrets.KUDU_PASS }} https://${{ secrets.KUDU_APP_URL }}/api/vfs/site/wwwroot/ -o kudu_files.txt
+          echo "Deployed files on Kudu server:"
+          cat kudu_files.txt
