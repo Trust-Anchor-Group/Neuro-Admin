@@ -25,26 +25,19 @@ jobs:
         run: |
           npm install
           npm run build
-          # Debug: Verify standalone directory
           echo "Contents of .next/standalone:"
           ls -la .next/standalone
 
       # Prepare deployment package
       - name: Prepare deployment package
         run: |
-          # Create output directories
-          mkdir -p out/.next/static
-          mkdir -p out/public
-          # Copy standalone files
+          mkdir -p out
           cp -r .next/standalone/* out/
-          # Copy static assets
-          cp -r .next/static/* out/.next/static/
-          cp -r public/* out/public/
-          # Debug: Verify out directory
+          cp -r .next/static out/.next/static
+          cp -r public out/public
           echo "Contents of out directory:"
           ls -la out
-          # Create deployment zip
-          cd out && zip -r ../release.zip . .[^.]*
+          cd out && zip -r ../release.zip .
 
       # Upload artifact
       - name: Upload artifact
