@@ -25,33 +25,27 @@ jobs:
         run: |
           npm install
           npm run build
-          # Debug: Check the `.next/standalone` folder after the build
-          echo "Contents of .next/standalone:"
-          ls -la .next/standalone
+          # Debug: Inspect `.next` directory
+          echo "Contents of .next directory after build:"
+          tree .next
+
+      # Validate the standalone build
+      - name: Validate standalone build
+        run: |
+          if [ ! -f ".next/standalone/server.js" ]; then
+            echo "Standalone build failed! server.js is missing in .next/standalone"
+            exit 1
+          fi
 
       # Prepare deployment package
       - name: Prepare deployment package
         run: |
-          # Create output directory
           mkdir -p out
-
-          # Check for standalone files
-          if [ -d ".next/standalone" ]; then
-            cp -r .next/standalone/* out/
-          else
-            echo "Standalone build files are missing in .next/standalone"
-            exit 1
-          fi
-
-          # Copy static and public directories
-          cp -r public out/public
+          cp -r .next/standalone/* out/
           cp -r .next/static out/static
-
-          # Debug: Check the `out` directory
-          echo "Contents of out directory:"
-          ls -la out
-
-          # Create deployment zip
+          cp -r public out/public
+          echo "Contents of deployment package:"
+          tree out
           cd out && zip -r ../release.zip .
 
       # Upload artifact
@@ -84,3 +78,4 @@ jobs:
           slot-name: 'Production'
           package: release.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3EEF8E8ED6AE4AC699E0F66A50A79DC2 }}
+
