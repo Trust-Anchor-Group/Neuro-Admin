@@ -32,13 +32,14 @@ jobs:
       # Prepare deployment package
       - name: Prepare deployment package
         run: |
-          # Create output directory
-          mkdir -p out
+          # Create output directories
+          mkdir -p out/.next/static
+          mkdir -p out/public
           # Copy standalone files
           cp -r .next/standalone/* out/
           # Copy static assets
-          cp -r .next/static out/.next/static
-          cp -r public out/public
+          cp -r .next/static/* out/.next/static/
+          cp -r public/* out/public/
           # Debug: Verify out directory
           echo "Contents of out directory:"
           ls -la out
