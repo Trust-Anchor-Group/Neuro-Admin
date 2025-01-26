@@ -25,6 +25,7 @@ jobs:
         run: |
           npm install
           npm run build
+          ls -la .next        # Debug: Check `.next` directory content
 
       # Prepare deployment package
       - name: Prepare deployment package
@@ -33,6 +34,8 @@ jobs:
           cp -r .next/standalone/* out/
           cp -r .next/static out/static
           cp -r public out/public
+          cp -r node_modules out/node_modules    # Include `node_modules` for standalone
+          ls -la out                             # Debug: Verify `out` structure
           cd out && zip -r ../release.zip .
 
       # Upload artifact
@@ -61,3 +64,8 @@ jobs:
           slot-name: 'Production'
           package: release.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3EEF8E8ED6AE4AC699E0F66A50A79DC2 }}
+
+      # Debug after deployment
+      - name: Debug Kudu Files
+        run: |
+          curl https://${{ secrets.AZURE_APP_KUDU_URL }}/api/vfs/site/wwwroot/ -u ${{ secrets.AZURE_APP_KUDU_USER }}:${{ secrets.AZURE_APP_KUDU_PASS }}
