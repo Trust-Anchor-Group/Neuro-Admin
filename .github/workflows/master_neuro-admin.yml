@@ -44,7 +44,7 @@ jobs:
           echo "Contents of out directory:"
           ls -la out
           # Create deployment zip
-          cd out && zip -r ../release.zip .
+          cd out && zip -r ../release.zip . .[^.]*
 
       # Upload artifact
       - name: Upload artifact
@@ -76,10 +76,3 @@ jobs:
           slot-name: 'Production'
           package: release.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3EEF8E8ED6AE4AC699E0F66A50A79DC2 }}
-
-      # Debug deployed files
-      - name: Debug deployed files
-        run: |
-          curl -u ${{ secrets.KUDU_USER }}:${{ secrets.KUDU_PASS }} https://${{ secrets.KUDU_APP_URL }}/api/vfs/site/wwwroot/ -o kudu_files.txt
-          echo "Deployed files on Kudu server:"
-          cat kudu_files.txt
