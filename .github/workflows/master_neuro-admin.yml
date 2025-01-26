@@ -25,30 +25,34 @@ jobs:
         run: |
           npm install
           npm run build
+          # Debug: Check the `.next/standalone` folder after the build
+          echo "Contents of .next/standalone:"
+          ls -la .next/standalone
 
       # Prepare deployment package
       - name: Prepare deployment package
         run: |
           # Create output directory
-          mkdir -p build/standalone
+          mkdir -p out
 
-          # Move standalone files
-          mv .next/standalone/* build/standalone/
+          # Check for standalone files
+          if [ -d ".next/standalone" ]; then
+            cp -r .next/standalone/* out/
+          else
+            echo "Standalone build files are missing in .next/standalone"
+            exit 1
+          fi
 
-          # Copy public and static directories
-          cp -r public build/standalone/public
-          cp -r .next/static build/standalone/static
+          # Copy static and public directories
+          cp -r public out/public
+          cp -r .next/static out/static
 
-          # Ensure `server.js` and `package.json` are in the right place
-          cp server.js package.json build/standalone/
-
-          # Debug: Check directory contents
-          echo "Contents of build/standalone:"
-          ls -la build/standalone
+          # Debug: Check the `out` directory
+          echo "Contents of out directory:"
+          ls -la out
 
           # Create deployment zip
-          cd build/standalone
-          zip -r ../../release.zip .
+          cd out && zip -r ../release.zip .
 
       # Upload artifact
       - name: Upload artifact
