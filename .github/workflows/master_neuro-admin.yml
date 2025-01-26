@@ -31,8 +31,10 @@ jobs:
         run: |
           mkdir -p out
           cp -r .next/standalone/* out/
-          cp -r public out/public
           cp -r .next/static out/static
+          cp -r public out/public
+          cp package.json out/
+          cp server.js out/
           cd out && zip -r ../release.zip .
 
       # Upload artifact
