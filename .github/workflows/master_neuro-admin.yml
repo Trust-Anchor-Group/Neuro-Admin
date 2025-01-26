@@ -11,61 +11,50 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - uses: actions/checkout@v4
 
-      # Set up Node.js
-      - name: Set up Node.js
+      - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
 
-      # Install dependencies and build
-      - name: Install dependencies and build
+      - name: Install dependencies and build app
         run: |
           npm install
           npm run build
-          echo "Contents of .next/standalone:"
-          ls -la .next/standalone
-
-      # Prepare deployment package
-      - name: Prepare deployment package
+      - name: Zip build artifacts for deployment
         run: |
-          mkdir -p out
-          cp -r .next/standalone/* out/
-          cp -r .next/static out/.next/static
-          cp -r public out/public
-          echo "Contents of out directory:"
-          ls -la out
-          cd out && zip -r ../release.zip .
-
-      # Upload artifact
-      - name: Upload artifact
+          mkdir deploy
+          mv .next deploy/  # Adjust this for your build folder (e.g., dist)
+          mv package.json deploy/
+          mv package-lock.json deploy/
+          zip -r release.zip deploy/
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
+          name: node-app
           path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-
+    environment:
+      name: 'Production'
+    
     steps:
-      # Download artifact
-      - name: Download artifact
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: app-release
+          name: node-app
 
-      # Inspect the zip file
-      - name: Inspect release.zip
-        run: unzip -l release.zip
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
 
       # Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'Neuro-Admin'
+          app-name: 'Neuro-Shop'
           slot-name: 'Production'
-          package: release.zip
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3EEF8E8ED6AE4AC699E0F66A50A79DC2 }}
+          package: ./deploy
+           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7048224BA48E4825A6E6A3F20F4786C3 }}
