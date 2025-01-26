@@ -21,19 +21,62 @@ jobs:
           node-version: '20.x'
 
       # Install dependencies and build
-      - name: npm install, build, and test
+      - name: Install dependencies and build
         run: |
           npm install
           npm run build
-          mv ./build/static ./build/standalone/build
-          mv ./public ./build/standalone
+
+      # Prepare deployment package
+      - name: Prepare deployment package
+        run: |
+          # Create output directory
+          mkdir -p build/standalone
+
+          # Move standalone files
+          mv .next/standalone/* build/standalone/
+
+          # Copy public and static directories
+          cp -r public build/standalone/public
+          cp -r .next/static build/standalone/static
+
+          # Ensure `server.js` and `package.json` are in the right place
+          cp server.js package.json build/standalone/
+
+          # Debug: Check directory contents
+          echo "Contents of build/standalone:"
+          ls -la build/standalone
+
+          # Create deployment zip
+          cd build/standalone
+          zip -r ../../release.zip .
+
+      # Upload artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: release.zip
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      # Download artifact
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-release
+
+      # Inspect the zip file
+      - name: Inspect release.zip
+        run: unzip -l release.zip
 
       # Deploy to Azure Web App
-    
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Neuro-Admin'
           slot-name: 'Production'
-          package: ./build/standalone
+          package: release.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3EEF8E8ED6AE4AC699E0F66A50A79DC2 }}
