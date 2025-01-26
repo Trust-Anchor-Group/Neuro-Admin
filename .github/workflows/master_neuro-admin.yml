@@ -25,18 +25,21 @@ jobs:
         run: |
           npm install
           npm run build
-          ls -la .next        # Debug: Check `.next` directory content
 
       # Prepare deployment package
       - name: Prepare deployment package
         run: |
+          # Create output directory
           mkdir -p out
-          cp -r .next/standalone/* out/            # Include standalone build files
-          cp -r .next/static out/static            # Include static files
-          cp -r public out/public                  # Include public assets
-          cp -r node_modules out/node_modules      # Include node_modules
-          cp package.json out/package.json         # Ensure package.json is included
-          ls -la out                               # Debug: Verify `out` structure
+          
+          # Copy standalone files
+          cp -r .next/standalone/* out/
+          
+          # Copy public and static folders
+          cp -r public out/public
+          cp -r .next/static out/static
+          
+          # Create the deployment zip
           cd out && zip -r ../release.zip .
 
       # Upload artifact
@@ -58,6 +61,7 @@ jobs:
           name: app-release
 
       # Deploy to Azure Web App
+    
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
