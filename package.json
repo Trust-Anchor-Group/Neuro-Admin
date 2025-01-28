@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^11.0.5"
     "mapbox-gl": "^3.9.3",
     "next": "15.1.4",
     "react": "^19.0.0",
@@ -16,6 +19,7 @@
     "react-icons": "^5.4.0",
     "react-map-gl": "^7.1.8",
     "recharts": "^2.15.0"
+
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
