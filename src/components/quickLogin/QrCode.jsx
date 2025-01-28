@@ -4,7 +4,7 @@ import {fetchQrCode} from "@/utils/quickLogin";
 import {updateServiceIdSession} from "@/utils/quickLogin";
 
 export default function QrCode({initialQrCodeUrl, service, serviceId, sessionId, tabId}) {
-
+const [user, setUser] = useState(null);
   const [qrCodeUrl, setQrCodeUrl] = useState(initialQrCodeUrl);
   const timeoutSessionRef = useRef(null);
   const timeoutNewQrCodeRef = useRef(null)
@@ -71,6 +71,9 @@ export default function QrCode({initialQrCodeUrl, service, serviceId, sessionId,
         credentials: 'include'
       });
       console.log('RESULT TOKEN:', res);
+       const data = await res.json();
+      console.log('RESULT DATA:', data);
+       setUser(data.identity);
     } catch (error) {
       console.log('Something went wrong...', error);
     }
@@ -85,6 +88,7 @@ export default function QrCode({initialQrCodeUrl, service, serviceId, sessionId,
       <>
       {qrCodeUrl && <img src={qrCodeUrl} alt="Neuro-admin QR code for QuickLogin" />};
       <button onClick={() => fetchCookie()}>Fetch!!!</button>
+      {user && <p>Welcome, {user.id || "User"}!</p>}
       </>
   )
 }
