@@ -1,34 +1,33 @@
 import ResponseModel from "@/models/ResponseModel";
 import { cookies } from "next/headers";
 
-export async function GET(req) {
+export async function GET() {
   try {
+    const cookieStore = cookies();
+    const token = cookieStore.get("access-token")?.value;
 
-      const cookieStore = await cookies();
-      const token = cookieStore.get('token')?.value;
-
-      console.log('222 COOKIESTORE', cookieStore);
-      console.log('THE TOKEN', token);
-
-      if(!token){
-          return new Response(JSON.stringify(new ResponseModel(401, 'Not Authorized')), {
-              headers: {
-                  'Content-Type': 'application/json',
-                  "Access-Control-Allow-Origin": "http://localhost:3000",
-                  "Access-Control-Allow-Credentials": "true"
-              }
-          })
-      }
-      console.log('GET RESPONSE TOKEN: ', token);
-      return new Response(JSON.stringify(new ResponseModel(200, 'Token')), {
-          headers: {
-              'Content-Type': 'application/json',
-              "Access-Control-Allow-Origin": "http://localhost:3000",
-              "Access-Control-Allow-Credentials": "true"
-          }
+    if (!token) {
+      return new Response(JSON.stringify(new ResponseModel(401, 'Unauthorized')), {
+        status: 401,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-
-  }   catch (error){
-      console.log('error res token:', error);
+    }
+   const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('GET DECODED TOKEN: ', decoded);
+    console.log('GET RESPONSE TOKEN: ', token);
+   return new Response(JSON.stringify({ identity: decoded }), {
+      headers: { "Content-Type": "application/json" },
+      status: 200,
+    });
+  }  catch (error) {
+    console.log('error res token:', error);
+    return new Response(JSON.stringify(new ResponseModel(500, 'Internal Server Error')), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 }
