@@ -1,5 +1,5 @@
 
-import UserCard from "@/components/UserCard";
+import UserCard from "@/components/ui/UserCard";
 
 const AdminPage = () => {
   return (
