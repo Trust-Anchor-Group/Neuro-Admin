@@ -15,39 +15,32 @@ export async function POST(request) {
 
         const jwt = jwtSign(payload, {expiresIn: '1h'})
 
-     // const cookieStore = await cookies();
-     //    cookieStore.set({
-     //        name: 'access-token',
-     //        value: JSON.stringify(jwt),
-     //        httpOnly: true,
-     //        path: '/',
-     //        sameSite: true
-     //    }); 
         const cookieStore = await cookies();
             cookieStore.set({
-              name: "token",
-              value: jwt,
-              httpOnly: true, 
-              sameSite: "none",
-              path: "/",
-              maxAge: 3600,
-                secure: false
-            });
+                name: "access-token",
+                value: jwt, 
+                httpOnly: true, 
+                secure: process.env.NODE_ENV === "production", 
+                sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+                path: "/", 
+                maxAge: 3600,
+                });
+
 
             console.log('SET CALLBACK COOKIESTORE: ', cookieStore);
 
         return new Response(JSON.stringify(new ResponseModel(200, 'Callback recieved')), {
             headers: {
-                // 'Set-Cookie': cookieStore,
                 'Content-Type': 'application/json',
-                "Access-Control-Allow-Origin": "http://localhost:3000",
-                "Access-Control-Allow-Credentials": "true"
             }
         });
 
     } catch (error){
         const statusCode = error.statusCode || 500;
         const message = error.message || 'Internal Server Error';
-        return new Response(JSON.stringify(new ResponseModel(statusCode, message)));
+        return new Response(
+      JSON.stringify({ message, statusCode }),
+      { status: statusCode, headers: { "Content-Type": "application/json" } }
+    );
     }
 }
