@@ -66,7 +66,10 @@ export default function QrCode({initialQrCodeUrl, service, serviceId, sessionId,
   const fetchCookie = async () => {
     console.log('Fetching cookie...');
     try {
-      const res = await fetch('http://localhost:3000/api/auth/quickLogin/me');
+      const res = await fetch('https://5086-13-53-207-73.ngrok-free.app/api/auth/quickLogin/me', {
+        method: 'GET',
+        credentials: 'include'
+      });
       console.log('RESULT TOKEN:', res);
     } catch (error) {
       console.log('Something went wrong...', error);

@@ -11,7 +11,7 @@ export default {
         }
     },
     quickLogin: {
-        callBackUrl: 'https://4d77-13-53-207-73.ngrok-free.app/api/auth/quickLogin/callback', // HTTPS only
+        callBackUrl: 'https://5086-13-53-207-73.ngrok-free.app/api/auth/quickLogin/callback', // HTTPS only
     },
     jwt: {
         secretKey: process.env.JWT_SECRET_KEY,

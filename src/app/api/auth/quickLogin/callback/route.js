@@ -23,19 +23,25 @@ export async function POST(request) {
      //        path: '/',
      //        sameSite: true
      //    }); 
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
             cookieStore.set({
-              name: "access-token",
-              value: token, 
+              name: "token",
+              value: jwt,
               httpOnly: true, 
-              sameSite: "strict", 
-              path: "/", 
+              sameSite: "none",
+              path: "/",
               maxAge: 3600,
+                secure: false
             });
+
+            console.log('SET CALLBACK COOKIESTORE: ', cookieStore);
+
         return new Response(JSON.stringify(new ResponseModel(200, 'Callback recieved')), {
             headers: {
                 // 'Set-Cookie': cookieStore,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Access-Control-Allow-Origin": "http://localhost:3000",
+                "Access-Control-Allow-Credentials": "true"
             }
         });
 
