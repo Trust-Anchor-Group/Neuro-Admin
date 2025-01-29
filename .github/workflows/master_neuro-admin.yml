@@ -58,5 +58,5 @@ jobs:
           app-name: 'Neuro-Admin'
           slot-name: ${{ github.ref == 'refs/heads/master' && 'Production' || 'dev' }}
           package: ./deploy
-          publish-profile: ${{ github.ref == 'refs/heads/master' && secrets.AZURE_NEUR_ADMIN_PROD || secrets.AZURE_NEURO_ADMIN_DEV_}}
+          publish-profile: ${{ github.ref == 'refs/heads/master' && secrets.AZURE_NEURO_ADMIN_PROD || secrets.AZURE_NEURO_ADMIN_DEV}}
           
