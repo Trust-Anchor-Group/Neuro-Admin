@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - dev
   workflow_dispatch:
 
 jobs:
@@ -55,6 +56,7 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Neuro-Admin'
-          slot-name: 'Production'
+          slot-name: ${{ github.ref == 'refs/heads/master' && 'Production' || 'dev' }}
           package: ./deploy
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3EEF8E8ED6AE4AC699E0F66A50A79DC2 }}
+          publish-profile: ${{ github.ref == 'refs/heads/master' && secrets.AZURE_NEURO_ADMIN_PROD || secrets.AZURE_NEURO_ADMIN_DEV}}
+          
