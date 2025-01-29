@@ -66,7 +66,9 @@ const [user, setUser] = useState(null);
   const fetchCookie = async () => {
     console.log('Fetching cookie...');
     try {
-      const res = await fetch('https://5086-13-53-207-73.ngrok-free.app/api/auth/quickLogin/me', {
+      const { protocol, origin } = config;
+    const url = `${protocol}://${origin}/api/auth/quickLogin/me`;
+      const res = await fetch( url, {
         method: 'GET',
         credentials: 'include'
       });

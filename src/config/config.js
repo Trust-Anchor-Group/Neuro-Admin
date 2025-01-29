@@ -2,18 +2,20 @@ import dotenv from 'dotenv';
 
 dotenv.config({path: './.env'});
 
-export default {
-    protocol: 'http',
-    origin: 'localhost:3000',
+const config = {
+    protocol: 'https',
+    origin: 'neuro-admin-dev-gnega5g4acbpfddm.germanywestcentral-01.azurewebsites.net',
     api: {
         agent: {
             host: 'https://lab.tagroot.io',
         }
     },
     quickLogin: {
-        callBackUrl: 'https://5086-13-53-207-73.ngrok-free.app/api/auth/quickLogin/callback', // HTTPS only
+        callBackUrl: 'https://neuro-admin-dev-gnega5g4acbpfddm.germanywestcentral-01.azurewebsites.net/api/auth/quickLogin/callback', // HTTPS only
     },
     jwt: {
         secretKey: process.env.JWT_SECRET_KEY,
     }
-}
+};
+
+export default config;
