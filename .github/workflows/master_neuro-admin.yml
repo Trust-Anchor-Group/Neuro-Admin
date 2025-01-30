@@ -23,20 +23,17 @@ jobs:
         run: |
           npm install
           npm run build
-          
+
       - name: Zip build artifacts for deployment
         run: |
           mkdir deploy
-          # Copy Next.js standalone output
-          mv .next/standalone deploy/
-          # Copy static assets
-          mv .next/static deploy/.next/static
-          mv public deploy/public
-          # Copy package files
+          mv .next deploy/  # Non-standalone deployment
+          mv public deploy/
           mv package.json deploy/
           mv package-lock.json deploy/
+          mv node_modules deploy/  # Include dependencies if needed
           zip -r release.zip deploy/
-      
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -47,8 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
-    
+      name: ${{ github.ref == 'refs/heads/master' && 'Production' || 'Development' }}
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -58,11 +55,15 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      # Deploy to Azure Web App
+      - name: Debug Deployed Files
+        run: |
+          echo "Checking deployed files..."
+          ls -la ./deploy
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Neuro-Admin'
           slot-name: ${{ github.ref == 'refs/heads/master' && 'Production' || 'dev' }}
           package: ./deploy
-          publish-profile: ${{ github.ref == 'refs/heads/master' && secrets.AZURE_NEURO_ADMIN_PROD || secrets.AZURE_NEURO_ADMIN_DEV}}
+          publish-profile: ${{ github.ref == 'refs/heads/master' && secrets.AZURE_NEURO_ADMIN_PROD || secrets.AZURE_NEURO_ADMIN_DEV }}
