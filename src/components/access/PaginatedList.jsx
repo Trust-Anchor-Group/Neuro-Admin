@@ -1,8 +1,13 @@
-import { Check, Clock, XCircle } from 'lucide-react';
+import { getUserList } from '@/app/utils/getUserList';
 import React from 'react'
-import { userList } from '@/app/(dashboard)/mockdata/userList';
+import { FaCheck, FaClock, FaTimesCircle } from 'react-icons/fa';
 
-export const PaginatedList = () => {
+
+
+export const PaginatedList = async () => {
+    
+   const userList = await getUserList()
+
     return (
         <div className='p-5 border-2 bg-white rounded-xl overflow-x-auto md:overflow-x-hidden'>
             <h2 className='text-center mb-10 text-xl font-semibold md:text-3xl'>User&nbsp;List</h2>
@@ -27,17 +32,17 @@ export const PaginatedList = () => {
                                 <div className="flex items-center justify-center gap-2">
                                     {user.status === "Active" ? (
                                         <>
-                                            <Check className='text-green-500' />
+                                            <FaCheck className='text-green-500' />
                                             <span className="text-green-600 hidden md:inline">Active</span>
                                         </>
                                     ) : user.status === "Pending" ? (
                                         <>
-                                            <Clock className='text-orange-500' />
+                                            <FaClock className='text-orange-500' />
                                             <span className="text-orange-500 hidden md:inline">Pending</span>
                                         </>
                                     ) : (
                                         <>
-                                            <XCircle className='text-red-500' />
+                                            <FaTimesCircle className='text-red-500' />
                                             <span className="text-red-500 hidden md:inline">Revoked</span>
                                         </>
                                     )}

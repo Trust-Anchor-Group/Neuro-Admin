@@ -1,10 +1,10 @@
-'use client'
+
 import { PaginatedList } from '@/components/access/PaginatedList'
-import React, { useState } from 'react'
+import React from 'react'
 
 const AccessPage = () => {
 
-
+  
 
   return (
     <div>
