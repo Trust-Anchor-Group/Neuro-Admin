@@ -26,7 +26,8 @@ jobs:
       - name: Zip build artifacts for deployment
         run: |
           mkdir deploy
-          mv .next deploy/  # Adjust this for your build folder (e.g., dist)
+          mv .next/standalone deploy/
+          mv public deploy/public
           mv package.json deploy/
           mv package-lock.json deploy/
           zip -r release.zip deploy/
