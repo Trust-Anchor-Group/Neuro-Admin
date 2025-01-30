@@ -1,62 +1,92 @@
-name: Build and deploy Next.js 15 app to Azure Web App - Neuro-Admin
+name: Generate Release Notes for Next.js 15
 
 on:
   push:
-    branches:
-      - master
-      - dev
-  workflow_dispatch:
+    tags:
+      - 'v*.*.*'  # Trigger the workflow on versioned tags like v1.0.0
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Fetch full history for all branches and tags
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.x'
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'  # Specify the Node.js version compatible with Next.js 15
+        cache: 'npm'  # Cache npm dependencies for faster builds
 
-      - name: Install dependencies and build app
-        run: |
-          npm install
-          npm run build
-      - name: Zip build artifacts for deployment
-        run: |
-          mkdir deploy
-          mv .next deploy/  # Adjust this for your build folder (e.g., dist)
-          mv package.json deploy/
-          mv package-lock.json deploy/
-          zip -r release.zip deploy/
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: release.zip
+    - name: Verify tag push
+      id: verify_tag_push
+      run: |
+        if [[ "${GITHUB_REF}" != refs/tags/* ]]; then
+          echo "This is not a tag push. Exiting."
+          exit 1
+        fi
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-    
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: node-app
+    - name: Extract tag name
+      run: echo "TAG_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
+    - name: Debug tag name
+      run: echo "Tag name is ${{ env.TAG_NAME }}"
 
-      # Deploy to Azure Web App
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'Neuro-Admin'
-          slot-name: ${{ github.ref == 'refs/heads/master' && 'Production' || 'dev' }}
-          package: ./deploy
-          publish-profile: ${{ github.ref == 'refs/heads/master' && secrets.AZURE_NEURO_ADMIN_PROD || secrets.AZURE_NEURO_ADMIN_DEV}}
-          
+    - name: Get previous tag
+      id: prev_tag
+      run: echo "PREV_TAG=$(git describe --tags --abbrev=0 ${GITHUB_REF}^)" >> $GITHUB_ENV || echo "PREV_TAG=" >> $GITHUB_ENV
+
+    - name: Debug previous tag
+      run: echo "Previous tag is ${{ env.PREV_TAG }}"
+
+    - name: Generate Release Notes
+      id: generate_release_notes
+      run: |
+        echo "## Release Notes" > release_notes.md
+        echo "### Features" >> release_notes.md
+        if [ -n "${{ env.PREV_TAG }}" ]; then
+          git log ${{ env.PREV_TAG }}..${{ env.TAG_NAME }} --pretty=format:"* %s" --grep '^feat' >> release_notes.md
+        else
+          git log --pretty=format:"* %s" --grep '^feat' >> release_notes.md
+        fi
+        echo "" >> release_notes.md
+        echo "### Bug Fixes" >> release_notes.md
+        if [ -n "${{ env.PREV_TAG }}" ]; then
+          git log ${{ env.PREV_TAG }}..${{ env.TAG_NAME }} --pretty=format:"* %s" --grep '^fix' >> release_notes.md
+        else
+          git log --pretty-format:"* %s" --grep '^fix' >> release_notes.md
+        fi
+        echo "" >> release_notes.md
+        echo "### Documentation" >> release_notes.md
+        if [ -n "${{ env.PREV_TAG }}" ]; then
+          git log ${{ env.PREV_TAG }}..${{ env.TAG_NAME }} --pretty=format:"* %s" --grep '^docs' >> release_notes.md
+        else
+          git log --pretty-format:"* %s" --grep '^docs' >> release_notes.md
+        fi
+        echo "" >> release_notes.md
+        echo "### Dependency Updates" >> release_notes.md
+        git log --pretty=format:"* %s" --grep '^chore' >> release_notes.md
+        cat release_notes.md
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.TAG_NAME }}
+        release_name: Release ${{ env.TAG_NAME }}
+        body_path: ./release_notes.md
+        draft: false
+        prerelease: false
+
+    - name: Install Dependencies
+      run: npm install  # Use npm for dependency management
+
+    - name: Build Next.js Project
+      run: npm run build  # Builds the Next.js application
+
+    - name: Run Tests
+      run: npm test  # Executes tests to ensure stability before release
