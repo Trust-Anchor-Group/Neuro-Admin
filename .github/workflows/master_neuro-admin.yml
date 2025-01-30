@@ -25,12 +25,13 @@ jobs:
           npm run build
       - name: Zip build artifacts for deployment
         run: |
-          mkdir deploy
-          mv .next/standalone deploy/
-          mv public deploy/public
-          mv package.json deploy/
-          mv package-lock.json deploy/
-          zip -r release.zip deploy/
+           mkdir deploy
+            mv .next/standalone deploy/
+            mv .next/static deploy/.next/static
+            mv public deploy/public
+            mv package.json deploy/
+            mv package-lock.json deploy/
+            zip -r release.zip deploy/
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
