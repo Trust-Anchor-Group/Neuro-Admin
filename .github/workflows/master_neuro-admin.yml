@@ -26,14 +26,13 @@ jobs:
 
       - name: Zip build artifacts for deployment
         run: |
-          mkdir deploy
-          mv .next deploy/  # Non-standalone deployment
+         mkdir deploy
+          mv .next deploy/  # Adjust this for your build folder (e.g., dist)
           mv public deploy/
           mv package.json deploy/
           mv package-lock.json deploy/
-          mv node_modules deploy/  # Include dependencies if needed
+          mv node_modules deploy/  # Include dependencies for dev slot
           zip -r release.zip deploy/
-
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
