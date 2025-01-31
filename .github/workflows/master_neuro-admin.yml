@@ -21,19 +21,23 @@ jobs:
 
       - name: Install dependencies and build app
         run: |
-          npm install
-          npm run build
-          # Debug: Check if API routes exist
-          echo "Checking API routes:"
-          ls -la .next/server/pages/api || echo "No API routes found!"
-          ls -la .next/server/app/api || echo "No App Router API routes found!"
+           npm install
+           npm run build
+           # Debug: Check if .next/static exists
+           if [ -d ".next/static" ]; then
+            echo "✅ .next/static exists!"
+           else
+            echo "⚠️ .next/static is missing!"
+           fi
 
       - name: Zip build artifacts for deployment
         run: |
-         mkdir deploy
+          mkdir deploy
           mv .next/standalone deploy/
-          mv .next/server deploy/  # <-- Ensure API routes are included
-          mv .next/static deploy/.next/static
+          mv .next/server deploy/  # Ensure API routes are included
+          if [ -d ".next/static" ]; then  # Only move static if it exists
+            mv .next/static deploy/.next/static
+          fi
           mv public deploy/public
           mv package.json deploy/
           mv package-lock.json deploy/
