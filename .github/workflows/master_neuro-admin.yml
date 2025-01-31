@@ -23,15 +23,20 @@ jobs:
         run: |
           npm install
           npm run build
+          # Debug: Check if API routes exist
+          echo "Checking API routes:"
+          ls -la .next/server/pages/api || echo "No API routes found!"
+          ls -la .next/server/app/api || echo "No App Router API routes found!"
 
       - name: Zip build artifacts for deployment
         run: |
          mkdir deploy
-          mv .next deploy/  # Adjust this for your build folder (e.g., dist)
-          mv public deploy/
+          mv .next/standalone deploy/
+          mv .next/server deploy/  # <-- Ensure API routes are included
+          mv .next/static deploy/.next/static
+          mv public deploy/public
           mv package.json deploy/
           mv package-lock.json deploy/
-          mv node_modules deploy/  # Include dependencies for dev slot
           zip -r release.zip deploy/
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
