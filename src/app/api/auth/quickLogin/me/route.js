@@ -1,6 +1,6 @@
 import ResponseModel from "@/models/ResponseModel";
 import { cookies } from "next/headers";
-
+import { jwtVerify } from "@/utils/jwt";
 export async function GET() {
   try {
     const cookieStore = cookies();
@@ -14,7 +14,7 @@ export async function GET() {
         },
       });
     }
-   const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwtVerify(token, process.env.JWT_SECRET);
     console.log('GET DECODED TOKEN: ', decoded);
     console.log('GET RESPONSE TOKEN: ', token);
    return new Response(JSON.stringify({ identity: decoded }), {
