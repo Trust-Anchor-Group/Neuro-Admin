@@ -21,32 +21,38 @@ jobs:
 
       - name: Install dependencies and build app
         run: |
-           npm install
-           npm run build
+             npm install
+             npm run build
 
-           # Debug: Check if .next/static exists
-           if [ -d ".next/static" ]; then
-            echo "✅ .next/static exists!"
-           else
-            echo "⚠️ .next/static is missing!"
-           fi
+              # Debug: Check directory structure
+              echo "Checking .next structure..."
+              ls -la .next
+
+              # Debug: Check for standalone and static files
+               echo "Checking .next/standalone/.next/static..."
+              ls -la .next/standalone/.next/static || echo "⚠️ .next/standalone/.next/static is missing!"
+
+              echo "Checking .next/static..."
+              ls -la .next/static || echo "⚠️ .next/static is missing!"
 
       - name: Zip build artifacts for deployment
         run: |
           mkdir deploy
-          mv .next/standalone deploy/
-          mv .next/server deploy/
+          mv .next/standalone deploy/ || echo "⚠️ No .next/standalone found, skipping..."
+          mv .next/server deploy/ || echo "⚠️ No .next/server found, skipping..."
 
           # Ensure static assets are copied correctly
           if [ -d ".next/static" ]; then
+            echo "✅ Moving .next/static..."
             mv .next/static deploy/.next/static
           elif [ -d ".next/standalone/.next/static" ]; then
+            echo "✅ Moving .next/standalone/.next/static..."
             mv .next/standalone/.next/static deploy/.next/static
           else
             echo "⚠️ No .next/static found!"
           fi
 
-          mv public deploy/public
+          mv public deploy/public || echo "⚠️ No public folder found, skipping..."
           mv package.json deploy/
           mv package-lock.json deploy/
           zip -r release.zip deploy/
