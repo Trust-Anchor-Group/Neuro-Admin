@@ -24,7 +24,7 @@ jobs:
           npm install
           npm run build
 
-          # Debugging: Check for static folder locations
+          # Debugging: Check static folder locations
           echo "Checking .next/static path..."
           if [ -d ".next/static" ]; then
             echo "✅ Found .next/static"
@@ -32,29 +32,15 @@ jobs:
             echo "⚠️ .next/static NOT found!"
           fi
 
-          if [ -d ".next/standalone/.next/static" ]; then
-            echo "✅ Found .next/standalone/.next/static"
-          else
-            echo "⚠️ .next/standalone/.next/static NOT found!"
-          fi
-
       - name: Zip build artifacts for deployment
         run: |
-          mkdir deploy
-          mv .next/standalone deploy/ || mv .next deploy/  # Handle both cases
+          mkdir -p deploy/.next  # ✅ Ensure `deploy/.next` exists
+          mv .next deploy/.next  # ✅ Move everything inside `.next`
           mv package.json deploy/
           mv package-lock.json deploy/
 
-          # Copy the correct `.next/static` path
-          if [ -d ".next/static" ]; then
-            mv .next/static deploy/.next/static
-          elif [ -d ".next/standalone/.next/static" ]; then
-            mv .next/standalone/.next/static deploy/.next/static
-          else
-            echo "⚠️ No .next/static found!"
-          fi
-
           zip -r release.zip deploy/
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
