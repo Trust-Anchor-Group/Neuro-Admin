@@ -24,20 +24,39 @@ jobs:
           npm install
           npm run build
 
-          # Debugging: Check static folder locations
-          echo "Checking .next/static path..."
-          if [ -d ".next/static" ]; then
-            echo "✅ Found .next/static"
-          else
-            echo "⚠️ .next/static NOT found!"
-          fi
+          # Debugging: Verify required folders exist
+          echo "Checking .next directory..."
+          ls -la .next
 
-      - name: Zip build artifacts for deployment
+          echo "Checking .next/server directory (API routes)..."
+          ls -la .next/server || echo "⚠️ .next/server NOT found!"
+
+          echo "Checking .next/static directory..."
+          ls -la .next/static || echo "⚠️ .next/static NOT found!"
+
+      - name: Prepare deployment package
         run: |
-          mkdir -p deploy/.next  # ✅ Ensure `deploy/.next` exists
-          mv .next deploy/.next  # ✅ Move everything inside `.next`
-          mv package.json deploy/
-          mv package-lock.json deploy/
+          mkdir -p deploy/.next/server
+          mkdir -p deploy/.next/static
+          mkdir -p deploy/node_modules
+          mkdir -p deploy/public
+
+          # Copy Next.js build output
+          cp -r .next/server deploy/.next/server  # ✅ Include API routes
+          cp -r .next deploy/.next
+          cp -r node_modules deploy/node_modules
+          cp -r public deploy/public
+
+          # Copy necessary package files
+          cp package.json deploy/
+          cp package-lock.json deploy/
+
+          # Move server.js to the root (needed for standalone)
+          cp .next/standalone/server.js deploy/server.js || echo "⚠️ server.js NOT found!"
+
+          # Debugging: Check the structure before zipping
+          echo "Final deploy folder structure:"
+          ls -la deploy
 
           zip -r release.zip deploy/
 
