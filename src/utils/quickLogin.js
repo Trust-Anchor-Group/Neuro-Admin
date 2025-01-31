@@ -48,6 +48,10 @@ export const fetchQrCode = async ({ serviceId, tabId, sessionId }) => {
             body: JSON.stringify({ serviceId, tabId, sessionId }),
         });
 
+        if(!response.ok){
+            throw new Error(`Error fetching QR code: ${response.statusText}`);
+        }
+
         const responseData = await response.json();
 
         return responseData.data.src;
