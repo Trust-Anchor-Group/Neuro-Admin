@@ -3,7 +3,7 @@ name: Generate Release Notes for Next.js 15
 on:
   push:
     tags:
-      - 'v*..'  # Trigger the workflow on versioned tags like v1.0.0
+      - 'v*.*.*'  # Trigger the workflow on versioned tags like v1.0.0
 
 jobs:
   release:

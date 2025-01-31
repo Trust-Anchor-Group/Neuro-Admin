@@ -1,5 +1,6 @@
 'use client';
 import React, {useEffect, useRef, useState} from 'react';
+import config from '@/config/config';
 import {fetchQrCode} from "@/utils/quickLogin";
 import {updateServiceIdSession} from "@/utils/quickLogin";
 
