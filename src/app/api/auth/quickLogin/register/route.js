@@ -33,11 +33,30 @@ export async function POST(request) {
         }
 
         if (!response.ok) {
-            return new Response(JSON.stringify(new ResponseModel(response.status, data || 'Failed to fetch Service ID')), { headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify(new ResponseModel(response.status, data || 'Failed to fetch Service ID')), {
+                status: response.status,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
         }
 
-        return new Response(JSON.stringify(new ResponseModel(response.status, 'Successfully fetched Service ID', data)), { headers: { 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify(new ResponseModel(200, 'Successfully fetched Service ID', data)), {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
     } catch (error) {
-        return new Response(JSON.stringify(new ResponseModel(error.statusCode, error.message)), { headers: { 'Content-Type': 'application/json' } });
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'Internal Server Error';
+        return new Response(JSON.stringify(new ResponseModel(statusCode, message)),{
+                status: statusCode,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
     }
 }
