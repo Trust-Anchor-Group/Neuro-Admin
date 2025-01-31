@@ -23,6 +23,7 @@ jobs:
         run: |
            npm install
            npm run build
+
            # Debug: Check if .next/static exists
            if [ -d ".next/static" ]; then
             echo "✅ .next/static exists!"
@@ -34,10 +35,17 @@ jobs:
         run: |
           mkdir deploy
           mv .next/standalone deploy/
-          mv .next/server deploy/  # Ensure API routes are included
-          if [ -d ".next/static" ]; then  # Only move static if it exists
+          mv .next/server deploy/
+
+          # Ensure static assets are copied correctly
+          if [ -d ".next/static" ]; then
             mv .next/static deploy/.next/static
+          elif [ -d ".next/standalone/.next/static" ]; then
+            mv .next/standalone/.next/static deploy/.next/static
+          else
+            echo "⚠️ No .next/static found!"
           fi
+
           mv public deploy/public
           mv package.json deploy/
           mv package-lock.json deploy/
