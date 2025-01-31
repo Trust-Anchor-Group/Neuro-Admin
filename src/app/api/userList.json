@@ -18,5 +18,6 @@
     { "userId": "312540", "name": "Camilla Hansson", "email": "camilla.hansson@email.com", "accessLevel": "Admin", "status": "Active" },
     { "userId": "658493", "name": "Daniel Larsson", "email": "daniel.larsson@email.com", "accessLevel": "User", "status": "Active" },
     { "userId": "120987", "name": "Malin Öberg", "email": "malin.oberg@email.com", "accessLevel": "Guest", "status": "Pending" },
-    { "userId": "907341", "name": "Patrik Holm", "email": "patrik.holm@email.com", "accessLevel": "Admin", "status": "Revoked" }
+    { "userId": "907341", "name": "Patrik Holm", "email": "patrik.holm@email.com", "accessLevel": "Admin", "status": "Revoked" },
+    { "userId": "907342", "name": "Patrik Andersson", "email": "patrik.andersson@email.com", "accessLevel": "Admin", "status": "Revoked" }
   ]

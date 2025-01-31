@@ -6,7 +6,7 @@ export const PaginatedList = async ({userList}) => {
 
 
     return (
-        <div className='p-5 border-2 bg-white rounded-xl overflow-x-auto md:overflow-x-hidden'>
+        <div className='p-5 border-2 bg-white rounded-xl overflow-x-auto md:overflow-x-hidden min-w-[800px] min-h-[400px]'>
             <h2 className='text-center mb-10 text-xl font-semibold md:text-3xl'>User&nbsp;List</h2>
             <table className='w-full table-auto border-collapse'>
                 <thead>
