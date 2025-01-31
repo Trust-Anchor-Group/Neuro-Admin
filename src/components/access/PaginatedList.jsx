@@ -1,12 +1,9 @@
-import { getUserList } from '@/app/utils/getUserList';
+'use server'
 import React from 'react'
 import { FaCheck, FaClock, FaTimesCircle } from 'react-icons/fa';
 
+export const PaginatedList = async ({userList}) => {
 
-
-export const PaginatedList = async () => {
-    
-   const userList = await getUserList()
 
     return (
         <div className='p-5 border-2 bg-white rounded-xl overflow-x-auto md:overflow-x-hidden'>

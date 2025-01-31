@@ -8,5 +8,15 @@
     { "userId": "051437", "name": "Erik Lundberg", "email": "erik.lundberg@email.com", "accessLevel": "User", "status": "Active" },
     { "userId": "537735", "name": "Anna Lindqvist", "email": "anna.lindqvist@email.com", "accessLevel": "Admin", "status": "Pending" },
     { "userId": "658752", "name": "John Smith", "email": "john.smith@email.com", "accessLevel": "Guest", "status": "Revoked" },
-    { "userId": "146096", "name": "Sofia Karlsson", "email": "sofia.karlsson@email.com", "accessLevel": "User", "status": "Active" }
+    { "userId": "146096", "name": "Sofia Karlsson", "email": "sofia.karlsson@email.com", "accessLevel": "User", "status": "Active" },
+    { "userId": "872301", "name": "Karin Nilsson", "email": "karin.nilsson@email.com", "accessLevel": "User", "status": "Active" },
+    { "userId": "763520", "name": "Oskar Berg", "email": "oskar.berg@email.com", "accessLevel": "Guest", "status": "Pending" },
+    { "userId": "654872", "name": "Emilia Andersson", "email": "emilia.andersson@email.com", "accessLevel": "Admin", "status": "Revoked" },
+    { "userId": "549032", "name": "Niklas Eriksson", "email": "niklas.eriksson@email.com", "accessLevel": "User", "status": "Pending" },
+    { "userId": "231487", "name": "Felicia Sjöberg", "email": "felicia.sjoberg@email.com", "accessLevel": "Guest", "status": "Active" },
+    { "userId": "984125", "name": "Henrik Blom", "email": "henrik.blom@email.com", "accessLevel": "User", "status": "Revoked" },
+    { "userId": "312540", "name": "Camilla Hansson", "email": "camilla.hansson@email.com", "accessLevel": "Admin", "status": "Active" },
+    { "userId": "658493", "name": "Daniel Larsson", "email": "daniel.larsson@email.com", "accessLevel": "User", "status": "Active" },
+    { "userId": "120987", "name": "Malin Öberg", "email": "malin.oberg@email.com", "accessLevel": "Guest", "status": "Pending" },
+    { "userId": "907341", "name": "Patrik Holm", "email": "patrik.holm@email.com", "accessLevel": "Admin", "status": "Revoked" }
   ]
