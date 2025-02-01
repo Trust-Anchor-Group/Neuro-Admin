@@ -21,6 +21,7 @@ jobs:
 
       - name: Install dependencies and build app
         run: |
+          rm -rf .next  # 🚀 Remove cached files
           npm install
           npm run build
 
@@ -36,29 +37,24 @@ jobs:
 
       - name: Prepare deployment package
         run: |
-          mkdir -p deploy/.next/server
-          mkdir -p deploy/.next/static
-          mkdir -p deploy/node_modules
-          mkdir -p deploy/public
-
-          # Copy Next.js build output
-          cp -r .next/server deploy/.next/server  # ✅ Include API routes
-          cp -r .next deploy/.next
-          cp -r node_modules deploy/node_modules
-          cp -r public deploy/public
-
-          # Copy necessary package files
-          cp package.json deploy/
-          cp package-lock.json deploy/
-
-          # Move server.js to the root (needed for standalone)
-          cp .next/standalone/server.js deploy/server.js || echo "⚠️ server.js NOT found!"
-
-          # Debugging: Check the structure before zipping
-          echo "Final deploy folder structure:"
-          ls -la deploy
-
-          zip -r release.zip deploy/
+            mkdir -p deploy/.next/server
+            mkdir -p deploy/.next/static
+            mkdir -p deploy/node_modules
+            mkdir -p deploy/public
+            # Copy Next.js build output
+            cp -r .next/server deploy/.next/server  # ✅ Ensures API routes are included
+            cp -r .next deploy/.next
+            cp -r node_modules deploy/node_modules
+            cp -r public deploy/public
+            # Copy necessary package files
+            cp package.json deploy/
+            cp package-lock.json deploy/
+            # Ensure standalone server.js is included
+            cp .next/standalone/server.js deploy/server.js || echo "⚠️ server.js NOT found!"
+            # Debugging: Check structure
+            echo "Final deploy folder structure:"
+            ls -la deploy
+            zip -r release.zip deploy/
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
