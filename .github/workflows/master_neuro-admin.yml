@@ -19,17 +19,50 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install, build, and test
+      - name: Install dependencies and build app
         run: |
           npm install
           npm run build
-          mv ./build/static ./build/standalone/build
-          mv ./public ./build/standalone
+
+          # Ensure standalone output exists
+          mkdir -p build/standalone
+          
+          # Move standalone files for deployment
+          mv .next/standalone/* build/standalone/
+          cp -r public build/standalone/
+          cp -r .next/static build/standalone/.next/static
+
+      - name: Debug Build Output
+        run: |
+          echo "Checking standalone build directory..."
+          ls -la build/standalone
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build
+          path: build/standalone
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build
+          path: build/standalone
+
+      - name: Debug Deployment Files
+        run: |
+          echo "Checking deployment package..."
+          ls -la build/standalone
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Neuro-Admin'
           slot-name: ${{ github.ref == 'refs/heads/master' && 'Production' || 'dev' }}
-          package: ./build/standalone
+          package: build/standalone
           publish-profile: ${{ github.ref == 'refs/heads/master' && secrets.AZURE_NEURO_ADMIN_PROD || secrets.AZURE_NEURO_ADMIN_DEV }}
