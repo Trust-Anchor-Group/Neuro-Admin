@@ -1,7 +1,9 @@
 import ResponseModel from "@/models/ResponseModel";
 import { cookies } from "next/headers";
 import { jwtVerify } from "@/utils/jwt";
+
 export async function GET() {
+      console.log('🔎 JWT_SECRET:', process.env.JWT_SECRET); 
   try {
     const cookieStore = cookies();
     const token = cookieStore.get("access-token")?.value;
@@ -15,6 +17,7 @@ export async function GET() {
       });
     }
     const decoded = jwtVerify(token, process.env.JWT_SECRET);
+    
     console.log('GET DECODED TOKEN: ', decoded);
     console.log('GET RESPONSE TOKEN: ', token);
    return new Response(JSON.stringify({ identity: decoded }), {
