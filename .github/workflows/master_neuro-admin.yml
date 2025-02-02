@@ -24,18 +24,27 @@ jobs:
           npm install
           npm run build
 
-          # Ensure standalone output exists
-          mkdir -p build/standalone
-          
+          # Ensure standalone output directories exist
+          mkdir -p build/standalone/.next/static
+          mkdir -p build/standalone/public
+
           # Move standalone files for deployment
-          mv .next/standalone/* build/standalone/
-          cp -r public build/standalone/
-          cp -r .next/static build/standalone/.next/static
+          if [ -d ".next/standalone" ]; then
+            mv .next/standalone/* build/standalone/
+          else
+            echo "⚠️ .next/standalone NOT found! Deployment might fail."
+          fi
+
+          # Copy necessary files
+          cp -r public/* build/standalone/public/ || echo "⚠️ No public files found."
+          cp -r .next/static/* build/standalone/.next/static/ || echo "⚠️ No static files found."
 
       - name: Debug Build Output
         run: |
           echo "Checking standalone build directory..."
           ls -la build/standalone
+          echo "Checking .next/static directory..."
+          ls -la build/standalone/.next/static
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
