@@ -12,6 +12,7 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 import { FaSearch } from 'react-icons/fa'
+import { useDebouncedCallback } from 'use-debounce'
 
 const SearchBar = ({placeholder}) => {
 
@@ -19,10 +20,10 @@ const searchParams = useSearchParams() // Get search parameters from the URL
 const pathName = usePathname() // Get the current path
 const { replace } = useRouter() // To navigate when the query changes
 
-function handleSearch(searchTerm){
+const handleSearch = useDebouncedCallback((searchTerm) =>{
        // Create a URLSearchParams object to modify the query parameters
     const params = new URLSearchParams(searchParams)
-  
+    console.log(searchTerm)
     // If we have a search term, set it in the URL query, otherwise delete it
     if(searchTerm){
         params.set('query',searchTerm)
@@ -32,7 +33,7 @@ function handleSearch(searchTerm){
 
     // Replace the current URL with the updated query string
     replace(`${pathName}?${params.toString()}`)
-}
+},300)
 
   return (
     <div className='relative flex flex-col justify-center items-center'>

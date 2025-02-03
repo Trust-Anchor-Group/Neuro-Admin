@@ -16,7 +16,8 @@
     "react-dom": "^19.0.0",
     "react-icons": "^5.4.0",
     "react-map-gl": "^7.1.8",
-    "recharts": "^2.15.0"
+    "recharts": "^2.15.0",
+    "use-debounce": "^10.0.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

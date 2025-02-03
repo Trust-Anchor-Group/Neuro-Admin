@@ -9,7 +9,7 @@ export async function GET(req) {
         const page = parseInt(searchParams.get('page') || '1', 10) // Get the page number, default to 1
         const limit = parseInt(searchParams.get('limit') || '5', 10) // Get the limit of users per page, default to 5
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
-        
+        console.log(query)
         // Fetch mock user data from a local JSON file
         const filePath = path.join(process.cwd(), 'src/app/api/userList.json')
         const jsonData = fs.readFileSync(filePath, 'utf-8')
