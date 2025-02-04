@@ -2,6 +2,8 @@
 
 import React from "react";
 import Image from "next/image";
+import QuickLogin from "@/utils/quickLogin";
+import config from "@/config/config";
 
 const LoginPage = () => {
   return (
@@ -14,6 +16,11 @@ const LoginPage = () => {
 
       {/* QR Code */}
       <div className="bg-white shadow-lg rounded-lg p-6">
+        <QuickLogin
+          neuron={config.api.agent}
+          purpose={"Login test"}
+          active={true}
+        />
         {/* Replace this placeholder with your actual QR code */}
         {/* <Image
           src="/qr-code-placeholder.png" // Replace with the actual QR code source
