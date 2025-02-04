@@ -14,7 +14,7 @@ const AccessPage = async ({searchParams}) => {
   const limit = 5
   
   const query = (await searchParams)?.query || ''
-  console.log('Sökterm',query)
+
 
   //Fetch data from backend
   const { data:userList,totalPages } = await getUserList(page,limit,query)
@@ -25,7 +25,7 @@ const AccessPage = async ({searchParams}) => {
     <div>
         <div className='flex justify-center items-center h-screen my-10'>
           <div className='flex flex-col gap-3'>
-            <SearchBar placeholder={'Search...'}/>
+            <SearchBar placeholder={'Search...'} classNameText={'w-full border-2 rounded-md py-3 pl-10 text-sm'}/>
             <PaginatedList userList={userList} />
             <Pagination page={page} prevPage={prevPage} totalPages={totalPages}/>
           </div>

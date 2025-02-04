@@ -14,7 +14,7 @@ import React from 'react'
 import { FaSearch } from 'react-icons/fa'
 import { useDebouncedCallback } from 'use-debounce'
 
-const SearchBar = ({placeholder}) => {
+const SearchBar = ({placeholder,classNameText}) => {
 
 const searchParams = useSearchParams() // Get search parameters from the URL
 const pathName = usePathname() // Get the current path
@@ -39,7 +39,7 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
     <div className='relative flex flex-col justify-center items-center'>
         <label className='text-lg' htmlFor="search">Search</label>
         <input type="text" 
-        className='w-full border-2 rounded-md py-3 pl-10 text-sm'
+        className={classNameText}
         placeholder={placeholder}
         onChange={(e) => handleSearch(e.target.value)}
         defaultValue={searchParams.get('query')?.toString()} />
