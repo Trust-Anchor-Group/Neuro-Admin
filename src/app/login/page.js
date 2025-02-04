@@ -18,7 +18,7 @@ const LoginPage = () => {
       {/* QR Code */}
       <div className="bg-white shadow-lg rounded-lg p-6">
         <QuickLogin
-          neuron={config.api.agent}
+          neuron={config.api.agent.host}
           purpose={"Login test"}
           active={true}
         />
