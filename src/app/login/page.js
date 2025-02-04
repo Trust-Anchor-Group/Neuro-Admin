@@ -2,9 +2,10 @@
 
 import React from "react";
 import Image from "next/image";
-import QuickLogin from "@/utils/quickLogin";
 import config from "@/config/config";
+import dynamic from "next/dynamic";
 
+const QuickLogin = dynamic(() => import("@/components/quickLogin/QuickLogin"), { ssr: false });
 const LoginPage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-50 via-white to-blue-50">
@@ -17,7 +18,7 @@ const LoginPage = () => {
       {/* QR Code */}
       <div className="bg-white shadow-lg rounded-lg p-6">
         <QuickLogin
-          neuron={config.api.agent}
+          neuron={config.api.agent.host}
           purpose={"Login test"}
           active={true}
         />
