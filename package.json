@@ -9,6 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.4.2",
+    "agent-api": "github:Trust-Anchor-Group/AgentApiJavascript#npm-package",
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
     "mapbox-gl": "^3.9.3",
