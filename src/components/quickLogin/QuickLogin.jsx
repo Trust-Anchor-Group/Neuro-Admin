@@ -1,8 +1,26 @@
 "use client"
+
 import { useEffect, useState } from "react";
 import AgentAPI from "agent-api";
 import { CircularProgress, Typography } from "@mui/material";
-import * as events from "@/utils/events.js";
+
+function CreateGUID() {
+  function Segment() {
+    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+  }
+
+  return Segment() + Segment() + '-' + Segment() + '-' + Segment() + '-' + Segment() + '-' + Segment() + Segment() + Segment();
+}
+var TabID
+try {
+  if (window.name.length === 36)
+    TabID = window.name;
+  else
+    TabID = window.name = CreateGUID();
+}
+catch (e) {
+  TabID = CreateGUID();
+}
 
 function uuidv4() {
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
@@ -15,13 +33,13 @@ function uuidv4() {
 
 export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) {
   const [tagSign, setTagSign] = useState();
-  const [tabId, setTabId] = useState(events.TabID);
+  const [tabId, setTabId] = useState(TabID);
   const [success, setSuccess] = useState(false);
   const [serviceId, setServiceId] = useState("");
 
   useEffect(() => {
-    setTabId(events.TabID);
-  }, [events.TabID]);
+    setTabId(TabID);
+  }, [TabID]);
 
 
   let displayInterval = null;
@@ -185,9 +203,8 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
             1800
           );
           AgentAPI.Account.AuthenticateJwt(event.data.AgentApiToken);
-        } else if (event.type === "signStatus") {
-          console.log(event.type);
-          events.signStatus(event);
+        } else if (event.type === "CheckServerInstance") {
+          console.log(event.data);
         }
       } catch (e) {
         console.log(e);
@@ -195,13 +212,17 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
     }
   };
 
-  const displayQuickLogin = () => {
+  const displayQuickLogin = async () => {
     const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = () => {
       if (xhttp.readyState === 4 && xhttp.status === 200) {
         try {
           const data = JSON.parse(xhttp.responseText);
           setTagSign(data.signUrl);
+          let serviceIdValue = window.localStorage.getItem("serviceId")
+          if (serviceIdValue === null || serviceIdValue === "") {
+            window.localStorage.setItem("serviceId", data.serviceId);
+          }
         } catch (err) {
           console.error(err);
         }
@@ -210,14 +231,27 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
     const uri = `${"https:"}//${neuron}/QuickLogin`;
     xhttp.open("POST", uri);
     xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.send(
-      JSON.stringify({
-        serviceId: window.localStorage.getItem("serviceId"),
-        tab: events.TabID,
-        mode: "image",
-        purpose: purpose,
-      })
-    );
+    let serviceIdValue = window.localStorage.getItem("serviceId")
+    if (serviceIdValue === null || serviceIdValue === "") {
+      xhttp.send(
+        JSON.stringify({
+          agentApiTimeout: 1000,
+          serviceId: "",
+          tab: TabID,
+          mode: "image",
+          purpose: purpose,
+        })
+      );
+    } else {
+      xhttp.send(
+        JSON.stringify({
+          serviceId: window.localStorage.getItem("serviceId"),
+          tab: TabID,
+          mode: "image",
+          purpose: purpose,
+        })
+      );
+    }
   };
 
   useEffect(() => {
@@ -262,7 +296,6 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
   }, [active]);
 
   const timeServiceId = async () => {
-   // const response = await getServiceId();
     window.localStorage.setItem("serviceId", "");
   };
 
