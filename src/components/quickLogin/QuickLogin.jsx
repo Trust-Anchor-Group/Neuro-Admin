@@ -231,7 +231,7 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
       }
     };
 
-    const uri = `${"http:"}//${config.origin}/api/auth/quickLogin/session`;
+    const uri = `${config.protocol}://${config.origin}/api/auth/quickLogin/session`;
     xhttp.open("POST", uri);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.withCredentials = true;
