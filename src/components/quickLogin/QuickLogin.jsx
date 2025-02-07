@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AgentAPI from "agent-api";
 import { CircularProgress, Typography } from "@mui/material";
+import config from '@/config/config';
 
 function CreateGUID() {
   function Segment() {
@@ -217,41 +218,33 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
     xhttp.onreadystatechange = () => {
       if (xhttp.readyState === 4 && xhttp.status === 200) {
         try {
-          const data = JSON.parse(xhttp.responseText);
-          setTagSign(data.signUrl);
+          const response = JSON.parse(xhttp.responseText);
+          console.log('DATA FROM ENDPOINT', response);
+          setTagSign(response.data.signUrl);
           let serviceIdValue = window.localStorage.getItem("serviceId")
           if (serviceIdValue === null || serviceIdValue === "") {
-            window.localStorage.setItem("serviceId", data.serviceId);
+            window.localStorage.setItem("serviceId", response.data.serviceId);
           }
         } catch (err) {
           console.error(err);
         }
       }
     };
-    const uri = `${"https:"}//${neuron}/QuickLogin`;
+
+    const uri = `${"http:"}//${config.origin}/api/auth/quickLogin/session`;
     xhttp.open("POST", uri);
     xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.withCredentials = true;
     let serviceIdValue = window.localStorage.getItem("serviceId")
-    if (serviceIdValue === null || serviceIdValue === "") {
       xhttp.send(
         JSON.stringify({
           agentApiTimeout: 1000,
-          serviceId: "",
-          tab: TabID,
-          mode: "image",
-          purpose: purpose,
-        })
-      );
-    } else {
-      xhttp.send(
-        JSON.stringify({
           serviceId: window.localStorage.getItem("serviceId"),
           tab: TabID,
           mode: "image",
           purpose: purpose,
         })
       );
-    }
   };
 
   useEffect(() => {
