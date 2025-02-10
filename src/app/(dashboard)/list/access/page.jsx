@@ -18,7 +18,7 @@ const AccessPage = async ({searchParams}) => {
 
   //Fetch data from backend
   const { data:userList,totalPages } = await getUserList(page,limit,query)
-  
+  console.log(userList)
   const prevPage = page - 1 > 0 ? page - 1 : 1
   
   return (
