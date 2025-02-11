@@ -6,14 +6,16 @@ import { cookies } from 'next/headers';
 import Image from 'next/image';
 
 export default async function DetailPage() {
+    //Get the id from cookies
     const userId = (await cookies()).get('selectedUserId')?.value
 
     if (!userId) {
         return <p>Ingen användare vald</p>;
     }
 
+    //Get user from a getUser function with a fetch to api/user
     const user = await getUser(userId); 
-    console.log(user)
+
 
     return (
         <div className='flex justify-center items-center h-screen'>
@@ -21,7 +23,7 @@ export default async function DetailPage() {
             {
                 user &&
                 <>
-            <div className='w-[200px] h-[200px] rounded-full overflow-hidden'>
+            <div className='w-[200px] h-[200px] rounded-full overflow-hidden max-sm:h-[150px] max-sm:w-[150px]'>
                 <Image
                 className='w-full h-full object-cover'
                 src={'https://res.cloudinary.com/drkty7j9v/image/upload/v1737114626/profil-ezgif.com-avif-to-jpg-converter_jkimmv.jpg'}
@@ -53,11 +55,11 @@ export default async function DetailPage() {
             </div>
             <div className='flex flex-col gap-5'>
                 <RedirectButton hrefText={'/list/access'}
-                 classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold hover:bg-black/50 transition-all'}
+                 classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold max-sm:py-2 max-sm:px-4  hover:bg-black/50 transition-all'}
                  buttonName={'Back'}/>
                 <RedirectButton hrefText={'/list/access'}
                 buttonName={'Manage User'} 
-                classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold hover:bg-black/50 transition-all'}/>
+                classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold max-sm:py-2 max-sm:px-4 hover:bg-black/50 transition-all'}/>
             </div>
                 </>
             }

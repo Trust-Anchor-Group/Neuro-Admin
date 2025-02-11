@@ -1,6 +1,5 @@
-import fs from 'fs'
 import { NextResponse } from 'next/server'
-import path from 'path'
+
 
 export async function GET(req) {
     try {
@@ -9,11 +8,13 @@ export async function GET(req) {
         const page = parseInt(searchParams.get('page') || '1', 10) // Get the page number, default to 1
         const limit = parseInt(searchParams.get('limit') || '5', 10) // Get the limit of users per page, default to 5
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
-        console.log(query)
-        // Fetch mock user data from a local JSON file
-        // const filePath = path.join(process.cwd(), 'src/app/api/userList.json')
-        // const jsonData = fs.readFileSync(filePath, 'utf-8')
+
         const res = await fetch('https://jsonplaceholder.typicode.com/users')
+
+        if(res.status !== 200){
+            return NextResponse.json({message:`Could not retrieve data ${res.statusText}`},{status:404})
+        }
+
         const data = await res.json()        
         
 
@@ -49,6 +50,6 @@ export async function GET(req) {
 
     } catch (error) {
 
-        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 })
+        return NextResponse.json({ message: `Internal Server Error ${error}` }, { status: 500 })
     }
 }
