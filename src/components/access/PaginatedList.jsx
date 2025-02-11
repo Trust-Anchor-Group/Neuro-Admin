@@ -22,9 +22,9 @@ export const PaginatedList = async ({userList}) => {
                 </thead>
                 <tbody>
                     {userList && userList.map((user) => (
-                        <tr className="border-b" key={user.userId}>
-                            <DetailPageLink name={user.userId} userId={user.userId} hrefText={'/'}/>
-                            <DetailPageLink name={user.name} userId={user.userId} hrefText={'/list/access/detailpage'}/>
+                        <tr className="border-b" key={user.id}>
+                            <DetailPageLink name={user.id} userId={user.id} hrefText={'/'}/>
+                            <DetailPageLink name={user.name} userId={user.id} hrefText={'/list/access/detailpage'}/>
                             <td className="p-3 break-words text-left">{user.email}</td>
                             <td className="p-3 break-words text-left">{user.accessLevel}</td>
                             <td className="p-3 flex justify-center items-center gap-4 md:text-center">

@@ -12,13 +12,17 @@ export async function POST(req){
            return NextResponse.json({message:'Please provide with a userId'},{status:404})
         }
 
-            const filePath = path.join(process.cwd(), 'src/app/api/userList.json')
-            const jsonData = fs.readFileSync(filePath, 'utf-8')
+            // const filePath = path.join(process.cwd(), 'src/app/api/userList.json')
+            // const jsonData = fs.readFileSync(filePath, 'utf-8')
                 
-            const users = JSON.parse(jsonData) 
+            // const users = JSON.parse(jsonData) 
 
-            const findId = users.filter((user) => (
-                user.userId === userId
+            const res = await fetch('https://jsonplaceholder.typicode.com/users')
+            const data = await res.json()
+            console.log(data)
+
+            const findId = data.filter((user) => (
+                user.id === userId
             ))
             
             return NextResponse.json(findId,{status:200})

@@ -11,15 +11,16 @@ export async function GET(req) {
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
         console.log(query)
         // Fetch mock user data from a local JSON file
-        const filePath = path.join(process.cwd(), 'src/app/api/userList.json')
-        const jsonData = fs.readFileSync(filePath, 'utf-8')
+        // const filePath = path.join(process.cwd(), 'src/app/api/userList.json')
+        // const jsonData = fs.readFileSync(filePath, 'utf-8')
+        const res = await fetch('https://jsonplaceholder.typicode.com/users')
+        const data = await res.json()        
         
-        const users = JSON.parse(jsonData) 
 
         
-        let filteredUsers = users
+        let filteredUsers = data
         if (query) {
-            filteredUsers = users.filter(user =>
+            filteredUsers = data.filter(user =>
                 user.name.toLowerCase().includes(query) 
             )
         }

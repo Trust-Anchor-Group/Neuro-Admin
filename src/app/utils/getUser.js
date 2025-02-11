@@ -4,7 +4,7 @@
 export async function getUser(userId){
 
     try {
-        const res = await fetch('https://neuro-admin-dev-gnega5g4acbpfddm.germanywestcentral-01.azurewebsites.net/api/user',{
+        const res = await fetch(`${process.env.URL}/api/user`,{
             method:'POST',
             headers:{
                 'Content-Type':'application/json',
