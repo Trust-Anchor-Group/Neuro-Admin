@@ -36,12 +36,11 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
   const [tagSign, setTagSign] = useState();
   const [tabId, setTabId] = useState(TabID);
   const [success, setSuccess] = useState(false);
-  const [serviceId, setServiceId] = useState("");
+  const [serviceId, setServiceId] = useState(null);
 
   useEffect(() => {
     setTabId(TabID);
   }, [TabID]);
-
 
   let displayInterval = null;
   let resetInterval = null;
@@ -214,15 +213,17 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
   };
 
   const displayQuickLogin = async () => {
+
+    const serviceIdValue = window.localStorage.getItem("serviceId");
+
     const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = () => {
       if (xhttp.readyState === 4 && xhttp.status === 200) {
         try {
           const response = JSON.parse(xhttp.responseText);
-          console.log('DATA FROM ENDPOINT', response);
           setTagSign(response.data.signUrl);
-          let serviceIdValue = window.localStorage.getItem("serviceId")
-          if (serviceIdValue === null || serviceIdValue === "") {
+
+          if (serviceIdValue === null) {
             window.localStorage.setItem("serviceId", response.data.serviceId);
           }
         } catch (err) {
@@ -235,17 +236,20 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
     xhttp.open("POST", uri);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.withCredentials = true;
-    let serviceIdValue = window.localStorage.getItem("serviceId")
       xhttp.send(
         JSON.stringify({
           agentApiTimeout: 1000,
-          serviceId: window.localStorage.getItem("serviceId"),
+          serviceId: serviceIdValue || "",
           tab: TabID,
           mode: "image",
           purpose: purpose,
         })
       );
   };
+
+  window.addEventListener("beforeunload", () => {
+    window.localStorage.removeItem("serviceId");
+  });
 
   useEffect(() => {
     try {
@@ -259,11 +263,10 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
   }, []);
 
   useEffect(() => {
-    displayQuickLogin();
 
     displayInterval = setInterval(() => {
       if (active) {
-        displayQuickLogin();
+         displayQuickLogin();
       }
     }, 2000);
 
@@ -274,23 +277,8 @@ export default function QuickLogin({ neuron, purpose, active, onLoginSuccess }) 
   }, [active]);
 
   useEffect(() => {
-    timeServiceId();
-
-    resetInterval = setInterval(() => {
-      if (active) {
-        timeServiceId();
-      }
-    }, 180000);
-
-    return () => {
-      clearInterval(resetInterval);
-      resetInterval = null;
-    };
-  }, [active]);
-
-  const timeServiceId = async () => {
-    window.localStorage.setItem("serviceId", "");
-  };
+    window.localStorage.removeItem("serviceId");
+  }, []);
 
   return (
     <>
