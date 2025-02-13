@@ -6,6 +6,7 @@ import PieChartComponent from "@/components/charts/PieChartComponent";
 import KPIsList from "@/components/assets/KPIsList";
 import LineChartComponent from "@/components/charts/LineChartComponent";
 import AssetHeader from "@/components/assets/AssetHeader";
+import AttendanceChart from "@/components/charts/AttendanceChart";
 
 const DigitalAssetDetailsPage = () => {
   const { id } = useParams();
@@ -14,26 +15,29 @@ const DigitalAssetDetailsPage = () => {
     id,
     name: "Creturner Factory 1",
     metrics: [
-      { label: "Asset Rating", value: "A+", color: "indigo" },
-      { label: "Risk Level", value: "Low", color: "green" },
-      { label: "Correlation Risk", value: "0.82", color: "orange" },
-      { label: "ESG Rating", value: "85/100", color: "blue" },
+      { label: "Carbon Processed (This Month)", value: "5,000 kg", color: "green" },
+      { label: "Carbon Processed (Total)", value: "50,000 kg", color: "blue" },
+      { label: "Factory Utilization", value: "85%", color: "orange" },
+      { label: "Uptime", value: "98.5%", color: "green" },
     ],
     distribution: [
-      { name: "Offseted Carbon", value: 60 },
-      { name: "Renewable Energy", value: 40 },
+      { name: "Offseted Carbon", value: 70 },
+      { name: "Proccessing Carbon", value: 30 },
     ],
     performanceIndicators: {
       "Current Balance": "12,450 Units",
       "Total Payments": "$25,000",
-      "Mismatch (In/Out)": "-$500",
-      "Renewable Assets": "60%",
-      "Alternative Assets": "40%",
+      "Current Capacity": "10,000 kg / month",
+      "Downtime This Month": "2 hours",
+      "Incident Reports": "0",
     },
     yieldPerformance: [
       { year: "2020", yield: 1500 },
       { year: "2021", yield: 1700 },
       { year: "2022", yield: 2000 },
+      { year: "2023", yield: 3000 },
+      { year: "2024", yield: 4000 },
+      { year: "2025", yield: 2000 },
     ],
   };
 
@@ -42,7 +46,7 @@ const DigitalAssetDetailsPage = () => {
   return (
     <div className="p-6 bg-gradient-to-b from-gray-100 via-gray-50 to-white min-h-screen">
       {/* Header */}
-      <AssetHeader name={digitalAssetDetails.name} />
+      <AssetHeader name={digitalAssetDetails.name} logoSrc="/Creturner-logotyp-bla.png" />
 
       {/* Content Container */}
       <div className="mx-auto grid grid-cols-1 gap-8">
@@ -69,6 +73,7 @@ const DigitalAssetDetailsPage = () => {
           data={digitalAssetDetails.yieldPerformance}
           title="Yield Performance Over Time"
         />
+      
       </div>
     </div>
   );
