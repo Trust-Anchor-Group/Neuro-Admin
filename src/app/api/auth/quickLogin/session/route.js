@@ -9,6 +9,7 @@ export async function POST(request) {
 
     const { host } = config.api.agent;
     const url = `https://${host}/QuickLogin`;
+
     const payload = {
         ...(serviceId ? {serviceId} : {agentApiTimeout, serviceId: ""}),
         tab,
@@ -22,9 +23,9 @@ export async function POST(request) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'credentials': 'include',
                 'Cookie': clientCookie
             },
+            credentials: 'include',
             body: JSON.stringify(payload),
             mode: 'cors'
         });
@@ -56,7 +57,6 @@ export async function POST(request) {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
-                'credentials': 'include',
                 'Set-Cookie': setCookie
             }
         });

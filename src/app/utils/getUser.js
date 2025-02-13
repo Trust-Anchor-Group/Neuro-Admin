@@ -4,24 +4,25 @@
 export async function getUser(userId){
 
     try {
-        const res = await fetch('https://neuro-admin-dev-gnega5g4acbpfddm.germanywestcentral-01.azurewebsites.net/api/user',{
+        const res = await fetch(`${process.env.URL}/api/user`,{
             method:'POST',
             headers:{
                 'Content-Type':'application/json',
             },
             body:JSON.stringify({userId})
         })
-    
+        
         const data = await res.json()
-        console.log(data)
-    
-        if(!data){
-            throw new Error('Something went wrong')
+       
+        
+        if(res.status !== 200){
+            throw new Error(`Did not get the user ${data.message}`)
         }
 
         return data
+
     } catch (error) {
-        console.log(error)
+        throw new Error('Server Error, did not get userId',error)
     }
 
 }

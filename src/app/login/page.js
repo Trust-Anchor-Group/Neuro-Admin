@@ -4,6 +4,8 @@ import React from "react";
 import Image from "next/image";
 import config from "@/config/config";
 import dynamic from "next/dynamic";
+import LegalIdButton from "@/components/legalIdButton/LegalIdButton";
+
 
 const QuickLogin = dynamic(() => import("@/components/quickLogin/QuickLogin"), { ssr: false });
 const LoginPage = () => {
@@ -19,16 +21,10 @@ const LoginPage = () => {
       <div className="bg-white shadow-lg rounded-lg p-6">
         <QuickLogin
           neuron={config.api.agent.host}
-          purpose={"Login test"}
+          purpose={"Login to Neuro-admin"}
           active={true}
         />
-        {/* Replace this placeholder with your actual QR code */}
-        {/* <Image
-          src="/qr-code-placeholder.png" // Replace with the actual QR code source
-          alt="QR Code"
-          width={200}
-          height={200}
-        /> */}
+          <LegalIdButton />
       </div>
 
       {/* App Download Section */}

@@ -4,14 +4,15 @@ import { useTransition } from 'react'
 import { navigateToDetail } from './NavigateToDetail'
 
 
-export const DetailPageLink = ({ name, userId,hrefText }) => {
+export const DetailPageLink = ({ name, userId,hrefText,classNameText }) => {
+    //Send id and a href to redirect to another page
     const [isPending, startTransition] = useTransition()
 
     return (
-        <td className="p-3 break-words text-left">
+        <td className="p-3 break-words text-left max-sm:text-center">
             <button 
                 onClick={() => startTransition(() => navigateToDetail(userId,hrefText))}
-                className="text-blue-600 hover:underline hover:text-blue-400"
+                className={classNameText}
                 disabled={isPending}
             >
                 {name}

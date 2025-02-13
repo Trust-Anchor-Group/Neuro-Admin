@@ -7,6 +7,10 @@ import { HiDotsHorizontal } from "react-icons/hi"
 import { navigateToDetail } from './NavigateToDetail'
 
 export const RedirectButton = ({ hrefText, classText, hamburgMeny,userId,buttonName }) => {
+ //Send id and a href to redirect to another page
+ //If using a hamburgMeny, write hambrugMeny = true. 
+ //You can use this component just as a button to just redirect back(without id)
+
   const [toggle, setToggle] = useState(false)
       const [isPending, startTransition] = useTransition()
 

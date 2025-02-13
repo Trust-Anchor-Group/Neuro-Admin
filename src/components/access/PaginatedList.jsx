@@ -8,25 +8,34 @@ export const PaginatedList = async ({userList}) => {
 
 
     return (
-        <div className='p-5 border-2 bg-white rounded-xl  min-w-[800px] min-h-[400px]'>
+        <>
+        {
+             userList === null || userList === undefined ?
+            <div className='p-5 border-2 bg-white rounded-xl  min-w-[800px] min-h-[400px]'>
+                <h2 className='text-center mb-10 text-xl font-semibold md:text-3xl'>User&nbsp;List</h2>
+                <h3 className='flex justify-center items-center'>Could not retrieve any data, try later</h3>
+
+            </div> :
+
+            <div className='p-5 border-2 bg-white rounded-xl min-w-[800px] min-h-[400px] max-sm:min-w-[300px]'>
             <h2 className='text-center mb-10 text-xl font-semibold md:text-3xl'>User&nbsp;List</h2>
             <table className='w-full table-auto border-collapse'>
                 <thead>
                     <tr className='border-b-2'>
-                        <th className='p-3 text-left'>User&nbsp;ID</th>
-                        <th className='p-3 text-left'>Name</th>
-                        <th className='p-3 text-left'>Email</th>
-                        <th className='p-3 text-left'>Access&nbsp;Level</th>
+                        <th className='p-3 text-left max-sm:text-center'>User&nbsp;ID</th>
+                        <th className='p-3 text-left max-sm:text-center'>Name</th>
+                        <th className='p-3 text-left max-sm:hidden'>Email</th>
+                        <th className='p-3 text-left max-sm:hidden'>Access&nbsp;Level</th>
                         <th className='p-3 text-left'>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     {userList && userList.map((user) => (
-                        <tr className="border-b" key={user.userId}>
-                            <DetailPageLink name={user.userId} userId={user.userId} hrefText={'/'}/>
-                            <DetailPageLink name={user.name} userId={user.userId} hrefText={'/list/access/detailpage'}/>
-                            <td className="p-3 break-words text-left">{user.email}</td>
-                            <td className="p-3 break-words text-left">{user.accessLevel}</td>
+                        <tr className="border-b" key={user.id}>
+                            <DetailPageLink name={user.id} userId={user.id} hrefText={'/'} classNameText={'text-blue-600 hover:underline hover:text-blue-400'}/>
+                            <DetailPageLink name={user.name} userId={user.id} hrefText={'/list/access/detailpage'} classNameText={'text-blue-600 hover:underline hover:text-blue-400'}/>
+                            <td className="p-3 break-words text-left max-sm:hidden">{user.email}</td>
+                            <td className="p-3 break-words text-left max-sm:hidden">{user.accessLevel}</td>
                             <td className="p-3 flex justify-center items-center gap-4 md:text-center">
                                 <div className="grid grid-cols-2 max-w-[100px]">
                                     {user.status === "Active" ? (
@@ -59,5 +68,7 @@ export const PaginatedList = async ({userList}) => {
                 </tbody>
             </table>
         </div>
+                }
+                    </>
     )
 }
