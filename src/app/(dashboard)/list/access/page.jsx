@@ -1,24 +1,51 @@
-'use server'
-import { getUserList } from '@/app/utils/getUserList';
+'use client'
 import { PaginatedList } from '@/components/access/PaginatedList'
 import { Pagination } from '@/components/access/Pagination';
 import SearchBar from '@/components/SearchBar';
-import React from 'react'
+import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react'
 
-const AccessPage = async ({searchParams}) => {
+const AccessPage = () => {
 
-  //Check the page number in the url
-  let page = parseInt((await searchParams)?.page || '1', 10)
-  page = !page || page < 1 ? 1 : page
+
+  const searchParams = useSearchParams()  //Check the page number in the url
+
+  const page = Number(searchParams.get('page') || 1)
+  let limit = 5
+  const query = searchParams.get('query') || ''
+  const [userList, setUserList] = useState(null)
+  const [totalPages, setTotalPages] = useState(0)
   
-  const limit = 5
-  
-  const query = (await searchParams)?.query || ''
+  useEffect(() => {
+    async function getData(){
 
+      try {
+        const res = await fetch(`http://localhost:3000/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`, {
+          method:'GET',
+          headers:{
+            'Content-Type':'application/json',       
+          },
+          credentials:'include'
+        })
+  
+        const data = await res.json()
+        console.log(data)
+        setUserList(data.data)
+        setTotalPages(data.totalPages)
+        console.log(userList)
+      } catch (error) {
+        throw new Error('Could not get userList',error)  
+      }
+
+    }
+
+    getData()
+  }, [page,limit,query])
+  
 
   //Fetch data from backend
-  const { data:userList,totalPages } = await getUserList(page,limit,query)
-  console.log(userList)
+
+
   const prevPage = page - 1 > 0 ? page - 1 : 1
   
   return (
@@ -26,7 +53,7 @@ const AccessPage = async ({searchParams}) => {
         <div className='flex justify-center items-center h-screen my-10'>
           <div className='flex flex-col gap-3'>
             <SearchBar placeholder={'Search...'} classNameText={'w-full border-2 rounded-md py-3 pl-10 text-sm'}/>
-            <PaginatedList userList={userList} />
+            <PaginatedList userList={userList}/>
             <Pagination page={page} prevPage={prevPage} totalPages={totalPages}/>
           </div>
         </div>

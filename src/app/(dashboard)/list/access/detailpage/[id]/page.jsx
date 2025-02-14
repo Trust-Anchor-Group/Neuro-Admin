@@ -1,20 +1,35 @@
-'use server';
-
-import { getUser } from '@/app/utils/getUser';
+'use client'
 import { RedirectButton } from '@/components/access/RedirectButton';
-import { cookies } from 'next/headers';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-export default async function DetailPage() {
-    //Get the id from cookies
-    const userId = (await cookies()).get('selectedUserId')?.value
+export default function DetailPage() {
 
-    if (!userId) {
-        return <p>Ingen användare vald</p>;
-    }
+    const { id } = useParams()
 
-    //Get user from a getUser function with a fetch to api/user
-    const user = await getUser(userId); 
+    const [user, setUser] = useState(null)
+
+   useEffect(() => {
+     async function getData(){
+ 
+       const res = await fetch(`http://localhost:3000/api/user?id=${id}`, {
+         method:'GET',
+         headers:{
+           'Content-Type':'application/json',       
+         },
+         credentials:'include'
+       })
+ 
+       const data = await res.json()
+       setUser(data)
+       console.log(data)
+
+     }
+ 
+     getData()
+   }, [id])
+    
 
 
     return (
