@@ -16,7 +16,6 @@ export default function Home() {
     >
       <Container>
         <Typography variant="h3" gutterBottom fontWeight="bold">
-          🚀 Admin Dashboard
         </Typography>
         <Typography variant="h6" sx={{ mb: 4 }}>
           Manage access requests with a modern interface.
@@ -31,7 +30,7 @@ export default function Home() {
             "&:hover": { backgroundColor: "#e3f2fd" },
           }}
         >
-          📋 Manage ID Requests
+        Manage ID Requests
         </Button>
       </Container>
     </Box>

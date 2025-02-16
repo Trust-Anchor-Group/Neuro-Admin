@@ -1,63 +1,48 @@
-import { fetchRequests, updateRequestStatus } from "../../../server/actions";
+import { fetchRequests } from "@/server/actions";
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, Button, Typography, Container
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Container,
+  Box,
 } from "@mui/material";
+import ActionDropdown from "@/components/ui/ActionDropdown";
 
-export default async function ManageIDRequests() { 
-  const requests = await fetchRequests(); // Fetching data server-side
+export default async function ManageIDRequests() {
+  const requests = await fetchRequests(); // Fetch data server-side
 
   return (
-    <Container maxWidth="lg">
-      <Typography variant="h4" gutterBottom textAlign="center">
-        📋 Manage ID Requests
-      </Typography>
-
-      <TableContainer component={Paper} elevation={3}>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Box sx={{ textAlign: "center", mb: 3 }}>
+        <Typography variant="h3" fontWeight="bold" color="primary">
+          {/* Manage ID Requests */}
+        </Typography>
+      </Box>
+      <TableContainer component={Paper} elevation={5} sx={{ borderRadius: 2, overflow: "hidden" }}>
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableCell><strong>User Name</strong></TableCell>
-              <TableCell><strong>Requested Date</strong></TableCell>
-              <TableCell><strong>Access Level</strong></TableCell>
-              <TableCell align="center"><strong>Actions</strong></TableCell>
+            <TableRow sx={{ backgroundColor: "#1976D2" }}>
+              <TableCell sx={{ color: "white", fontWeight: "bold" }}>User Name</TableCell>
+              <TableCell sx={{ color: "white", fontWeight: "bold" }}>Requested Date</TableCell>
+              <TableCell sx={{ color: "white", fontWeight: "bold" }}>Access Level</TableCell>
+              <TableCell sx={{ color: "white", fontWeight: "bold" }}>Status</TableCell>
+              <TableCell align="center" sx={{ color: "white", fontWeight: "bold" }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {requests.map((req) => (
-              <TableRow key={req.id} hover>
+              <TableRow key={req.id} hover sx={{ "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" } }}>
                 <TableCell>{req.user}</TableCell>
                 <TableCell>{req.requestedDate}</TableCell>
                 <TableCell>{req.accessLevel}</TableCell>
+                <TableCell>{req.status || "Pending"}</TableCell>
                 <TableCell align="center">
-                  <form action={updateRequestStatus}>
-                    <input type="hidden" name="id" value={req.id} />
-                    <input type="hidden" name="status" value="Approved" />
-                    <Button type="submit" variant="contained" color="success" sx={{ mx: 1 }}>
-                      ✅ Approve
-                    </Button>
-                  </form>
-                  <form action={updateRequestStatus}>
-                    <input type="hidden" name="id" value={req.id} />
-                    <input type="hidden" name="status" value="Rejected" />
-                    <Button type="submit" variant="contained" color="error" sx={{ mx: 1 }}>
-                      ❌ Reject
-                    </Button>
-                  </form>
-                  <form action={updateRequestStatus}>
-                    <input type="hidden" name="id" value={req.id} />
-                    <input type="hidden" name="status" value="Obsoleted" />
-                    <Button type="submit" variant="contained" color="warning" sx={{ mx: 1 }}>
-                      📌 Obsolete
-                    </Button>
-                  </form>
-                  <form action={updateRequestStatus}>
-                    <input type="hidden" name="id" value={req.id} />
-                    <input type="hidden" name="status" value="Compromised" />
-                    <Button type="submit" variant="contained" color="secondary" sx={{ mx: 1 }}>
-                      ⚠️ Compromised
-                    </Button>
-                  </form>
+                  <ActionDropdown requestId={req.id} />
                 </TableCell>
               </TableRow>
             ))}
