@@ -1,7 +1,7 @@
 
 const config = {
-    protocol: 'http',
-    origin: 'localhost:3000',
+    protocol: 'https',
+    origin: 'neuro-admin-dev-gnega5g4acbpfddm.germanywestcentral-01.azurewebsites.net',
     api: {
         agent: {
             host: 'mateo.lab.tagroot.io',

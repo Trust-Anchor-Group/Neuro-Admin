@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 export default function DetailPage() {
 
     const { id } = useParams()
-
+    console.log(id)
     const [user, setUser] = useState(null)
 
    useEffect(() => {
@@ -27,16 +27,18 @@ export default function DetailPage() {
 
      }
  
-     getData()
+     if(id){
+         getData()
+     }
    }, [id])
     
 
 
     return (
         <div className='flex justify-center items-center h-screen'>
-            <div className='bg-white p-10 border-2 gap-5 flex max-md:flex-col max-md:justify-center max-md:items-center'>
+            <div className='bg-white p-10 border-2 gap-5 flex justify-center items-center max-md:flex-col'>
             {
-                user &&
+                user ?
                 <>
             <div className='w-[200px] h-[200px] rounded-full overflow-hidden max-sm:h-[150px] max-sm:w-[150px]'>
                 <Image
@@ -69,6 +71,18 @@ export default function DetailPage() {
                 </div>
             </div>
             <div className='flex flex-col gap-5'>
+                <RedirectButton hrefText={'/list/access'}
+                 classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold max-sm:py-2 max-sm:px-4  hover:bg-black/50 transition-all'}
+                 buttonName={'Back'}/>
+                <RedirectButton hrefText={'/list/access'}
+                buttonName={'Manage User'} 
+                classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold max-sm:py-2 max-sm:px-4 hover:bg-black/50 transition-all'}/>
+            </div>
+                </>
+                :
+                <>
+                <h1 className='flex justify-center items-center text-lg'>Could not find the user</h1>
+                <div className='flex flex-col gap-5'>
                 <RedirectButton hrefText={'/list/access'}
                  classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold max-sm:py-2 max-sm:px-4  hover:bg-black/50 transition-all'}
                  buttonName={'Back'}/>

@@ -30,7 +30,6 @@ export async function GET(req) {
         
         const data = await res.json()        
         
-         console.log(data)
 
          let filteredUsers = data
          if (query) {
