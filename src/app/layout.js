@@ -18,10 +18,10 @@ export default function RootLayout({ children }) {
             <CssBaseline />
             <AppBar position="fixed" sx={{ background: "linear-gradient(90deg, #1976D2, #9C27B0)" }}>
               <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Typography variant="h6">🚀 Admin Panel</Typography>
+                <Typography variant="h6"></Typography>
                 <div>
-                  <Button color="inherit" component={Link} href="/">🏠 Home</Button>
-                  <Button color="inherit" component={Link} href="/admin/requests">📋 Manage Requests</Button>
+                  <Button color="inherit" component={Link} href="/">Home</Button>
+                  <Button color="inherit" component={Link} href="/admin/requests">Manage Requests</Button>
                 </div>
               </Toolbar>
             </AppBar>
