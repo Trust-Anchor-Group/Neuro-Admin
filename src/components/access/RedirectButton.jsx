@@ -1,15 +1,17 @@
 'use client'
 import Link from 'next/link'
-import React, { useState, useTransition } from 'react'
+import React, {  useState, } from 'react'
 import { FaBars, FaUser, FaUserCog } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
 import { HiDotsHorizontal } from "react-icons/hi"
-import { navigateToDetail } from './NavigateToDetail'
 
 export const RedirectButton = ({ hrefText, classText, hamburgMeny,userId,buttonName }) => {
-  const [toggle, setToggle] = useState(false)
-      const [isPending, startTransition] = useTransition()
+ //Send id and a href to redirect to another page
+ //If using a hamburgMeny, write hambrugMeny = true. 
+ //You can use this component just as a button to just redirect back(without id)
 
+  const [toggle, setToggle] = useState(false)
+  
   function handleToggle() {
     setToggle((prev) => !prev)
   }
@@ -46,8 +48,8 @@ export const RedirectButton = ({ hrefText, classText, hamburgMeny,userId,buttonN
                 </button>
                 <button
                   className="p-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black rounded-md transition"
-                  onClick={() => startTransition (() => navigateToDetail(userId,'/list/access/detailpage'))}
                 >
+                  <Link href={`/list/access/detailpage/${userId}`}>
                   <div className='flex items-center gap-5'>
                     <FaUser className='text-lg'/>
                     <p>
@@ -55,6 +57,7 @@ export const RedirectButton = ({ hrefText, classText, hamburgMeny,userId,buttonN
                     </p>
                   </div>
                   
+                  </Link>
                 </button>
               </div>
             </div>

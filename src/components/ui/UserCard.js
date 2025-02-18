@@ -1,4 +1,4 @@
-import { BsThreeDots } from "react-icons/bs"; // Import the "more" icon from React Icons
+import { BsThreeDots } from "react-icons/bs";
 
 const UserCard = ({ type }) => {
   return (

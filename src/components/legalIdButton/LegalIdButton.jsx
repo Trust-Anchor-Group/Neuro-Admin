@@ -5,13 +5,16 @@ export default function LegalIdButton() {
       const { protocol, origin } = config;
       const url = `${protocol}://${origin}/api/mockdata/legalIdentities`;
 
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
+      const handleFetch = async () => {
+        try {
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          });
+
 
       if (!response.ok) {
         console.error('Response not ok ', response.statusText);

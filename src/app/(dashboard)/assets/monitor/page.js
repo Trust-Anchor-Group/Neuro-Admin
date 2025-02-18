@@ -17,7 +17,7 @@ const MonitorPage = () => {
       type: "Carbon Offset",
       address: "Vasagatan 1, 111 20 Stockholm",
       location: { lat: 59.3308, lng: 18.0567 },
-      carbonProcessed: 100000,
+      carbonProcessed: "330,0000 kg",
       status: "Active",
     },
     {
@@ -26,18 +26,18 @@ const MonitorPage = () => {
       type: "Carbon Offset",
       address: "Vasagatan 2, 111 20 Stockholm",
       location: { lat: 59.3309, lng: 18.0568 },
-      carbonProcessed: 100000,
+      carbonProcessed: "20,0000 kg",
       status: "Active",
     },
-    {
-      id: 3,
-      name: "DeTrash Facility",
-      type: "Recycling",
-      address: "Kungsgatan 18, 111 35 Stockholm",
-      location: { lat: 59.3369, lng: 18.0668 },
-      carbonProcessed: 50000,
-      status: "Inactive",
-    },
+    // {
+    //   id: 3,
+    //   name: "DeTrash Facility",
+    //   type: "Recycling",
+    //   address: "Kungsgatan 18, 111 35 Stockholm",
+    //   location: { lat: 59.3369, lng: 18.0668 },
+    //   carbonProcessed: 50000,
+    //   status: "Inactive",
+    // },
   ];
 
   return (
