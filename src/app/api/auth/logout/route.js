@@ -1,16 +1,19 @@
-import { cookies } from 'next/headers';
-import ResponseModel from "@/models/ResponseModel";
+import { NextResponse } from 'next/server';
+import config from '@/config/config';
 
-export async function GET(){
+export async function GET() {
 
-    const cookieStore = await cookies();
-    cookieStore.delete('token');
+    const { protocol, origin } = config;
+    const nextRes = NextResponse.redirect(new URL('/', `${protocol}://${origin}`));
 
-    return new Response(JSON.stringify(new ResponseModel(200, 'Logout successfull')), {
-        headers: {
-            'Content-Type': 'application/json',
-            'Set-Cookie': 'token=; max-age=0; Path=/;'
-        }
+    nextRes.cookies.set('HttpSessionID', "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 0,
+        expires: new Date(0),
     });
 
+    return nextRes;
 }
