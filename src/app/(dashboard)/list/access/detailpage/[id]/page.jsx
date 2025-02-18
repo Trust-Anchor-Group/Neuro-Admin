@@ -8,17 +8,19 @@ export default function DetailPage() {
 
     const { id } = useParams()
     console.log(id)
+
     const [user, setUser] = useState(null)
 
    useEffect(() => {
      async function getData(){
  
-       const res = await fetch(`http://localhost:3000/api/user?id=${id}`, {
-         method:'GET',
+       const res = await fetch(`http://localhost:3000/api/user`, {
+         method:'POST',
          headers:{
            'Content-Type':'application/json',       
          },
-         credentials:'include'
+         credentials:'include',
+         body:JSON.stringify({userId:id})
        })
  
        const data = await res.json()
@@ -53,7 +55,7 @@ export default function DetailPage() {
                 <div className='mt-5'>
                     <div className='grid grid-cols-2 gap-5 max-sm:grid-cols-1 max-sm:gap-0 max-sm:mb-5'>
                         <p className='border-b-2 border-black/50'>UserId:</p>
-                        <p className='font-semibold'> {user.id}</p>
+                        <p className='font-semibold'> {user.id.slice(0,10)}</p>
                     </div>
                     <div className='grid grid-cols-2 gap-5 max-sm:grid-cols-1 max-sm:gap-0 max-sm:mb-5'>
                         <p className='border-b-2 border-black/50'>Email:</p>
@@ -65,7 +67,7 @@ export default function DetailPage() {
                     </div>
                     <div className='grid grid-cols-2 gap-5 max-sm:grid-cols-1 max-sm:gap-0'>
                         <p className='border-b-2 border-black/50'>Status:</p>
-                        <p className='font-semibold'></p>
+                        <p className='font-semibold'>{user.state}</p>
                     </div>
                     
                 </div>

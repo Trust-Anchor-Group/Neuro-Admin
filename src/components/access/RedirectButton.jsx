@@ -49,6 +49,7 @@ export const RedirectButton = ({ hrefText, classText, hamburgMeny,userId,buttonN
                 <button
                   className="p-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black rounded-md transition"
                 >
+                  <Link href={`/list/access/detailpage/${userId}`}>
                   <div className='flex items-center gap-5'>
                     <FaUser className='text-lg'/>
                     <p>
@@ -56,6 +57,7 @@ export const RedirectButton = ({ hrefText, classText, hamburgMeny,userId,buttonN
                     </p>
                   </div>
                   
+                  </Link>
                 </button>
               </div>
             </div>
