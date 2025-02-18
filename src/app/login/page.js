@@ -1,11 +1,8 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import config from "@/config/config";
 import dynamic from "next/dynamic";
-import LegalIdButton from "@/components/legalIdButton/LegalIdButton";
-
 
 const QuickLogin = dynamic(() => import("@/components/quickLogin/QuickLogin"), { ssr: false });
 const LoginPage = () => {
@@ -24,7 +21,6 @@ const LoginPage = () => {
           purpose={"Login to Neuro-admin"}
           active={true}
         />
-          <LegalIdButton />
       </div>
 
       {/* App Download Section */}
