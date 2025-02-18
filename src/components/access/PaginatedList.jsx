@@ -22,48 +22,49 @@ export const PaginatedList = ({userList,page}) => {
                     <tr className='border-b-2'>
                         <th className='p-3 text-left max-sm:text-center'>User&nbsp;ID</th>
                         <th className='p-3 text-left max-sm:text-center'>Name</th>
+                        <th className='p-3 text-left max-sm:hidden'>Account</th>
                         <th className='p-3 text-left max-sm:hidden'>Email</th>
-                        <th className='p-3 text-left max-sm:hidden'>Access&nbsp;Level</th>
                         <th className='p-3 text-left'>Status</th>
-                        <th className='p-3 text-left'>Type of ID</th>
+                        <th className='p-3 text-left max-sm:hidden'>Type of ID</th>
                     </tr>
                 </thead>
                 <tbody>
                     {userList && userList.map((user) => (
                         <tr className="border-b text-center" key={user.id}>
-                            <DetailPageLink name={user.id.slice(0,10)} userId={user.id} page={page} hrefText={'/'} classNameText={'text-blue-600 hover:underline hover:text-blue-400'}/>
-                            {user.name === '' ? <td>No Name Provided</td> : 
-                            
+                          <td>
+                            <span>
+                            <DetailPageLink name={user.id.slice(0,8)} userId={user.id} page={page} hrefText={'/'} classNameText={'text-blue-600 hover:underline hover:text-blue-400'}/>
+                            </span>
+                          </td>
+                            {user.name === '' ? <td>-</td> : 
                             <DetailPageLink name={user.name} userId={user.id} hrefText={'/list/access/detailpage'} classNameText={'text-blue-600 hover:underline hover:text-blue-400'}/>
-                            
                             }
-
+                            <td className="p-3 break-words text-left max-sm:hidden">{user.account}</td>
                             <td className="p-3 break-words text-left max-sm:hidden">vincentpraktiant@Email.com</td>
-                            <td className="p-3 break-words text-left max-sm:hidden">{user.accessLevel}</td>
                             <td className="p-3 flex justify-center items-center gap-4 md:text-center">
                             <div className="grid grid-cols-2 max-w-[100px]">
                             {user.state === "Approved" ? (
-                              <div className='grid grid-cols-2 items-center'>
+                              <div className='grid grid-cols-2 items-center max-md:grid-cols-1'>
                                               <FaCheck className='text-green-500' />
                                               <span className="text-green-600 hidden md:inline">Approved</span>
                                             </div>
                                           ) : user.state === "Compromised" ? (
-                                            <div className='grid grid-cols-2 items-center'>
+                                            <div className='grid grid-cols-2 items-center max-md:grid-cols-1'>
                                               <FaExclamationTriangle className='text-orange-500' />
                                               <span className="text-orange-500 hidden md:inline">Compromised</span>
                                             </div>
                                           ) : user.state === "Created" ? (
-                                            <div className='grid grid-cols-2 items-center'>
+                                            <div className='grid grid-cols-2 items-center max-md:grid-cols-1'>
                                               <FaPlusCircle className='text-yellow-500' />
                                               <span className="text-yellow-500 hidden md:inline">Created</span>
                                             </div>
                                           ) : user.state === "Obsoleted" ? (
-                                            <div className='grid grid-cols-2 items-center'>
+                                            <div className='grid grid-cols-2 items-center max-md:grid-cols-1'>
                                               <FaTimesCircle className='text-red-500' />
                                               <span className="text-red-500 hidden md:inline">Obsoleted</span>
                                             </div>
                                           ) : user.state === "Rejected" ? (
-                                            <div className='grid grid-cols-2 items-center'>
+                                            <div className='grid grid-cols-2 items-center max-md:grid-cols-1'>
                                               <FaBan className='text-red-500' />
                                               <span className="text-red-500 hidden md:inline">Rejected</span>
                                             </div>
@@ -75,10 +76,10 @@ export const PaginatedList = ({userList,page}) => {
 
                                     {
                                       user.name === '' ?
-                                  <td>
+                                  <td className='max-sm:hidden'>
                                     Light ID
                                   </td> : 
-                                  <td>
+                                  <td className='max-sm:hidden'>
                                     Full ID
                                   </td>
                                     }
