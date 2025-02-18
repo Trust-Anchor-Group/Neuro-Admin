@@ -32,8 +32,13 @@ export const PaginatedList = ({userList,page}) => {
                     {userList && userList.map((user) => (
                         <tr className="border-b text-center" key={user.id}>
                             <DetailPageLink name={user.id.slice(0,10)} userId={user.id} page={page} hrefText={'/'} classNameText={'text-blue-600 hover:underline hover:text-blue-400'}/>
+                            {user.name === '' ? <td>No Name Provided</td> : 
+                            
                             <DetailPageLink name={user.name} userId={user.id} hrefText={'/list/access/detailpage'} classNameText={'text-blue-600 hover:underline hover:text-blue-400'}/>
-                            <td className="p-3 break-words text-left max-sm:hidden">Email</td>
+                            
+                            }
+
+                            <td className="p-3 break-words text-left max-sm:hidden">vincentpraktiant@Email.com</td>
                             <td className="p-3 break-words text-left max-sm:hidden">{user.accessLevel}</td>
                             <td className="p-3 flex justify-center items-center gap-4 md:text-center">
                             <div className="grid grid-cols-2 max-w-[100px]">
@@ -68,9 +73,15 @@ export const PaginatedList = ({userList,page}) => {
                                     </div>
                             </td>
 
+                                    {
+                                      user.name === '' ?
                                   <td>
                                     Light ID
+                                  </td> : 
+                                  <td>
+                                    Full ID
                                   </td>
+                                    }
                                   <td>
                                     <RedirectButton hamburgMeny={true} userId={user.id}/>
                                   </td>
