@@ -1,34 +1,36 @@
 import ResponseModel from "@/models/ResponseModel";
 import config from '@/config/config';
+import { cookies } from "next/headers";
 
 export async function GET(req) {
 
-    const clientCookie = req.headers.get('Cookie');
-    console.log('THE USER COOKIE!', clientCookie);
+    const cookieStore = await cookies();
+    const clientCookieObject = cookieStore.get('HttpSessionID');
+    const clientCookie = clientCookieObject
+        ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
+        : null;
 
     try {
-        const {host} = config.api.agent;
+        const { host } = config.api.agent;
         const url = `https://${host}/LegalIdentities.ws`;
-/*
-        const url = 'https://mateo.lab.tagroot.io/LegalIdentities.ws';
-*/
+
         const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Cookie': clientCookie,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
             },
-            credentials: 'include',
             body: JSON.stringify({
                 'maxCount': 10,
                 'offset': 0
             })
-        })
+        });
 
-        const responseData = await response.json();
-
-        console.log('THE RESPONSE DATA', responseData);
+        const contentType = response.headers.get('content-type');
+        const responseData = contentType.includes('application/json')
+            ? await response.json()
+            : await response.text();
 
         if (!response.ok) {
             return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${responseData}`)), {
@@ -39,23 +41,23 @@ export async function GET(req) {
             });
         }
 
-        return new Response(JSON.stringify(new ResponseModel(200, 'Successfully fetched legal identities', responseData)),{
+        return new Response(JSON.stringify(new ResponseModel(200, 'Successfully fetched legal identities', responseData)), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json'
             }
         });
 
-    } catch(error) {
+    } catch (error) {
 
         const statusCode = error.statusCode || 500;
         const message = error.message || 'Internal Server Error';
         return new Response(JSON.stringify(new ResponseModel(statusCode, message)), {
-                status: statusCode,
-                headers: {
-                    "Content-Type": "application/json"
-                }
+            status: statusCode,
+            headers: {
+                "Content-Type": "application/json"
             }
+        }
         );
     }
 
