@@ -3,7 +3,7 @@ export default function LegalIdButton() {
     const handleFetch = async () => {
         console.log('Fetching legal identities');
         try {
-            const response = await fetch(`http://localhost:3000/api/mockdata/legalIdentities`, {
+            const response = await fetch(`http://localhost:3000/api/mockdata/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

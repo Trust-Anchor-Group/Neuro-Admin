@@ -4,7 +4,7 @@ const config = {
     origin: 'neuro-admin-dev-gnega5g4acbpfddm.germanywestcentral-01.azurewebsites.net',
     api: {
         agent: {
-            host: 'lab.tagroot.io',
+            host: 'mateo.lab.tagroot.io',
         }
     },
     quickLogin: {
