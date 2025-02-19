@@ -1,19 +1,19 @@
-"use client";
-import { useState } from "react";
-import { FaSearch, FaEnvelope, FaBullhorn, FaUserCircle } from "react-icons/fa";
+'use client';
+
+import { useState } from 'react';
+import { FaSearch, FaEnvelope, FaBullhorn, FaUserCircle } from 'react-icons/fa';
+import LogoutBtn from '../logoutBtn/LogoutBtn';
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
-  };
+  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   return (
     <div className="flex items-center justify-between bg-white shadow-md p-4 rounded-lg">
       {/* SEARCH BAR */}
       <div className="hidden md:flex items-center gap-2 text-sm bg-gray-100 rounded-full px-4 py-2 ring-1 ring-gray-300">
-        <FaSearch className="text-gray-500 text-base" /> {/* Search Icon */}
+        <FaSearch className="text-gray-500 text-base" />
         <input
           type="text"
           placeholder="Search..."
@@ -43,7 +43,7 @@ const Navbar = () => {
           </span>
         </div>
 
-        {/* User Info with Dropdown */}
+        {/* User Dropdown */}
         <div className="relative">
           <div
             onClick={toggleDropdown}
@@ -52,27 +52,17 @@ const Navbar = () => {
             <FaUserCircle className="text-gray-600 text-2xl" />
           </div>
 
-          {/* Dropdown Menu */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50">
               <ul className="py-2">
-                <li
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700"
-                  onClick={() => console.log("Navigate to Profile")}
-                >
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">
                   Profile
                 </li>
-                <li
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700"
-                  onClick={() => console.log("Navigate to Help")}
-                >
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">
                   Help
                 </li>
-                <li
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700"
-                  onClick={() => console.log("Logout")}
-                >
-                  Logout
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">
+                  <LogoutBtn>Logout</LogoutBtn>
                 </li>
               </ul>
             </div>

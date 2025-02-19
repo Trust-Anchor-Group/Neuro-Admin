@@ -37,9 +37,8 @@ const DigitalAssetsTable = ({ assets }) => {
 
   return (
     <div className="bg-white shadow-xl rounded-lg p-8">
-      {/* Filter */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Digital Assets</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">Facilities</h2>
         <div className="flex items-center gap-3">
           {["all", "active", "inactive"].map((status) => (
             <button
@@ -66,8 +65,8 @@ const DigitalAssetsTable = ({ assets }) => {
           <tr>
             <th className="py-3 px-4">ID</th>
             <th className="py-3 px-4">Asset Name</th>
-            <th className="py-3 px-4">Type</th>
-            <th className="py-3 px-4">Value</th>
+            <th className="py-3 px-4">Address</th>
+            <th className="py-3 px-4">Total Processed Carbon </th>
             <th className="py-3 px-4">Status</th>
           </tr>
         </thead>
@@ -81,7 +80,7 @@ const DigitalAssetsTable = ({ assets }) => {
             >
               <td className="py-3 px-4">{asset.id}</td>
               <td className="py-3 px-4">{asset.name}</td>
-              <td className="py-3 px-4">{asset.type}</td>
+              <td className="py-3 px-4">{asset.address}</td>
               <td className="py-3 px-4">{asset.carbonProcessed}</td>
               <td className="py-3 px-4 flex items-center gap-2">
                 {asset.status === "Active" ? (

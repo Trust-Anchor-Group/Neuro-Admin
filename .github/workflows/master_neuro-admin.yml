@@ -23,12 +23,25 @@ jobs:
         run: |
           npm install
           npm run build
-      - name: Zip build artifacts for deployment
+          # Debugging: Ensure `.next` contains required files
+          echo "Checking .next directory..."
+          ls -la .next
+          echo "Checking .next/server directory (API routes)..."
+          ls -la .next/server || echo "⚠️ .next/server NOT found!"
+          echo "Checking .next/static directory..."
+          ls -la .next/static || echo "⚠️ .next/static NOT found!"
+      - name: Prepare deployment package
         run: |
-          mkdir deploy
-          mv .next deploy/  # Adjust this for your build folder (e.g., dist)
-          mv package.json deploy/
-          mv package-lock.json deploy/
+          mkdir -p deploy
+          cp -r .next deploy/.next  # ✅ Copy Next.js build output
+          cp -r node_modules deploy/node_modules
+          cp -r public deploy/public
+          cp package.json deploy/
+          cp package-lock.json deploy/
+          cp server.js deploy/ || echo "⚠️ server.js NOT found!"
+          # Debugging: Check deploy structure
+          echo "Final deploy folder structure:"
+          ls -la deploy
           zip -r release.zip deploy/
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -40,8 +53,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
-    
+      name: ${{ github.ref == 'refs/heads/master' && 'Production' || 'Development' }}
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -51,12 +64,14 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      # Deploy to Azure Web App
+      - name: Debug Deployed Files
+        run: |
+          echo "Checking deployed files..."
+          ls -la ./deploy
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Neuro-Admin'
           slot-name: ${{ github.ref == 'refs/heads/master' && 'Production' || 'dev' }}
           package: ./deploy
-          publish-profile: ${{ github.ref == 'refs/heads/master' && secrets.AZURE_NEURO_ADMIN_PROD || secrets.AZURE_NEURO_ADMIN_DEV}}
-          
+          publish-profile: ${{ github.ref == 'refs/heads/master' && secrets.AZURE_NEURO_ADMIN_PROD || secrets.AZURE_NEURO_ADMIN_DEV }}

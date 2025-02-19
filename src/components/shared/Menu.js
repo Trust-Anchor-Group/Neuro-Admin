@@ -18,7 +18,7 @@ const menuItems = [
         label: "Manage Assets",
         dropdown: true,
         subItems: [
-          { label: "Trading", href: "/assets/trading" },
+          { label: "Orders", href: "/assets/orders" },
           { label: "Monitor", href: "/assets/monitor" },
         ],
         visible: ["admin", "customer-assets"],
