@@ -12,7 +12,7 @@ export default function DetailPage() {
     useEffect(() => {
         async function getData() {
             try {
-                 const url = `${config.protocol}://${config.api.agent.host}/api/user`;
+                 const url = `${config.protocol}://${config.origin}/api/user`;
                  const res = await fetch(url, {
                     method: 'POST',
                     headers: {
