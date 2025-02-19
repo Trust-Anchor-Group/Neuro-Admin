@@ -17,9 +17,9 @@ export const AccessContet = () => {
     
     useEffect(() => {
       async function getData(){
-  
+
         try {
-          const url = `${config.protocol}://${config.api.agent.host}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
+          const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
           const res = await fetch(url, {
             method:'GET',
             headers:{
