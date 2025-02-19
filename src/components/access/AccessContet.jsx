@@ -3,7 +3,7 @@ import { Pagination } from '@/components/access/Pagination';
 import SearchBar from '@/components/SearchBar';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-
+import config from '@/config/config';
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
@@ -19,7 +19,8 @@ export const AccessContet = () => {
       async function getData(){
   
         try {
-          const res = await fetch(`http://localhost:3000/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`, {
+          const url = `${config.protocol}://${config.api.agent.host}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
+          const res = await fetch(url, {
             method:'GET',
             headers:{
               'Content-Type':'application/json',       
