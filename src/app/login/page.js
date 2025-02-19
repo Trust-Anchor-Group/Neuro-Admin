@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import config from "@/config/config";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation"; 
 
 
 const QuickLogin = dynamic(() => import('@/components/quickLogin/QuickLogin'), { ssr: false });
