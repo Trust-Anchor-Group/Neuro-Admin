@@ -1,4 +1,5 @@
 import AssetOrdersTable from "@/components/assets/orders/AssetOrdersTable";
+import TokensFetcher from "@/components/assets/orders/TokensFetcher";
 
 const OrdersPage = () => {
   const assetOrders = [
@@ -47,6 +48,7 @@ const OrdersPage = () => {
     <div className="p-6 bg-gradient-to-r from-blue-50 via-white to-blue-50 min-h-screen">
       <h1 className="p-3 text-3xl font-bold text-gray-800">Asset Orders</h1>
       <AssetOrdersTable orders={assetOrders} />
+      <TokensFetcher />
     </div>
   );
 };
