@@ -1,9 +1,9 @@
 import React from 'react'
 import { FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimesCircle, FaBan } from 'react-icons/fa';
-import { DetailPageLink } from './DetailPageLink';
 import { RedirectButton } from './RedirectButton';
+import Link from 'next/link';
 
-export const PaginatedList = ({userList,page}) => {
+export const PaginatedList = ({userList}) => {
 
     return (
         <>
@@ -32,12 +32,14 @@ export const PaginatedList = ({userList,page}) => {
                     {userList && userList.map((user) => (
                         <tr className="border-b text-center" key={user.id}>
                           <td>
-                            <span>
-                            <DetailPageLink name={user.id.slice(0,8)} userId={user.id} page={page} hrefText={'/'} classNameText={'text-blue-600 hover:underline hover:text-blue-400'}/>
-                            </span>
+                            <Link className='text-blue-600 hover:underline hover:text-blue-400'
+                             href={'/'}>{user.id.slice(0,10)}</Link> 
                           </td>
                             {user.name === '' ? <td>-</td> : 
-                            <DetailPageLink name={user.name} userId={user.id} hrefText={'/list/access/detailpage'} classNameText={'text-blue-600 hover:underline hover:text-blue-400'}/>
+                              <td>
+                                <Link className='text-blue-600 hover:underline hover:text-blue-400'
+                                 href={`/list/access/detailpage/${user.id}`}>{user.name}</Link>
+                              </td>
                             }
                             <td className="p-3 break-words text-left max-sm:hidden">{user.account}</td>
                             <td className="p-3 break-words text-left max-sm:hidden">vincentpraktiant@Email.com</td>
