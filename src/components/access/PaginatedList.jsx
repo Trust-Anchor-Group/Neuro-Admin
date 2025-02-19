@@ -33,7 +33,7 @@ export const PaginatedList = ({userList}) => {
                         <tr className="border-b text-center" key={user.id}>
                           <td>
                             <Link className='text-blue-600 hover:underline hover:text-blue-400'
-                             href={'/'}>{user.id.slice(0,10)}</Link> 
+                             href={`/list/access/admin/${user.id}`}>{user.id.slice(0,10)}</Link> 
                           </td>
                             {user.name === '' ? <td>-</td> : 
                               <td>
