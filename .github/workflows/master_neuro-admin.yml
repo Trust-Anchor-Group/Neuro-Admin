@@ -20,16 +20,13 @@ jobs:
           node-version: '20.x'
 
       - name: Install dependencies and build app
+        env:
+          NEXT_PUBLIC_PROTOCOL: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_PROTOCOL || secrets.NEXT_PUBLIC_PROTOCOL }}
+          NEXT_PUBLIC_ORIGIN: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_ORIGIN || secrets.NEXT_PUBLIC_ORIGIN_DEV }}
+          NEXT_PUBLIC_AGENT_HOST: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_AGENT_HOST || secrets.NEXT_PUBLIC_AGENT_HOST }}
         run: |
           npm install
           npm run build
-          # Debugging: Ensure `.next` contains required files
-          echo "Checking .next directory..."
-          ls -la .next
-          echo "Checking .next/server directory (API routes)..."
-          ls -la .next/server || echo "⚠️ .next/server NOT found!"
-          echo "Checking .next/static directory..."
-          ls -la .next/static || echo "⚠️ .next/static NOT found!"
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
