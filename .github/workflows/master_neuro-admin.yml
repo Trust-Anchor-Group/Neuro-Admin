@@ -23,7 +23,6 @@ jobs:
         run: |
           npm install
           npm run build
-
           # Debugging: Ensure `.next` contains required files
           echo "Checking .next directory..."
           ls -la .next
@@ -31,7 +30,6 @@ jobs:
           ls -la .next/server || echo "⚠️ .next/server NOT found!"
           echo "Checking .next/static directory..."
           ls -la .next/static || echo "⚠️ .next/static NOT found!"
-
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
@@ -41,13 +39,10 @@ jobs:
           cp package.json deploy/
           cp package-lock.json deploy/
           cp server.js deploy/ || echo "⚠️ server.js NOT found!"
-
           # Debugging: Check deploy structure
           echo "Final deploy folder structure:"
           ls -la deploy
-
           zip -r release.zip deploy/
-
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -73,7 +68,6 @@ jobs:
         run: |
           echo "Checking deployed files..."
           ls -la ./deploy
-
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
