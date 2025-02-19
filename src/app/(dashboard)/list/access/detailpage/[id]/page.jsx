@@ -3,7 +3,7 @@ import { RedirectButton } from '@/components/access/RedirectButton'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-
+import config from '@/config/config';
 export default function DetailPage() {
     const { id } = useParams()
     const [user, setUser] = useState(null)
@@ -12,7 +12,8 @@ export default function DetailPage() {
     useEffect(() => {
         async function getData() {
             try {
-                const res = await fetch(`http://localhost:3000/api/user`, {
+                 const url = `${config.protocol}://${config.api.agent.host}/api/user`;
+                 const res = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
