@@ -4,6 +4,8 @@ import React, { Suspense} from 'react'
 
 const AccessPage = () => {
   
+//Suspense so that useSearchParams works
+
   return (
     <div>
       <Suspense fallback={<div>Loading...</div>}>

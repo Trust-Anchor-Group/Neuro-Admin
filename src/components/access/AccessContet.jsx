@@ -52,7 +52,7 @@ export const AccessContet = () => {
           <div className='flex justify-center items-center h-screen my-10'>
             <div className='flex flex-col gap-3'>
               <SearchBar placeholder={'Search...'} classNameText={'w-full border-2 rounded-md py-3 pl-10 text-sm'}/>
-              <PaginatedList userList={userList} page={page}/>
+              <PaginatedList userList={userList}/>
               <Pagination page={page} prevPage={prevPage} totalPages={totalPages}/>
             </div>
           </div>
