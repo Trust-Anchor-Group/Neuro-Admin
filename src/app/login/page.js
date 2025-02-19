@@ -4,7 +4,6 @@ import React from "react";
 import Image from "next/image";
 import config from "@/config/config";
 import dynamic from "next/dynamic";
-import LegalIdButton from "@/components/legalIdButton/LegalIdButton";
 
 
 const QuickLogin = dynamic(() => import('@/components/quickLogin/QuickLogin'), { ssr: false });
