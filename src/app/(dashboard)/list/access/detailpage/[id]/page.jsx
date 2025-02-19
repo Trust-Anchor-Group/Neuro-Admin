@@ -1,13 +1,13 @@
 'use client'
-import { RedirectButton } from '@/components/access/RedirectButton';
-import Image from 'next/image';
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { RedirectButton } from '@/components/access/RedirectButton'
+import Image from 'next/image'
+import { useParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export default function DetailPage() {
-    const { id } = useParams();
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true); // Ny state för att hantera laddning
+    const { id } = useParams()
+    const [user, setUser] = useState(null)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function getData() {
@@ -19,26 +19,26 @@ export default function DetailPage() {
                     },
                     credentials: 'include',
                     body: JSON.stringify({ userId: id })
-                });
+                })
 
                 if (!res.ok) {
-                    throw new Error('Failed to fetch user');
+                    throw new Error('Failed to fetch user')
                 }
 
-                const data = await res.json();
-                setUser(data);
+                const data = await res.json()
+                setUser(data)
             } catch (error) {
-                console.error('Error fetching user:', error);
-                setUser(undefined); // Indikerar att användaren inte hittades
+                console.error('Error fetching user:', error)
+                setUser(undefined) 
             } finally {
-                setLoading(false); // Avsluta laddning
+                setLoading(false) 
             }
         }
 
         if (id) {
-            getData();
+            getData()
         }
-    }, [id]);
+    }, [id])
 
     return (
         <div className='flex justify-center items-center h-screen'>
@@ -68,8 +68,8 @@ export default function DetailPage() {
                             <Image
                                 className='w-full h-full object-cover'
                                 src={'https://res.cloudinary.com/drkty7j9v/image/upload/v1737114626/profil-ezgif.com-avif-to-jpg-converter_jkimmv.jpg'}
-                                width={200}
-                                height={200}
+                                width={1200}
+                                height={1200}
                                 alt='Profile'
                             />
                         </div>
@@ -114,5 +114,5 @@ export default function DetailPage() {
                 )}
             </div>
         </div>
-    );
+    )
 }

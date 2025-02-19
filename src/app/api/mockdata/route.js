@@ -34,7 +34,8 @@ export async function GET(req) {
          let filteredUsers = data
          if (query) {
              filteredUsers = data.filter(user =>
-                 user.name.toLowerCase().includes(query) 
+                 user.name.toLowerCase().includes(query) ||
+                 user.account.toLowerCase().includes(query)
              )
          }
 
