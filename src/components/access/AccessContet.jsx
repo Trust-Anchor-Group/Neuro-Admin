@@ -4,6 +4,7 @@ import SearchBar from '@/components/SearchBar';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import config from '@/config/config';
+import { FilterId } from './FilterId';
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
@@ -11,6 +12,7 @@ export const AccessContet = () => {
     const page = Number(searchParams.get('page') || 1)
     console.log(page)
     const query = searchParams.get('query') || ''
+    const filterIds = searchParams.get('filterIds') || ''
     let limit = 5
     const [userList, setUserList] = useState(null)
     const [totalPages, setTotalPages] = useState(0)
@@ -19,7 +21,7 @@ export const AccessContet = () => {
       async function getData(){
 
         try {
-          const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
+          const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filterIds=${encodeURIComponent(filterIds)}`;
           const res = await fetch(url, {
             method:'GET',
             headers:{
@@ -40,7 +42,7 @@ export const AccessContet = () => {
       }
   
       getData()
-    }, [page,limit,query])
+    }, [page,limit,query,filterIds])
     
   
     //Fetch data from backend
@@ -53,6 +55,9 @@ export const AccessContet = () => {
           <div className='flex justify-center items-center h-screen my-10'>
             <div className='flex flex-col gap-3'>
               <SearchBar placeholder={'Search...'} classNameText={'w-full border-2 rounded-md py-3 pl-10 text-sm'}/>
+              <div className='flex justify-end'>
+                <FilterId/>
+              </div>
               <PaginatedList userList={userList}/>
               <Pagination page={page} prevPage={prevPage} totalPages={totalPages}/>
             </div>

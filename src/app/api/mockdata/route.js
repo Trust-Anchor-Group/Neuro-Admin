@@ -4,23 +4,25 @@ import config from '@/config/config';
  
 export async function GET(req) {
     try {
+        console.log('Request',req.url)
         // Extract search parameters from the request URL
         const { searchParams } = new URL(req.url)
         const page = parseInt(searchParams.get('page') || '1', 10) //§ Get the page number, default to 1
         const limit = parseInt(searchParams.get('limit') || '5', 10) // Get the limit of users per page, default to 5
- 
+        
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
- 
-        //const clientCookie = req.headers.get('Cookie');
- 
+    
+        const filterIds = searchParams.get('filterIds')
+        
         const cookieStore = await cookies();
         const clientCookieObject = cookieStore.get('HttpSessionID');
         const clientCookie = clientCookieObject
-            ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
-            : null;
-
- 
+        ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
+        : null;
+    
+        
         const { host } = config.api.agent;
+        console.log('host',host)
         const url = `https://${host}/LegalIdentities.ws`;
  
         const res = await fetch(url, {
@@ -36,6 +38,7 @@ export async function GET(req) {
             })
         });
  
+   
  
         const data = await res.json()
  
@@ -44,9 +47,23 @@ export async function GET(req) {
             filteredUsers = data.filter(user =>
                 user.name.toLowerCase().includes(query) ||
                 user.account.toLowerCase().includes(query)
-            )
+            ) 
+
+        } 
+
+
+        
+        if(filterIds === 'fullId'){
+            filteredUsers = data.filter(user => user.name)
+        } else if(filterIds === 'lightId'){
+    
+            filteredUsers = data.filter(user => !user.name || user.name.trim() === '')
+        } else {
+            filteredUsers = data
         }
- 
+
+
+    
         // // Calculate total pages based on the number of filtered users
         const maxPages = Math.ceil(filteredUsers.length / limit)
  
