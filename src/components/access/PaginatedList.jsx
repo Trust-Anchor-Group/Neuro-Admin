@@ -2,14 +2,16 @@ import React from 'react'
 import { FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimesCircle, FaBan } from 'react-icons/fa';
 import { RedirectButton } from './RedirectButton';
 import Link from 'next/link';
+import TableComponent from './TableComponent';
+import { Pagination } from './Pagination';
 
-export const PaginatedList = ({userList}) => {
+export const PaginatedList = ({userList,page,prevPage,totalPages}) => {
 
     return (
         <>
         {
              userList === null || userList === undefined ?
-            <div className='p-5 border-2 bg-white rounded-xl  min-w-[800px] min-h-[400px]'>
+            <div className='border-2 bg-white rounded-xl  min-w-[600px] min-h-[400px]'>
                 <h2 className='text-center mb-10 text-xl font-semibold md:text-3xl'>User&nbsp;List</h2>
                 <h3 className='flex justify-center items-center'>Could not retrieve any data, try later</h3>
 
@@ -18,22 +20,23 @@ export const PaginatedList = ({userList}) => {
             <div className='p-5 border-2 bg-white rounded-xl min-w-[800px] min-h-[400px] max-sm:min-w-[300px]'>
             <h2 className='text-center mb-10 text-xl font-semibold md:text-3xl'>User&nbsp;List</h2>
             <table className='w-full table-auto border-collapse'>
-                <thead>
-                    <tr className='border-b-2'>
-                        <th className='p-3 text-left max-sm:text-center'>User&nbsp;ID</th>
-                        <th className='p-3 text-left max-sm:text-center'>Name</th>
-                        <th className='p-3 text-left max-sm:hidden'>Account</th>
-                        <th className='p-3 text-left max-sm:hidden'>Email</th>
-                        <th className='p-3 text-left'>Status</th>
-                        <th className='p-3 text-left max-sm:hidden'>Type of ID</th>
-                    </tr>
-                </thead>
                 <tbody>
-                    {userList && userList.map((user) => (
+                  <tr>
+                    <td>
+                      <div className='relative'>
+                        <TableComponent userList={userList}/>
+                        <Pagination page={page} prevPage={prevPage} totalPages={totalPages} />
+                      </div>
+                    </td>
+                  </tr>
+                 
+                    {/* {userList && userList.map((user) => (
                         <tr className="border-b text-center" key={user.id}>
                           <td>
                             <Link className='text-blue-600 hover:underline hover:text-blue-400'
                              href={`/list/access/admin/${user.id}`}>{user.id.slice(0,10)}</Link> 
+                          </td>
+                          <td>
                           </td>
                             {user.name === '' ? <td>-</td> : 
                               <td>
@@ -89,7 +92,7 @@ export const PaginatedList = ({userList}) => {
                                     <RedirectButton hamburgMeny={true} userId={user.id}/>
                                   </td>
                         </tr>
-                    ))}
+                    ))} */}
                 </tbody>
             </table>
         </div>

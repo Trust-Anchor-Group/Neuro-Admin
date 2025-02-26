@@ -30,7 +30,7 @@ export const RedirectButton = ({ hrefText, classText, hamburgMeny,userId,buttonN
           }
           {toggle && (
             <div
-              className="absolute top-8 right-0 w-48 bg-white border-2 rounded-lg shadow-lg z-10 pt-4 animate-fade-in"
+              className="absolute top-8 right-0 w-48 bg-white border-2 rounded-lg shadow-lg z-50 pt-4 animate-fade-in"
             >
               <ImCross
                 onClick={handleToggle}
