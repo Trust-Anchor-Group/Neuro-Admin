@@ -1,9 +1,8 @@
 import { PaginatedList } from '@/components/access/PaginatedList'
-import SearchBar from '@/components/SearchBar';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import config from '@/config/config';
-import { FilterId } from './FilterId';
+
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
@@ -14,12 +13,13 @@ export const AccessContet = () => {
     const [userList, setUserList] = useState(null)
     let limit = 5
     const page = Number(searchParams.get('page') || 1)
+    const [loading, setLoading] = useState(false)
 
     const [totalPages, setTotalPages] = useState(0)
     
     useEffect(() => {
       async function getData(){
-
+        setLoading(true)
         try {
           const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filterIds=${encodeURIComponent(filterIds)}`;
           const res = await fetch(url, {
@@ -35,6 +35,7 @@ export const AccessContet = () => {
           setUserList(data.data)
           setTotalPages(data.totalPages)
           console.log(userList)
+          setLoading(false)
         } catch (error) {
           throw new Error('Could not get userList',error)  
         }
@@ -63,6 +64,7 @@ export const AccessContet = () => {
                     page={page}
                     totalPages={totalPages}
                     prevPage={prevPage}
+                    loading={loading}
                 />
             </div>
           </div>

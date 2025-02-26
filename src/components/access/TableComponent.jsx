@@ -8,14 +8,15 @@ import {
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Link from "next/link";
-import { FaBan, FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimesCircle } from "react-icons/fa";
+import { FaBan, FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimesCircle, FaUser, FaUserCog } from "react-icons/fa";
 import { RedirectButton } from "./RedirectButton";
 import { StatusIcon } from "./StatusIcon";
-import { useRouter } from "next/navigation";
+import { MenuItem } from "@mui/material";
+
 
 const TableComponent = ({ userList }) => {
   const data = userList || [];
-  const router = useRouter();
+
 
 
   const columns = useMemo(
@@ -55,12 +56,33 @@ const TableComponent = ({ userList }) => {
         accessorKey: "account",
         header: "Account",
         size: 100,
+        muiTableBodyCellProps: {
+          sx: {
+            display: { xs: "none", sm: "table-cell" }, 
+          },
+        },
+        muiTableHeadCellProps: {
+          sx: {
+            display: { xs: "none", sm: "table-cell" }, 
+          },
+        },
       },
       {
         accessorKey: "email",
         header: "Email",
         size: 100,
         Cell: () => "vincentpraktiant@Email.com",
+        muiTableBodyCellProps: {
+          sx: {
+            display: { xs: "none", sm: "table-cell" }, 
+          },
+        },
+        muiTableHeadCellProps: {
+          sx: {
+            display: { xs: "none", sm: "table-cell" }, 
+          },
+        },
+      
       },
       {
         accessorKey: "state",
@@ -75,6 +97,16 @@ const TableComponent = ({ userList }) => {
           if (state === "Rejected") return <StatusIcon icon={<FaBan className="text-red-500" />} text="Rejected" color="text-red-500" />;
           return <span className="text-gray-500">Unknown</span>;
         },
+        muiTableBodyCellProps: {
+          sx: {
+            display: { xs: "none", sm: "table-cell" }, 
+          },
+        },
+        muiTableHeadCellProps: {
+          sx: {
+            display: { xs: "none", sm: "table-cell" }, 
+          },
+        },
       },
       {
         accessorKey: "type of id",
@@ -82,13 +114,18 @@ const TableComponent = ({ userList }) => {
         size: 100,
         filterVariant: "select",
         Cell: ({ row }) => (row.original.name ? "Full ID" : "Light ID"),
+        muiTableBodyCellProps: {
+          sx: {
+            display: { xs: "none", sm: "table-cell" }, 
+          },
+        },
+        muiTableHeadCellProps: {
+          sx: {
+            display: { xs: "none", sm: "table-cell" }, 
+          },
+        },
       },
-      {
-        accessorKey: "actions",
-        header: "Actions",
-        size: 100,
-        Cell: ({ row }) => <RedirectButton hamburgMeny={true} userId={row.original.id} />,
-      },
+
     ],
     []
   );
@@ -101,9 +138,42 @@ const TableComponent = ({ userList }) => {
     initialState: { showColumnFilters: false },
     enablePagination: false,
     manualPagination: false,
-    muiPaginationProps: {
-      sx:{display:'none'}
-    },
+    enableRowActions: true,
+    positionActionsColumn:'last',
+    renderRowActionMenuItems: ({ closeMenu, row }) => [
+      <MenuItem
+      key={1}
+      onClick={() => closeMenu()}
+      >
+        <Link href={`/list/access/admin/${row.original.id}`}>
+            <div className="flex justify-center items-center gap-5">
+                <FaUserCog className='text-lg'/>
+                <span>
+                Manage user            
+                </span>  
+            </div>
+        </Link>
+      
+      </MenuItem>,
+            <MenuItem
+            key={2}
+            onClick={() => {
+              closeMenu();
+            }}
+          >
+            <Link href={`/list/access/detailpage/${row.original.id}`}>
+              <div className="flex justify-center items-center gap-5">
+                   <FaUser className='text-lg'/>
+              <span>
+              Manage userId  
+              </span>
+              </div>
+            </Link>
+          
+          </MenuItem>,
+  
+    ],
+
   });
 
   return (
