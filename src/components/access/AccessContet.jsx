@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import config from '@/config/config';
 
 
+
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
 
@@ -13,13 +14,11 @@ export const AccessContet = () => {
     const [userList, setUserList] = useState(null)
     let limit = 5
     const page = Number(searchParams.get('page') || 1)
-    const [loading, setLoading] = useState(false)
 
     const [totalPages, setTotalPages] = useState(0)
     
     useEffect(() => {
       async function getData(){
-        setLoading(true)
         try {
           const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filterIds=${encodeURIComponent(filterIds)}`;
           const res = await fetch(url, {
@@ -35,7 +34,6 @@ export const AccessContet = () => {
           setUserList(data.data)
           setTotalPages(data.totalPages)
           console.log(userList)
-          setLoading(false)
         } catch (error) {
           throw new Error('Could not get userList',error)  
         }
@@ -50,10 +48,10 @@ export const AccessContet = () => {
   
   
     const prevPage = page - 1 > 0 ? page - 1 : 1
-    
+
     return (
       <div>
-          <div className='flex justify-center items-center h-screen my-10'>
+          <div className='flex justify-center items-center h-screen'>
             <div className='flex flex-col gap-3'>
               {/* <SearchBar placeholder={'Search...'} classNameText={'w-full border-2 rounded-md py-3 pl-10 text-sm'}/>
               <div className='flex justify-end'>
@@ -64,7 +62,7 @@ export const AccessContet = () => {
                     page={page}
                     totalPages={totalPages}
                     prevPage={prevPage}
-                    loading={loading}
+                    limit={limit}
                 />
             </div>
           </div>

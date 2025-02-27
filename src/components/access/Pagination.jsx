@@ -6,12 +6,21 @@ import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from '
 
 
 
- export const Pagination = ({page,prevPage,totalPages}) => {
+ export const Pagination = ({ page,prevPage,totalPages,limit }) => {
 
+    const maxCount = totalPages * limit
+
+    const startItem = (page -1) * limit + 1
+    const endItem = Math.min(page * limit, maxCount)
     //Pagination buttons.
 
    return (
      <div className='absolute bottom-[3vh] right-[3vw] z-50 flex gap-2 justify-between items-center'>
+      <div className='flex gap-2 justify-center items-center'>
+        <p>{startItem}-{endItem}</p>
+        <p>of</p>
+        <p>{maxCount}</p>
+      </div>
       <div>
        {page === 1 ? (
         <div className='flex justify-center items-center gap-2'>

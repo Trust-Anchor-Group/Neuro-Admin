@@ -11,7 +11,6 @@
 'use client'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
-import { FaSearch } from 'react-icons/fa'
 import { useDebouncedCallback } from 'use-debounce'
 
 const SearchBar = ({placeholder,classNameText}) => {
@@ -36,14 +35,13 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
 },300)
 
   return (
-    <div className='relative flex flex-col justify-center items-center'>
-        <label className='text-lg' htmlFor="search">Search</label>
+    <div className='absolute top-[3.5%] right-[14%] z-50 flex flex-col justify-center items-center max-sm:right-0'>
         <input type="text" 
         className={classNameText}
         placeholder={placeholder}
         onChange={(e) => handleSearch(e.target.value)}
         defaultValue={searchParams.get('query')?.toString()} />
-        <FaSearch className='absolute left-5 top-1/2 h-[30px] w-[20px] -translate-x-1/2'/>
+        {/* <FaSearch className='absolute left-5 top-1/2 h-[30px] w-[20px] -translate-x-1/2'/> */}
     </div>
   )
 }

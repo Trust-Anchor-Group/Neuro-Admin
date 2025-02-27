@@ -4,14 +4,13 @@ import config from '@/config/config';
  
 export async function GET(req) {
     try {
-        console.log('Request',req.url)
         // Extract search parameters from the request URL
         const { searchParams } = new URL(req.url)
         const page = parseInt(searchParams.get('page') || '1', 10) //§ Get the page number, default to 1
         const limit = parseInt(searchParams.get('limit') || '5', 10) // Get the limit of users per page, default to 5
         
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
-    
+      
         const filterIds = searchParams.get('filterIds')
         
         const cookieStore = await cookies();
@@ -51,16 +50,15 @@ export async function GET(req) {
 
         } 
 
-
         
-        if(filterIds === 'fullId'){
-            filteredUsers = data.filter(user => user.name)
-        } else if(filterIds === 'lightId'){
+        // if(filterIds === 'fullId'){
+        //     filteredUsers = data.filter(user => user.name)
+        // } else if(filterIds === 'lightId'){
     
-            filteredUsers = data.filter(user => !user.name || user.name.trim() === '')
-        } else {
-            filteredUsers = data
-        }
+        //     filteredUsers = data.filter(user => !user.name || user.name.trim() === '')
+        // } else {
+        //     filteredUsers = data
+        // }
 
 
     

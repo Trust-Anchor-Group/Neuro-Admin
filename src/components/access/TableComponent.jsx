@@ -9,12 +9,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Link from "next/link";
 import { FaBan, FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimesCircle, FaUser, FaUserCog } from "react-icons/fa";
-import { RedirectButton } from "./RedirectButton";
 import { StatusIcon } from "./StatusIcon";
 import { MenuItem } from "@mui/material";
 
 
 const TableComponent = ({ userList }) => {
+
+
+
   const data = userList || [];
 
 
@@ -23,8 +25,19 @@ const TableComponent = ({ userList }) => {
     () => [
       {
         accessorKey: "id",
-        header: "User ID",
+        header: "Legal identites",
         size: 100,
+        muiTableBodyCellProps: {
+          sx: {
+            display: { xs: "none", sm: "table-cell" }, 
+          },
+        },
+        muiTableHeadCellProps: {
+          sx: {
+            display: { xs: "none", sm: "table-cell" }, 
+          },
+        },
+      
         Cell: ({ cell }) => (
           <Link className="text-blue-600 hover:underline hover:text-blue-400" href={`/list/access/admin/${cell.getValue()}`}>
             {cell.getValue().slice(0, 10)}
@@ -33,7 +46,7 @@ const TableComponent = ({ userList }) => {
       },
       {
         accessorKey: "name",
-        header: "Name",
+        header: "Full Name",
         size: 100,
         Cell: ({ cell, row }) => {
           const nameParts = cell.getValue()?.split(" ") || [];
@@ -139,7 +152,9 @@ const TableComponent = ({ userList }) => {
     enablePagination: false,
     manualPagination: false,
     enableRowActions: true,
+    enableColumnFilters: false,
     positionActionsColumn:'last',
+    enableGlobalFilter: false,
     renderRowActionMenuItems: ({ closeMenu, row }) => [
       <MenuItem
       key={1}
@@ -178,7 +193,17 @@ const TableComponent = ({ userList }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <MaterialReactTable table={table} sx={{ maxWidth: "1000px", overflowX: "auto" }} />
+      <div className="min-h-[400px]">
+      <MaterialReactTable 
+      table={table} 
+      sx={{ 
+        minWidth: "800px", 
+        minHeight: "400px", 
+        overflowX: "auto",
+        display: "flex", // Ser till att tabellen fyller utrymmet
+        flexDirection: "column" // Behåller strukturen
+      }}  />
+      </div>
     </LocalizationProvider>
   );
 };

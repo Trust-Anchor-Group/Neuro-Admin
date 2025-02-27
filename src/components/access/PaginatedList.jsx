@@ -1,17 +1,11 @@
 import React from 'react'
 import TableComponent from './TableComponent';
 import { Pagination } from './Pagination';
-import { FaSpinner } from 'react-icons/fa';
+import SearchBar from '../SearchBar';
 
-export const PaginatedList = ({ userList, page, prevPage, totalPages, loading }) => {
+export const PaginatedList = ({ userList, page, prevPage, totalPages,limit }) => {
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-32">
-                <FaSpinner className="text-4xl text-blue-600 animate-spin" />
-            </div>
-        );
-    }
+
 
     if (!userList) {
         return (
@@ -19,7 +13,7 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages, loading })
                 <h2 className="text-xl font-semibold md:text-3xl">User&nbsp;List</h2>
                 <h3 className="mt-4 text-gray-600">Could not retrieve any data, try later</h3>
             </div>
-        );
+        )
     }
 
     return (
@@ -31,7 +25,8 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages, loading })
                         <td>
                             <div className="relative">
                                 <TableComponent userList={userList} />
-                                <Pagination page={page} prevPage={prevPage} totalPages={totalPages} />
+                                <Pagination page={page} prevPage={prevPage} totalPages={totalPages} limit={limit} />
+                                <SearchBar placeholder={'Search...'} classNameText={'w-full border-2 rounded-md py-2 pl-10 text-sm'}/>
                             </div>
                         </td>
                     </tr>
