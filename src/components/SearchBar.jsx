@@ -35,7 +35,7 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
 },300)
 
   return (
-    <div className='absolute top-[3.5%] right-[14%] z-50 flex flex-col justify-center items-center max-sm:right-0'>
+    <div className='absolute top-[3.5%] right-[15%] z-50 flex flex-col justify-center items-center max-sm:right-[10%]'>
         <input type="text" 
         className={classNameText}
         placeholder={placeholder}

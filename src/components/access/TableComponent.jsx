@@ -110,16 +110,7 @@ const TableComponent = ({ userList }) => {
           if (state === "Rejected") return <StatusIcon icon={<FaBan className="text-red-500" />} text="Rejected" color="text-red-500" />;
           return <span className="text-gray-500">Unknown</span>;
         },
-        muiTableBodyCellProps: {
-          sx: {
-            display: { xs: "none", sm: "table-cell" }, 
-          },
-        },
-        muiTableHeadCellProps: {
-          sx: {
-            display: { xs: "none", sm: "table-cell" }, 
-          },
-        },
+
       },
       {
         accessorKey: "type of id",
@@ -153,8 +144,10 @@ const TableComponent = ({ userList }) => {
     manualPagination: false,
     enableRowActions: true,
     enableColumnFilters: false,
+    enableSorting: false, 
     positionActionsColumn:'last',
     enableGlobalFilter: false,
+    enableColumnActions: false,
     renderRowActionMenuItems: ({ closeMenu, row }) => [
       <MenuItem
       key={1}

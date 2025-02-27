@@ -26,7 +26,7 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,limit }) =>
                             <div className="relative">
                                 <TableComponent userList={userList} />
                                 <Pagination page={page} prevPage={prevPage} totalPages={totalPages} limit={limit} />
-                                <SearchBar placeholder={'Search...'} classNameText={'w-full border-2 rounded-md py-2 pl-10 text-sm'}/>
+                                <SearchBar placeholder={'Search...'} classNameText={'w-full border-2 rounded-md py-2 pr-10 pl-2 text-sm'}/>
                             </div>
                         </td>
                     </tr>
