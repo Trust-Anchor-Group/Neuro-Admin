@@ -1,141 +1,106 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo } from "react";
+import { MaterialReactTable } from "material-react-table";
+import { Box, CircularProgress } from "@mui/material";
 import { FaCheckCircle, FaTimesCircle, FaShippingFast, FaClock } from "react-icons/fa";
 
-const AssetOrdersTable = ({ orders }) => {
-  const router = useRouter();
-  const [filter, setFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  const filteredOrders =
-    filter === "all"
-      ? orders
-      : orders.filter((order) => order.status.toLowerCase() === filter);
-
-  const totalItems = filteredOrders.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedOrders = filteredOrders.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
-
-  const handleFilterChange = (status) => {
-    setFilter(status);
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const handleRowClick = (id) => {
-    router.push(`/assets/orders/${id}`);
-  };
-
-  return (
-    <div className="bg-white shadow-xl rounded-lg p-8">
-      {/* Filter */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Creturner Carbon Credit Orders</h2>
-        <div className="flex items-center gap-3">
-          {["all", "pending", "shipped", "delivered", "cancelled"].map(
-            (status) => (
-              <button
-                key={status}
-                className={`px-4 py-2 rounded-lg font-medium shadow-md transition-all ${filter === status
-                    ? status === "pending"
-                      ? "bg-yellow-500 text-white"
-                      : status === "shipped"
-                        ? "bg-blue-500 text-white"
-                        : status === "delivered"
-                          ? "bg-green-500 text-white"
-                          : status === "cancelled"
-                            ? "bg-red-500 text-white"
-                            : "bg-gray-500 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
-                onClick={() => handleFilterChange(status)}
+const AssetOrdersTable = ({ orders, isLoading }) => {
+  // Define columns
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "id",
+        header: "Token ID",
+        size: 300, // Adjust column size
+      },
+      {
+        accessorKey: "assetName",
+        header: "Asset Name",
+        size: 250,
+      },
+      {
+        accessorKey: "category",
+        header: "Category",
+        size: 250,
+      },
+      {
+        accessorKey: "amount",
+        header: "Amount",
+        size: 150,
+      },
+      {
+        accessorKey: "orderDate",
+        header: "Created Date",
+        size: 200,
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        size: 150,
+        Cell: ({ cell }) => {
+          const status = cell.getValue();
+          return (
+            <Box display="flex" alignItems="center" gap={1}>
+              {status === "delivered" ? (
+                <FaCheckCircle className="text-green-500" />
+              ) : status === "shipped" ? (
+                <FaShippingFast className="text-blue-500" />
+              ) : status === "cancelled" ? (
+                <FaTimesCircle className="text-red-500" />
+              ) : (
+                <FaClock className="text-yellow-500" />
+              )}
+              <span
+                className={`font-bold ${
+                  status === "delivered"
+                    ? "text-green-600"
+                    : status === "shipped"
+                    ? "text-blue-600"
+                    : status === "cancelled"
+                    ? "text-red-600"
+                    : "text-yellow-600"
+                }`}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            )
-          )}
-        </div>
-      </div>
+              </span>
+            </Box>
+          );
+        },
+      },
+    ],
+    []
+  );
 
-      {/* Table */}
-      <table className="w-full text-left text-sm border-collapse rounded-lg overflow-hidden">
-        <thead className="bg-gray-100 text-gray-700">
-          <tr>
-            <th className="py-3 px-4">Order ID</th>
-            <th className="py-3 px-4">Asset Name</th>
-            <th className="py-3 px-4">Customer</th>
-            <th className="py-3 px-4">Order Date</th>
-            <th className="py-3 px-4">Amount</th>
-            <th className="py-3 px-4">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedOrders.map((order, index) => (
-            <tr
-              key={order.id}
-              onClick={() => handleRowClick(order.id)}
-              className={`cursor-pointer transition-all ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                } hover:bg-blue-50 hover:shadow-md`}
-            >
-              <td className="py-3 px-4">{order.id}</td>
-              <td className="py-3 px-4">{order.assetName}</td>
-              <td className="py-3 px-4">{order.customer}</td>
-              <td className="py-3 px-4">{order.orderDate}</td>
-              <td className="py-3 px-4">{order.amount}</td>
-              <td className="py-3 px-4 flex items-center gap-2">
-                {order.status === "delivered" ? (
-                  <FaCheckCircle className="text-green-500" />
-                ) : order.status === "shipped" ? (
-                  <FaShippingFast className="text-blue-500" />
-                ) : order.status === "cancelled" ? (
-                  <FaTimesCircle className="text-red-500" />
-                ) : (
-                  <FaClock className="text-yellow-500" />
-                )}
-                <span
-                  className={`font-bold ${order.status === "delivered"
-                      ? "text-green-600"
-                      : order.status === "shipped"
-                        ? "text-blue-600"
-                        : order.status === "cancelled"
-                          ? "text-red-600"
-                          : "text-yellow-600"
-                    }`}
-                >
-                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-      {/* Pagination */}
-      <div className="flex justify-center items-center gap-2 mt-6">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            className={`px-4 py-2 rounded-md font-medium shadow-md transition-all ${currentPage === i + 1
-                ? "bg-blue-500 text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            onClick={() => handlePageChange(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
-    </div>
+  return (
+    <MaterialReactTable
+      columns={columns}
+      data={orders}
+      enableColumnFilters
+      enableSorting
+      enablePagination
+      muiTableProps={{
+        sx: { boxShadow: 2, borderRadius: 2 },
+      }}
+      muiTableBodyProps={{
+        sx: { "& tr:hover": { backgroundColor: "#f5f5f5" } },
+      }}
+      muiTableContainerProps={{
+        sx: { maxHeight: "600px" }, // Set max height for scrollable table
+      }}
+      initialState={{
+        pagination: { pageSize: 5, pageIndex: 0 }, // Default page size
+        sorting: [{ id: "orderDate", desc: true }], // Default sorting by date
+      }}
+    />
   );
 };
 

@@ -11,7 +11,8 @@ const QuickLogin = dynamic(() => import('@/components/quickLogin/QuickLogin'), {
 
 export default function LoginPage() {
   const router = useRouter();
-
+console.log('Neuron Host:', config.api.agent.host);
+console.log('Protocol:', config.protocol);
   const handleLoginSuccess = () => {
     router.push('/admin');
   };

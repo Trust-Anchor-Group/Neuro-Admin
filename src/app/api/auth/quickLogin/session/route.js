@@ -11,7 +11,6 @@ export async function POST(request) {
 
     // Access incoming request cookies
     const cookieStore = await cookies();
-
     const { host } = config.api.agent;
     const url = `https://${host}/QuickLogin`;
 

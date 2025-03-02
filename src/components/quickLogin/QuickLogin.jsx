@@ -156,8 +156,8 @@ export default function QuickLogin({
         }
       }
     };
-
-    const uri = `${config.protocol}://${config.origin}/api/auth/quickLogin/session`;
+    console.log('config.origin:', config.origin); 
+    const uri = `/api/auth/quickLogin/session`;
     xhttp.open('POST', uri, true);
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.withCredentials = true;
