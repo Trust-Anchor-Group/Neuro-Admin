@@ -12,38 +12,36 @@ export default function AdminPage() {
   const [error, setError] = useState(null);
   const [stateForm, setStateForm] = useState({ state: "" });
 
-  async function fetchData() {
-    try {
-      console.log("Fetching data from real API...");
+async function fetchData() {
+  try {
+    console.log("Fetching data from real API...");
 
-      
-      const res = await fetch(`http://localhost:3000/api/user`, {
-        method: "POST" ,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ userId: id }),
-      });
+    const res = await fetch(`/api/user`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ userId: id }),
+    });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`API error: ${res.status} - ${errorText}`);
-      }
-
-      const requestData = await res.json();
-      console.log("✅ API Response:", requestData);
-
-      
-      setUserRequests(Array.isArray(requestData) ? requestData : []);
-      setError(null);
-    } catch (error) {
-      console.error("🚨 API Error:", error);
-      setUserRequests([]);
-      setError(error.message);
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`API error: ${res.status} - ${errorText}`);
     }
+
+    const requestData = await res.json();
+    console.log("✅ API Response:", requestData);
+
+    setUserRequests(Array.isArray(requestData) ? requestData : [requestData]);
+    setError(null);
+  } catch (error) {
+    console.error("🚨 API Error:", error);
+    setUserRequests([]);
+    setError(error.message);
+  } finally {
+    setLoading(false);
   }
+}
 
   useEffect(() => {
     if (id) fetchData();
