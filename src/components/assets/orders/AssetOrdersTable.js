@@ -6,13 +6,12 @@ import { Box, CircularProgress } from "@mui/material";
 import { FaCheckCircle, FaTimesCircle, FaShippingFast, FaClock } from "react-icons/fa";
 
 const AssetOrdersTable = ({ orders, isLoading }) => {
-  // Define columns
   const columns = useMemo(
     () => [
       {
         accessorKey: "id",
         header: "Token ID",
-        size: 300, // Adjust column size
+        size: 300,
       },
       {
         accessorKey: "assetName",
