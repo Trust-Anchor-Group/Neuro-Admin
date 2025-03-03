@@ -1,0 +1,81 @@
+{
+    "title": "My first form",
+    "description": "My first description",
+    "pages": [
+      {
+        "title": "Page Title 1",
+        "description": "Page desc 1",
+        "inputs": [
+          {
+            "label": "Project Description",
+            "name": "projectDescription",
+            "type": "String",
+            "required": true,
+            "comment": "Must be more informative. Please provide some more details."
+          },
+          {
+            "label":"Disclaimer",
+            "name":"disclaimer",
+            "required": false,
+            "comment": null
+          },
+          {
+            "label":"About organisation",
+            "name":"aboutOrganisation",
+            "required": false,
+            "comment": null
+          }
+        ]
+      },
+      {
+        "title": "Page Title 2",
+        "description": "Page desc 2",
+        "inputs": [
+          {
+            "label": "Field 2",
+            "name": "field2",
+            "type": "String",
+            "required": true,
+            "comment": null
+          },
+          {
+            "label":"Field 2.1",
+            "name":"field21",
+            "required": false,
+            "comment": null
+          },
+          {
+            "label":"Field 2.2",
+            "name":"field22",
+            "required": false,
+            "comment": null
+          }
+        ]
+      },
+      {
+        "title": "Page Title 3",
+        "description": "Page desc 3",
+        "inputs": [
+          {
+            "label": "Field 3",
+            "name": "field3",
+            "type": "String",
+            "required": true,
+            "comment": null
+          },
+          {
+            "label":"Field 3.1",
+            "name":"field31",
+            "required": false,
+            "comment": null
+          },
+          {
+            "label":"Field 3.2",
+            "name":"field32",
+            "required": false,
+            "comment": null
+          }
+        ]
+      }
+    ]
+}
