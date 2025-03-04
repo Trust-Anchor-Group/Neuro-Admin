@@ -11,17 +11,19 @@ export async function GET(req) {
         
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
       
-        const filterIds = searchParams.get('filterIds')
         
         const cookieStore = await cookies();
         const clientCookieObject = cookieStore.get('HttpSessionID');
         const clientCookie = clientCookieObject
         ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
         : null;
+
+        console.log('Raw Cookie',clientCookieObject)
+        console.log('Cookie',clientCookie)
     
         
         const { host } = config.api.agent;
-        console.log('host',host)
+        
         const url = `https://${host}/LegalIdentities.ws`;
  
         const res = await fetch(url, {
@@ -33,14 +35,19 @@ export async function GET(req) {
             },
             body: JSON.stringify({
                 'maxCount': 20,
-                'offset': 0
+                'offset': 0,
             })
         });
  
+        if(!res.ok){
+            console.log('Res Status ',res.status)
+            console.log('StatusText ', res.statusText)
+            console.log(res)
+
+        }
    
  
         const data = await res.json()
- 
         let filteredUsers = data
         if (query) {
             filteredUsers = data.filter(user =>
@@ -50,15 +57,6 @@ export async function GET(req) {
 
         } 
 
-        
-        // if(filterIds === 'fullId'){
-        //     filteredUsers = data.filter(user => user.name)
-        // } else if(filterIds === 'lightId'){
-    
-        //     filteredUsers = data.filter(user => !user.name || user.name.trim() === '')
-        // } else {
-        //     filteredUsers = data
-        // }
 
 
     
