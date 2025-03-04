@@ -2,6 +2,10 @@
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {v4 as uuidv4} from "uuid";
+import { InputElement } from "./InputElement";
+import { PageBar } from "../PageBar";
+import { Button } from "@/components/ui/button";
+import { ButtonForm } from "./ButtonForm";
 
 const DynamicForm = ({uri, endpoint}) => {
 
@@ -79,48 +83,43 @@ const DynamicForm = ({uri, endpoint}) => {
             {
                 template?.pages?.length > 1 && (
                     <div>
-                        <span>{pageData.title}</span>
-                        <span>{`Step ${formInfo.currentSlide}/${formInfo.totalSlides}`}</span>
+                        <PageBar title={pageData.title} currentSlide={formInfo.currentSlide} totalSlides={formInfo.totalSlides}/>
                     </div>
                 )
             }
                 <p>{pageData.description}</p>
-                {pageData.inputs.map((input) => {
+                {pageData.inputs.map((input,index) => {
                     return (
-                        <label key={input.name} className="flex flex-col gap-2">
-                            <span>{`${input.label}${input.required ? '*' : ''}`}</span>
-                            <input
-                                className={`border p-3 shadow-1g ${errors[input.name] ? 'border-red-500' : ''}`}
+                        <div key={index}>
+                            <InputElement
+                                key={input.name}
+                                label={input.label}
                                 name={input.name}
                                 type={input.type}
-                                {...register(input.name, {
-                                    required: input.required
-                                })}
+                                register={register}
+                                errors={errors}
+                                required={input.required}
+                                comment={input.comment}
                             />
-
-                            {errors[input.name]  && <span className="text-red-500 text-xs">{`${input.label} is required`}</span>}
-
-                            {
-                                input.comment && (
-                                    <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
-                                        <span className="font-bold">Feedback:</span>
-                                        <p>{input.comment}</p>
-                                    </div>
-                                )
-                            }
-                        </label>
+                        </div>
                     )
                 })}
 
             <nav>
             {
 
-                pageIndex === 0 && formInfo.totalSlides === 1 ? (<button type="button">Complete</button>) :
-                pageIndex === 0 && formInfo.totalSlides > 0 ? (<button onClick={() => handleSlide('next')} type="button">Continue</button>) :
+                pageIndex === 0 && formInfo.totalSlides === 1 ? (<ButtonForm handleSlide={handleSlide} handleSlideProp={'next'} textColor={'text-white'} bgColor={'bg-blue-500'}
+                    buttonText={'Complete'}/>) :
+                pageIndex === 0 && formInfo.totalSlides > 0 ? (<ButtonForm handleSlide={handleSlide} handleSlideProp={'next'} textColor={'text-white'} bgColor={'bg-blue-500'}
+                    buttonText={'Complete'}/>) :
                         pageIndex > 0 && formInfo.currentSlide !== formInfo.totalSlides ? (
                     <>
-                        <button onClick={() => handleSlide('prev')} type="button">Back</button>
-                        <button onClick={() => handleSlide('next')} type="button">Continue</button>
+                    <div className="flex justify-between items-center">
+                        <ButtonForm handleSlide={handleSlide} handleSlideProp={'prev'} textColor={'text-white'} bgColor={'bg-blue-500'}
+                    buttonText={'Back'}/>
+                               <ButtonForm handleSlide={handleSlide} handleSlideProp={'Next'} textColor={'text-white'} bgColor={'bg-blue-500'}
+                    buttonText={'Continue'}/>
+                    </div>
                     </>
                 ) : formInfo.currentSlide === formInfo.totalSlides ? (
                     <>
