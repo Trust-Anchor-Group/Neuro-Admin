@@ -14,7 +14,7 @@ export default function LoginPage() {
 console.log('Neuron Host:', config.api.agent.host);
 console.log('Protocol:', config.protocol);
   const handleLoginSuccess = () => {
-    router.push('/dashboard');
+    router.push('/landingpage');
   };
 
   return (

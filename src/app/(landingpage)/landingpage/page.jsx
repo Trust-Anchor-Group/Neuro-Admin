@@ -11,7 +11,7 @@ import { FiLock } from "react-icons/fi";
 
 
 
-const Dashboard = () => {
+const LandingPage = () => {
 
     const [neuroArray, setneuroArray] = useState([
         {
@@ -84,4 +84,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default LandingPage

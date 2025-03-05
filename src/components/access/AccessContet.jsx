@@ -20,7 +20,7 @@ export const AccessContet = () => {
     useEffect(() => {
       async function getData(){
         try {
-          const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filterIds=${encodeURIComponent(filterIds)}`;
+          const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
           const res = await fetch(url, {
             method:'GET',
             headers:{
@@ -32,7 +32,7 @@ export const AccessContet = () => {
           const data = await res.json()
           console.log(data)
           setUserList(data.data)
-          setTotalPages(data.totalPages)
+          setTotalPages(2)
           console.log(userList)
         } catch (error) {
           throw new Error('Could not get userList',error)  
