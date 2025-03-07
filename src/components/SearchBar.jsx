@@ -42,7 +42,7 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
         placeholder={placeholder}
         onChange={(e) => handleSearch(e.target.value)}
         defaultValue={searchParams.get('query')?.toString()} />
-         <FaSearch className='absolute left-[1%] top-[32%] h-[30px] w-[20px] max-md:left-[4%]'/> 
+         <FaSearch className='text-gray-400 absolute left-[1%] top-[32%] h-[30px] w-[20px] max-md:left-[4%]'/> 
     </div>
   )
 }

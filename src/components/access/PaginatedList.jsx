@@ -11,6 +11,7 @@ import { StatusIcon } from './StatusIcon';
 
 export const PaginatedList = ({ userList, page, prevPage, totalPages,limit }) => {
 
+    
     //Decide what columns you should have in your table
     const userColoumns = [
         { accessorKey: "id", header: "Legal identites", size: 100,
@@ -76,7 +77,6 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,limit }) =>
     if (!userList) {
         return (
             <div className="">
-                <h1 className="text-xl font-semibold md:text-3xl">Legal&nbsp;Identities</h1>
                 <div className='flex justify-center items-center h-screen'>
                   <p className=" text-gray-600 text-xl max-sm:text-lg">Could not retrieve any data, try later</p>
                 </div>
@@ -87,19 +87,9 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,limit }) =>
     return (
         <div>
             <div className='mb-5 flex justify-between items-center'>
-                <div>
-                    <h1 className="mb-2 text-xl font-semibold md:text-3xl">Legal&nbsp;Identities</h1>
-                    <p className='text-lg opacity-70 max-sm:text-sm'>Manage user accounts and permissions</p>
-                </div>
-                <div className=''>
-                    <button className='flex cursor-pointer
-                     items-center justify-center gap-2 py-3 px-3
-                      bg-neuroBlue text-white text-lg rounded-lg transition-all 
-                       hover:bg-neuroBlue/70 max-sm:text-sm'><FiUserPlus className=''/>Add&nbsp;user</button>
-                </div>
             </div>
                 <SearchBar placeholder={'Search...'}
-                 classNameText={'w-full border-2 rounded-md py-2 my-5 pr-10 pl-12 text-sm'}/>
+                 classNameText={'w-full border-2 rounded-md py-3 my-5 pr-10 pl-12 text-sm'}/>
             <table className="w-full table-auto border-collapse">
                 <tbody>
                     <tr>
