@@ -4,13 +4,13 @@ import React, { useEffect, useState } from 'react'
 import config from '@/config/config';
 import Link from 'next/link';
 import { FiUserPlus } from 'react-icons/fi';
+import { userColoumnsAccount,customCellAcountTable,accountActions } from './accountTableList.js'
 
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
 
     const query = searchParams.get('query') || ''
-    const filterIds = searchParams.get('filterIds') || ''
 
     const [userList, setUserList] = useState(null)
     let limit = 5
@@ -43,7 +43,7 @@ export const AccessContet = () => {
       }
   
       getData()
-    }, [page,limit,query,filterIds])
+    }, [page,limit,query])
     
   
  
@@ -73,6 +73,9 @@ export const AccessContet = () => {
                     totalPages={totalPages}
                     prevPage={prevPage}
                     limit={limit}
+                    userColoumns={userColoumnsAccount}
+                    customCellRenderers={customCellAcountTable}
+                    renderRowActions={accountActions}
                 />
             </div>
           </div>
