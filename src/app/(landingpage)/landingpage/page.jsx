@@ -16,7 +16,7 @@ const LandingPage = () => {
     const [neuroArray, setneuroArray] = useState([
         {
             title:'Neuro-Access',
-            href:'/admin',
+            href:'/neuro-access',
             icon:FiShield,
             iconColor:'text-blue-500',
             text:'Identity and access management',
