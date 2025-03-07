@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, MenuItem, IconButton } from "@mui/material";
+import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SecurityIcon from "@mui/icons-material/Security";
 
 export default function ActionDropdown({ requestId }) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -38,9 +42,30 @@ export default function ActionDropdown({ requestId }) {
         <MoreVertIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        <MenuItem onClick={() => handleUpdate("Approved")} sx={{ color: "green" }}>Approve</MenuItem>
-        <MenuItem onClick={() => handleUpdate("Rejected")} sx={{ color: "red" }}> Reject</MenuItem>
-        <MenuItem onClick={() => handleUpdate("Obsoleted")} sx={{ color: "orange" }}> Obsolete</MenuItem>
+        <MenuItem onClick={() => handleUpdate("Approved")} sx={{ color: "green" }}>
+          <ListItemIcon>
+            <CheckCircleIcon sx={{ color: "green" }} />
+          </ListItemIcon>
+          <ListItemText primary="Approve" />
+        </MenuItem>
+        <MenuItem onClick={() => handleUpdate("Rejected")} sx={{ color: "red" }}>
+          <ListItemIcon>
+            <CancelIcon sx={{ color: "red" }} />
+          </ListItemIcon>
+          <ListItemText primary="Reject" />
+        </MenuItem>
+        <MenuItem onClick={() => handleUpdate("Obsoleted")} sx={{ color: "gray" }}>
+          <ListItemIcon>
+            <DeleteIcon sx={{ color: "gray" }} />
+          </ListItemIcon>
+          <ListItemText primary="Mark as Obsolete" />
+        </MenuItem>
+        <MenuItem onClick={() => handleUpdate("Compromised")} sx={{ color: "purple" }}>
+          <ListItemIcon>
+            <SecurityIcon sx={{ color: "purple" }} />
+          </ListItemIcon>
+          <ListItemText primary="Mark as Compromised" />
+        </MenuItem>
       </Menu>
     </>
   );

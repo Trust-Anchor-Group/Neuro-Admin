@@ -2,7 +2,8 @@ import { PaginatedList } from '@/components/access/PaginatedList'
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import config from '@/config/config';
-
+import Link from 'next/link';
+import { FiUserPlus } from 'react-icons/fi';
 
 
 export const AccessContet = () => {
@@ -18,6 +19,7 @@ export const AccessContet = () => {
     const [totalPages, setTotalPages] = useState(0)
     
     useEffect(() => {
+    //Fetch data from backend
       async function getData(){
         try {
           const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
@@ -44,19 +46,27 @@ export const AccessContet = () => {
     }, [page,limit,query,filterIds])
     
   
-    //Fetch data from backend
+ 
   
   
     const prevPage = page - 1 > 0 ? page - 1 : 1
 
     return (
       <div>
-          <div className='flex justify-center items-center h-screen'>
-            <div className='flex flex-col gap-3'>
-              {/* <SearchBar placeholder={'Search...'} classNameText={'w-full border-2 rounded-md py-3 pl-10 text-sm'}/>
-              <div className='flex justify-end'>
-                <FilterId/>
-              </div> */}
+          <div className='p-5'>
+            <div className='flex justify-between items-center'>
+              <div>
+                      <h1 className="mb-2 text-xl font-semibold md:text-3xl">Legal&nbsp;Identities</h1>
+                      <p className='text-lg opacity-70 max-sm:text-sm'>Manage user accounts and permissions</p>
+                  </div>
+                  <div className=''>
+                      <button className='flex cursor-pointer
+                      items-center justify-center gap-2 py-3 px-3
+                        bg-neuroBlue text-white text-lg rounded-lg transition-all 
+                        hover:bg-neuroBlue/70 max-sm:text-sm'><FiUserPlus className=''/>Add&nbsp;user</button>
+                  </div>
+            </div>
+            <div className=''>
               <PaginatedList 
                     userList={userList} 
                     page={page}

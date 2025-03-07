@@ -38,7 +38,7 @@ export async function GET(req) {
                 'maxCount': limit,
                 'offset': (page - 1) * limit,
                 'filter':{
-                    "LAST":query
+                    "FIRST":query
                 }
             })
         });
