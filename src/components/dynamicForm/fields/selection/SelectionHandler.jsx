@@ -11,10 +11,6 @@ export default function SelectionHandler({ control, errors, element }) {
     name: element.name,
     control,
     defaultValue: [],
-    rules: {
-      required: element.required,
-      validate: (value) => !element.required || (value && value.length > 0),
-    },
   });
 
   const handleChange = (value) => {

@@ -7,11 +7,7 @@ export default function TextHandler({ control, errors, element }) {
   const { field } = useController({
     name: element.name,
     control,
-    defaultValues: '',
-    rules: {
-      required: element.required,
-      validate: (value) => !element.required || (value && value.length > 0),
-    },
+    defaultValue: '',
   });
 
   return (

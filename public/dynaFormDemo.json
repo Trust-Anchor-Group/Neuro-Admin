@@ -20,7 +20,7 @@
           "name": "email",
           "description": "We need this for account creation",
           "type": "email",
-          "required": false,
+          "required": true,
           "comment": "Must be more informative. Please provide some more details."
         },
         {

@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import validationSchema from './validation/validationSchema';
 import SelectionHandler from './fields/selection/SelectionHandler';
 import TextHandler from './fields/text/TextHandler';
 import Navigation from './components/Navigation';
@@ -12,6 +14,7 @@ const DynamicForm = ({ uri, endpoint }) => {
   const [slideIndex, setSlideIndex] = useState(0);
   const [pageData, setPageData] = useState(null);
   const [formInfo, setFormInfo] = useState({});
+  const [dynamicSchema, setDynamicSchema] = useState({});
 
   const {
     register,
@@ -20,9 +23,11 @@ const DynamicForm = ({ uri, endpoint }) => {
     trigger,
     control,
     watch,
+    reset,
   } = useForm({
     mode: 'onChange',
     reValidateMode: 'onChange',
+    resolver: pageData ? yupResolver(dynamicSchema) : undefined,
   });
 
   useEffect(() => {
@@ -66,6 +71,20 @@ const DynamicForm = ({ uri, endpoint }) => {
       totalSlides: template?.slides?.length,
     });
   }, [template, slideIndex]);
+
+  useEffect(() => {
+    console.log('page data', pageData);
+    setDynamicSchema(validationSchema(pageData));
+  }, [pageData]);
+
+  useEffect(() => {
+    if (dynamicSchema && Object.keys(dynamicSchema).length > 0) {
+      reset(undefined, {
+        keepValues: true, // Keep current values
+        keepDirtyValues: true, // Don't mark as pristine
+      });
+    }
+  }, [dynamicSchema, reset]);
 
   const onSumbit = (data) => {
     console.log('the form data', data);
