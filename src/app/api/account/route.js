@@ -10,7 +10,6 @@ export async function POST(request) {
     const { host } = config.api.agent;
     const url = `https://${host}/account.ws`;
 
-    // state can be set to Created, Approved, Rejected, Obsoleted, or Compromised
     const payload = {
         userName
     };
