@@ -49,18 +49,18 @@ const LandingPage = () => {
     ])
 
   return (
-    <div className='mx-10 pb-10'>
-        <div className='text-center mt-10 '>
+    <div className='mx-12 pb-12'>
+        <div className='text-center my-12 '>
             <h1 className='text-4xl font-semibold mb-10'>Neuro</h1>
             <h2 className='text-4xl font-semibold mb-5'>Admin Dashboard</h2>
-            <p className='text-lg opacity-70'>Select a service to manaage from the options below</p>
+            <p className='text-lg opacity-70'>Select a service to manage from the options below</p>
         </div>
         <div className='max-w-6xl mx-auto mt-10'>
             <div className='grid grid-cols-4 gap-6 max-lg:grid-cols-2 max-sm:grid-cols-1'>
                 {
                     neuroArray.map((item,index)=>(
                 <Link href={item.href} key={index}>
-                        <div className='flex flex-col gap-5 border-2 p-10 rounded-lg shadow'>
+                        <div className='flex flex-col gap-5 mt-12 border-2 p-10 rounded-lg shadow'>
                             <div className='flex justify-between'>
                                 <item.icon size={24} className={item.iconColor}/>
                                 {

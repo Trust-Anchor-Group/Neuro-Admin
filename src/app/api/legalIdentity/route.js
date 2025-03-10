@@ -4,16 +4,15 @@ import ResponseModel from "@/models/ResponseModel";
 export async function POST(request) {
 
     const requestData = await request.json();
-    const { userName } = requestData;
+    const { legalIdentity } = requestData;
     const clientCookie = request.headers.get('Cookie');
 
     const { host } = config.api.agent;
-    const url = `https://${host}/account.ws`;
+    const url = `https://${host}/legalIdentity.ws`;
 
     const payload = {
-        userName
+        id:legalIdentity
     };
-
 
     try {
 
@@ -28,7 +27,6 @@ export async function POST(request) {
             body: JSON.stringify(payload),
             mode: 'cors'
         });
-
 
         const contentType = response.headers.get('content-type');
         let data;
@@ -48,7 +46,7 @@ export async function POST(request) {
             });
         }
 
-        return new Response(JSON.stringify(new ResponseModel(200, 'Account returned', data)), {
+        return new Response(JSON.stringify(new ResponseModel(200, 'Legal Identity returned', data)), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',

@@ -5,13 +5,14 @@ import config from '@/config/config';
 import Link from 'next/link';
 import { FiUserPlus } from 'react-icons/fi';
 import { userColoumnsAccount,customCellAcountTable,accountActions } from './accountTableList.js'
+import { FaSpinner } from 'react-icons/fa';
 
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
 
     const query = searchParams.get('query') || ''
-
+    const [loading, setLoading] = useState(false)
     const [userList, setUserList] = useState(null)
     let limit = 5
     const page = Number(searchParams.get('page') || 1)
@@ -22,6 +23,7 @@ export const AccessContet = () => {
     //Fetch data from backend
       async function getData(){
         try {
+          setLoading(true)
           const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
           const res = await fetch(url, {
             method:'GET',
@@ -38,6 +40,8 @@ export const AccessContet = () => {
           console.log(userList)
         } catch (error) {
           throw new Error('Could not get userList',error)  
+        } finally{
+          setLoading(false)
         }
   
       }
@@ -67,16 +71,23 @@ export const AccessContet = () => {
                   </div>
             </div>
             <div className=''>
-              <PaginatedList 
-                    userList={userList} 
-                    page={page}
-                    totalPages={totalPages}
-                    prevPage={prevPage}
-                    limit={limit}
-                    userColoumns={userColoumnsAccount}
-                    customCellRenderers={customCellAcountTable}
-                    renderRowActions={accountActions}
+              {
+                loading ? (
+                        <div className='flex justify-center items-center mt-12'>
+                          <FaSpinner className='animate-spin text-5xl'/>
+                         </div>
+                    ) :
+                <PaginatedList 
+                userList={userList} 
+                page={page}
+                totalPages={totalPages}
+                prevPage={prevPage}
+                limit={limit}
+                userColoumns={userColoumnsAccount}
+                customCellRenderers={customCellAcountTable}
+                renderRowActions={accountActions}
                 />
+              }
             </div>
           </div>
       </div>

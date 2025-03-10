@@ -4,37 +4,33 @@ import ResponseModel from "@/models/ResponseModel";
 export async function POST(request) {
 
     const requestData = await request.json();
-    const { userName } = requestData;
-    const clientCookie = request.headers.get('Cookie');
+    const { legalId } = requestData;
+    let dimension;
+    if (requestData.dimension > 120 || !requestData.dimension) {
+        dimension = 120
+    } else {
+        dimension = requestData.dimension;
+    }
 
     const { host } = config.api.agent;
-    const url = `https://${host}/account.ws`;
+    const url = `https://${host}/QuickLogin/Session/${host}/Attachments/${legalId}?Width=${dimension}&Height=${dimension}`;
 
-    const payload = {
-        userName
-    };
-
+    console.log(url)
 
     try {
 
         const response = await fetch(url, {
-            method: 'POST',
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                'Cookie': clientCookie,
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify(payload),
-            mode: 'cors'
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            }
         });
-
 
         const contentType = response.headers.get('content-type');
         let data;
 
-        if (contentType.includes('application/json')) {
-            data = await response.json();
+        if (contentType.includes('image/webp')) {
+            data = await response.blob();
         } else {
             data = await response.text();
         }
@@ -43,17 +39,18 @@ export async function POST(request) {
             return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${data}`)), {
                 status: response.status,
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'image/webp'
                 }
             });
         }
 
-        return new Response(JSON.stringify(new ResponseModel(200, 'Account returned', data)), {
+        return new Response(data, {
             status: 200,
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'image/webp'
             }
         });
+
 
     } catch (error) {
         const statusCode = error.statusCode || 500;

@@ -71,13 +71,13 @@ export const AdminContent = () => {
                 </div>
                 <nav className="grid grid-cols-3 py-2 px-4 mt-5 bg-gray-200 text-center rounded-lg">
                     <Link href="/list/access/admin/?tab=current&page=1">
-                    <p className={`text-lg ${tab === 'current' ? 'bg-white/90 rounded-full duration-300' : 'text-gray-600'}`}>Current Ids</p>
+                    <p className={`text-lg ${tab === 'current' ? 'bg-white/90 rounded-lg duration-300' : 'text-gray-600'}`}>Current Ids</p>
                     </Link>
                     <Link href="/list/access/admin/?tab=pending&page=1">
-                    <p className={`text-lg ${tab === 'pending' ? 'bg-white/90 rounded-full duration-300' : 'text-gray-600'}`}>Pending Applications</p>
+                    <p className={`text-lg ${tab === 'pending' ? 'bg-white/90 rounded-lg duration-300' : 'text-gray-600'}`}>Pending Applications</p>
                     </Link>
                     <Link href="/list/access/admin/?tab=roles&page=1">
-                    <p className={`text-lg ${tab === 'roles' ? 'bg-white/90 rounded-full duration-300' : 'text-gray-600'}`}>Identity Roles</p>
+                    <p className={`text-lg ${tab === 'roles' ? 'bg-white/90 rounded-lg duration-300' : 'text-gray-600'}`}>Identity Roles</p>
                     </Link>
                 </nav>
               {
@@ -118,7 +118,7 @@ export const AdminContent = () => {
                 {tab === 'roles' && (
                   <div>
                     <h2 className="text-xl">Identity Roles</h2>
-                      Husseins
+                      
                     </div>
                 )}
                 </>
