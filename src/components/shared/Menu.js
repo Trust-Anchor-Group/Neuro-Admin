@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { FaHome, FaIdCard, FaUserShield, FaCog, FaChevronDown } from "react-icons/fa";
+import { FaHome,FaRegUser , FaIdCard, FaUserShield, FaCog, FaChevronDown } from "react-icons/fa";
 
 const menuItems = [
   {
@@ -15,9 +15,15 @@ const menuItems = [
         visible: ["admin", "customer-assets"],
       },
       {
+        icon: <FaRegUser   size={20} />,
+        label: "Accounts",
+        href: "/list/access",
+        visible: ["admin"],
+      },
+      {
         icon: <FaIdCard size={20} />,
         label: "Identity Management",
-        href: "/list/access",
+        href: "/list/access/admin",
         visible: ["admin"],
       },
       {
