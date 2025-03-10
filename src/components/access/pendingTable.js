@@ -2,20 +2,17 @@ import Link from "next/link";
 import { StatusIcon } from "./StatusIcon";
 import { FaBan, FaCheck, FaClock, FaExclamationTriangle, FaTimes, FaTimesCircle } from "react-icons/fa";
 import { MenuItem } from "@mui/material";
+import { pendingAction } from './pendingFetch.js'
 
     //Decide what columns you should have in your table
    export const userColoumnsPending = [
-    { accessorKey: "id", header: "Legal Identities", size: 100,
-        muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
-        muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } }, 
-    },
-        { accessorKey: "account", header: "Account", size: 100,
+        { accessorKey: "account", header: "Account", size: 150,
           },
-        { accessorKey: "state", header: "Status", size: 100, 
+        { accessorKey: "state", header: "Status", size: 50, 
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
             muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
         },
-        { accessorKey: "createdDate", header: "Created", size: 100, 
+        { accessorKey: "createdDate", header: "Created", size: 150, 
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
             muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
         },
@@ -27,7 +24,7 @@ import { MenuItem } from "@mui/material";
           const state = cell.getValue();
           if (state === "Approved") return <StatusIcon icon={<FaCheck className="text-green-500" />} text="Approved" color="text-green-600" bgColor={'bg-green-500'} />;
           if (state === "Compromised") return <StatusIcon icon={<FaExclamationTriangle className="text-orange-500" />} text="Compromised" color="text-orange-500" bgColor={'bg-orange-500'} />;
-          if (state === "Created") return <StatusIcon icon={<FaClock className="text-yellow-500" />} text="Created" color="text-yellow-500" bgColor={'bg-yellow-500'} />;
+          if (state === "Created") return <StatusIcon icon={<FaClock className="text-yellow-500" />} text="New application" color="text-yellow-500" bgColor={'bg-yellow-500'} />;
           if (state === "Obsoleted") return <StatusIcon icon={<FaTimesCircle className="text-red-500" />} text="Obsoleted" color="text-red-800" bgColor={'bg-red-500'} />;
           if (state === "Rejected") return <StatusIcon icon={<FaBan className="text-red-500" />} text="Rejected" color="text-red-500" bgColor={'bg-red-500'} />;
           return <span className="text-gray-500">Unknown</span>;
@@ -56,24 +53,32 @@ import { MenuItem } from "@mui/material";
         
       }}
 
-     export const pendingActions = ({ closeMenu, row }) => [
-        <MenuItem key={1} onClick={closeMenu}>
-            <Link href={`/list/access/approve/${row.original.id}`}>
-                <div className="flex gap-2 items-center">
-                    <FaCheck className="text-green-600" />
-                    Approve
-                </div>
-            </Link>
-        </MenuItem>,
-        <MenuItem key={2} onClick={closeMenu}>
+     function handleClick(userId,clickedState){
+       pendingActions(userId,clickedState)
+      }
+
+      export const pendingActions = ({ closeMenu, row }) => {
+      console.log(row)    
+        return [
+          <MenuItem className="bg-black" key={1} onClick={closeMenu}>
+            <button 
+              onClick={() => handleClick(row.original.id, 'Approved')} 
+              className="flex gap-2 rounded-full items-center"
+            >
+              <FaCheck className="text-green-600" />
+              Approve
+            </button>
+          </MenuItem>,
+          <MenuItem key={2} onClick={closeMenu}>
             <Link href={`/list/access/reject/${row.original.id}`}>
-                <div className="flex gap-2 items-center">
-                    <FaTimes className="text-red-600" />
-                    Reject
-                </div>
+              <div className="flex gap-2 items-center">
+                <FaTimes className="text-red-600" />
+                Reject
+              </div>
             </Link>
-        </MenuItem>,
-    ];
+          </MenuItem>,
+        ];
+      };
 
 
     

@@ -4,6 +4,9 @@ import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import config from '@/config/config';
+import { FaArrowLeft, FaSpinner } from 'react-icons/fa'
+import Link from 'next/link'
+import { InputField } from '@/components/access/InputField'
 export default function DetailPage() {
     const { id } = useParams()
     const [user, setUser] = useState(null)
@@ -42,29 +45,35 @@ export default function DetailPage() {
     }, [id])
 
     return (
-        <div className='flex justify-center items-center h-screen'>
-            <div className='bg-white p-10 border-2 gap-5 flex justify-center items-center max-md:flex-col max-md:mt-[30%]'>
-
-                {loading ? (
-                    <h1 className='text-lg font-semibold'>Loading...</h1>
-                ) : user === undefined ? (
-                    <>
-                        <h1 className='text-lg font-semibold'>Could not find the user</h1>
-                        <div className='flex flex-col gap-5'>
-                            <RedirectButton 
-                                hrefText={'/list/access'}
-                                classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold hover:bg-black/50 transition-all'}
-                                buttonName={'Back'}
-                            />
-                            <RedirectButton 
-                                hrefText={'/list/access'}
-                                classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold hover:bg-black/50 transition-all'}
-                                buttonName={'Manage User'}
-                            />
-                        </div>
-                    </>
-                ) : (
-                    <>
+        <div className='p-10'>
+            <div>
+            <h1 className="mb-2 text-xl font-semibold md:text-3xl">Identity&nbsp;Management</h1>
+            <p className='text-lg opacity-70 max-sm:text-sm'>Manage identity verification and roles</p>
+            </div>
+            <div className='flex items-center gap-5 mt-10'>
+                <Link href={'/list/access'}>
+                    <FaArrowLeft/>
+                </Link>
+                <h2 className='text-xl font-semibold md:text-2xl'>Identity Details</h2>
+            </div>
+           {
+            loading ? (
+                <div className='flex justify-center items-center mt-12'>
+                    <FaSpinner className='animate-spin text-5xl'/>
+                </div>
+                ) :
+                <div className='grid grid-cols-2 gap-5 py-10'>
+                    <div className='bg-white border-2 rounded-md p-5'>
+                        <h3 className='text-xl font-semibold mb-3'>Personal Information</h3>
+                        {
+                            user &&
+                            <div>
+                                <InputField labelText={'First Name'} name={user.name}/>
+                            </div> 
+                            
+                        }
+                    </div>
+                    <div className='bg-white border-2 rounded-md'>
                         <div className='w-[200px] h-[200px] rounded-full overflow-hidden max-sm:h-[150px] max-sm:w-[150px]'>
                             <Image
                                 className='w-full h-full object-cover'
@@ -74,46 +83,9 @@ export default function DetailPage() {
                                 alt='Profile'
                             />
                         </div>
-                        <div className='flex flex-col'>
-                            <h1 className='text-2xl font-semibold text-center'>{user.name || user.account}</h1>
-                            <div className='mt-5'>
-                                <div className='grid grid-cols-2 gap-5 max-sm:grid-cols-1 max-sm:gap-0 max-sm:mb-5'>
-                                    <p className='border-b-2 border-black/50'>UserId:</p>
-                                    <p className='font-semibold'>{user.id ? user.id.slice(0, 10) : 'N/A'}</p>
-                                </div>
-                                <div className='grid grid-cols-2 gap-5 max-sm:grid-cols-1 max-sm:gap-0 max-sm:mb-5'>
-                                    <p className='border-b-2 border-black/50'>Email:</p>
-                                    <p className='font-semibold'>{user.email || '-'}</p>
-                                </div>
-                                <div className={`grid grid-cols-2 gap-5 max-sm:grid-cols-1 max-sm:gap-0 max-sm:mb-5 ${user.name == '' ? 'hidden':''}`}>
-                                    <p className='border-b-2 border-black/50'>Address:</p>
-                                    <p className='font-semibold'>{user.addr || '-'}</p>
-                                </div>
-                                <div className={`grid grid-cols-2 gap-5 max-sm:grid-cols-1 max-sm:gap-0 max-sm:mb-5 ${user.name == '' ? 'hidden':''}`}>
-                                    <p className='border-b-2 border-black/50'>City:</p>
-                                    <p className='font-semibold'>{user.city || '-'}</p>
-                                </div>
-                                <div className='grid grid-cols-2 gap-5 max-sm:grid-cols-1 max-sm:gap-0'>
-                                    <p className='border-b-2 border-black/50'>Status:</p>
-                                    <p className='font-semibold'>{user.state || '-'}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='flex flex-col gap-5'>
-                            <RedirectButton 
-                                hrefText={'/list/access'}
-                                classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold hover:bg-black/50 transition-all'}
-                                buttonName={'Back'}
-                            />
-                            <RedirectButton 
-                                hrefText={'/list/access'}
-                                classText={'py-4 px-6 w-full bg-black text-white rounded-md font-semibold hover:bg-black/50 transition-all'}
-                                buttonName={'Manage User'}
-                            />
-                        </div>
-                    </>
-                )}
-            </div>
+                    </div>
+                </div>
+           } 
         </div>
     )
 }

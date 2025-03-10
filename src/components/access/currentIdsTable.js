@@ -1,15 +1,12 @@
 import Link from "next/link";
 import { StatusIcon } from "./StatusIcon";
-import { FaBan, FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimes, FaTimesCircle } from "react-icons/fa";
+import { FaBan, FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimes, FaTimesCircle, FaUserCircle } from "react-icons/fa";
 import { MenuItem } from "@mui/material";
+import Image from "next/image";
 
     //Decide what columns you should have in your table
    export const userColoumnsCurrentIds = [
-    { accessorKey: "id", header: "Legal Identities", size: 100,
-        muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
-        muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } }, 
-    },
-        { accessorKey: "name", header: "Full Name", size: 100,
+        { accessorKey: "name", header: "Name", size: 100,
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
             muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } }, 
         }
@@ -20,6 +17,10 @@ import { MenuItem } from "@mui/material";
         },
         { accessorKey: "account", header: "Account", size: 100,
           },
+          { accessorKey: "createdDate", header: "Created", size: 100, 
+            muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
+            muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
+        },
         { accessorKey: "state", header: "Status", size: 100, 
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
             muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
@@ -44,20 +45,36 @@ import { MenuItem } from "@mui/material";
           </Link>
         ),
         name: ({ cell, row }) => {
-            const nameParts = cell.getValue()?.split(" ") || [];
-            const firstName = nameParts[0] || "";
-            const lastName = nameParts.slice(1).join(" ") || ""
-        
-            const fullName = `${firstName}\u00A0${lastName}`.trim()
-        
-            return firstName && lastName ? (
+          const nameParts = cell.getValue()?.split(" ") || [];
+          const firstName = nameParts[0] || "";
+          const lastName = nameParts.slice(1).join(" ") || ""
+      
+          const fullName = `${firstName}\u00A0${lastName}`.trim()
+      
+          const profileImage = row.original.profileImage
+
+          return firstName && lastName ? (
+            <div className="flex items-center gap-5">
+                {profileImage ? (
+                <img
+                  src={profileImage}
+                  alt={fullName}
+                  className="size-8 rounded-full object-cover"
+                />
+              ) : (
+                <FaUserCircle className="size-8 text-gray-400" />
+              )}
+            <div>
               <Link
                 className="text-blue-600 hover:underline hover:text-blue-400"
                 href={`/list/access/detailpage/${row.original.id}`}
-              >
+                >
                 {fullName}
               </Link>
-            ) : "-";
+
+            </div>
+          </div>
+          ) : "-";
         
       }}
 
