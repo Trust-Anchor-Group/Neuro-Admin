@@ -1,5 +1,4 @@
 'use client'
-import { RedirectButton } from '@/components/access/RedirectButton'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
