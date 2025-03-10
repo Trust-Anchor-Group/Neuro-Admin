@@ -12,7 +12,7 @@ export default function PendingApplications() {
         const requestBody = {
           offset: 0,
           maxCount: 10,
-          state: "Approved",
+          state: "Created",
           createdFrom: 1704078000,
            filter: {}, 
         };
