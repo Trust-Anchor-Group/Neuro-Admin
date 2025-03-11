@@ -49,7 +49,6 @@ export default function APIKeys() {
 
   const copyToClipboard = (key) => {
     navigator.clipboard.writeText(key);
-    alert("API Key copied to clipboard!");
   };
 
   return (
