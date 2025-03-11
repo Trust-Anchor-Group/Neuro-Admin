@@ -9,7 +9,7 @@ export default function APIKeyQR({ apiKey }) {
   const [expires, setExpires] = useState(Math.floor(Date.now() / 1000) + 86400); // Default: 24 hours from now
 
   useEffect(() => {
-    generateQR(); // Auto-generate QR on load
+    generateQR(); 
   }, [apiKey]);
 
   async function generateQR() {
