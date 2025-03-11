@@ -121,6 +121,13 @@ export default function QuickLogin({
     console.log('[Login] Successful Signature Received:', signatureData);
     setSuccess(true);
     if (onLoginSuccess) onLoginSuccess();
+     if (signatureData?.Properties) {
+      const userData = {
+        name: `${signatureData.Properties.FIRST} ${signatureData.Properties.LAST}`,
+      };
+
+      sessionStorage.setItem("neuroUser", JSON.stringify(userData));
+    }
   };
 
   const evaluateEvent = (event) => {

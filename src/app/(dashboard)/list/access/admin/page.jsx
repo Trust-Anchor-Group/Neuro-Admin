@@ -4,8 +4,6 @@ import React, { Suspense} from 'react'
 
 const AdminPage = () => {
   
-//Suspense so that useSearchParams works
-
   return (
     <div>
       <Suspense fallback={<div>Loading...</div>}>
