@@ -45,16 +45,13 @@ export default function APIKeyDetails() {
   return (
     <div className="min-h-screen flex flex-col pt-20 bg-gray-100">
       <div className="w-full max-w-5xl mx-auto bg-white shadow-lg rounded-2xl border border-gray-300 p-10">
-        {/* 🔙 Back Button */}
         <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-6">
           <FaArrowLeft /> Back to API Keys
         </button>
 
-        {/* 🔑 API Key Information */}
         <h2 className="text-4xl font-bold text-gray-800 mb-4">API Key Details</h2>
         <p className="text-gray-500 mb-8 text-lg">Manage and secure your API credentials.</p>
 
-        {/* 📝 Details Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <DetailRow label="Owner" value={apiKeyDetails.owner} />
           <DetailRow label="Email" value={apiKeyDetails.eMail} />
@@ -78,7 +75,6 @@ export default function APIKeyDetails() {
           <DetailRow label="Deleted Accounts" value={apiKeyDetails.nrDeleted} />
         </div>
 
-        {/* 🏷️ QR Code Section with Reserved Space */}
         <div className="mt-10 p-6 bg-gray-50 rounded-lg border border-gray-300 shadow-md text-center min-h-[400px] flex flex-col items-center">
           <h3 className="text-2xl font-bold text-gray-700 mb-4">API Key QR Code</h3>
           <APIKeyQR apiKey={apiKeyDetails.key} />
@@ -88,7 +84,6 @@ export default function APIKeyDetails() {
   );
 }
 
-// ✅ Fancy Detail Row Component with Scrollable Secrets
 function DetailRow({ label, value, hidden, onToggle, isSecret }) {
   return (
     <div className="flex flex-col bg-gray-100 p-4 rounded-lg shadow-sm border border-gray-300">
