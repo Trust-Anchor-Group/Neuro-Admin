@@ -60,7 +60,7 @@ export const AccessContet = () => {
           <div className='p-5'>
             <div className='flex justify-between items-center'>
               <div>
-                      <h1 className="mb-2 text-xl font-semibold md:text-3xl">Legal&nbsp;Identities</h1>
+                      <h1 className="mb-2 text-xl font-semibold md:text-3xl">Accounts</h1>
                       <p className='text-lg opacity-70 max-sm:text-sm'>Manage user accounts and permissions</p>
                   </div>
                   <div className=''>

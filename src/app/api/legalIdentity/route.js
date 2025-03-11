@@ -6,14 +6,14 @@ export async function POST(request) {
     const requestData = await request.json();
     const { legalIdentity } = requestData;
     const clientCookie = request.headers.get('Cookie');
-
+    const decodedUserId = decodeURIComponent(legalIdentity);
     const { host } = config.api.agent;
     const url = `https://${host}/legalIdentity.ws`;
 
     const payload = {
-        id:legalIdentity
+        id:decodedUserId
     };
-
+    console.log(payload)
     try {
 
         const response = await fetch(url, {

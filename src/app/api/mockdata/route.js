@@ -18,8 +18,8 @@ export async function GET(req) {
             : null;
 
         const payload = {
-            'maxCount': 20,
-            'offset': 0,
+            'maxCount':limit,
+            'offset': (page - 1) * limit,
             ...(query ? {
                 'filter': {
                     "FIRST": query
@@ -27,10 +27,6 @@ export async function GET(req) {
             } : {}),
         };
 
-
-        const filterId = {
-
-        }
 
         const { host } = config.api.agent;
 
@@ -49,34 +45,6 @@ export async function GET(req) {
 
 
         const data = await res.json()
-        /*     console.log(data)
-            console.log(res.statusText)
-            console.log(res.status)
-     */
-        // let filteredUsers = data
-        // if (query) {
-        //     filteredUsers = data.filter(user =>
-        //         user.name.toLowerCase().includes(query) ||
-        //         user.account.toLowerCase().includes(query)
-        //     ) 
-
-        // } 
-
-
-
-
-        // // Calculate total pages based on the number of filtered users
-        // const maxPages = Math.ceil(filteredUsers.length / limit)
-
-        // // // If the requested page exceeds max pages, reset to page 1
-        // const currentPage = page > maxPages ? 1 : page
-
-        // // // Calculate the start and end index for pagination
-        // const startIndex = (currentPage - 1) * limit
-        // const endIndex = Math.min(startIndex + limit, filteredUsers.length)
-
-        // // // Extract the users for the current page
-        // const userList = filteredUsers.slice(startIndex, endIndex)
 
 
         const response = {

@@ -16,10 +16,14 @@ import { MenuItem } from "@mui/material";
         },
         { accessorKey: "account", header: "Account", size: 200,
           },
-        { accessorKey: "state", header: "Status", size: 50, 
+        { accessorKey: "state", header: "Id status", size: 50, 
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
             muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
         },
+        { accessorKey: "createdDate", header: "Created", size: 100, 
+          muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
+          muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
+      },
     ]
 
     const getLatestStateForAccount = (accountStates) => {
@@ -43,14 +47,13 @@ import { MenuItem } from "@mui/material";
 
     //Special actions a column should/could have
    export const customCellAcountTable = {
-        state: ({ cell }) => {
-          const state = cell.getValue();
-          if (state === "Approved") return <StatusIcon icon={<FaCheck className="text-green-500" />} text="Approved" color="text-green-600" bgColor={'bg-green-500/30'} />;
-          if (state === "Compromised") return <StatusIcon icon={<FaExclamationTriangle className="text-orange-500" />} text="Compromised" color="text-orange-500" bgColor={'bg-orange-500/30'} />;
-          if (state === "Created") return <StatusIcon icon={<FaPlusCircle className="text-yellow-500" />} text="Created" color="text-yellow-500" bgColor={'bg-yellow-500/30'} />;
-          if (state === "Obsoleted") return <StatusIcon icon={<FaTimesCircle className="text-red-500" />} text="Obsoleted" color="text-red-800" bgColor={'bg-red-500/30'} />;
-          if (state === "Rejected") return <StatusIcon icon={<FaBan className="text-red-500" />} text="Rejected" color="text-red-500" bgColor={'bg-red-500/30'} />;
-          return <span className="text-gray-500">Unknown</span>;
+        state: ({ cell,row }) => {
+           const name = row.original.name
+           if(name === ''){
+            return <p>Light ID</p>
+           }else{
+            return <p>Full ID</p>
+           }
         },
         name: ({ cell, row }) => {
           const nameParts = cell.getValue()?.split(" ") || [];

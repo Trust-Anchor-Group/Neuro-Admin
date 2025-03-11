@@ -49,8 +49,8 @@ const LandingPage = () => {
     ])
 
   return (
-    <div className='mx-12 pb-12'>
-        <div className='text-center my-12 '>
+    <div className='pb-12'>
+        <div className='text-center mt-12 '>
             <h1 className='text-4xl font-semibold mb-10'>Neuro</h1>
             <h2 className='text-4xl font-semibold mb-5'>Admin Dashboard</h2>
             <p className='text-lg opacity-70'>Select a service to manage from the options below</p>
