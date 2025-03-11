@@ -76,7 +76,7 @@ export default function PendingApplications() {
             </li>
           ))}
         </ul>
-      )}
+      )}      
     </div>
   );
 }
