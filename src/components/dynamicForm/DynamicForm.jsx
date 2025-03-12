@@ -8,6 +8,9 @@ import TextHandler from './fields/text/TextHandler';
 import Navigation from './components/Navigation';
 import ProgressBar from './components/ProgressBar';
 import SlideDesc from './components/SlideDesc';
+import SuccessSlide from './components/SuccessSlide';
+import templateFetcher from './utils/templateFetcher';
+import submitHandler from './utils/submitHandler';
 
 const DynamicForm = ({ uri, endpoint }) => {
   const [template, setTemplate] = useState(null);
@@ -15,11 +18,13 @@ const DynamicForm = ({ uri, endpoint }) => {
   const [pageData, setPageData] = useState(null);
   const [formInfo, setFormInfo] = useState({});
   const [dynamicSchema, setDynamicSchema] = useState({});
+  const [formSuccess, setFormSuccess] = useState(false);
 
+  // React Hook Form Handler
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     trigger,
     control,
     watch,
@@ -37,30 +42,9 @@ const DynamicForm = ({ uri, endpoint }) => {
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  const fetchFormContent = async () => {
-    try {
-      const response = await fetch(uri, {
-        method: 'GET',
-        headers: {
-          'content-type': 'application/json',
-        },
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        console.log(`Response not ok: ${response.statusText}`);
-      }
-
-      const responseData = await response.json();
-      console.log('Response data:', responseData);
-      setTemplate(responseData);
-    } catch (error) {
-      console.log(`Something went wrong: ${error.message}`);
-    }
-  };
-
   useEffect(() => {
-    fetchFormContent();
+    const fetchTemplate = async () => setTemplate(await templateFetcher(uri));
+    fetchTemplate();
   }, []);
 
   useEffect(() => {
@@ -72,6 +56,7 @@ const DynamicForm = ({ uri, endpoint }) => {
     });
   }, [template, slideIndex]);
 
+  // Generate validation schema
   useEffect(() => {
     console.log('page data', pageData);
     setDynamicSchema(validationSchema(pageData));
@@ -86,65 +71,68 @@ const DynamicForm = ({ uri, endpoint }) => {
     }
   }, [dynamicSchema, reset]);
 
-  const onSumbit = (data) => {
-    console.log('the form data', data);
-    Object.entries(data).forEach(([fieldName, fieldValue]) => {
-      for (const slide of template.slides) {
-        const element = slide.elements.find((el) => el.name === fieldName);
-        if (element) {
-          element.value = fieldValue;
-          break;
-        }
-      }
-    });
-
-    console.log('Final payload:', template);
+  const onSubmit = async (formData) => {
+    const response = await submitHandler({ formData, template, endpoint });
+    if (response) {
+      setFormSuccess(response);
+    } else {
+      console.log('Unable to send form. Please try again later');
+    }
   };
 
   return (
-    pageData && (
-      <form
-        onSubmit={handleSubmit(onSumbit)}
-        className="flex flex-col gap-5 w-full min-w-[35rem] max-w-xl"
-      >
-        <ProgressBar
-          title={pageData.step}
-          currentSlide={formInfo.currentSlide}
-          totalSlides={formInfo.totalSlides}
-        />
+    <div>
+      {pageData && !formSuccess && (
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-5 w-full min-w-[35rem] max-w-xl"
+        >
+          <ProgressBar
+            title={pageData.step}
+            currentSlide={formInfo.currentSlide}
+            totalSlides={formInfo.totalSlides}
+          />
 
-        <SlideDesc title={pageData.title} description={pageData.description} />
+          <SlideDesc
+            title={pageData.title}
+            description={pageData.description}
+          />
 
-        {pageData.elements.map((element) => {
-          return (
-            <div key={element.name}>
-              {['text', 'textarea', 'email'].includes(element.type) && (
-                <TextHandler
-                  errors={errors}
-                  control={control}
-                  element={element}
-                />
-              )}
+          {pageData.elements.map((element) => {
+            return (
+              <div key={element.name}>
+                {['text', 'textarea', 'email'].includes(element.type) && (
+                  <TextHandler
+                    errors={errors}
+                    control={control}
+                    element={element}
+                  />
+                )}
 
-              {['pill', 'tile', 'radio', 'checkbox'].includes(element.type) && (
-                <SelectionHandler
-                  errors={errors}
-                  control={control}
-                  element={element}
-                />
-              )}
-            </div>
-          );
-        })}
+                {['pill', 'tile', 'radio', 'checkbox'].includes(
+                  element.type
+                ) && (
+                  <SelectionHandler
+                    errors={errors}
+                    control={control}
+                    element={element}
+                  />
+                )}
+              </div>
+            );
+          })}
 
-        <Navigation
-          formInfo={formInfo}
-          slideIndex={slideIndex}
-          setSlideIndex={setSlideIndex}
-          trigger={trigger}
-        />
-      </form>
-    )
+          <Navigation
+            formInfo={formInfo}
+            slideIndex={slideIndex}
+            setSlideIndex={setSlideIndex}
+            trigger={trigger}
+          />
+        </form>
+      )}
+
+      {formSuccess && <SuccessSlide />}
+    </div>
   );
 };
 
