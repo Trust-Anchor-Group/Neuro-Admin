@@ -19,6 +19,7 @@
     "agent-api": "github:Trust-Anchor-Group/AgentApiJavascript#npm-package",
     "dayjs": "^1.11.13",
     "jsonwebtoken": "^9.0.2",
+    "lottie-react": "^2.4.1",
     "mapbox-gl": "^3.9.3",
     "material-react-table": "^3.2.0",
     "next": "15.1.4",
