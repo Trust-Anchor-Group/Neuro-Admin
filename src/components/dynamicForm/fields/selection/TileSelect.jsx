@@ -10,7 +10,7 @@ export default function TileSelect({ element, field, option, onValueChange }) {
 
   return (
     <label
-      className={`flex flex-row gap-5 min-h-24 min-w-full cursor-pointer align-middle p-4 border shadow-sm rounded items-center
+      className={`flex flex-row gap-5 min-h-24 min-w-full cursor-pointer align-middle p-4 border shadow-sm rounded items-center hover:bg-blue-50
             ${
               field.value?.includes(optionValue)
                 ? 'bg-blue-100 border-blue-400'
