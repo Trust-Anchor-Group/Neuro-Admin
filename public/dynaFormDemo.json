@@ -20,7 +20,6 @@
           "name": "email",
           "description": "We need this for account creation",
           "type": "email",
-          "required": true,
           "comment": "Must be more informative. Please provide some more details."
         },
         {
@@ -28,7 +27,7 @@
           "name": "projectDescriptionPill",
           "description": "Be specific here, what will the project do etc.",
           "type": "pill",
-          "select": 1,
+          "select": 3,
           "required": true,
           "options": [
             {
@@ -71,7 +70,7 @@
           "name": "loremIpsum",
           "description": "Be specific here, what will the project do etc.",
           "type": "tile",
-          "select": 2,
+          "select": 1,
           "required": true,
           "options": [
             {
