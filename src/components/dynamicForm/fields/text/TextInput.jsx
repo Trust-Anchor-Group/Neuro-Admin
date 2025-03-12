@@ -6,7 +6,7 @@ export default function TextInput({ errors, element, field }) {
       <ElementDesc element={element} />
 
       <input
-        className={`border p-3 shadow-1g ${
+        className={`border rounded p-3 shadow-1g ${
           errors[element.name] ? 'border-red-500' : ''
         }`}
         name={element.name}
