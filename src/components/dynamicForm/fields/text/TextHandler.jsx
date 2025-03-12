@@ -7,7 +7,7 @@ export default function TextHandler({ control, errors, element }) {
   const { field } = useController({
     name: element.name,
     control,
-    defaultValue: '',
+    defaultValue: element.defaultValue ?? '',
   });
 
   return (
