@@ -1,0 +1,141 @@
+{
+    "title": "Project proposal",
+    "status": null,
+    "description": "",
+    "slides": [
+        {
+            "title": "Hello there 👋",
+            "description": "Before getting into project details, we need some contact information.",
+            "step": "Contact details",
+            "elements": [
+                {
+                    "label": "First name",
+                    "name": "fname",
+                    "type": "text",
+                    "required": true,
+                    "comment": "This is needed because how should we otherwise know your name? Please provide your name."
+                },
+                {
+                    "label": "Last name",
+                    "name": "lname",
+                    "type": "text"
+                },
+                {
+                    "label": "Email",
+                    "name": "email",
+                    "type": "email",
+                    "required": true
+                }
+            ]
+        },
+        {
+            "step": "Project motivation",
+            "elements": [
+                {
+                    "label": "What best describes why you're creating this project?",
+                    "name": "projectDescriptionPill",
+                    "description": "Select the primary motivations behind your project initiative",
+                    "type": "pill",
+                    "select": 3,
+                    "required": true,
+                    "options": [
+                        {
+                            "title": "Business Growth",
+                            "description": "Drive revenue, expand market share, or improve business operations"
+                        },
+                        {
+                            "title": "Cost Reduction",
+                            "description": "Decrease expenses through improved efficiency or resource optimization"
+                        },
+                        {
+                            "title": "Innovation",
+                            "description": "Create something novel that doesn't currently exist in the market"
+                        },
+                        {
+                            "title": "Research",
+                            "description": "Gather information or test hypotheses to generate new knowledge"
+                        },
+                        {
+                            "title": "Education",
+                            "description": "Training, skill development, or knowledge transfer purposes"
+                        },
+                        {
+                            "title": "Process Improvement",
+                            "description": "Streamline existing workflows or operational procedures"
+                        },
+                        {
+                            "title": "Customer Experience",
+                            "description": "Enhance interactions and satisfaction for end users"
+                        },
+                        {
+                            "title": "Compliance",
+                            "description": "Meet regulatory requirements or industry standards"
+                        },
+                        {
+                            "title": "Community Benefit",
+                            "description": "Provide social value or address community needs"
+                        },
+                        {
+                            "title": "Data Intelligence",
+                            "description": "Leverage information for better decision making"
+                        },
+                        {
+                            "title": "Infrastructure Enhancement",
+                            "description": "Upgrade or establish foundational systems or platforms"
+                        },
+                        {
+                            "title": "Personal Development",
+                            "description": "Build skills or portfolio through practical experience"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "step": "Project description",
+            "elements": [
+                {
+                    "label": "Describe",
+                    "name": "projectDescription",
+                    "type": "textarea",
+                    "description": "Describe in detail what your project will be about",
+                    "required": "true",
+                    "value": "Lorem ipsum odor amet, consectetuer adipiscing elit. Eros turpis cursus imperdiet curabitur duis? Sapien tristique quis sagittis praesent feugiat aenean dignissim. Fringilla volutpat potenti, magna dapibus gravida quisque."
+                }
+            ]
+        },
+        {
+            "step": "What source",
+            "elements": [
+                {
+                    "label": "Where did you hear about us?",
+                    "name": "heardAboutUs",
+                    "type": "tile",
+                    "required": "true",
+                    "select": 1,
+                    "options": [
+                        {
+                            "title": "From a friend",
+                            "description": "Word of mouth",
+                            "icon": "Diversity1Outlined"
+                        },
+                        {
+                            "title": "From a TV commercial",
+                            "description": "An epic TV ad promoting our services",
+                            "icon": "LiveTvOutlined"
+                        },
+                        {
+                            "title": "Via the web",
+                            "description": "Perhaps an ad or email campaign"
+                        },
+                        {
+                            "title": "From a social media platform",
+                            "description": "Probably an epic ad",
+                            "icon": "FacebookOutlined"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
