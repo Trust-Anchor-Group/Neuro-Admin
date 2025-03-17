@@ -2,6 +2,7 @@
 
 import Menu from "@/components/shared/Menu";
 import Navbar from "@/components/shared/Navbar";
+import Footer from "@/components/shared/Footer"; 
 import Image from "next/image";
 import Link from "next/link";
 
@@ -20,7 +21,13 @@ export default function DashboardLayout({ children }) {
       {/* Main Content */}
       <div className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-gray-100 overflow-scroll flex flex-col">
         <Navbar />
-        {children}
+        
+        <div className="flex-1 p-6">
+          {children} 
+        </div>
+
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   );
