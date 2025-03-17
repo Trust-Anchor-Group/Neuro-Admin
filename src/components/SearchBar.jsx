@@ -20,6 +20,7 @@ const searchParams = useSearchParams() // Get search parameters from the URL
 const pathName = usePathname() // Get the current path
 const { replace } = useRouter() // To navigate when the query changes
 
+
 const handleSearch = useDebouncedCallback((searchTerm) =>{
        // Create a URLSearchParams object to modify the query parameters
     const params = new URLSearchParams(searchParams)
@@ -33,11 +34,11 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
 
     // Replace the current URL with the updated query string
     replace(`${pathName}?${params.toString()}`)
-},300)
+},1000)
 
   return (
     <div className='relative'>
-        <input type="text" 
+        <input type="text"
         className={classNameText}
         placeholder={placeholder}
         onChange={(e) => handleSearch(e.target.value)}

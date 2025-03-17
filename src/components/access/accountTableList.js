@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { StatusIcon } from "./StatusIcon";
-import { FaBan, FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimesCircle, FaTrash, FaUser, FaUserCircle } from "react-icons/fa";
+import { FaBan, FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimes, FaTimesCircle, FaTrash, FaUser, FaUserCircle } from "react-icons/fa";
 import { MenuItem } from "@mui/material";
 
     //Decide what columns you should have in your table
@@ -25,25 +24,6 @@ import { MenuItem } from "@mui/material";
           muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
       },
     ]
-
-    const getLatestStateForAccount = (accountStates) => {
-      // Skapa en fullständig tidsstämpel för varje post (kombo av datum och tid)
-      const statesWithDateTime = accountStates.map(state => {
-        // Kombinera createdDate och createdTime till en fullständig sträng
-        const dateTimeString = `${state.createdDate} ${state.createdTime}`;
-        // Skapa ett JavaScript Date-objekt från den fullständiga strängen
-        return {
-          ...state,
-          createdDateTime: new Date(dateTimeString), // Skapa Date-objekt för jämförelse
-        };
-      });
-    
-      // Sortera baserat på den skapade tidsstämpeln (nyast först)
-      const sortedStates = statesWithDateTime.sort((a, b) => b.createdDateTime - a.createdDateTime);
-    
-      // Returnera den senaste statusen
-      return sortedStates[0];
-    };
 
     //Special actions a column should/could have
    export const customCellAcountTable = {
@@ -77,10 +57,11 @@ import { MenuItem } from "@mui/material";
               )}
             <div>
               <Link
-                className="text-blue-600 hover:underline hover:text-blue-400"
+                className=""
                 href={`/list/access/detailpage/${row.original.id}`}
                 >
-                {fullName}
+                   <p className="cursor-pointer text-blue-600 hover:underline
+             hover:text-blue-400">{fullName}</p>
               </Link>
 
             </div>
@@ -89,21 +70,40 @@ import { MenuItem } from "@mui/material";
         
       }}
 
-      export const accountActions = ({ closeMenu, row }) => [
+      const arrayActions = [
+        {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve'},
+        {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Reject'},
+        {actionTitle:'Obsoleted',icon:FaTimesCircle,iconColor:'text-red-600',name:'Obsolete'},
+        {actionTitle:'Compromised',icon:FaExclamationTriangle,iconColor:'text-orange-500',name:'Compromise'},
+      ]
+
+      export const accountActions = ({ closeMenu, row,getData }) => [
         <MenuItem key={1} onClick={closeMenu}>
+                <div className="">
             <Link href={`/list/access/detailpage/${row.original.id}`}>
-                <div className="flex gap-2 items-center">
-                    <FaUser />
-                    See Profile
-                </div>
-            </Link>
-        </MenuItem>,
-                <MenuItem key={2} onClick={closeMenu}>
-                <Link href={``}>
-                    <div className="flex gap-2 items-center">
-                        <FaTrash className="text-red-600" />
-                        Delete 
+                  <div className="flex gap-2 items-center">
+                      <FaUser />
+                      <p>See Profile</p>
                     </div>
-                </Link>
-            </MenuItem>
+            </Link>
+                </div>
+        </MenuItem>,
+                arrayActions.map((item,index) =>(
+                  <MenuItem key={index + 2} onClick={closeMenu}>
+                    <button 
+                      onClick={async() => {
+                        try {
+                          await pendingAction(row.original.id, item.actionTitle)
+                          getData()
+                        } catch (error) {
+                          console.log(error)
+                        }
+                      }}
+                      className="flex gap-2 rounded-full items-center"
+                    >
+                      <item.icon className={item.iconColor} />
+                      {item.name}
+                    </button>
+                  </MenuItem>
+                    )),   
     ];

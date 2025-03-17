@@ -2,8 +2,6 @@ import { PaginatedList } from '@/components/access/PaginatedList'
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import config from '@/config/config';
-import Link from 'next/link';
-import { FiUserPlus } from 'react-icons/fi';
 import { userColoumnsAccount,customCellAcountTable,accountActions } from './accountTableList.js'
 import { FaSpinner } from 'react-icons/fa';
 
@@ -34,7 +32,7 @@ export const AccessContet = () => {
           })
     
           const data = await res.json()
-          console.log(data)
+
           setUserList(data.data)
           setTotalPages(2)
           console.log(userList)
@@ -62,12 +60,6 @@ export const AccessContet = () => {
               <div>
                       <h1 className="mb-2 text-xl font-semibold md:text-3xl">Accounts</h1>
                       <p className='text-lg opacity-70 max-sm:text-sm'>Manage user accounts and permissions</p>
-                  </div>
-                  <div className=''>
-                      <button className='flex cursor-pointer
-                      items-center justify-center gap-2 py-3 px-3
-                        bg-neuroBlue text-white text-lg rounded-lg transition-all 
-                        hover:bg-neuroBlue/70 max-sm:text-sm'><FiUserPlus className=''/>Add&nbsp;user</button>
                   </div>
             </div>
             <div className=''>

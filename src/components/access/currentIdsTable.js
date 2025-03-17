@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { StatusIcon } from "./StatusIcon";
-import { FaBan, FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimes, FaTimesCircle, FaUserCircle } from "react-icons/fa";
+import { FaBan, FaCheck, FaExclamationTriangle, FaPlusCircle, FaRegTimesCircle, FaTimes, FaTimesCircle, FaUser, FaUserCircle } from "react-icons/fa";
 import { MenuItem } from "@mui/material";
-import Image from "next/image";
+import { pendingAction } from "./pendingFetch";
 
     //Decide what columns you should have in your table
    export const userColoumnsCurrentIds = [
@@ -72,21 +72,42 @@ import Image from "next/image";
         
       }}
 
-      export const currentIdActions = ({ closeMenu, row }) => [
+
+      const arrayActions = [
+        {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve'},
+        {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Reject'},
+        {actionTitle:'Obsoleted',icon:FaRegTimesCircle,iconColor:'text-red-600',name:'Obsolete'},
+        {actionTitle:'Compromised',icon:FaExclamationTriangle,iconColor:'text-orange-500',name:'Compromise'},
+      ]
+
+
+      export const currentIdActions = ({ closeMenu, row,getData }) => [
         <MenuItem key={1} onClick={closeMenu}>
-                <div className="flex flex-col gap-2 ">
-                    <p className="font-semibold">Actions</p>
-            <Link href={`/list/access/approve/${row.original.id}`}>
-                    <span className="">View Details</span>
+                <div className="">
+            <Link href={`/list/access/detailpage/${row.original.id}`}>
+                  <div className="flex gap-2 items-center">
+                      <FaUser />
+                      <p>See Profile</p>
+                    </div>
             </Link>
                 </div>
         </MenuItem>,
-        <MenuItem key={2} onClick={closeMenu}>
-            <Link href={`/list/access/reject/${row.original.id}`}>
-                <div className="flex gap-2 items-center">
-                    <FaTimes className="text-red-600" />
-                      <span>Reject</span>
-                </div>
-            </Link>
-        </MenuItem>,
+                arrayActions.map((item,index) =>(
+                  <MenuItem key={index + 2} onClick={closeMenu}>
+                    <button 
+                      onClick={async() => {
+                        try {
+                          await pendingAction(row.original.id, item.actionTitle)
+                          getData()
+                        } catch (error) {
+                          console.log(error)
+                        }
+                      }}
+                      className="flex gap-2 rounded-full items-center"
+                    >
+                      <item.icon className={item.iconColor} />
+                      {item.name}
+                    </button>
+                  </MenuItem>
+                    )),   
     ];

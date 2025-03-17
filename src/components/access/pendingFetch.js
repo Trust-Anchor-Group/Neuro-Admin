@@ -18,6 +18,9 @@ export async function pendingAction(userId,clickedState){
 
           const data = await res.json()
           console.log(data)
+          if(res.status === 200){
+            
+          }
 
     } catch (error) {
         throw new Error(`Could not post fetch state ${error}`)

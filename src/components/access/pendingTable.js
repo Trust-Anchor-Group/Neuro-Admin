@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { StatusIcon } from "./StatusIcon";
-import { FaBan, FaCheck, FaClock, FaExclamationTriangle, FaPlusCircle, FaTimes, FaTimesCircle } from "react-icons/fa";
+import { FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimes, FaTimesCircle, FaUser } from "react-icons/fa";
 import { MenuItem } from "@mui/material";
 import { pendingAction } from './pendingFetch.js'
 
@@ -22,7 +21,7 @@ import { pendingAction } from './pendingFetch.js'
    export const customCellPendingTable = {
         state: ({ cell }) => {
           const state = cell.getValue();
-          if(state === 'Created'){
+          if(state === 'Obsoleted'){
             
            return <div className={`grid grid-cols-2 bg-yellow-500/30 mr-12 pr-[35%] rounded-full items-center max-md:grid-cols-1`}>
             <span className={`z-10 pl-[30%]`}><FaPlusCircle className="text-yellow-500" /></span>
@@ -30,50 +29,53 @@ import { pendingAction } from './pendingFetch.js'
           </div>
           }
         },
-        name: ({ cell, row }) => {
-            const nameParts = cell.getValue()?.split(" ") || [];
-            const firstName = nameParts[0] || "";
-            const lastName = nameParts.slice(1).join(" ") || ""
+        account: ({ cell, row }) => {
+          return <Link href={`/list/access/detailpage/${row.original.id}`}>
+            <p className="cursor-pointer text-blue-600 hover:underline
+             hover:text-blue-400">{row.original.account}</p>
+          </Link>
+            
         
-            const fullName = `${firstName}\u00A0${lastName}`.trim()
-        
-            return firstName && lastName ? (
-              <Link
-                className="text-blue-600 hover:underline hover:text-blue-400"
-                href={`/list/access/detailpage/${row.original.id}`}
-              >
-                {fullName}
-              </Link>
-            ) : "-";
-        
-      }}
+      }}     
 
-     function handleClick(userId,clickedState){
-       pendingActions(userId,clickedState)
-      }
+     const arrayActions = [
+          {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve'},
+          {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Reject'},
+          {actionTitle:'Obsoleted',icon:FaTimesCircle,iconColor:'text-red-600',name:'Obsolete'},
+          {actionTitle:'Compromised',icon:FaExclamationTriangle,iconColor:'text-orange-500',name:'Compromise'},
+        ]
+  
 
-      export const pendingActions = ({ closeMenu, row }) => {
-      console.log(row)    
-        return [
-          <MenuItem className="bg-black" key={1} onClick={closeMenu}>
-            <button 
-              onClick={() => handleClick(row.original.id, 'Approved')} 
-              className="flex gap-2 rounded-full items-center"
-            >
-              <FaCheck className="text-green-600" />
-              Approve
-            </button>
-          </MenuItem>,
-          <MenuItem key={2} onClick={closeMenu}>
-            <Link href={`/list/access/reject/${row.original.id}`}>
-              <div className="flex gap-2 items-center">
-                <FaTimes className="text-red-600" />
-                Reject
-              </div>
+      export const pendingActions = ({ closeMenu, row,getData }) => [
+        <MenuItem key={1} onClick={closeMenu}>
+                <div className="">
+            <Link href={`/list/access/detailpage/${row.original.id}`}>
+                  <div className="flex gap-2 items-center">
+                      <FaUser />
+                          <p>See Profile</p>
+                    </div>
             </Link>
-          </MenuItem>,
-        ];
-      };
+                </div>
+        </MenuItem>,
+                arrayActions.map((item,index) =>(
+                  <MenuItem key={index + 2} onClick={closeMenu}>
+                    <button 
+                      onClick={async() => {
+                        try {
+                          await pendingAction(row.original.id, item.actionTitle)
+                          getData()
+                        } catch (error) {
+                          console.log(error)
+                        }
+                      }}
+                      className="flex gap-2 rounded-full items-center"
+                    >
+                      <item.icon className={item.iconColor} />
+                      {item.name}
+                    </button>
+                  </MenuItem>
+                    )),   
+    ];
 
 
     
