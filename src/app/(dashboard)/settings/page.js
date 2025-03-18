@@ -1,9 +1,9 @@
 "use client";
+export const dynamic = "force-dynamic"; 
 
 import { useState } from "react";
 import KYCSettings from "@/components/settings/kyc/KYCSettings";
 import APIKeys from "@/components/settings/apiKey/APIKeys";
-
 export default function SettingsPage() {
   const [tab, setTab] = useState("kyc");
 
