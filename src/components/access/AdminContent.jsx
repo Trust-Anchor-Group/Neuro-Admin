@@ -20,38 +20,42 @@ export const AdminContent = () => {
     const [loading, setLoading] = useState(false)
     const [totalPages, setTotalPages] = useState(0)
     
+    const handleUserRemoval = (userId) => {
+      setUserList((prevList) => prevList.filter((user) => user.id !== userId))
+    }
+    
+    async function getData(){
+      try {
+        setLoading(true)
+        let endpoint = tab === "pending"
+        ? "/api/pending"
+        : "/api/mockdata"
+
+        
+        const url = `${config.protocol}://${config.origin}${endpoint}?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
+        console.log(url)
+        const res = await fetch(url, {
+          method:'GET',
+          headers:{
+            'Content-Type':'application/json',       
+          },
+          credentials:'include'
+        })
+  
+        const data = await res.json()
+        console.log(data)
+        setUserList(data.data)
+        setTotalPages(2)
+        console.log(userList)
+      } catch (error) {
+        throw new Error('Could not get userList',error)  
+      } finally {
+        setLoading(false)
+    }
+
+    }
     useEffect(() => {
     //Fetch data from backend
-      async function getData(){
-        try {
-          setLoading(true)
-          let endpoint = tab === "pending"
-          ? "/api/pending"
-          : "/api/mockdata"
-
-          
-          const url = `${config.protocol}://${config.origin}${endpoint}?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
-          console.log(url)
-          const res = await fetch(url, {
-            method:'GET',
-            headers:{
-              'Content-Type':'application/json',       
-            },
-            credentials:'include'
-          })
-    
-          const data = await res.json()
-          console.log(data)
-          setUserList(data.data)
-          setTotalPages(2)
-          console.log(userList)
-        } catch (error) {
-          throw new Error('Could not get userList',error)  
-        } finally {
-          setLoading(false)
-      }
-  
-      }
   
       getData()
     }, [page,limit,query,tab])
@@ -97,7 +101,7 @@ export const AdminContent = () => {
                         limit={limit}
                         customCellRenderers={customCellCurrentIdsTable}
                         userColoumns={userColoumnsCurrentIds}
-                        renderRowActions={currentIdActions}
+                        renderRowActions={(props) => currentIdActions({...props,getData})}
                     />
                 </div>
                 )}
@@ -111,7 +115,7 @@ export const AdminContent = () => {
                         limit={limit}
                         customCellRenderers={customCellPendingTable}
                         userColoumns={userColoumnsPending}
-                        renderRowActions={pendingActions}
+                        renderRowActions={(props) => pendingActions({...props,getData})}
                         />
                     </div>
                 )}

@@ -33,8 +33,8 @@ export async function POST(req){
             const data = await res.json()
        
             const decodedUserId = decodeURIComponent(userId);
-            const findId = data.find((user) => (
-                user.id === decodedUserId
+            const findId = data.filter((user) => (
+                user.account === decodedUserId
             ))
 
             console.log('One User',findId)

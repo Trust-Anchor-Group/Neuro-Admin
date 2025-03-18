@@ -1,18 +1,17 @@
 import Link from "next/link";
-import { StatusIcon } from "./StatusIcon";
-import { FaBan, FaCheck, FaClock, FaExclamationTriangle, FaTimes, FaTimesCircle } from "react-icons/fa";
+import { FaCheck, FaExclamationTriangle, FaPlusCircle, FaTimes, FaTimesCircle, FaUser } from "react-icons/fa";
 import { MenuItem } from "@mui/material";
 import { pendingAction } from './pendingFetch.js'
 
     //Decide what columns you should have in your table
    export const userColoumnsPending = [
-        { accessorKey: "account", header: "Account", size: 150,
+        { accessorKey: "account", header: "Account", size: 200,
           },
         { accessorKey: "state", header: "Status", size: 50, 
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
             muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
         },
-        { accessorKey: "createdDate", header: "Created", size: 150, 
+        { accessorKey: "createdDate", header: "Created", size: 200, 
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
             muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
         },
@@ -22,63 +21,61 @@ import { pendingAction } from './pendingFetch.js'
    export const customCellPendingTable = {
         state: ({ cell }) => {
           const state = cell.getValue();
-          if (state === "Approved") return <StatusIcon icon={<FaCheck className="text-green-500" />} text="Approved" color="text-green-600" bgColor={'bg-green-500'} />;
-          if (state === "Compromised") return <StatusIcon icon={<FaExclamationTriangle className="text-orange-500" />} text="Compromised" color="text-orange-500" bgColor={'bg-orange-500'} />;
-          if (state === "Created") return <StatusIcon icon={<FaClock className="text-yellow-500" />} text="New application" color="text-yellow-500" bgColor={'bg-yellow-500'} />;
-          if (state === "Obsoleted") return <StatusIcon icon={<FaTimesCircle className="text-red-500" />} text="Obsoleted" color="text-red-800" bgColor={'bg-red-500'} />;
-          if (state === "Rejected") return <StatusIcon icon={<FaBan className="text-red-500" />} text="Rejected" color="text-red-500" bgColor={'bg-red-500'} />;
-          return <span className="text-gray-500">Unknown</span>;
+          if(state === 'Obsoleted'){
+            
+           return <div className={`grid grid-cols-2 bg-yellow-500/30 mr-12 pr-[35%] rounded-full items-center max-md:grid-cols-1`}>
+            <span className={`z-10 pl-[30%]`}><FaPlusCircle className="text-yellow-500" /></span>
+            <span className={`hidden md:inline`}>New&nbsp;application</span>
+          </div>
+          }
         },
-    
-        id: ({ cell }) => (
-          <Link className="text-blue-600 hover:underline hover:text-blue-400" href={`/list/access/admin/${cell.getValue()}`}>
-            {cell.getValue().slice(0, 10)}
+        account: ({ cell, row }) => {
+          return <Link href={`/list/access/detailpage/${row.original.id}`}>
+            <p className="cursor-pointer text-blue-600 hover:underline
+             hover:text-blue-400">{row.original.account}</p>
           </Link>
-        ),
-        name: ({ cell, row }) => {
-            const nameParts = cell.getValue()?.split(" ") || [];
-            const firstName = nameParts[0] || "";
-            const lastName = nameParts.slice(1).join(" ") || ""
+            
         
-            const fullName = `${firstName}\u00A0${lastName}`.trim()
-        
-            return firstName && lastName ? (
-              <Link
-                className="text-blue-600 hover:underline hover:text-blue-400"
-                href={`/list/access/detailpage/${row.original.id}`}
-              >
-                {fullName}
-              </Link>
-            ) : "-";
-        
-      }}
+      }}     
 
-     function handleClick(userId,clickedState){
-       pendingActions(userId,clickedState)
-      }
+     const arrayActions = [
+          {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve'},
+          {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Reject'},
+          {actionTitle:'Obsoleted',icon:FaTimesCircle,iconColor:'text-red-600',name:'Obsolete'},
+          {actionTitle:'Compromised',icon:FaExclamationTriangle,iconColor:'text-orange-500',name:'Compromise'},
+        ]
+  
 
-      export const pendingActions = ({ closeMenu, row }) => {
-      console.log(row)    
-        return [
-          <MenuItem className="bg-black" key={1} onClick={closeMenu}>
-            <button 
-              onClick={() => handleClick(row.original.id, 'Approved')} 
-              className="flex gap-2 rounded-full items-center"
-            >
-              <FaCheck className="text-green-600" />
-              Approve
-            </button>
-          </MenuItem>,
-          <MenuItem key={2} onClick={closeMenu}>
-            <Link href={`/list/access/reject/${row.original.id}`}>
-              <div className="flex gap-2 items-center">
-                <FaTimes className="text-red-600" />
-                Reject
-              </div>
+      export const pendingActions = ({ closeMenu, row,getData }) => [
+        <MenuItem key={1} onClick={closeMenu}>
+                <div className="">
+            <Link href={`/list/access/detailpage/${row.original.id}`}>
+                  <div className="flex gap-2 items-center">
+                      <FaUser />
+                          <p>See Profile</p>
+                    </div>
             </Link>
-          </MenuItem>,
-        ];
-      };
+                </div>
+        </MenuItem>,
+                arrayActions.map((item,index) =>(
+                  <MenuItem key={index + 2} onClick={closeMenu}>
+                    <button 
+                      onClick={async() => {
+                        try {
+                          await pendingAction(row.original.id, item.actionTitle)
+                          getData()
+                        } catch (error) {
+                          console.log(error)
+                        }
+                      }}
+                      className="flex gap-2 rounded-full items-center"
+                    >
+                      <item.icon className={item.iconColor} />
+                      {item.name}
+                    </button>
+                  </MenuItem>
+                    )),   
+    ];
 
 
     
