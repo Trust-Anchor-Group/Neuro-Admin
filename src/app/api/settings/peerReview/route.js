@@ -4,79 +4,63 @@ import ResponseModel from "@/models/ResponseModel";
 export async function POST(request) {
     try {
         const requestData = await request.json();
-        const clientCookie = request.headers.get('Cookie');
+        const clientCookie = request.headers.get("Cookie");
         const { host } = config.api.agent;
         const url = `https://${host}/Settings/PeerReview`;
 
         const payload = {
-            allowPeerReview: requestData.allowPeerReview,
-            nrReviewersToApprove: requestData.nrReviewersToApprove,
-            nrPhotosRequired: requestData.nrPhotosRequired,
-            requireFirstName: requestData.requireFirstName,
-            requireMiddleName: requestData.requireMiddleName,
-            requireLastName: requestData.requireLastName,
-            requirePersonalNumber: requestData.requirePersonalNumber,
-            requireCountry: requestData.requireCountry,
-            requireRegion: requestData.requireRegion,
-            requireCity: requestData.requireCity,
-            requireArea: requestData.requireArea,
-            requirePostalCode: requestData.requirePostalCode,
-            requireAddress: requestData.requireAddress,
-            requireIso3166Compliance: requestData.requireIso3166Compliance,
-            requireNationality: requestData.requireNationality,
-            requireGender: requestData.requireGender,
-            requireBirthDate: requestData.requireBirthDate
+            allowPeerReview: requestData.allowPeerReview ?? false,
+            nrReviewersToApprove: requestData.nrReviewersToApprove ?? 1,
+            nrPhotosRequired: requestData.nrPhotosRequired ?? 1,
+            requireFirstName: requestData.requireFirstName ?? false,
+            requireMiddleName: requestData.requireMiddleName ?? false,
+            requireLastName: requestData.requireLastName ?? false,
+            requirePersonalNumber: requestData.requirePersonalNumber ?? false,
+            requireCountry: requestData.requireCountry ?? false,
+            requireRegion: requestData.requireRegion ?? false,
+            requireCity: requestData.requireCity ?? false,
+            requireArea: requestData.requireArea ?? false,
+            requirePostalCode: requestData.requirePostalCode ?? false,
+            requireAddress: requestData.requireAddress ?? false,
+            requireIso3166Compliance: requestData.requireIso3166Compliance ?? false,
+            requireNationality: requestData.requireNationality ?? false,
+            requireGender: requestData.requireGender ?? false,
+            requireBirthDate: requestData.requireBirthDate ?? false
         };
-        console.log(payload)
-        console.log(url)
-
 
         const response = await fetch(url, {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'Cookie': clientCookie
+                "Content-Type": "application/json",
+                "Cookie": clientCookie
             },
-            credentials: 'include',
+            credentials: "include",
             body: JSON.stringify(payload),
-            mode: 'cors'
+            mode: "cors"
         });
-        console.log(response)
-        if (!response) {
-            return new Response(JSON.stringify(new ResponseModel(500, "No response received from the server")), {
-                status: 500,
+
+
+        const contentType = response.headers.get("content-type") || "";
+        let data = contentType.includes("application/json") ? await response.json() : await response.text();
+
+        if (!response.ok) {
+            console.error("❌ Error Response:", data);
+            return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${data}`)), {
+                status: response.status,
                 headers: { "Content-Type": "application/json" }
             });
         }
 
-        const contentType = response.headers?.get('content-type') || '';
-        let data;
-
-        if (contentType.includes('application/json')) {
-            data = await response.json();
-        } else {
-            data = await response.text();
-        }
-
-        if (!response.ok) {
-            return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${data}`)), {
-                status: response.status,
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-
-        return new Response(JSON.stringify(new ResponseModel(200, 'Peer Review settings successfully updated', data)), {
+        return new Response(JSON.stringify(new ResponseModel(200, "Peer Review settings successfully updated", data)), {
             status: 200,
-            headers: { 'Content-Type': 'application/json' }
+            headers: { "Content-Type": "application/json" }
         });
 
     } catch (error) {
-        console.error("Fetch error:", error);
+        console.error("❌ Fetch error:", error);
         return new Response(JSON.stringify(new ResponseModel(500, error.message)), {
             status: 500,
-            headers: {
-                "Content-Type": "application/json"
-            }
+            headers: { "Content-Type": "application/json" }
         });
     }
 }
