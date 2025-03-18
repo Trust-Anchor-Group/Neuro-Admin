@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import AgentAPI from "agent-api";
+import dynamic from "next/dynamic";
+const AgentAPI = dynamic(() => import("agent-api"), { ssr: false });
+
 import { FaCheckCircle, FaExclamationCircle, FaSave, FaSpinner } from "react-icons/fa";
 
 export default function KYCSettings() {
