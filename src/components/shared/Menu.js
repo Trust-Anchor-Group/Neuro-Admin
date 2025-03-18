@@ -20,6 +20,7 @@ const menuItems = [
         href: "/list/access",
         visible: ["admin"],
       },
+      
       {
         icon: <FaIdCard size={20} />,
         label: "Identity Management",
@@ -48,9 +49,9 @@ const Menu = () => {
       {menuItems.map((section) => (
         <div className="flex flex-col gap-3" key={section.title}>
           {/* Section Title */}
-          <span className="text-gray-600 font-bold uppercase text-xs px-6 tracking-wider">
+          {/* <span className="text-gray-600 font-bold uppercase text-xs px-6 tracking-wider">
             {section.title}
-          </span>
+          </span> */}
 
           {section.items.map((item, itemIndex) => (
             <div key={item.label} className="relative">
@@ -58,7 +59,7 @@ const Menu = () => {
               {!item.dropdown ? (
                 <Link
                   href={item.href}
-                  className="flex items-center gap-4 text-gray-700 px-6 py-3 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200"
+                  className="flex items-center gap-4 text-gray-700 px-3 py-3 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200"
                 >
                   <div className="text-xl text-gray-600 group-hover:text-white">{item.icon}</div>
                   <span className="hidden lg:block">{item.label}</span>
@@ -81,7 +82,7 @@ const Menu = () => {
 
                   {/* Dropdown Sub-Items */}
                   {openDropdown === itemIndex && (
-                    <div className="ml-8 flex flex-col gap-2 mt-2 bg-gray-100 rounded-lg p-3">
+                    <div className="ml-6 flex flex-col gap-2 mt-2 bg-gray-100 rounded-lg p-2">
                       {item.subItems.map((subItem) => (
                         <Link
                           key={subItem.label}
