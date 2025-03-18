@@ -10,7 +10,6 @@ export async function POST(request) {
         const { host } = config.api.agent;
         const url = `https://${host}/LegalIdentities.ws`;
 
-    
         const payload = {
             maxCount,
             offset: offset || 0,
