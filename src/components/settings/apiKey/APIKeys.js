@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { FaEye, FaEyeSlash, FaCopy, FaEllipsisV, FaKey } from "react-icons/fa";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import {MaterialReactTable} from "material-react-table";
+import { FaEye, FaEyeSlash, FaCopy, FaKey } from "react-icons/fa";
 
 export default function APIKeys() {
   const [apiKeys, setApiKeys] = useState([]);
   const [visibleKeys, setVisibleKeys] = useState({});
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+
   useEffect(() => {
     async function fetchAPIKeys() {
       try {
@@ -17,9 +20,7 @@ export default function APIKeys() {
           body: JSON.stringify({ offset: 0, maxCount: 10 }),
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch API keys");
-        }
+        if (!response.ok) throw new Error("Failed to fetch API keys");
 
         const data = await response.json();
         const formattedKeys = data.data.map((key, index) => ({
@@ -36,70 +37,113 @@ export default function APIKeys() {
 
         setApiKeys(formattedKeys);
       } catch (error) {
-        console.error("Error fetching API keys:", error);
+        console.error("❌ Error fetching API keys:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchAPIKeys();
   }, []);
 
-  const toggleVisibility = (id) => {
-    setVisibleKeys({ ...visibleKeys, [id]: !visibleKeys[id] });
+  const toggleVisibility = (id, event) => {
+    event.stopPropagation(); 
+    setVisibleKeys((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const copyToClipboard = (key) => {
+  const copyToClipboard = (key, event) => {
+    event.stopPropagation(); 
     navigator.clipboard.writeText(key);
   };
 
-  return (
-    <div>
-      <h2 className="text-3xl font-bold text-gray-800">API Keys</h2>
-      <p className="text-gray-500 text-sm mb-6">Manage API keys for accessing the identity verification system</p>
+  const handleRowClick = (key) => {
+    router.push(`/settings/api-key/${key}`);
+  };
 
-      {/* API Keys Table */}
-      <div className="bg-white/80 backdrop-blur-md shadow-xl rounded-xl p-6 border border-gray-200">
-        <table className="w-full text-left border-collapse">
-          <thead className="text-gray-600 border-b border-gray-300">
-            <tr>
-              <th className="py-3 px-4">Key Name</th>
-              <th className="py-3 px-4">API Key</th>
-              <th className="py-3 px-4">Owner</th>
-              <th className="py-3 px-4">Email</th>
-              <th className="py-3 px-4">Created</th>
-              <th className="py-3 px-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {apiKeys.map((key) => (
-              <tr key={key.id} className="border-b border-gray-300 hover:bg-gray-50 transition">
-                <td className="py-4 px-4 font-medium text-gray-700">{key.name}</td>
-               <td
-                    className="py-4 px-4 flex items-center gap-2 cursor-pointer hover:text-blue-600"
-                    onClick={() => router.push(`/settings/api-key/${key.key}`)}
-                  >
-                  <span className="bg-gray-100 px-3 py-1 rounded-lg text-gray-700 font-mono text-sm">
-                    {visibleKeys[key.id] ? key.key : `${key.key.substring(0, 6)}...${key.key.slice(-4)}`}
-                  </span>
-                  <button onClick={() => toggleVisibility(key.id)} className="text-gray-500 hover:text-gray-700 transition">
-                    {visibleKeys[key.id] ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                  <button onClick={() => copyToClipboard(key.key)} className="text-gray-500 hover:text-gray-700 transition">
-                    <FaCopy />
-                  </button>
-                </td>
-                <td className="py-4 px-4 text-gray-600">{key.owner}</td>
-                <td className="py-4 px-4 text-gray-600">{key.email}</td>
-                <td className="py-4 px-4 text-gray-600">{key.created}</td>
-                <td className="py-4 px-4 text-right">
-                  <button className="text-gray-500 hover:text-gray-700 p-2 rounded-full transition">
-                    <FaEllipsisV />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  const columns = useMemo(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Key Name",
+        size: 200,
+        Cell: ({ row }) => (
+          <div
+            className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition"
+            onClick={() => handleRowClick(row.original.key)}
+          >
+            <FaKey className="text-blue-600" />
+            <span className="font-medium">{row.original.name}</span>
+          </div>
+        ),
+      },
+      {
+        accessorKey: "key",
+        header: "API Key",
+        size: 300,
+        Cell: ({ row }) => (
+          <div className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-lg font-mono text-sm w-full overflow-hidden">
+            <span className="truncate w-40 sm:w-60 md:w-80">
+              {visibleKeys[row.original.id]
+                ? row.original.key
+                : `${row.original.key.substring(0, 6)}...${row.original.key.slice(-4)}`}
+            </span>
+            <button
+              onClick={(event) => toggleVisibility(row.original.id, event)}
+              className="text-gray-500 hover:text-gray-700 transition"
+            >
+              {visibleKeys[row.original.id] ? <FaEyeSlash /> : <FaEye />}
+            </button>
+            <button
+              onClick={(event) => copyToClipboard(row.original.key, event)}
+              className="text-gray-500 hover:text-gray-700 transition"
+            >
+              <FaCopy />
+            </button>
+          </div>
+        ),
+      },
+      { accessorKey: "owner", header: "Owner", size: 150 },
+      { accessorKey: "email", header: "Email", size: 250 },
+      { accessorKey: "created", header: "Created", size: 150 },
+    ],
+    [visibleKeys]
+  );
+
+  return (
+    <div className="max-w-6xl mx-auto mt-10 px-6">
+      {/* Header Section */}
+      <div className="mb-6">
+        <h2 className="text-4xl font-bold text-gray-800">API Keys</h2>
+        <p className="text-gray-500">Manage API keys for accessing the identity verification system.</p>
       </div>
+
+      {/* Loading State */}
+      {loading ? (
+        <div className="flex justify-center py-5">
+          <div className="w-8 h-8 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-200">
+          <MaterialReactTable
+            columns={columns}
+            data={apiKeys}
+            enableSorting
+            enablePagination
+            enableGlobalFilter
+            enableColumnResizing
+            muiTablePaperProps={{ elevation: 0 }}
+            muiTableHeadCellProps={{
+              sx: { fontWeight: "bold", bgcolor: "#1E40AF", color: "white" },
+            }}
+            muiTableBodyCellProps={{ sx: { borderBottom: "1px solid #ddd" } }}
+            muiTableContainerProps={{ sx: { borderRadius: 3, overflow: "hidden" } }}
+            muiTableBodyRowProps={({ row }) => ({
+              onClick: () => handleRowClick(row.original.key),
+              sx: { cursor: "pointer", "&:hover": { backgroundColor: "#f0f9ff" } },
+            })}
+          />
+        </div>
+      )}
     </div>
   );
 }
