@@ -38,12 +38,11 @@ export default function DashboardPage() {
   );
 }
 
-// Fancy Stats Card Component
 function StatCard({ title, value, icon }) {
   return (
-    <div className="p-6 bg-white/80 backdrop-blur-md border border-gray-200 rounded-xl shadow-lg flex items-center gap-4 
+    <div className="p-5 bg-white/80 backdrop-blur-md border border-gray-200 rounded-xl shadow-lg flex items-center gap-4 
     transform transition-all hover:scale-105 hover:shadow-xl hover:bg-white/90">
-      <div className="p-3 bg-white rounded-full shadow-lg">{icon}</div>
+      <div className="p-2 bg-white rounded-full shadow-lg">{icon}</div>
       <div>
         <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
         <p className="text-3xl font-bold text-gray-900">{value}</p>
