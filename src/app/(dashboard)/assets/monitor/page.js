@@ -29,15 +29,7 @@ const MonitorPage = () => {
       carbonProcessed: "20,0000 kg",
       status: "Active",
     },
-    // {
-    //   id: 3,
-    //   name: "DeTrash Facility",
-    //   type: "Recycling",
-    //   address: "Kungsgatan 18, 111 35 Stockholm",
-    //   location: { lat: 59.3369, lng: 18.0668 },
-    //   carbonProcessed: 50000,
-    //   status: "Inactive",
-    // },
+ 
   ];
 
   return (
@@ -58,7 +50,6 @@ const MonitorPage = () => {
           {showMap ? "Hide Map" : "View Map"}
         </button>
       </div>
-
       {/* Map Section */}
       {showMap && (
         <div className="my-8">
