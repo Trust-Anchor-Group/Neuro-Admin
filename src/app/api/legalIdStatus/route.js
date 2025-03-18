@@ -29,7 +29,6 @@ export async function POST(request) {
             mode: 'cors'
         });
 
-
         const contentType = response.headers.get('content-type');
         let data;
 
