@@ -1,9 +1,9 @@
 import AssetOrdersTable from "@/components/assets/orders/AssetOrdersTable";
 import { Suspense } from "react";
-import { fetchOrders } from "@/lib/fetchOrders"; // A helper function to fetch data
+import { fetchOrders } from "@/lib/fetchOrders"; 
 
 export default async function OrdersPage() {
-  const ordersData = await fetchOrders(); // Fetch data server-side
+  const ordersData = await fetchOrders(); 
 
   return (
     <div className="p-6 bg-gradient-to-r from-blue-50 via-white to-blue-50 min-h-screen">

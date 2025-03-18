@@ -6,7 +6,7 @@ import { FaCheckCircle, FaExclamationCircle, FaSave, FaSpinner } from "react-ico
 
 export default function KYCSettings() {
   const [settings, setSettings] = useState(null);
-  const [originalSettings, setOriginalSettings] = useState(null); // 🔄 Track original values
+  const [originalSettings, setOriginalSettings] = useState(null); 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -35,7 +35,7 @@ export default function KYCSettings() {
         };
 
         setSettings(formattedSettings);
-        setOriginalSettings(JSON.stringify(formattedSettings)); // Store for comparison
+        setOriginalSettings(JSON.stringify(formattedSettings)); 
       } catch (error) {
         console.error("❌ Error fetching KYC settings:", error);
         setMessage({ type: "error", text: "Failed to load settings." });
