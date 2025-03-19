@@ -1,18 +1,35 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import AgentAPI from "agent-api";
 import { FaCheckCircle, FaExclamationCircle, FaSave, FaSpinner } from "react-icons/fa";
 
 export default function KYCSettings() {
   const [settings, setSettings] = useState(null);
+  const[AgentAPI, setAgentAPI] = useState(null);
   const [originalSettings, setOriginalSettings] = useState(null); 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
   useEffect(() => {
+    async function loadAgentAPI() {
+      if (typeof window !== "undefined") {
+        try {
+          const agentModule = await import("agent-api");
+          setAgentAPI(agentModule.default || agentModule);
+        } catch (error) {
+          console.log("❌ Failed to load AgentAPI:", error);
+        }
+      }
+    }
+    loadAgentAPI();
+  }, []);
+  useEffect(() => {
     async function fetchSettings() {
+      if (!AgentAPI || !AgentAPI.Legal?.GetApplicationAttributes) {
+        console.log("❌ AgentAPI is not available yet.");
+        return;
+      }
       try {
         console.log("🚀 Fetching KYC settings...");
         const data = await AgentAPI.Legal.GetApplicationAttributes();
@@ -45,7 +62,7 @@ export default function KYCSettings() {
     }
 
     fetchSettings();
-  }, []);
+  }, [AgentAPI]);
 
   //  Toggle settings
   const toggleSetting = (key) => {
