@@ -6,15 +6,17 @@ export async function POST(request) {
     const requestData = await request.json();
     const { id, state } = requestData;
     const clientCookie = request.headers.get('Cookie');
-
+    const decodedUserId = decodeURIComponent(id);
     const { host } = config.api.agent;
     const url = `https://${host}/LegalIdentityStateChanged`;
 
     // state can be set to Created, Approved, Rejected, Obsoleted, or Compromised
     const payload = {
-        id,
+        id:decodedUserId,
         state
     };
+
+    console.log(payload)
 
     try {
 
@@ -28,7 +30,6 @@ export async function POST(request) {
             body: JSON.stringify(payload),
             mode: 'cors'
         });
-
 
         const contentType = response.headers.get('content-type');
         let data;

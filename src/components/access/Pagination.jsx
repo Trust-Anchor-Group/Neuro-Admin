@@ -1,28 +1,65 @@
 'use client'
 import Link from 'next/link'
 import React from 'react'
+import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from 'react-icons/fi'
 
 
 
- export const Pagination = ({page,prevPage,totalPages}) => {
 
+ export const Pagination = ({ page,prevPage,totalPages,limit }) => {
+
+    const maxCount = totalPages * limit
+
+    const startItem = (page -1) * limit + 1
+    const endItem = Math.min(page * limit, maxCount)
     //Pagination buttons.
 
    return (
-     <div className='flex justify-between items-center'>
+     <div className='absolute bottom-[3vh] right-[3vw] z-50 flex gap-2 justify-between items-center'>
+      <div className='flex gap-2 justify-center items-center'>
+        <p>{startItem}-{endItem}</p>
+        <p>of</p>
+        <p>{maxCount}</p>
+      </div>
+      <div>
        {page === 1 ? (
-        <button className='px-6 py-4 rounded-lg 
-        font-medium shadow-md transition-all bg-neuroDarkGray text-neuroGray opacity-70' aria-disabled='true'>Previous</button>
-       ): <Link href={`?page=${prevPage}`}><button className='px-6 py-4 rounded-lg 
-        font-medium shadow-md transition-all bg-neuroDarkGray text-neuroGray hover:opacity-70 max-sm:ml-5' aria-label='Previous Page'>Previous</button></Link>}
+        <div className='flex justify-center items-center gap-2'>
+         <FiChevronsLeft className='text-gray-300' size={20} />
+        <FiChevronLeft className='text-gray-300' size={20} />
+        </div>
+       ):
+       <div className='flex justify-center items-center gap-2'>
+        <Link href={`?page=${1}`}>
+          <FiChevronsLeft className='cursor-pointer hover:opacity-70' size={20} />   
+        </Link>
+       <Link href={`?page=${prevPage}`}>
+       <FiChevronLeft className='cursor-pointer hover:opacity-70' size={20} />
+        </Link>
+       </div> 
+        }
+      </div>
         
+        <div>
         {page === totalPages ? (
-          <button className='px-6 py-4 rounded-lg 
-          font-medium shadow-md transition-all bg-neuroDarkGray
-           text-neuroGray opacity-70' aria-disabled='true'>Next</button>
-        ): <Link href={`?page=${page + 1}`}><button className='px-6 py-4 rounded-lg 
-        font-medium shadow-md transition-all bg-neuroDarkGray
-         text-neuroGray hover:opacity-70 max-sm:mr-5' aria-label='Next Page'>Next</button></Link>}
+      
+      <div className='flex justify-center items-center gap-2'>
+        <FiChevronRight className='text-gray-300' size={20} />
+        <FiChevronsRight className='text-gray-300' size={20} />   
+      </div>
+       
+        ):
+        <div className='flex justify-center items-center gap-2'>
+        <Link href={`?page=${page + 1}`}>
+        <FiChevronRight className='cursor-pointer hover:opacity-70' size={20} />
+         </Link>
+         <Link href={`?page=${totalPages}`}>
+            <FiChevronsRight className='cursor-pointer hover:opacity-70' size={20} />   
+         </Link>
+        </div> 
+         }
+        </div>
+        <div>
+        </div>
      </div>
    )
  }

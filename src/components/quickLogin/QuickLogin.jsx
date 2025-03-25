@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import AgentAPI from 'agent-api';
 import { CircularProgress, Typography } from '@mui/material';
 import config from '@/config/config';
@@ -44,6 +44,12 @@ export default function QuickLogin({
   const [tagSign, setTagSign] = useState();
   const [tabId, setTabId] = useState(TabID);
   const [success, setSuccess] = useState(false);
+  const [serviceId, setServiceId] = useState('');
+  const serviceIdRef = useRef(serviceId);
+
+  useEffect(() => {
+    serviceIdRef.current = serviceId;
+  }, [serviceId]);
 
   useEffect(() => {
     setTabId(TabID);
@@ -113,9 +119,15 @@ export default function QuickLogin({
 
   const signatureReceived = (signatureData) => {
     console.log('[Login] Successful Signature Received:', signatureData);
-    window.localStorage.removeItem('serviceId');
     setSuccess(true);
     if (onLoginSuccess) onLoginSuccess();
+     if (signatureData?.Properties) {
+      const userData = {
+        name: `${signatureData.Properties.FIRST} ${signatureData.Properties.LAST}`,
+      };
+
+      sessionStorage.setItem("neuroUser", JSON.stringify(userData));
+    }
   };
 
   const evaluateEvent = (event) => {
@@ -139,7 +151,6 @@ export default function QuickLogin({
   };
 
   const displayQuickLogin = async () => {
-    const serviceIdValue = window.localStorage.getItem('serviceId');
 
     const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = () => {
@@ -148,33 +159,29 @@ export default function QuickLogin({
           const response = JSON.parse(xhttp.responseText);
           setTagSign(response.data.signUrl);
 
-          if (serviceIdValue === null) {
-            window.localStorage.setItem('serviceId', response.data.serviceId);
+          if (!serviceIdRef.current) {
+            setServiceId(response.data.serviceId);
           }
         } catch (err) {
           console.error('[QR Fetch] Error parsing response:', err);
         }
       }
     };
-
-    const uri = `${config.protocol}://${config.origin}/api/auth/quickLogin/session`;
+    console.log('config.origin:', config.origin); 
+    const uri = `/api/auth/quickLogin/session`;
     xhttp.open('POST', uri, true);
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.withCredentials = true;
     xhttp.send(
       JSON.stringify({
         agentApiTimeout: 3600, // Requesting Agent API Token
-        serviceId: serviceIdValue || '',
+        serviceId: serviceIdRef.current || '',
         tab: TabID,
         mode: 'image',
         purpose,
       })
     );
   };
-
-  window.addEventListener('beforeunload', () => {
-    window.localStorage.removeItem('serviceId');
-  });
 
   useEffect(() => {
     if (active) {

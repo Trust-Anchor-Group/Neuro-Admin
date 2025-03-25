@@ -1,24 +1,27 @@
 import { PaginatedList } from '@/components/access/PaginatedList'
-import { Pagination } from '@/components/access/Pagination';
-import SearchBar from '@/components/SearchBar';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import config from '@/config/config';
+import { userColoumnsAccount,customCellAcountTable,accountActions } from './accountTableList.js'
+import { FaSpinner } from 'react-icons/fa';
+
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
 
-    const page = Number(searchParams.get('page') || 1)
-    console.log(page)
     const query = searchParams.get('query') || ''
-    let limit = 5
+    const [loading, setLoading] = useState(false)
     const [userList, setUserList] = useState(null)
+    let limit = 5
+    const page = Number(searchParams.get('page') || 1)
+
     const [totalPages, setTotalPages] = useState(0)
     
     useEffect(() => {
+    //Fetch data from backend
       async function getData(){
-
         try {
+          setLoading(true)
           const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
           const res = await fetch(url, {
             method:'GET',
@@ -29,12 +32,14 @@ export const AccessContet = () => {
           })
     
           const data = await res.json()
-          console.log(data)
+
           setUserList(data.data)
-          setTotalPages(data.totalPages)
+          setTotalPages(2)
           console.log(userList)
         } catch (error) {
           throw new Error('Could not get userList',error)  
+        } finally{
+          setLoading(false)
         }
   
       }
@@ -43,18 +48,38 @@ export const AccessContet = () => {
     }, [page,limit,query])
     
   
-    //Fetch data from backend
+ 
   
   
     const prevPage = page - 1 > 0 ? page - 1 : 1
-    
+
     return (
       <div>
-          <div className='flex justify-center items-center h-screen my-10'>
-            <div className='flex flex-col gap-3'>
-              <SearchBar placeholder={'Search...'} classNameText={'w-full border-2 rounded-md py-3 pl-10 text-sm'}/>
-              <PaginatedList userList={userList}/>
-              <Pagination page={page} prevPage={prevPage} totalPages={totalPages}/>
+          <div className='p-5'>
+            <div className='flex justify-between items-center'>
+              <div>
+                      <h1 className="mb-2 text-xl font-semibold md:text-3xl">Accounts</h1>
+                      <p className='text-lg opacity-70 max-sm:text-sm'>Manage user accounts and permissions</p>
+                  </div>
+            </div>
+            <div className=''>
+              {
+                loading ? (
+                        <div className='flex justify-center items-center mt-12'>
+                          <FaSpinner className='animate-spin text-5xl'/>
+                         </div>
+                    ) :
+                <PaginatedList 
+                userList={userList} 
+                page={page}
+                totalPages={totalPages}
+                prevPage={prevPage}
+                limit={limit}
+                userColoumns={userColoumnsAccount}
+                customCellRenderers={customCellAcountTable}
+                renderRowActions={accountActions}
+                />
+              }
             </div>
           </div>
       </div>

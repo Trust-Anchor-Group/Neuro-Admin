@@ -20,6 +20,7 @@ const searchParams = useSearchParams() // Get search parameters from the URL
 const pathName = usePathname() // Get the current path
 const { replace } = useRouter() // To navigate when the query changes
 
+
 const handleSearch = useDebouncedCallback((searchTerm) =>{
        // Create a URLSearchParams object to modify the query parameters
     const params = new URLSearchParams(searchParams)
@@ -33,17 +34,16 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
 
     // Replace the current URL with the updated query string
     replace(`${pathName}?${params.toString()}`)
-},300)
+},1000)
 
   return (
-    <div className='relative flex flex-col justify-center items-center'>
-        <label className='text-lg' htmlFor="search">Search</label>
-        <input type="text" 
+    <div className='relative'>
+        <input type="text"
         className={classNameText}
         placeholder={placeholder}
         onChange={(e) => handleSearch(e.target.value)}
         defaultValue={searchParams.get('query')?.toString()} />
-        <FaSearch className='absolute left-5 top-1/2 h-[30px] w-[20px] -translate-x-1/2'/>
+         <FaSearch className='text-gray-400 absolute left-[1%] top-[32%] h-[30px] w-[20px] max-md:left-[4%]'/> 
     </div>
   )
 }
