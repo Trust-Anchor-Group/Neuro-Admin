@@ -12,7 +12,7 @@ export const AccessContet = () => {
     const query = searchParams.get('query') || ''
     const [loading, setLoading] = useState(false)
     const [userList, setUserList] = useState(null)
-    let limit = 5
+    let limit = 10
     const page = Number(searchParams.get('page') || 1)
 
     const [totalPages, setTotalPages] = useState(0)
@@ -34,7 +34,7 @@ export const AccessContet = () => {
           const data = await res.json()
 
           setUserList(data.data)
-          setTotalPages(2)
+          setTotalPages(38)
           console.log(userList)
         } catch (error) {
           throw new Error('Could not get userList',error)  
