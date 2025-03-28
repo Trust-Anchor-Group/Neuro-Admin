@@ -4,18 +4,16 @@ import { MenuItem } from "@mui/material";
 
     //Decide what columns you should have in your table
    export const userColoumnsAccount = [
-    { accessorKey: "name", header: "Name", size: 100,
-      muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
-      muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } }, 
-  }
+    { accessorKey: "name", header: "Name", size: 100, }
         ,
         { accessorKey: "other.EMAIL", header: "Email", size: 100, 
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
             muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
         },
-        { accessorKey: "account", header: "Account", size: 200,
-          },
-        { accessorKey: "state", header: "Id status", size: 50, 
+        { accessorKey: "other.PHONE", header: "Phone", size: 200,
+          muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
+          muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } }},
+        { accessorKey: "state", header: "Identity", size: 50, 
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
             muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
         },
@@ -30,9 +28,9 @@ import { MenuItem } from "@mui/material";
         state: ({ cell,row }) => {
            const name = row.original.name
            if(name === ''){
-            return <p>Light ID</p>
+            return <p>No</p>
            }else{
-            return <p>Full ID</p>
+            return <p className="">Yes</p>
            }
         },
         name: ({ cell, row }) => {
@@ -83,27 +81,10 @@ import { MenuItem } from "@mui/material";
             <Link href={`/list/access/detailpage/${row.original.id}`}>
                   <div className="flex gap-2 items-center">
                       <FaUser />
-                      <p>See Profile</p>
+                      <p>View&nbsp;details</p>
                     </div>
             </Link>
                 </div>
         </MenuItem>,
-                arrayActions.map((item,index) =>(
-                  <MenuItem key={index + 2} onClick={closeMenu}>
-                    <button 
-                      onClick={async() => {
-                        try {
-                          await pendingAction(row.original.id, item.actionTitle)
-                          getData()
-                        } catch (error) {
-                          console.log(error)
-                        }
-                      }}
-                      className="flex gap-2 rounded-full items-center"
-                    >
-                      <item.icon className={item.iconColor} />
-                      {item.name}
-                    </button>
-                  </MenuItem>
-                    )),   
+         
     ];

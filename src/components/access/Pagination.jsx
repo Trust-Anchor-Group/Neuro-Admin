@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import React from 'react'
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from 'react-icons/fi'
 
@@ -7,7 +8,8 @@ import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from '
 
 
  export const Pagination = ({ page,prevPage,totalPages,limit }) => {
-
+    const searchParams = useSearchParams()
+    const tab = searchParams.get('tab') || 'current'
     const maxCount = totalPages * limit
 
     const startItem = (page -1) * limit + 1
@@ -29,10 +31,10 @@ import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from '
         </div>
        ):
        <div className='flex justify-center items-center gap-2'>
-        <Link href={`?page=${1}`}>
+        <Link href={`?tab=${tab}&page=1`}>
           <FiChevronsLeft className='cursor-pointer hover:opacity-70' size={20} />   
         </Link>
-       <Link href={`?page=${prevPage}`}>
+       <Link href={`?tab=${tab}&page=${prevPage}`}>
        <FiChevronLeft className='cursor-pointer hover:opacity-70' size={20} />
         </Link>
        </div> 
@@ -49,10 +51,10 @@ import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from '
        
         ):
         <div className='flex justify-center items-center gap-2'>
-        <Link href={`?page=${page + 1}`}>
+        <Link href={`?tab=${tab}&page=${page + 1}`}>
         <FiChevronRight className='cursor-pointer hover:opacity-70' size={20} />
          </Link>
-         <Link href={`?page=${totalPages}`}>
+         <Link href={`?tab=${tab}&page=${totalPages}`}>
             <FiChevronsRight className='cursor-pointer hover:opacity-70' size={20} />   
          </Link>
         </div> 

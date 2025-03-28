@@ -27,6 +27,9 @@ const config = {
                 neuroPurpleLight: "#D1C4E9",
                 backgroundDark: "#121212",
                 backgroundLight: "#FAFAFA",
+                activeGreen:"#085E50",
+                obsoletedRed:"#A81123",
+                aprovedPurple:"#8F40D4"
             },
             boxShadow: {
                 fancy: "0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)",

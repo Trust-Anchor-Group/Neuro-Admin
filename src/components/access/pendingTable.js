@@ -21,11 +21,10 @@ import { pendingAction } from './pendingFetch.js'
    export const customCellPendingTable = {
         state: ({ cell }) => {
           const state = cell.getValue();
-          if(state === 'Obsoleted'){
+          if(state === 'Created'){
             
-           return <div className={`grid grid-cols-2 bg-yellow-500/30 mr-12 pr-[35%] rounded-full items-center max-md:grid-cols-1`}>
-            <span className={`z-10 pl-[30%]`}><FaPlusCircle className="text-yellow-500" /></span>
-            <span className={`hidden md:inline`}>New&nbsp;application</span>
+           return <div className={`text-center bg-yellow-500/30 max-w-[125px] rounded-full items-center`}>
+            <span className={``}>New&nbsp;application</span>
           </div>
           }
         },

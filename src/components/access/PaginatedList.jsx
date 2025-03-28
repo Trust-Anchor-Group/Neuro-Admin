@@ -2,11 +2,6 @@ import React from 'react'
 import TableComponent from './TableComponent';
 import { Pagination } from './Pagination';
 import SearchBar from '../SearchBar';
-import { FaUser, FaUserCog } from "react-icons/fa";
-import { MenuItem } from "@mui/material";
-import Link from 'next/link';
-
-
 
 export const PaginatedList = ({ userList, page, prevPage, totalPages,limit,customCellRenderers,userColoumns,renderRowActions }) => {
 
@@ -26,7 +21,7 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,limit,custo
 
     return (
         <div>
-            <div className='mb-5 flex justify-between items-center'>
+            <div className='flex justify-between items-center'>
             </div>
                 <SearchBar placeholder={'Search...'}
                  classNameText={'w-full border-2 rounded-md py-3 my-5 pr-10 pl-12 text-sm'}/>
