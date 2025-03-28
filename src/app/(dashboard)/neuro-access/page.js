@@ -21,18 +21,18 @@ export default function DashboardPage() {
       <p className="text-gray-500 text-md mb-8">Real-time identity management insights</p>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
         <StatCard title="Total Digital Identities" value={stats.totalIdentities} icon={<FaIdCard className="text-blue-500" />} />
         <StatCard title="Active Sessions" value={stats.activeSessions} icon={<FaUserShield className="text-green-500" />} />
         <StatCard title="Digital Signatures Processed" value={stats.digitalSignatures} icon={<FaFileSignature className="text-yellow-500" />} />
         <StatCard title="Identity Wallets Utilized" value={stats.identityWallets} icon={<FaWallet className="text-purple-500" />} />
         <StatCard title="Pending Applications" value={stats.PendingApplications} icon={<FaSignInAlt className="text-gray-500" />} />
-      </div>
+      </div> */}
 
       {/* Pending Applications & Recent Activity */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <PendingApplications />
-        <RecentActivity />
+        {/* <RecentActivity /> */}
       </div>
     </div>
   );
