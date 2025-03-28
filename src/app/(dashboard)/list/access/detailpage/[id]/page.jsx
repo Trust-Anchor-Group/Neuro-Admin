@@ -6,6 +6,7 @@ import config from '@/config/config';
 import { FaArrowLeft, FaBan, FaCheck, FaExclamationTriangle, FaPlusCircle, FaSpinner, FaTimesCircle } from 'react-icons/fa'
 import { InputField } from '@/components/access/InputField'
 import { pendingAction } from '@/components/access/pendingFetch';
+import { Modal } from '@/components/shared/Modal';
 export default function DetailPage() {
     const { id } = useParams()
     const [user, setUser] = useState(null)
@@ -19,6 +20,9 @@ export default function DetailPage() {
     ]
 
     const router = useRouter()
+    const [toggle, setToggle] = useState(false)
+    const [actionButtonName, setActionButtonName] = useState('')
+    const [buttonName, setButtonName] = useState('')
     
     async function getData() {
         try {
@@ -54,6 +58,23 @@ export default function DetailPage() {
         }
     }, [id])
 
+
+    async function onHandleModal(){
+        try {
+            await pendingAction(id,actionButtonName)
+            getData()
+            setToggle(false)
+         } catch (error) {
+             console.log(error)
+         }
+    }
+
+    function onToggleHandler(btnName,btnText){
+        setToggle((prev => !prev))
+        setActionButtonName(btnName)
+        setButtonName(btnText)
+        console.log(actionButtonName)
+    }
 
 
     return (
@@ -137,21 +158,24 @@ export default function DetailPage() {
                                 />
                         </div>
                     }
+ 
                     <p className='text-gray-500 mb-5'>Actions</p>
+                          {
+                                                toggle &&
+                                                <Modal 
+                                                text={`Are you sure you want to ${buttonName}?`}
+                                                setToggle={setToggle}
+                                                onHandleModal={onHandleModal}/>
+                             }
+                    
                         {
                             adminActions.map((btn,index) => (
                                 <button 
-                                onClick={async() => {
-                                    try {
-                                       await pendingAction(id,btn.actionTitle)
-                                       getData()
-                                    } catch (error) {
-                                        console.log(error)
-                                    }
-                                }} key={index} className={`w-full 
+                                onClick={() => onToggleHandler(btn.actionTitle,btn.name)} key={index} className={`w-full 
                                     ${btn.bgColor} ${btn.textColor} border-2 py-2 grid grid-cols-2 items-center pl-[20%] pr-[35%]
                                      rounded-lg mb-2 cursor-pointer transition-opacity
                      hover:opacity-70`}>
+                        
                         <btn.icon/>{btn.name}
                      </button>
                             ))

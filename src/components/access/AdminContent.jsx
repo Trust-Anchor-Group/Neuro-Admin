@@ -6,6 +6,8 @@ import Link from 'next/link';
 import {customCellCurrentIdsTable,userColoumnsCurrentIds, currentIdActions} from './currentIdsTable.js'
 import {userColoumnsPending,customCellPendingTable,pendingActions} from './pendingTable.js'
 import { FaSpinner } from 'react-icons/fa';
+import { pendingAction } from './pendingFetch.js';
+import { Modal } from '../shared/Modal.jsx';
 
 
 export const AdminContent = () => {
@@ -15,14 +17,14 @@ export const AdminContent = () => {
     
     const tab = searchParams.get('tab') || 'current'
     const [userList, setUserList] = useState(null)
-    let limit = 5
+    let limit = 10
     const page = Number(searchParams.get('page') || 1)
     const [loading, setLoading] = useState(false)
     const [totalPages, setTotalPages] = useState(0)
-    
-    const handleUserRemoval = (userId) => {
-      setUserList((prevList) => prevList.filter((user) => user.id !== userId))
-    }
+    const [toggle, setToggle] = useState(false)
+    const [actionButtonName, setActionButtonName] = useState('')
+    const [buttonName, setButtonName] = useState('')
+    const [id, setId] = useState('')
     
     async function getData(){
       try {
@@ -44,8 +46,9 @@ export const AdminContent = () => {
   
         const data = await res.json()
         console.log(data)
+        
         setUserList(data.data)
-        setTotalPages(2)
+        setTotalPages(38)
         console.log(userList)
       } catch (error) {
         throw new Error('Could not get userList',error)  
@@ -59,6 +62,24 @@ export const AdminContent = () => {
   
       getData()
     }, [page,limit,query,tab])
+
+        async function onHandleModal(){
+            try {
+                await pendingAction(id,actionButtonName)
+                getData()
+                setToggle(false)
+             } catch (error) {
+                 console.log(error)
+             }
+        }
+    
+        function onToggleHandler(id,btnName,btnText){
+            setToggle((prev => !prev))
+            setActionButtonName(btnName)
+            setButtonName(btnText)
+            setId(id) 
+        }
+    
     
   
  
@@ -73,15 +94,12 @@ export const AdminContent = () => {
             <h1 className="mb-2 text-xl font-semibold md:text-3xl">Identity&nbsp;Management</h1>
             <p className='text-lg opacity-70 max-sm:text-sm'>Manage identity verification and roles</p>
                 </div>
-                <nav className="grid grid-cols-3 py-2 px-4 mt-5 bg-gray-200 text-center rounded-lg">
+                <nav className="grid grid-cols-2 py-2 px-4 mt-5 bg-gray-200 text-center rounded-lg">
                     <Link href="/list/access/admin/?tab=current&page=1">
                     <p className={`text-lg ${tab === 'current' ? 'bg-white/90 rounded-lg duration-300' : 'text-gray-600'}`}>Current Ids</p>
                     </Link>
                     <Link href="/list/access/admin/?tab=pending&page=1">
                     <p className={`text-lg ${tab === 'pending' ? 'bg-white/90 rounded-lg duration-300' : 'text-gray-600'}`}>Pending Applications</p>
-                    </Link>
-                    <Link href="/list/access/admin/?tab=roles&page=1">
-                    <p className={`text-lg ${tab === 'roles' ? 'bg-white/90 rounded-lg duration-300' : 'text-gray-600'}`}>Identity Roles</p>
                     </Link>
                 </nav>
               {
@@ -101,10 +119,18 @@ export const AdminContent = () => {
                         limit={limit}
                         customCellRenderers={customCellCurrentIdsTable}
                         userColoumns={userColoumnsCurrentIds}
-                        renderRowActions={(props) => currentIdActions({...props,getData})}
+                        renderRowActions={(props) => currentIdActions({...props,onToggleHandler})}
                     />
                 </div>
                 )}
+                     {
+                      toggle &&
+                                <Modal 
+                                    text={`Are you sure you want to ${buttonName}?`}
+                                    setToggle={setToggle}
+                                    onHandleModal={onHandleModal}/>
+                      }
+                                    
                 {tab === 'pending' && (
                   <div>
                     <PaginatedList 
@@ -115,14 +141,8 @@ export const AdminContent = () => {
                         limit={limit}
                         customCellRenderers={customCellPendingTable}
                         userColoumns={userColoumnsPending}
-                        renderRowActions={(props) => pendingActions({...props,getData})}
+                        renderRowActions={(props) => pendingActions({...props,onToggleHandler})}
                         />
-                    </div>
-                )}
-                {tab === 'roles' && (
-                  <div>
-                    <h2 className="text-xl">Identity Roles</h2>
-                      
                     </div>
                 )}
                 </>

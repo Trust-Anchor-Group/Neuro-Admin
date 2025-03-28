@@ -46,7 +46,7 @@ import { pendingAction } from './pendingFetch.js'
         ]
   
 
-      export const pendingActions = ({ closeMenu, row,getData }) => [
+      export const pendingActions = ({ closeMenu, row,getData,onToggleHandler }) => [
         <MenuItem key={1} onClick={closeMenu}>
                 <div className="">
             <Link href={`/list/access/detailpage/${row.original.id}`}>
@@ -60,14 +60,7 @@ import { pendingAction } from './pendingFetch.js'
                 arrayActions.map((item,index) =>(
                   <MenuItem key={index + 2} onClick={closeMenu}>
                     <button 
-                      onClick={async() => {
-                        try {
-                          await pendingAction(row.original.id, item.actionTitle)
-                          getData()
-                        } catch (error) {
-                          console.log(error)
-                        }
-                      }}
+                      onClick={() => onToggleHandler(row.original.id,item.actionTitle,item.name)}
                       className="flex gap-2 rounded-full items-center"
                     >
                       <item.icon className={item.iconColor} />
