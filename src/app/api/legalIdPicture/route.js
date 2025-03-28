@@ -2,7 +2,7 @@ import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
 
 export async function POST(request) {
-
+    console.log("Request received")
     const requestData = await request.json();
     const { legalId } = requestData;
     let dimension;
@@ -14,8 +14,6 @@ export async function POST(request) {
 
     const { host } = config.api.agent;
     const url = `https://${host}/QuickLogin/Session/${host}/Attachments/${legalId}?Width=${dimension}&Height=${dimension}`;
-
-    console.log(url)
 
     try {
 
