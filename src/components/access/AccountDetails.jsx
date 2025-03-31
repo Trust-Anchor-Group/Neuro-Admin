@@ -39,10 +39,10 @@ export const AccountDetails = ({user}) => {
                                 </div>
                             }
                             <div className='flex justify-center items-center'>
-                                <p className='text-lg font-semibold'>{user.data.properties.FIRST + ' ' + user.data.properties.LAST || 'N/A'}</p>
+                                <p className='text-lg font-semibold'>{user.data.account || 'N/A'}</p>
                             </div>
                         </div>
-                        <InputField labelText={'Full Name'} name={user.data.properties.FIRST + ' ' + user.data.properties.LAST || 'N/A'}/>
+                        <InputField labelText={'Account Name'} name={user.data.account || 'N/A'}/>
                         <InputField labelText={'Phone'} name={user.data.properties.PHONE || 'N/A'}/>
                         <InputField labelText={'Email'} name={user.data.properties.EMAIL || 'N/A'}/>
                     </div>

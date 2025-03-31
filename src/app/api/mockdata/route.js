@@ -22,7 +22,7 @@ export async function GET(req) {
             'offset': (page - 1) * limit,
             ...(query ? {
                 'filter': {
-                    "FIRST": query
+                    "ACCOUNT": query
                 }
             } : {}),
         };

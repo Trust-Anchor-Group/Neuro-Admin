@@ -18,7 +18,6 @@ export default function DetailPageContent() {
 
     const adminActions = [
         {actionTitle:'Approved', bgColor:'bg-green-500', icon:FaCheck,textColor:'text-white',name:'Approve'},
-        {actionTitle:'Created', bgColor:'bg-yellow-500', icon:FaFileAlt,textColor:'text-white',name:'New\u00A0Application'},
         {actionTitle:'Rejected', bgColor:'bg-red-500', icon:FaBan,textColor:'text-white',name:'Reject'},
         {actionTitle:'Obsoleted', bgColor:'bg-obsoletedRed', icon:FaTimesCircle,textColor:'text-white',name:'Obsolete'},
         {actionTitle:'Compromised', bgColor:'bg-orange-500', icon:FaExclamationTriangle,textColor:'text-white',name:'Compromise'},
@@ -96,7 +95,7 @@ export default function DetailPageContent() {
                             </div>
                             <div className='flex flex-col gap-3'>
                                 <div className='flex items-center gap-2'>
-                                    <p className='text-3xl font-semibold'>{user.data.properties.FIRST || ''}</p>
+                                    <p className='text-3xl font-semibold'>{user.data.properties.FIRST || user.data.account}</p>
                                     <p className='text-3xl font-semibold'>{user.data.properties.LAST || ''}</p>
                                 </div>
                                 <div>

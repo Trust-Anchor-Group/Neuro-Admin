@@ -3,7 +3,7 @@ import TableComponent from './TableComponent';
 import { Pagination } from './Pagination';
 import SearchBar from '../SearchBar';
 
-export const PaginatedList = ({ userList, page, prevPage, totalPages,limit,customCellRenderers,userColoumns,renderRowActions }) => {
+export const PaginatedList = ({ userList, page, prevPage, totalPages,limit,customCellRenderers,userColoumns,renderRowActions = false }) => {
 
     //  If you plan to use the table on a different page, make sure to wrap both the <TableComponent />
     //  and <Pagination /> inside a <div className="relative">.

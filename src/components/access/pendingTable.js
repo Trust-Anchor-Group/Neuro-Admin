@@ -24,7 +24,7 @@ import { pendingAction } from './pendingFetch.js'
           if(state === 'Created'){
             
            return <div className={`text-center bg-yellow-500/30 max-w-[125px] rounded-full items-center`}>
-            <span className={``}>New&nbsp;application</span>
+            <span className={``}>Pending&nbsp;approval</span>
           </div>
           }
         },

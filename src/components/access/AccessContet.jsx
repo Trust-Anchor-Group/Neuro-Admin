@@ -31,7 +31,9 @@ export const AccessContet = () => {
                       maxCount: limit,
                       state: "Created",
                       createdFrom: 1704078000,
-                      filter: {},
+                      filter: {
+                        FIRST:query
+                      },
                   };
 
                   const res = await fetch("/api/legal-identities", {
@@ -50,6 +52,7 @@ export const AccessContet = () => {
                   if (!res.ok) throw new Error("Could not fetch userList");
                   const data = await res.json();
                   setUserList(data.data || []);
+                  console.log(data)
                   setTotalPages(data.totalPages || 38);
               }
           } catch (error) {
@@ -102,7 +105,6 @@ export const AccessContet = () => {
                                  limit={limit}
                                  customCellRenderers={customCellAcountTable}
                                  userColoumns={userColoumnsAccount}
-                                 renderRowActions={accountActions}
                              />
                          </div>
                          )}
