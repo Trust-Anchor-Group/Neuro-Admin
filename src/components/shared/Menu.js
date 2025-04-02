@@ -21,12 +21,12 @@ const menuItems = [
         visible: ["admin"],
       },
       
-      {
-        icon: <FaIdCard size={20} />,
-        label: "Identity Management",
-        href: "/list/access/admin",
-        visible: ["admin"],
-      },
+      // {
+      //   icon: <FaIdCard size={20} />,
+      //   label: "Identity Management",
+      //   href: "/list/access/admin",
+      //   visible: ["admin"],
+      // },
       {
         icon: <FaCog size={20} />,
         label: "Settings",

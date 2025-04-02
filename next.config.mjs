@@ -21,7 +21,8 @@ const nextConfig = {
   images:{
     domains:['images.unsplash.com',
         "plus.unsplash.com",
-        "res.cloudinary.com"]
+        "res.cloudinary.com",
+      'api.dicebear.com']
   }
 };
 

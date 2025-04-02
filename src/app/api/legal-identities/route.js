@@ -6,14 +6,14 @@ export async function POST(request) {
         const requestData = await request.json();
         const { maxCount, offset, state, createdFrom, filter } = requestData;
         const clientCookie = request.headers.get("Cookie");
-
+        console.log('Från Pending',filter.FIRST)
         const { host } = config.api.agent;
         const url = `https://${host}/LegalIdentities.ws`;
 
         const payload = {
             maxCount,
             offset: offset || 0,
-            filter: {}
+            filter: filter.FIRST === '' ? {} : filter
         };
 
         if (state) payload.state = state; 

@@ -1,82 +1,52 @@
-"use client";
-
-import { Box, Container, Grid, Typography, Link, Divider } from "@mui/material";
 import Image from "next/image";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import { FaLinkedin } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <Box
-      component="footer"
-      sx={{
-        backgroundColor: "#F8F9FA",
-        color: "#333",
-        mt: "auto", 
-        py: 4,
-        width: "100%", 
-        textAlign: "center",
-        boxShadow: "0 -1px 5px rgba(0,0,0,0.1)", 
-      }}
-    >
-      <Container maxWidth="lg">
-        <Grid container spacing={4} justifyContent="space-between">
-          
-          <Grid item xs={12} sm={4}>
-            <Typography variant="h6" fontWeight="bold">
-              Neuro-Admin
-            </Typography>
-            <Typography variant="body2" color="gray">
+    <footer className="bg-gray-100 text-gray-800 mt-auto py-4 w-full text-center shadow-[0_-1px_5px_rgba(0,0,0,0.1)]">
+      <div className="max-w-screen-lg mx-auto px-4">
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
+          <div className="text-center sm:text-left">
+            <h3 className="font-bold text-lg">Neuro-Admin</h3>
+            <p className="text-sm text-gray-500">
               © {new Date().getFullYear()} Neuro-Admin. All rights reserved.
-            </Typography>
-          </Grid>
-          
-          <Grid item xs={12} sm={4}>
-            <Typography variant="h6" fontWeight="bold">
-              Quick Links
-            </Typography>
-            <Box>
-              <Link href="/" color="inherit" underline="none" sx={{ display: "block", my: 1 }}>
+            </p>
+          </div>
+          <div className="text-center">
+            <h3 className="font-bold text-lg">Quick Links</h3>
+            <nav>
+              <a href="/" className="block my-1 hover:underline">
                 Home
-              </Link>
-              <Link href="/dashboard" color="inherit" underline="none" sx={{ display: "block", my: 1 }}>
+              </a>
+              <a href="/dashboard" className="block my-1 hover:underline">
                 Dashboard
-              </Link>
-              <Link href="/contact" color="inherit" underline="none" sx={{ display: "block", my: 1 }}>
+              </a>
+              <a href="/contact" className="block my-1 hover:underline">
                 Contact Us
-              </Link>
-            </Box>
-          </Grid>
+              </a>
+            </nav>
+          </div>
+          <div className="text-center">
+            <h3 className="font-bold text-lg">Follow Us</h3>
+            <div className="flex justify-center mt-1 gap-2">
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-current"
+              >
+                <FaLinkedin size={24} />
+              </a>
+            </div>
+          </div>
+        </div>
 
-          <Grid item xs={12} sm={4}>
-            <Typography variant="h6" fontWeight="bold">
-              Follow Us
-            </Typography>
-            <Box sx={{ display: "flex", gap: 2, mt: 1, justifyContent: "center" }}>
-              {/* <Link href="https://facebook.com" target="_blank" color="inherit">
-                <FacebookIcon />
-              </Link> */}
-              {/* <Link href="https://twitter.com" target="_blank" color="inherit">
-                <TwitterIcon />
-              </Link> */}
-              {/* <Link href="https://instagram.com" target="_blank" color="inherit">
-                <InstagramIcon />
-              </Link> */}
-              <Link href="https://linkedin.com" target="_blank" color="inherit">
-                <LinkedInIcon />
-              </Link>
-            </Box>
-          </Grid>
-        </Grid>
+        <hr className="my-3" />
 
-        <Divider sx={{ my: 3 }} />
-
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", mt: 2 }}>
+        <div className="flex justify-center mt-2">
           <Image src="/neuroAdminLogo.svg" alt="logo" width={32} height={32} />
-        </Box>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </footer>
   );
 }
