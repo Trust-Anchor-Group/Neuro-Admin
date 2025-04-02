@@ -17,7 +17,6 @@ export default function RootLayout({
       <body className={inter.className}>
       <SessionPing />
 
-      {/* Render the main app content */}
       {children}
       
       </body>
