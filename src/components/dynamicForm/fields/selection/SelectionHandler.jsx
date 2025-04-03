@@ -5,6 +5,7 @@ import PillSelect from './PillSelect';
 import TileSelect from './TileSelect';
 import RadioSelect from './RadioSelect';
 import CheckboxSelect from './CheckboxSelect';
+import SelectList from './SelectList';
 
 export default function SelectionHandler({ control, errors, element }) {
   const { field } = useController({
@@ -36,6 +37,10 @@ export default function SelectionHandler({ control, errors, element }) {
     radio: 'radio flex flex-col gap-3 mt-3 mb-3',
     checkbox: 'checkbox flex flex-col gap-3 mt-3 mb-3',
   };
+
+  if (element.type === 'select') {
+    return <SelectList control={control} errors={errors} element={element} />;
+  }
 
   return (
     <div>

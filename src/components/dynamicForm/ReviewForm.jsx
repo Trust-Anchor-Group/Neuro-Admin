@@ -6,6 +6,8 @@ import TextHandler from './fields/text/TextHandler';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import submitHandler from './utils/submitHandler';
+import { DeleteOutline } from '@mui/icons-material';
+import SelectionHandler from './fields/selection/SelectionHandler';
 
 export default function ReviewForm({ uri }) {
   const [template, setTemplate] = useState(null);
@@ -14,6 +16,7 @@ export default function ReviewForm({ uri }) {
   const [dynamicSchema, setDynamicSchema] = useState({});
   const [commentToggle, setCommentToggle] = useState(new Map());
   const [formSuccess, setFormSuccess] = useState(null);
+  const [reviewStatus, setReviewStatus] = useState('pending');
 
   // React Hook Form Handler
   const {
@@ -31,33 +34,60 @@ export default function ReviewForm({ uri }) {
     resolver: formData ? yupResolver(dynamicSchema) : undefined,
   });
 
+  const formStatus = {
+    pending: {
+      title: 'Pending',
+      class: 'bg-amber-100 text-amber-700',
+    },
+    approve: {
+      title: 'Approved',
+      class: 'bg-green-100 text-green-700',
+    },
+    reject: {
+      title: 'Rejected',
+      class: 'bg-red-100 text-red-700',
+    },
+    hold: {
+      title: 'On hold',
+      class: 'bg-blue-100 text-blue-700',
+    },
+  };
+
   useEffect(() => {
     const subscription = watch((data) => {
       console.log('Form values:', data);
+      console.log('test', reviewStatus);
+      setReviewStatus(formStatus[data.status]);
     });
     return () => subscription.unsubscribe();
   }, [watch]);
 
+  /**
+   * ====================================================
+   * Store initial values temporary in memory
+   * ====================================================
+   */
   useEffect(() => {
     const initialValues = {};
+
     if (template && template.slides) {
       template?.slides?.forEach((slide) => {
         slide.elements.forEach((element) => {
           initialValues[element.name] = element.comment ?? '';
         });
       });
+
+      setReviewStatus(formStatus[template.meta.status]);
     }
+
+    initialValues['status'] = 'pending';
+    initialValues['general_comment'] = '';
 
     // Store original values for reset functionality
     setOriginalFormData(initialValues);
 
     reset(initialValues);
-    console.log('Form initialized with values:', initialValues);
   }, [template, reset]);
-
-  useEffect(() => {
-    console.log('template', template);
-  }, [template]);
 
   /**
    * ====================================================
@@ -78,9 +108,9 @@ export default function ReviewForm({ uri }) {
    * Handle comment toggles upon initialization
    * ====================================================
    */
-  useEffect(() => commentToggler(), [template]);
+  useEffect(() => commentsToggler(), [template]);
 
-  const commentToggler = () => {
+  const commentsToggler = () => {
     if (!template?.slides) return;
 
     const newMap = new Map();
@@ -93,10 +123,6 @@ export default function ReviewForm({ uri }) {
 
     setCommentToggle(newMap);
   };
-
-  useEffect(() => {
-    console.log('comment', commentToggle);
-  }, [commentToggle]);
 
   /**
    * ====================================================
@@ -137,7 +163,8 @@ export default function ReviewForm({ uri }) {
       keepIsValid: false,
       keepDefaultValues: true,
     });
-    console.log('Changes discarded, form reset to original state');
+
+    commentsToggler();
   };
 
   /**
@@ -161,8 +188,7 @@ export default function ReviewForm({ uri }) {
         <h1 className="text-2xl font-semibold leading-none tracking-tight">
           Form Reviewer
         </h1>
-        <div className="context border rounded p-5">
-          <h2 className="text-xl bold mb-2">Context:</h2>
+        <div className="context border rounded p-5 shadow-sm">
           <ul className="flex flex-col gap-1">
             <li>
               <span className="font-bold text-sm">Form: </span>
@@ -170,8 +196,10 @@ export default function ReviewForm({ uri }) {
             </li>
             <li>
               <span className="font-bold text-sm">Status: </span>
-              <span className="text-sm py-0.5 px-2.5 rounded-full bg-amber-100 text-amber-700 ">
-                {!template.status ? 'Pending' : template.status}
+              <span
+                className={`inline-flex text-sm rounded px-2.5 py-0.5  ${reviewStatus.class}`}
+              >
+                {reviewStatus.title}
               </span>
             </li>
 
@@ -200,26 +228,37 @@ export default function ReviewForm({ uri }) {
                     <li>
                       <div className="flex flex-row">
                         {element.required ? (
-                          <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent hover:bg-secondary/80 text-xs font-normal bg-amber-100 text-amber-700 self-start">
+                          <span className="inline-flex items-center rounded border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent hover:bg-secondary/80 text-xs font-normal bg-amber-100 text-amber-700 self-start">
                             Required
                           </span>
                         ) : (
-                          <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent hover:bg-secondary/80 text-xs font-normal bg-blue-100 text-blue-700  self-start">
+                          <span className="inline-flex items-center rounded border px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent hover:bg-secondary/80 text-xs font-normal bg-blue-100 text-blue-700  self-start">
                             Optional
                           </span>
                         )}
                         <button
                           type="button"
                           onClick={() => toggleComment(elementId)}
-                          className="ml-auto text-sm rounded border border-gray-200 p-2 shadow-sm bg-white"
+                          className={`ml-auto text-sm rounded border border-gray-200 p-2 shadow-sm bg-white ${
+                            isExpanded ? 'border-red-700' : ''
+                          }`}
                         >
-                          {isExpanded ? 'Cancel comment' : 'Comment'}
+                          {isExpanded ? (
+                            <div className="flex gap-1 items-center text-red-700">
+                              <DeleteOutline
+                                style={{ width: '18px', height: '18px' }}
+                              />
+                              <span>Discard comment</span>
+                            </div>
+                          ) : (
+                            'Comment'
+                          )}
                         </button>
                       </div>
                     </li>
 
                     <li className="flex flex-col">
-                      <span className="font-medium">Label & Description: </span>
+                      <span className="font-medium">Field context: </span>
                       <span className="text-sm">{element.label}</span>
                       <span className="text-sm">{element.description}</span>
                     </li>
@@ -259,28 +298,47 @@ export default function ReviewForm({ uri }) {
           })}
         </form>
 
-        <nav className="sticky bottom-8 left-0 right-0 w-full border bg-white p-4 rounded-lg shadow-lg">
-          <button
-            className={`p-3 rounded ${
-              isDirty
-                ? 'bg-red-50 text-red-700 hover:bg-red-100'
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
-            disabled={!isDirty}
-            onClick={handleDiscard}
-          >
-            Discard
-          </button>
-          <button
-            className={`p-3 rounded ${
-              isDirty
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-blue-200 text-white cursor-not-allowed'
-            }`}
-            disabled={!isDirty}
-          >
-            Save
-          </button>
+        <nav className="flex gap-2 sticky bottom-8 left-0 right-0 w-full border bg-white p-4 rounded-lg shadow-lg">
+          <div className="flex flex-row gap-3 ml-auto">
+            <div className="border rounded px-2 flex align-middle">
+              <SelectionHandler
+                errors={errors}
+                control={control}
+                element={{
+                  label: 'Status',
+                  name: 'status',
+                  type: 'select',
+                  options: [
+                    { title: 'Pending', value: 'pending' },
+                    { title: 'Reject', value: 'reject' },
+                    { title: 'Approve', value: 'approve' },
+                    { title: 'On hold', value: 'hold' },
+                  ],
+                }}
+              />
+            </div>
+            <div className="flex flex-row gap-1">
+              <button
+                className={`p-2 rounded border ${
+                  isDirty ? 'text-black' : ' text-gray-400 cursor-not-allowed'
+                }`}
+                disabled={!isDirty}
+                onClick={handleDiscard}
+              >
+                Discard
+              </button>
+              <button
+                className={`p-2 rounded px-8 ${
+                  isDirty
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-blue-200 text-white cursor-not-allowed'
+                }`}
+                disabled={!isDirty}
+              >
+                Save
+              </button>
+            </div>
+          </div>
         </nav>
       </div>
     )
