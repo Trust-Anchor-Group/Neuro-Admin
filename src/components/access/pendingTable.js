@@ -21,11 +21,10 @@ import { pendingAction } from './pendingFetch.js'
    export const customCellPendingTable = {
         state: ({ cell }) => {
           const state = cell.getValue();
-          if(state === 'Obsoleted'){
+          if(state === 'Created'){
             
-           return <div className={`grid grid-cols-2 bg-yellow-500/30 mr-12 pr-[35%] rounded-full items-center max-md:grid-cols-1`}>
-            <span className={`z-10 pl-[30%]`}><FaPlusCircle className="text-yellow-500" /></span>
-            <span className={`hidden md:inline`}>New&nbsp;application</span>
+           return <div className={`text-center bg-yellow-500/30 max-w-[125px] rounded-full items-center`}>
+            <span className={``}>Pending&nbsp;approval</span>
           </div>
           }
         },
@@ -46,7 +45,7 @@ import { pendingAction } from './pendingFetch.js'
         ]
   
 
-      export const pendingActions = ({ closeMenu, row,getData }) => [
+      export const pendingActions = ({ closeMenu, row,getData,onToggleHandler }) => [
         <MenuItem key={1} onClick={closeMenu}>
                 <div className="">
             <Link href={`/list/access/detailpage/${row.original.id}`}>
@@ -60,14 +59,7 @@ import { pendingAction } from './pendingFetch.js'
                 arrayActions.map((item,index) =>(
                   <MenuItem key={index + 2} onClick={closeMenu}>
                     <button 
-                      onClick={async() => {
-                        try {
-                          await pendingAction(row.original.id, item.actionTitle)
-                          getData()
-                        } catch (error) {
-                          console.log(error)
-                        }
-                      }}
+                      onClick={() => onToggleHandler(row.original.id,item.actionTitle,item.name)}
                       className="flex gap-2 rounded-full items-center"
                     >
                       <item.icon className={item.iconColor} />

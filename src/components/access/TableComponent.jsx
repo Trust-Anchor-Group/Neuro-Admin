@@ -7,7 +7,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
 
-const TableComponent = ({data = [], columns = [],enableSorting = false, enableRowActions = false, renderRowActionMenuItems = () => [],
+const TableComponent = ({data = [], columns = [],enableSorting = false, enableRowActions, renderRowActionMenuItems,
   customCellRenderers = {},}) => {
 
 
@@ -24,12 +24,12 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     enablePagination: false,
     enableGlobalFilter: false,
     enableColumnActions: true,
-    enableRowActions: true,
+    enableRowActions: renderRowActionMenuItems == false ? false : true,
     enableDensityToggle: true,
     enableFullScreenToggle: true,
     enableHiding: true,
     positionActionsColumn: "last",
-    renderRowActionMenuItems,
+    renderRowActionMenuItems: renderRowActionMenuItems || undefined,
     muiTableContainerProps: {
       sx: {
         minHeight: "310px",
