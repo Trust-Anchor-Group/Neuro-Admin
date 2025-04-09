@@ -24,7 +24,7 @@
     "next": "^15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.4.0",
+    "react-icons": "^5.5.0",
     "react-map-gl": "^7.1.8",
     "recharts": "^2.15.0",
     "set-cookie-parser": "^2.7.1",

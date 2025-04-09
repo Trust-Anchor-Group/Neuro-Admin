@@ -18,7 +18,6 @@ export default function RootLayout({
       <body className={`${inter.className} ${grotesk.className}`}>
       <SessionPing />
 
-      {/* Render the main app content */}
       {children}
       
       </body>
