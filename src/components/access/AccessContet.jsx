@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import config from '@/config/config';
 import { userColoumnsAccount,customCellAcountTable,accountActions } from './accountTableList.js'
 import {userColoumnsPending,customCellPendingTable,pendingActions} from './pendingTable.js'
-import { FaSpinner } from 'react-icons/fa';
+import { FaHourglassHalf, FaSpinner, FaUserFriends } from 'react-icons/fa';
 import Link from 'next/link.js';
 
 
@@ -12,6 +12,7 @@ import Link from 'next/link.js';
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
     const tab = searchParams.get('tab') || 'current'
+    const filterAccount = searchParams.get('filter-accounts') || 'all'
     const query = searchParams.get('query') || ''
     const [toggle, setToggle] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -51,6 +52,12 @@ export const AccessContet = () => {
                   const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
                   if (!res.ok) throw new Error("Could not fetch userList");
                   const data = await res.json();
+                  if(filterAccount === 'hasID'){
+                    const filterIds = data.data.filter((acc) => (
+                      acc.name !== ''
+                    ))
+                    setUserList(filterIds)
+                  }
                   setUserList(data.data || []);
                   console.log(data)
                   setTotalPages(data.totalPages || 38);
@@ -62,7 +69,7 @@ export const AccessContet = () => {
           }
       }
       getData();
-  }, [page, query, tab]);
+  }, [page, query, tab,filterAccount]);
     
   
  
@@ -75,16 +82,20 @@ export const AccessContet = () => {
           <div className='p-5 max-sm:p-0'>
             <div className='flex justify-between items-center'>
               <div>
-                      <h1 className="mb-2 text-xl font-semibold md:text-3xl">Accounts</h1>
+                      <h1 className="mb-2 text-xl font-semibold md:text-3xl">Accounts and ID</h1>
                       <p className='text-lg opacity-70 max-sm:text-sm'>Manage user accounts and permissions</p>
                   </div>
             </div>
-            <nav className="grid grid-cols-2 w-full md:w-[50%] gap-5 py-1 px-2 mt-5 bg-gray-200 text-center rounded-lg">
+            <nav className="grid grid-cols-2 w-full mt-5 text-center rounded-lg font-semibold">
                     <Link href="/list/access/?tab=current&page=1">
-                    <p className={`text-lg ${tab === 'current' ? 'bg-white/90 rounded-lg duration-300' : 'text-gray-600'}`}>Accounts</p>
+                    <div className={`flex justify-center items-center rounded-lg gap-2 py-2 border 
+                      ${tab === 'current' ? 'bg-neuroPurpleLight text-neruoPurpleDark ' : 'bg-white/90 text-neuroTextBlack/60'}`}>
+                    <FaUserFriends /><span>Accounts and IDs</span></div>
                     </Link>
                     <Link href="/list/access/?tab=pending&page=1">
-                    <p className={`text-lg ${tab === 'pending' ? 'bg-white/90 rounded-lg duration-300' : 'text-gray-600'}`}>Pending&nbsp;Applications</p>
+                    <div className={`flex justify-center items-center  gap-2 py-2 rounded-lg border 
+                      ${tab === 'pending' ? 'bg-neuroPurpleLight text-neruoPurpleDark' : 'bg-white/90 text-neuroTextBlack/60'}`}>
+                    <FaHourglassHalf /><span>Pending&nbsp;ID&nbsp;Applications</span></div>
                     </Link>
                 </nav>
             <div className=''>
@@ -105,6 +116,8 @@ export const AccessContet = () => {
                                  limit={limit}
                                  customCellRenderers={customCellAcountTable}
                                  userColoumns={userColoumnsAccount}
+                                 pending={false}
+                                 filterAccount={filterAccount}
                              />
                          </div>
                          )}
@@ -127,6 +140,7 @@ export const AccessContet = () => {
                                  customCellRenderers={customCellPendingTable}
                                  userColoumns={userColoumnsPending}
                                  renderRowActions={pendingActions}
+                                 pending={true}
                                  />
                              </div>
                          )}

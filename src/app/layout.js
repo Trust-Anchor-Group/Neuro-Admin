@@ -1,8 +1,9 @@
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import SessionPing from "@/components/SessionPing";
 
 const inter = Inter({ subsets: ["latin"] });
+const grotesk = Space_Grotesk({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
 
 export const metadata = {
   title: "Neuro-Admin Dashboard",
@@ -14,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${grotesk.className}`}>
       <SessionPing />
 
       {/* Render the main app content */}

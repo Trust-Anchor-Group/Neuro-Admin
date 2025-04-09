@@ -6,15 +6,24 @@ import { pendingAction } from './pendingFetch.js'
     //Decide what columns you should have in your table
    export const userColoumnsPending = [
         { accessorKey: "account", header: "Account", size: 200,
+          muiTableHeadCellProps: {
+            sx: {
+              color: "rgba(24, 31, 37, 0.6)",
+              fontWeight: 500,
+            },
+          },
           },
         { accessorKey: "state", header: "Status", size: 50, 
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
-            muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
+            muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" },   color: "rgba(24, 31, 37, 0.6)",
+            fontWeight: 500, } },
         },
         { accessorKey: "createdDate", header: "Created", size: 200, 
             muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
-            muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
+            muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" },   color: "rgba(24, 31, 37, 0.6)",
+            fontWeight: 500, } },
         },
+     
     ]
 
     //Special actions a column should/could have
@@ -23,19 +32,34 @@ import { pendingAction } from './pendingFetch.js'
           const state = cell.getValue();
           if(state === 'Created'){
             
-           return <div className={`text-center bg-yellow-500/30 max-w-[125px] rounded-full items-center`}>
-            <span className={``}>Pending&nbsp;approval</span>
+           return <div className={`text-center bg-neuroOrange/20 inline-block text-neuroDarkOrange font-bold p-1 max-w-[150px] rounded-full items-center`}>
+            <span className={``}>ID&nbsp;pending</span>
           </div>
           }
         },
         account: ({ cell, row }) => {
-          return <Link href={`/list/access/detailpage/${row.original.id}`}>
-            <p className="cursor-pointer text-blue-600 hover:underline
-             hover:text-blue-400">{row.original.account}</p>
-          </Link>
-            
+       
+          if(row.original.name !== ''){
+            return <div>
+              <Link href={`/list/access/detailpage/${row.original.id}`}>
+                <p className="font-semibold">{row.original.name}</p>
+                <p className="cursor-pointer text-blue-600 hover:underline
+                  hover:text-blue-400">{row.original.account}</p>
+              </Link>
+            </div>
+          }
+         return <div>
+
+          <Link
+          className=""
+          href={`/list/access/detailpage/${row.original.id}`}
+          >
+             <p className="cursor-pointer text-blue-600 hover:underline
+       hover:text-blue-400">{row.original.account}</p>
+        </Link>
         
-      }}     
+       </div>
+      }}  
 
      const arrayActions = [
           {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve'},

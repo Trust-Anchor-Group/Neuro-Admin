@@ -33,32 +33,21 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     muiTableContainerProps: {
       sx: {
         minHeight: "310px",
-        maxHeight: "310px", // Fixed typo here from "310x" to "310px"
+        maxHeight: "500px", // Fixed typo here from "310x" to "310px"
         overflowY: "auto",
       },
     },
-    muiTableBodyCellProps: ({ column }) => ({
-      sx: column.id === "mrt-row-actions"
-        ? {
-            textAlign: "center",
-            backgroundColor: "#f9fafb", 
-            "& button": {
-              backgroundColor: "black",
-              color: "white",
-              borderRadius: "9999px", 
-              padding: "6px",
-              minWidth: "32px",
-              minHeight: "32px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              "&:hover": {
-                backgroundColor: "#333",
-              }
-            }
-          }
-        : {},
+    muiTableHeadCellProps: ({ column }) => ({
+      sx: column.id === "mrt-row-actions" ? { 
+        color: "rgba(24, 31, 37, 0.6)", 
+        fontWeight: 500 
+      } : {}, 
     }),
+    muiTopToolbarProps: {
+      sx: {
+        marginTop: "100px", // Flyttar ned knapparna
+      },
+    }
   });
   
   return (

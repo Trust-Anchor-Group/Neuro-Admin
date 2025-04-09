@@ -22,11 +22,10 @@ export async function GET(req) {
             'offset': (page - 1) * limit,
             ...(query ? {
                 'filter': {
-                    "ACCOUNT": query
+                    "FIRST": query
                 }
             } : {}),
         };
-
 
         const { host } = config.api.agent;
 
@@ -42,10 +41,7 @@ export async function GET(req) {
             body: JSON.stringify(payload)
         });
 
-
-
         const data = await res.json()
-
 
         const response = {
             data: data,
