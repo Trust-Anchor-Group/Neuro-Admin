@@ -13,7 +13,7 @@ export const AccountDetails = ({user}) => {
            user && user ? (
                 <div className=''>
                     <div className='grid grid-cols-1 gap-5 max-sm:grid-cols-1 max-sm:px-5'>
-                        <div className='flex justify-between items-center gap-3 border-b-2 pb-4'>
+                        <div className='flex justify-between items-center gap-3 border-b-2 pb-4 max-sm:flex-col max-sm:mt-5'>
 
                        
                           

@@ -8,13 +8,14 @@ import { ActionButtons } from './ActionButtons';
 
 export const Identity = ({user}) => {
 
-const [arrowToggler, setArrowToggler] = useState(true)
+const [infoToggle, setIntoToggle] = useState(true)
+
 
 const adminActions = [
     {actionTitle:'Rejected', bgColor:'bg-neuroRed/20', icon:FaTimes,textColor:'text-obsoletedRed',name:'Deny\u00A0ID\u00A0application'},
     {actionTitle:'Approved', bgColor:'bg-neuroPurpleLight', icon:FaCheck,textColor:'text-neuroPurpleDark',name:'Approve\u00A0ID\u00A0application'},
-    {actionTitle:'Obsoleted', bgColor:'bg-obsoletedRed', icon:FaTimesCircle,textColor:'text-white',name:'Obsolete'},
-    {actionTitle:'Compromised', bgColor:'bg-orange-500', icon:FaExclamationTriangle,textColor:'text-white',name:'Compromise'},
+    {actionTitle:'Compromised', bgColor:'bg-neuroDarkOrange/20', icon:FaExclamationTriangle,textColor:'text-neuroDarkOrange',name:'Compromise'},
+    {actionTitle:'Obsoleted', bgColor:'bg-obsoletedRed/20', icon:FaTimesCircle,textColor:'text-obsoletedRed',name:'Obsolete'},
 ]
 
 if(!user){
@@ -34,7 +35,7 @@ if(!user){
            user && user.data.properties.FIRST ? (
                 <div className=''>
                     <div className='grid grid-cols-1 gap-1 max-sm:grid-cols-1 max-sm:px-5'>
-                        <div className='flex items-center gap-3 pb-4'>
+                        <div className='flex items-center gap-3 pb-4 max-sm:flex-col max-sm:mt-5'>
                         {
                                  user && user.data.attachments.length === 0 ?
                                  <div className='w-[100px] h-[100px] rounded-xl overflow-hidden'>
@@ -71,19 +72,19 @@ if(!user){
                         </div>
                         <div className='bg-neuroGray/70 rounded-xl p-5 overflow-auto'>
                            {
-                           arrowToggler ? (
+                           infoToggle ? (
                             <div className='flex justify-between border-b-2 pb-2'>
                             <h2 className='font-semibold text-neuroDarkGray/70'>Identity Information</h2>
-                             <button onClick={() => setArrowToggler(prev => !prev)}><FaChevronDown color='#6e6e6e' /></button>
-                     </div>
+                             <button onClick={() => setIntoToggle(prev => !prev)}><FaChevronDown color='#6e6e6e' /></button>
+                            </div>
                            ) :
                            <div className='flex justify-between border-b-2 pb-2'>
                                <h2 className='font-semibold text-neuroDarkGray/70'>Identity Information</h2>
-                            <button onClick={() => setArrowToggler(prev => !prev)}> <FaChevronUp color='#6e6e6e' /></button>
+                            <button onClick={() => setIntoToggle(prev => !prev)}> <FaChevronUp color='#6e6e6e' /></button>
                         </div>
                            }
                            {
-                               arrowToggler ? (
+                               infoToggle ? (
                                 <div className='transition-all delay-300 animate-fade-in'>
                                 <InputField labelText={'First name'} name={user.data.properties.FIRST || 'N/A'}/>
                                 <InputField labelText={'Last name'} name={user.data.properties.LAST || 'N/A'}/>
@@ -98,7 +99,7 @@ if(!user){
                          }
 
                         </div>
-                        <div>
+                        <div className='mt-5'>
                             <ActionButtons user={user} adminActions={adminActions}/>
 
                         </div>

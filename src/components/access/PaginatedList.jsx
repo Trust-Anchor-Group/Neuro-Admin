@@ -38,26 +38,24 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
 
                 {
                     pending ? (
-                        <p className='text-xl font-semibold pb-4'>Pending ID applications</p>
-                    ) : <p className='text-xl font-semibold pb-4'>Account and ID</p>
+                        <p className='text-xl font-semibold pb-4'>ID applications</p>
+                    ) : <p className='text-xl font-semibold pb-4'>Accounts</p>
                     
                 }
-                {
-                    pending == false && (
-                        <div className='grid grid-cols-3 w-[250px] text-center items-center cursor-pointer'>
-                          
-                             
-                        <Link className={`transition-all border rounded-lg ${filterAccount === 'all' ? 'bg-neuroPurpleLight'
-                             : 'bg-neuroGray text-neuroTextBlack/60' }`} href={'/list/access/?filter-accounts=all'}>All</Link>                          
-                            <Link className={`transition-all border rounded-lg ${filterAccount === 'hasID' ? 'bg-neuroPurpleLight'
-                             : 'bg-neuroGray text-neuroTextBlack/60' }`} href={'/list/access/?filter-accounts=hasID'}>Has ID</Link>                       
-                            <Link className={`transition-all border rounded-lg ${filterAccount === 'noID' ? 'bg-neuroPurpleLight'
-                             : 'bg-neuroGray text-neuroTextBlack/60' }`} href={'/list/access/?filter-accounts=noID'}>No ID</Link>                       
-                        </div>
-                    )
-                }
                 </div>
-                <SearchBar placeholder={'Search...'} classNameText={'w-[30%] border-2 rounded-md py-2 pr-10 pl-12 text-sm'} />
+                <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-2'>
+                    <SearchBar placeholder={'Search...'} classNameText={'border-2 rounded-md py-2 pr-10 pl-12 text-sm max-sm:pr-0 max-sm:pl-2'} />
+                    { pending === false && 
+                    <div className='hidden md:block'>
+                        <FilterAccounts pending={pending} filterAccount={filterAccount}/>
+                    </div>
+                    }
+                    </div>
+                    <div className='hidden md:block'>
+                        <Pagination page={page} prevPage={prevPage} totalPages={totalPages} limit={limit} />                
+                    </div>
+                </div>
             </div>
                 <TableComponent
                     data={userList}
@@ -67,7 +65,9 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
                     customCellRenderers={customCellRenderers}
                     renderRowActionMenuItems={renderRowActions}
                 />
-                <Pagination page={page} prevPage={prevPage} totalPages={totalPages} limit={limit} />
+                <div className='block py-2 md:hidden'>
+                        <Pagination page={page} prevPage={prevPage} totalPages={totalPages} limit={limit} />                
+                </div>
             </div>
             
             

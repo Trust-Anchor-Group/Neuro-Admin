@@ -15,18 +15,22 @@ const menuItems = [
         visible: ["admin", "customer-assets"],
       },
       {
-        icon: <FaRegUser   size={20} />,
-        label: "Accounts",
-        href: "/list/access",
+        icon: <FaRegUser size={20} />,
+        label: "Access",
+        href: "#", 
         visible: ["admin"],
+        dropdown: true,
+        subItems: [
+          {
+            label: "Accounts",
+            href: "/list/access",
+          },
+          {
+            label: "ID Applications",
+            href: "/list/access/pending-ids",
+          },
+        ],
       },
-      
-      // {
-      //   icon: <FaIdCard size={20} />,
-      //   label: "Identity Management",
-      //   href: "/list/access/admin",
-      //   visible: ["admin"],
-      // },
       {
         icon: <FaCog size={20} />,
         label: "Settings",
@@ -68,7 +72,7 @@ const Menu = () => {
                 <div>
                   {/* Dropdown Trigger */}
                   <div
-                    className="flex items-center justify-between px-6 py-3 rounded-lg text-gray-700 hover:bg-blue-500 hover:text-white transition-all cursor-pointer"
+                    className="flex items-center justify-between px-3 py-3 rounded-lg text-gray-700 hover:bg-blue-500 hover:text-white transition-all cursor-pointer"
                     onClick={() => toggleDropdown(itemIndex)}
                   >
                     <div className="flex items-center gap-4">

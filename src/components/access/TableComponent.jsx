@@ -30,13 +30,15 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     enableHiding: true,
     positionActionsColumn: "last",
     renderRowActionMenuItems: renderRowActionMenuItems || undefined,
-    muiTableContainerProps: {
-      sx: {
-        minHeight: "310px",
-        maxHeight: "500px", // Fixed typo here from "310x" to "310px"
-        overflowY: "auto",
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: () => {
+        window.location.href = `/list/access/detailpage/${row.original.id}`;
       },
-    },
+      sx: {
+        cursor: 'pointer',
+      },
+    }),
+  
     muiTableHeadCellProps: ({ column }) => ({
       sx: column.id === "mrt-row-actions" ? { 
         color: "rgba(24, 31, 37, 0.6)", 

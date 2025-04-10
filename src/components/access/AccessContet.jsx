@@ -1,5 +1,5 @@
 import { PaginatedList } from '@/components/access/PaginatedList'
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import config from '@/config/config';
 import { userColoumnsAccount,customCellAcountTable,accountActions } from './accountTableList.js'
@@ -11,7 +11,7 @@ import Link from 'next/link.js';
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
-    const tab = searchParams.get('tab') || 'current'
+    const pathname = usePathname()
     const filterAccount = searchParams.get('filter-accounts') || 'all'
     const query = searchParams.get('query') || ''
     const [toggle, setToggle] = useState(false)
@@ -26,7 +26,7 @@ export const AccessContet = () => {
       async function getData() {
           setLoading(true);
           try {
-              if (tab === 'pending') {
+              if (pathname === 'list/access/pending-ids') {
                   const requestBody = {
                       offset: (page - 1) * limit,
                       maxCount: limit,
@@ -69,7 +69,7 @@ export const AccessContet = () => {
           }
       }
       getData();
-  }, [page, query, tab,filterAccount]);
+  }, [page, query,filterAccount,pathname]);
     
   
  
@@ -79,25 +79,8 @@ export const AccessContet = () => {
 
     return (
       <div>
-          <div className='p-5 max-sm:p-0'>
-            <div className='flex justify-between items-center'>
-              <div>
-                      <h1 className="mb-2 text-xl font-semibold md:text-3xl">Accounts and ID</h1>
-                      <p className='text-lg opacity-70 max-sm:text-sm'>Manage user accounts and permissions</p>
-                  </div>
-            </div>
-            <nav className="grid grid-cols-2 w-full mt-5 text-center rounded-lg font-semibold">
-                    <Link href="/list/access/?tab=current&page=1">
-                    <div className={`flex justify-center items-center rounded-lg gap-2 py-2 border 
-                      ${tab === 'current' ? 'bg-neuroPurpleLight text-neruoPurpleDark ' : 'bg-white/90 text-neuroTextBlack/60'}`}>
-                    <FaUserFriends /><span>Accounts and IDs</span></div>
-                    </Link>
-                    <Link href="/list/access/?tab=pending&page=1">
-                    <div className={`flex justify-center items-center  gap-2 py-2 rounded-lg border 
-                      ${tab === 'pending' ? 'bg-neuroPurpleLight text-neruoPurpleDark' : 'bg-white/90 text-neuroTextBlack/60'}`}>
-                    <FaHourglassHalf /><span>Pending&nbsp;ID&nbsp;Applications</span></div>
-                    </Link>
-                </nav>
+          <div className=''>
+
             <div className=''>
                        {
                          loading ? (
@@ -106,7 +89,7 @@ export const AccessContet = () => {
                            </div>
                          ) :
                          <>
-                       {tab === 'current' && (
+                       {pathname === '/list/access' && (
                          <div className=''>
                          <PaginatedList 
                                  userList={userList} 
@@ -129,7 +112,7 @@ export const AccessContet = () => {
                                              onHandleModal={onHandleModal}/>
                                }
                                              
-                         {tab === 'pending' && (
+                         {pathname === '/list/access/pending-ids' && (
                            <div>
                              <PaginatedList 
                                  userList={userList} 

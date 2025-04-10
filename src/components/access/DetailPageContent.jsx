@@ -75,7 +75,7 @@ export default function DetailPageContent() {
                                     Back
                                 </button>
                             </div>
-                            <div className='flex flex-col gap-3'>
+                            <div className='flex flex-col gap-3 max-sm:items-center'>
                                 <div className='flex items-center gap-2'>
                                     <p className='text-3xl font-semibold'>{user.data.properties.FIRST || user.data.account}</p>
                                     <p className='text-3xl font-semibold'>{user.data.properties.LAST || ''}</p>
