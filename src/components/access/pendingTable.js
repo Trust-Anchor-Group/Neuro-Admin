@@ -41,22 +41,19 @@ import { StatusIcon } from "./StatusIcon.jsx";
        
       if(row.original.name !== ''){
         return <div>
-          <Link href={`/list/access/detailpage/${row.original.id}`}>
+          
             <p className="font-semibold">{row.original.name}</p>
-            <p className="cursor-pointer text-blue-600 hover:underline
-              hover:text-blue-400">{row.original.account}</p>
-          </Link>
+            <p className="
+              ">{row.original.account}</p>
+        
         </div>
       }
      return <div>
 
-      <Link
-      className=""
-      href={`/list/access/detailpage/${row.original.id}`}
-      >
-         <p className="cursor-pointer text-blue-600 hover:underline
-   hover:text-blue-400">{row.original.account}</p>
-    </Link>
+   
+         <p className="
+   ">{row.original.account}</p>
+  
     
    </div>
   }

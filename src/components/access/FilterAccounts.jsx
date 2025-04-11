@@ -56,7 +56,7 @@ export const FilterAccounts = () => {
             </button>  
           {
                      toggle && (
-                        <div className='absolute top-6 left-0 flex flex-col w-full cursor-pointer' ref={filterRef}>   
+                        <div className='absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer' ref={filterRef}>   
                             <Link className='transition-all border pl-2 hover:bg-neuroGray'
                              href={'/list/access/?filter-accounts=all'}>All</Link>                          
                             <Link className='transition-all border pl-2 hover:bg-neuroGray' 

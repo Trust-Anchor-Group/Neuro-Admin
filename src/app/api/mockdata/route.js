@@ -16,17 +16,17 @@ export async function GET(req) {
         const clientCookie = clientCookieObject
             ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
             : null;
-
-        const payload = {
-            'maxCount':limit,
-            'offset': (page - 1) * limit,
-            ...(query ? {
-                'filter': {
-                    "FIRST": query
-                }
-            } : {}),
-        };
-
+            const payload = {
+                'maxCount':limit,
+                'offset': (page - 1) * limit,
+                ...(query ? {
+                    'filter': {
+                        "FIRST": query
+                    }
+                } : {}),
+            };
+            
+            console.log('sök namn',payload)
         const { host } = config.api.agent;
 
         const url = `https://${host}/LegalIdentities.ws`;

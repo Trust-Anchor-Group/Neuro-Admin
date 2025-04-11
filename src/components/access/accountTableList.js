@@ -87,14 +87,14 @@ export const theme = createTheme({
           if(row.original.name !== ''){
             return <div>
              
-                <p className="font-semibold">{row.original.name}</p>
-                <p className="">{row.original.account}</p>
+                <p className="font-semibold">{row.original.account}</p>
+                
             
             </div>
           }
          return <div>
-
-             <p className="">{row.original.account}</p>  
+            
+             <p className="">-</p>  
        </div>
       }}
     

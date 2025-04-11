@@ -51,13 +51,9 @@ export const AccessContet = () => {
                   const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
                   const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
                   if (!res.ok) throw new Error("Could not fetch userList");
+                  
                   const data = await res.json();
-                  if(filterAccount === 'hasID'){
-                    const filterIds = data.data.filter((acc) => (
-                      acc.name !== ''
-                    ))
-                    setUserList(filterIds)
-                  }
+
                   setUserList(data.data || []);
                   console.log(data)
                   setTotalPages(data.totalPages || 38);
