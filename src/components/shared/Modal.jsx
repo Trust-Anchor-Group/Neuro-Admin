@@ -4,7 +4,7 @@ import { FaTimes } from 'react-icons/fa'
 export const Modal = ({ text, setToggle,onHandleModal}) => {
 
   return (
-    <div className='fixed inset-0 flex justify-center items-center z-10 '>
+    <div className='fixed inset-0 flex justify-center items-center z-50 '>
         <div className='relative flex flex-col  bg-neuroGray p-5 rounded-lg border-2 max-md:mx-10'>
         <div>
             <span onClick={() => setToggle((prev => !prev))} className='flex justify-end text-lg'><FaTimes className='

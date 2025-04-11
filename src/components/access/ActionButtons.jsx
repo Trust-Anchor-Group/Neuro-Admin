@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Modal } from '../shared/Modal'
+import { pendingAction } from './pendingFetch'
 
-export const ActionButtons = ({user,adminActions}) => {
+export const ActionButtons = ({user,adminActions,id,getData}) => {
 
 
 

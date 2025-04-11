@@ -29,7 +29,7 @@ export const DetailpageStatus = ({ user, adminActions }) => {
     if (user && user.data.state.includes('Compromised')) {
       return (
         <div className={`text-orange-500 bg-orange-500/30 font-semibold px-3 inline-block py-1 rounded-lg max-sm:mx-10 max-sm:mb-5`}>
-          <span>Obsoleted&nbsp;ID</span>
+          <span>Compromised&nbsp;ID</span>
         </div>
       );}
       if (user && user.data.state.includes('Rejected')) {

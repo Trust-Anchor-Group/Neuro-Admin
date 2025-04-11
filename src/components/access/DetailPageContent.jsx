@@ -70,7 +70,8 @@ export default function DetailPageContent() {
                     user && (
                         <div className='flex items-center gap-5 max-sm:flex-col'>
                             <div className=''>
-                                <button aria-label='Back to Access Page' className='flex items-center gap-5 border-2 p-2 rounded-lg' onClick={() => router.push('/list/access')}>
+                                <button aria-label='Back to Access Page' className='flex 
+                                items-center gap-5 border-2 p-2 rounded-lg' onClick={() => router.push('/list/access')}>
                                     <FaArrowLeft className='transition-opacity size-5 hover:opacity-50'/>
                                     Back
                                 </button>
@@ -106,6 +107,7 @@ export default function DetailPageContent() {
               {
                   tab === 'identity' && (
                       <Identity user={user}
+                      id={id} getData={getData}
                  />
                      
                     )

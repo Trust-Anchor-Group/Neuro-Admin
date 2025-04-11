@@ -26,7 +26,7 @@ const menuItems = [
             href: "/list/access",
           },
           {
-            label: "ID Applications",
+            label: "ID\u00A0Applications",
             href: "/list/access/pending-ids",
           },
         ],
@@ -86,7 +86,7 @@ const Menu = () => {
 
                   {/* Dropdown Sub-Items */}
                   {openDropdown === itemIndex && (
-                    <div className="ml-6 flex flex-col gap-2 mt-2 bg-gray-100 rounded-lg p-2">
+                    <div className="flex flex-col gap-2 mt-2 bg-gray-100 rounded-lg p-2">
                       {item.subItems.map((subItem) => (
                         <Link
                           key={subItem.label}

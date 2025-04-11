@@ -6,6 +6,8 @@ import { userColoumnsAccount,customCellAcountTable,accountActions } from './acco
 import {userColoumnsPending,customCellPendingTable,pendingActions} from './pendingTable.js'
 import { FaHourglassHalf, FaSpinner, FaUserFriends } from 'react-icons/fa';
 import Link from 'next/link.js';
+import { Modal } from '../shared/Modal.jsx';
+import { pendingAction } from './pendingFetch.js';
 
 
 
@@ -19,55 +21,78 @@ export const AccessContet = () => {
     const [userList, setUserList] = useState(null)
     let limit = 10
     const page = Number(searchParams.get('page') || 1)
+    const [actionButtonName, setActionButtonName] = useState('')
+    const [buttonName, setButtonName] = useState('')
+    const [id, setId] = useState('')
 
     const [totalPages, setTotalPages] = useState(0)
+    async function getData() {
+      setLoading(true);
+      try {
+          if (pathname.includes('pending-ids')) {
+              const requestBody = {
+                  offset: (page - 1) * limit,
+                  maxCount: limit,
+                  state: "Created",
+                  createdFrom: 1704078000,
+                  filter: {
+                    'FIRST':query
+                  },
+              };
+
+              const res = await fetch("/api/legal-identities", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(requestBody),
+              });
+
+              if (!res.ok) throw new Error("Failed to fetch pending applications");
+              const data = await res.json();
+              setUserList(data.data || []);
+              setTotalPages(data.totalPages || 38);
+          } else {
+              const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
+              const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+              if (!res.ok) throw new Error("Could not fetch userList");
+              
+              const data = await res.json();
+
+              setUserList(data.data || []);
+              console.log(data)
+              setTotalPages(data.totalPages || 38);
+          }
+      } catch (error) {
+          console.error(error);
+      } finally {
+          setLoading(false);
+      }
+  }
     
     useEffect(() => {
-      async function getData() {
-          setLoading(true);
-          try {
-              if (pathname === 'list/access/pending-ids') {
-                  const requestBody = {
-                      offset: (page - 1) * limit,
-                      maxCount: limit,
-                      state: "Created",
-                      createdFrom: 1704078000,
-                      filter: {
-                        FIRST:query
-                      },
-                  };
-
-                  const res = await fetch("/api/legal-identities", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify(requestBody),
-                  });
-
-                  if (!res.ok) throw new Error("Failed to fetch pending applications");
-                  const data = await res.json();
-                  setUserList(data.data || []);
-                  setTotalPages(data.totalPages || 38);
-              } else {
-                  const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
-                  const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
-                  if (!res.ok) throw new Error("Could not fetch userList");
-                  
-                  const data = await res.json();
-
-                  setUserList(data.data || []);
-                  console.log(data)
-                  setTotalPages(data.totalPages || 38);
-              }
-          } catch (error) {
-              console.error(error);
-          } finally {
-              setLoading(false);
-          }
-      }
+     if(!pathname) return
       getData();
   }, [page, query,filterAccount,pathname]);
     
-  
+  async function onHandleModal(){
+    try {
+        await pendingAction(id,actionButtonName)
+        getData()
+        setToggle(false)
+     } catch (error) {
+         console.log(error)
+     }
+}
+
+
+
+
+
+function onToggleHandler(id,btnName,btnText){
+    setToggle((prev => !prev))
+    setActionButtonName(btnName)
+    setButtonName(btnText)
+    setId(id)
+}
  
   
   
@@ -118,7 +143,7 @@ export const AccessContet = () => {
                                  limit={limit}
                                  customCellRenderers={customCellPendingTable}
                                  userColoumns={userColoumnsPending}
-                                 renderRowActions={pendingActions}
+                                 renderRowActions={(props) => pendingActions({...props,onToggleHandler})}
                                  pending={true}
                                  />
                              </div>

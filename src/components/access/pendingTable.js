@@ -62,10 +62,9 @@ import { StatusIcon } from "./StatusIcon.jsx";
      const arrayActions = [
           {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve'},
           {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Reject'},
-          {actionTitle:'Obsoleted',icon:FaTimesCircle,iconColor:'text-red-600',name:'Obsolete'},
-          {actionTitle:'Compromised',icon:FaExclamationTriangle,iconColor:'text-orange-500',name:'Compromise'},
         ]
   
+    
 
       export const pendingActions = ({ closeMenu, row,getData,onToggleHandler }) => [
         <MenuItem key={1} onClick={closeMenu}>

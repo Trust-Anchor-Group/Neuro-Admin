@@ -46,26 +46,7 @@ export const theme = createTheme({
           muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" },color: "rgba(24, 31, 37, 0.6)",
           fontWeight: 500, } },
       },
-      {
-        accessorKey: "actions",
-        header: "Actions",
-        size: 100,
-        muiTableHeadCellProps: {
-          sx: {
-            color: "rgba(24, 31, 37, 0.6)",
-            fontWeight: 500,
-            display:{lg:"table-cell", sm:"none"}
-          },
-        },
-        Cell: ({ row }) => (
-          <Link
-            href={`/list/access/detailpage/${row.original.id}`}
-            className="text-blue-600 hover:text-blue-400 flex items-center gap-2"
-          >
-            <FaEye /> View
-          </Link>
-        ),
-      },
+      
     ];
     
 

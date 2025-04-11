@@ -6,7 +6,7 @@ import { FaBan, FaCheck, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaFi
 import { DetailpageStatus } from './DetailpageStatus';
 import { ActionButtons } from './ActionButtons';
 
-export const Identity = ({user}) => {
+export const Identity = ({user,id,getData}) => {
 
 const [infoToggle, setIntoToggle] = useState(true)
 
@@ -100,7 +100,7 @@ if(!user){
 
                         </div>
                         <div className='mt-5'>
-                            <ActionButtons user={user} adminActions={adminActions}/>
+                            <ActionButtons user={user} adminActions={adminActions} id={id} getData={getData}/>
 
                         </div>
                     </div>
