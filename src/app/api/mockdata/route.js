@@ -10,23 +10,28 @@ export async function GET(req) {
         const limit = parseInt(searchParams.get('limit') || '5', 10) // Get the limit of users per page, default to 5
 
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
+        const fullId = searchParams.get('fullId') || '' // Gets only Full Id if set to true, gets only non-full Id when set to false
 
         const cookieStore = await cookies();
         const clientCookieObject = cookieStore.get('HttpSessionID');
         const clientCookie = clientCookieObject
             ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
             : null;
-            const payload = {
-                'maxCount':limit,
-                'offset': (page - 1) * limit,
-                ...(query ? {
-                    'filter': {
-                        "FIRST": query
-                    }
-                } : {}),
-            };
-            
-            console.log('sök namn',payload)
+
+        const payload = {
+            'maxCount':limit,
+            'offset': (page - 1) * limit,
+            ...(query ? {
+                'filter': {
+                    "FIRST": query
+                }
+            } : {}),
+            ...((fullId !== undefined && fullId !== null) ? {
+                fullId,
+                filter: {}
+            } : {})
+        };
+
         const { host } = config.api.agent;
 
         const url = `https://${host}/LegalIdentities.ws`;
