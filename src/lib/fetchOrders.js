@@ -24,6 +24,7 @@ export async function fetchOrders() {
     }
 
     const data = await response.json();
+    console.log("Fetched Orders:", data);
 
     const formattedOrders = data.data.map((token) => ({
       id: token.tokenId, 
