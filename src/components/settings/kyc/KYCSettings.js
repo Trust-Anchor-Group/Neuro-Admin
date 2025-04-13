@@ -1,12 +1,11 @@
 "use client";
-
 import { useState, useEffect, useCallback } from "react";
-import { FaCheckCircle, FaExclamationCircle, FaSave, FaSpinner } from "react-icons/fa";
+import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 
 export default function KYCSettings() {
   const [settings, setSettings] = useState(null);
-  const[AgentAPI, setAgentAPI] = useState(null);
-  const [originalSettings, setOriginalSettings] = useState(null); 
+  const [AgentAPI, setAgentAPI] = useState(null);
+  const [originalSettings, setOriginalSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -24,37 +23,35 @@ export default function KYCSettings() {
     }
     loadAgentAPI();
   }, []);
+
   useEffect(() => {
     async function fetchSettings() {
-      if (!AgentAPI || !AgentAPI.Legal?.GetApplicationAttributes) {
-        console.log("❌ AgentAPI is not available yet.");
-        return;
-      }
+      if (!AgentAPI || !AgentAPI.Legal?.GetApplicationAttributes) return;
       try {
-        console.log("🚀 Fetching KYC settings...");
         const data = await AgentAPI.Legal.GetApplicationAttributes();
-        console.log("✅ KYC Settings Data:", data);
-
         const formattedSettings = {
           peerReview: data.peerReview ?? false,
-          nrReviewers: data.nrReviewers ?? 1,
+          nrReviewers: data.nrReviewers ?? 2,
           nrPhotos: data.nrPhotos ?? 1,
-          iso3166: data.iso3166 ?? false,
           requiredFields: [
-            { id: "FIRST", label: "First Name", required: data.Required?.includes("FIRST") ?? false },
-            { id: "LAST", label: "Last Name", required: data.Required?.includes("LAST") ?? false },
-            { id: "PNR", label: "Personal Number", required: data.Required?.includes("PNR") ?? false },
-            { id: "ADDR", label: "Address", required: data.Required?.includes("ADDR") ?? false },
-            { id: "ZIP", label: "Postal Code", required: data.Required?.includes("ZIP") ?? false },
-            { id: "CITY", label: "City", required: data.Required?.includes("CITY") ?? false },
-            { id: "COUNTRY", label: "Country", required: data.Required?.includes("COUNTRY") ?? false },
+            { id: "FIRST", label: "First name", required: data.Required?.includes("FIRST") },
+            { id: "MID", label: "Middle name", required: data.Required?.includes("MID") },
+            { id: "LAST", label: "Last name", required: data.Required?.includes("LAST") },
+            { id: "PNR", label: "Personal number", required: data.Required?.includes("PNR") },
+            { id: "DOB", label: "Date of birth", required: data.Required?.includes("DOB") },
+            { id: "GENDER", label: "Gender", required: data.Required?.includes("GENDER") },
+            { id: "NATIONALITY", label: "Nationality", required: data.Required?.includes("NATIONALITY") },
+            { id: "ADDR", label: "Address", required: data.Required?.includes("ADDR") },
+            { id: "ZIP", label: "Postal code", required: data.Required?.includes("ZIP") },
+            { id: "CITY", label: "City", required: data.Required?.includes("CITY") },
+            { id: "COUNTRY", label: "Country", required: data.Required?.includes("COUNTRY") },
+            { id: "AREA", label: "Area", required: data.Required?.includes("AREA") },
+            { id: "REGION", label: "Region", required: data.Required?.includes("REGION") },
           ],
         };
-
         setSettings(formattedSettings);
-        setOriginalSettings(JSON.stringify(formattedSettings)); 
+        setOriginalSettings(JSON.stringify(formattedSettings));
       } catch (error) {
-        console.error("❌ Error fetching KYC settings:", error);
         setMessage({ type: "error", text: "Failed to load settings." });
       } finally {
         setLoading(false);
@@ -64,60 +61,42 @@ export default function KYCSettings() {
     fetchSettings();
   }, [AgentAPI]);
 
-  //  Toggle settings
   const toggleSetting = (key) => {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  //  Toggle required fields
   const toggleRequiredField = (id) => {
     setSettings((prev) => ({
       ...prev,
-      requiredFields: prev.requiredFields.map((field) =>
-        field.id === id ? { ...field, required: !field.required } : field
+      requiredFields: prev.requiredFields.map((f) =>
+        f.id === id ? { ...f, required: !f.required } : f
       ),
     }));
   };
 
-  //  Save settings to API
   const saveSettings = useCallback(async () => {
     if (!settings || JSON.stringify(settings) === originalSettings) return;
-
     setSaving(true);
-    setMessage({ type: "", text: "" });
-
     try {
       const payload = {
         allowPeerReview: settings.peerReview,
         nrReviewersToApprove: settings.nrReviewers.toString(),
         nrPhotosRequired: settings.nrPhotos.toString(),
-        requireFirstName: settings.requiredFields.some((field) => field.id === "FIRST" && field.required),
-        requireLastName: settings.requiredFields.some((field) => field.id === "LAST" && field.required),
-        requirePersonalNumber: settings.requiredFields.some((field) => field.id === "PNR" && field.required),
-        requireCountry: settings.requiredFields.some((field) => field.id === "COUNTRY" && field.required),
-        requireCity: settings.requiredFields.some((field) => field.id === "CITY" && field.required),
-        requirePostalCode: settings.requiredFields.some((field) => field.id === "ZIP" && field.required),
-        requireAddress: settings.requiredFields.some((field) => field.id === "ADDR" && field.required),
-        requireIso3166Compliance: settings.iso3166,
+        requiredFields: settings.requiredFields
+          .filter((f) => f.required)
+          .map((f) => f.id),
       };
 
-      console.log("📤 Sending Optimized Payload:", JSON.stringify(payload, null, 2));
-
-      const response = await fetch("/api/settings/peerReview", {
+      await fetch("/api/settings/peerReview", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update settings.");
-      }
-
-      setMessage({ type: "success", text: "✅ Settings updated successfully!" });
-      setOriginalSettings(JSON.stringify(settings)); 
+      setMessage({ type: "success", text: "Settings updated successfully!" });
+      setOriginalSettings(JSON.stringify(settings));
     } catch (error) {
-      console.error("❌ Error saving KYC settings:", error);
       setMessage({ type: "error", text: "Failed to update settings." });
     } finally {
       setSaving(false);
@@ -125,51 +104,91 @@ export default function KYCSettings() {
   }, [settings, originalSettings]);
 
   return (
-    <div className="max-w-4xl mx-auto p-10 bg-white/90 shadow-2xl rounded-2xl border border-gray-200 backdrop-blur-lg">
-      <h2 className="text-4xl font-extrabold text-gray-800 tracking-tight">KYC Settings</h2>
-      <p className="text-gray-500 text-lg mb-8">Manage identity verification settings with precision.</p>
+    <div className="bg-white rounded-2xl shadow-md p-8">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">KYC settings</h2>
 
       {message.text && (
-        <div className={`p-4 mb-4 rounded-lg text-center ${message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+        <div
+          className={`p-3 mb-6 rounded-md text-sm text-center ${
+            message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+          }`}
+        >
           {message.type === "success" ? <FaCheckCircle className="inline mr-2" /> : <FaExclamationCircle className="inline mr-2" />}
           {message.text}
         </div>
       )}
 
       {loading ? (
-        <p className="text-gray-500 text-center">Loading settings...</p>
+        <p className="text-gray-500">Loading settings...</p>
       ) : (
         <>
-          {/*  Peer Review Settings */}
-          <div className="bg-gray-50/80 p-6 rounded-lg shadow-lg border border-gray-300 mb-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">Peer Review Settings</h3>
+          {/* Peer review settings */}
+          <section className="bg-gray-50 rounded-xl border border-gray-200 p-6 mb-6">
+            <h3 className="text-sm font-semibold text-gray-600 mb-4">Peer review settings</h3>
 
-            <ToggleRow label="Enable Peer Review" checked={settings.peerReview} onChange={() => toggleSetting("peerReview")} />
-            <InputRow label="Number of Reviewers" value={settings.nrReviewers} onChange={(val) => setSettings((prev) => ({ ...prev, nrReviewers: val }))} />
-            <InputRow label="Number of Photos" value={settings.nrPhotos} onChange={(val) => setSettings((prev) => ({ ...prev, nrPhotos: val }))} />
-          </div>
+            <div className="space-y-4 border-b border-gray-200 pb-4">
+              <Checkbox label="Require peer review" checked={settings.peerReview} onChange={() => toggleSetting("peerReview")} />
+              {settings.peerReview && (
+                <div className="pl-6">
+                  <Input
+                    label="Min. number of peer reviewers required"
+                    value={settings.nrReviewers}
+                    onChange={(v) => setSettings({ ...settings, nrReviewers: Number(v) })}
+                  />
+                </div>
+              )}
+            </div>
 
-          {/*  Required Fields */}
-          <div className="bg-gray-50/80 p-6 rounded-lg shadow-lg border border-gray-300">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">Required Fields</h3>
+            <div className="space-y-4 pt-4">
+              <Checkbox label="Require photos" checked={settings.requirePhotos} onChange={() => toggleSetting("requirePhotos")} />
+              {settings.requirePhotos && (
+                <div className="pl-6">
+                  <Input
+                    label="Min. number of photos required"
+                    value={settings.nrPhotos}
+                    onChange={(v) => setSettings({ ...settings, nrPhotos: Number(v) })}
+                  />
+                </div>
+              )}
+            </div>
+          </section>
 
-            {settings.requiredFields.map((field) => (
-              <ToggleRow key={field.id} label={field.label} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
-            ))}
-          </div>
+          {/* Required fields */}
+          <section className="bg-gray-50 rounded-xl border border-gray-200 p-6">
+            <h3 className="text-sm font-semibold text-gray-600 mb-4">Required fields for ID creation</h3>
 
-          {/*  Save Button */}
-          <div className="mt-8 flex justify-end">
+            <div className="grid grid-cols-2 gap-0 border border-gray-200 rounded-lg divide-y divide-gray-200">
+              {settings.requiredFields.map((field, idx) => (
+                <div
+                  key={field.id}
+                  className={`flex items-center px-4 py-3 ${
+                    idx % 2 === 0 ? "border-r border-gray-200" : ""
+                  }`}
+                >
+                  <Checkbox label={field.label} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Buttons */}
+          <div className="flex justify-end mt-8 gap-3">
+            <button
+              onClick={() => setSettings(JSON.parse(originalSettings))}
+              className="px-4 py-2 text-sm font-medium border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100"
+            >
+              Reset changes
+            </button>
             <button
               onClick={saveSettings}
               disabled={JSON.stringify(settings) === originalSettings || saving}
-              className={`px-6 py-3 flex items-center gap-3 text-lg rounded-xl font-semibold shadow-md transition-all ${JSON.stringify(settings) === originalSettings || saving
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-                }`}
+              className={`px-5 py-2 text-sm font-semibold rounded-md ${
+                JSON.stringify(settings) === originalSettings || saving
+                  ? "bg-purple-300 cursor-not-allowed"
+                  : "bg-purple-600 hover:bg-purple-700 text-white"
+              }`}
             >
-              {saving ? <FaSpinner className="animate-spin" /> : <FaSave />}
-              {saving ? "Saving..." : "Save Settings"}
+              Save settings
             </button>
           </div>
         </>
@@ -178,21 +197,30 @@ export default function KYCSettings() {
   );
 }
 
-//  COMPONENTS: ToggleRow & InputRow
-function ToggleRow({ label, checked, onChange }) {
+function Checkbox({ label, checked, onChange }) {
   return (
-    <div className="flex items-center justify-between p-4 border-b last:border-none">
-      <span className="text-gray-700">{label}</span>
-      <input type="checkbox" checked={checked} onChange={onChange} className="toggle-input" />
-    </div>
+    <label className="flex items-center gap-2 cursor-pointer text-gray-800 text-sm">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="w-4 h-4 rounded border-gray-300 accent-figmaPurple text-figmaPurple"
+      />
+      {label}
+    </label>
   );
 }
 
-function InputRow({ label, value, onChange }) {
+function Input({ label, value, onChange }) {
   return (
-    <div className="flex items-center justify-between p-4 border-b">
-      <span className="text-gray-700">{label}</span>
-      <input type="number" value={value} onChange={(e) => onChange(parseInt(e.target.value))} className="input-field" />
-    </div>
+    <label className="flex items-center justify-between text-sm text-gray-800 gap-4">
+      {label}
+      <input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-20 border border-gray-300 rounded-md px-2 py-1 text-sm"
+      />
+    </label>
   );
 }
