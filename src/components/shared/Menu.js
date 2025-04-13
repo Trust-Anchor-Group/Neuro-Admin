@@ -2,104 +2,142 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { FaHome,FaRegUser , FaIdCard, FaUserShield, FaCog, FaChevronDown } from "react-icons/fa";
+import { FaHome, FaRegUser, FaCog, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import Image from "next/image";
 
 const menuItems = [
   {
-    title: "Neuro-Access",
-    items: [
-      {
-        icon: <FaHome size={20} />,
-        label: "Home",
-        href: "/neuro-access",
-        visible: ["admin", "customer-assets"],
-      },
-      {
-        icon: <FaRegUser   size={20} />,
-        label: "Accounts",
-        href: "/list/access",
-        visible: ["admin"],
-      },
-      
-      // {
-      //   icon: <FaIdCard size={20} />,
-      //   label: "Identity Management",
-      //   href: "/list/access/admin",
-      //   visible: ["admin"],
-      // },
-      {
-        icon: <FaCog size={20} />,
-        label: "Settings",
-        href: "/settings",
-        visible: ["admin"],
-      },
+    title: "Access",
+    icon: <FaRegUser size={20} />,
+    subItems: [
+      { label: "ID applications", href: "/neuro-access" },
+      { label: "Accounts", href: "/list/access" },
     ],
+  },
+  {
+    title: "Access settings",
+    icon: <FaCog size={20} />,
+    href: "/settings",
   },
 ];
 
 const Menu = () => {
-  const [openDropdown, setOpenDropdown] = useState(null);
-
-  const toggleDropdown = (index) => {
-    setOpenDropdown(openDropdown === index ? null : index);
-  };
+  const [open, setOpen] = useState(true);
+  const [hoveredItem, setHoveredItem] = useState(null);
 
   return (
-    <div className="mt-10 text-base font-semibold">
-      {menuItems.map((section) => (
-        <div className="flex flex-col gap-3" key={section.title}>
-          {/* Section Title */}
-          {/* <span className="text-gray-600 font-bold uppercase text-xs px-6 tracking-wider">
-            {section.title}
-          </span> */}
-
-          {section.items.map((item, itemIndex) => (
-            <div key={item.label} className="relative">
-              {/* Regular Menu Item */}
-              {!item.dropdown ? (
-                <Link
-                  href={item.href}
-                  className="flex items-center gap-4 text-gray-700 px-3 py-3 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-200"
-                >
-                  <div className="text-xl text-gray-600 group-hover:text-white">{item.icon}</div>
-                  <span className="hidden lg:block">{item.label}</span>
-                </Link>
-              ) : (
-                <div>
-                  {/* Dropdown Trigger */}
-                  <div
-                    className="flex items-center justify-between px-6 py-3 rounded-lg text-gray-700 hover:bg-blue-500 hover:text-white transition-all cursor-pointer"
-                    onClick={() => toggleDropdown(itemIndex)}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="text-xl text-gray-600 group-hover:text-white">{item.icon}</div>
-                      <span className="hidden lg:block">{item.label}</span>
-                    </div>
-                    <FaChevronDown
-                      className={`text-sm transition-transform ${openDropdown === itemIndex ? "rotate-180" : ""}`}
-                    />
-                  </div>
-
-                  {/* Dropdown Sub-Items */}
-                  {openDropdown === itemIndex && (
-                    <div className="ml-6 flex flex-col gap-2 mt-2 bg-gray-100 rounded-lg p-2">
-                      {item.subItems.map((subItem) => (
-                        <Link
-                          key={subItem.label}
-                          href={subItem.href}
-                          className="text-gray-700 text-sm font-medium py-2 px-3 rounded-md hover:bg-gray-300 transition"
-                        >
-                          {subItem.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+    <div
+      className={`h-screen bg-white shadow-md border-r border-gray-200 transition-all duration-300 flex flex-col justify-between ${
+        open ? "w-64" : "w-16"
+      }`}
+    >
+      <div>
+        <div className="flex flex-col items-center px-3 py-4 border-b relative">
+          <Image src="/neuroAdminLogo.svg" alt="Logo" width={48} height={48} />
+          {open && (
+            <div className="mt-4 w-full px-2">
+              <div className="bg-gray-50 p-2 rounded-lg text-sm text-center">
+                <span className="font-semibold">Neuro Admin</span>
+                <div className="text-xs text-gray-400">Access</div>
+              </div>
             </div>
+          )}
+          <button
+            onClick={() => setOpen(!open)}
+            className={`absolute top-[70px] ${
+              open ? "-right-3" : "right-1/2 translate-x-1/2"
+            } bg-gray-100 text-purple-600 rounded p-1 shadow z-20`}
+          >
+            {open ? <FaChevronLeft size={16} /> : <FaChevronRight size={16} />}
+          </button>
+        </div>
+
+      <nav className="mt-6 px-2">
+  {menuItems.map((item, idx) => (
+    <div
+      key={item.title}
+      className="relative"
+      onMouseEnter={() => setHoveredItem(idx)}
+      onMouseLeave={() => setHoveredItem(null)}
+    >
+      {item.href ? (
+        // Wrap the entire clickable area with Link for items with href
+        <Link
+          href={item.href}
+          className="flex items-center gap-3 py-3 px-2 text-gray-700 rounded hover:bg-purple-100 hover:text-purple-700 cursor-pointer transition-all"
+        >
+          <span className="text-lg text-gray-600">{item.icon}</span>
+          {open && <span className="text-sm font-medium">{item.title}</span>}
+        </Link>
+      ) : (
+        // Render as a div for items with subItems
+        <div className="flex items-center gap-3 py-3 px-2 text-gray-700 rounded hover:bg-purple-100 hover:text-purple-700 cursor-pointer transition-all">
+          <span className="text-lg text-gray-600">{item.icon}</span>
+          {open && <span className="text-sm font-medium">{item.title}</span>}
+        </div>
+      )}
+
+      {item.subItems && open && (
+        <div className="ml-8 text-sm flex flex-col gap-1">
+          {item.subItems.map((subItem) => (
+            <Link
+              key={subItem.label}
+              href={subItem.href}
+              className="py-1 px-2 rounded hover:bg-gray-200 text-gray-600 transition"
+            >
+              {subItem.label}
+            </Link>
           ))}
         </div>
-      ))}
+      )}
+
+      {item.subItems && !open && hoveredItem === idx && (
+        <div
+          className="absolute left-full top-0 bg-white shadow-lg rounded-lg text-sm p-2 z-30 ml-0"
+          style={{ pointerEvents: "auto" }}
+          onMouseEnter={() => setHoveredItem(idx)}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <div className="font-semibold text-purple-600 pb-1 border-b mb-1">
+            {item.title}
+          </div>
+          {item.subItems.map((subItem) => (
+            <Link
+              key={subItem.label}
+              href={subItem.href}
+              className="block py-1 px-2 rounded hover:bg-gray-200 text-gray-600 transition whitespace-nowrap"
+            >
+              {subItem.label}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {!item.subItems && !open && hoveredItem === idx && (
+        <div
+          className="absolute left-full top-0 bg-white shadow-md rounded-lg text-sm p-2 z-30 ml-0"
+          style={{ marginLeft: "0px" }}
+        >
+          <Link
+            href={item.href}
+            className="block py-1 px-2 rounded hover:bg-gray-200 text-purple-600 transition whitespace-nowrap font-semibold"
+          >
+            {item.title}
+          </Link>
+        </div>
+      )}
+
+      {/* Bottom divider for the last menu item */}
+      {idx === menuItems.length - 1 && <div className="border-b border-gray-200 my-2"></div>}
+    </div>
+  ))}
+</nav>
+      </div>
+   <Link href="/neuro-access" className="p-4 flex items-center justify-center">
+      <div className="mb-4 px-4 flex justify-center">
+        <Image src="/neuroAdminLogo.svg" alt="Neuro Logo" width={open ? 80 : 32} height={open ? 80 : 32} />
+      </div>
+      </Link>
     </div>
   );
 };
