@@ -34,9 +34,9 @@ export const AccessContet = () => {
                   offset: (page - 1) * limit,
                   maxCount: limit,
                   state: "Created",
-                  createdFrom: 1704078000,
+                  
                   filter: {
-                    'FIRST':query
+                    FIRST:query
                   },
               };
 
