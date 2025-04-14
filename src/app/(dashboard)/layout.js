@@ -17,7 +17,8 @@ export default function DashboardLayout({ children }) {
       {/* Main Content */}
       <div className="flex-1 bg-gray-100 overflow-y-auto flex flex-col">
         <Navbar />
-        <div className="flex-1 p-6">{children}</div>
+        <div className="flex-1 pb-6">{children}</div>
+
         <Footer />
       </div>
     </div>
