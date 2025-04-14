@@ -30,10 +30,11 @@ export async function GET(req) {
                 maxCount: limit,
                 offset: (page - 1) * limit,
                 ...(query ? {
+                    'strictSearch':"true",
                     filter: {
                         'FIRST': query
                     },
-                } : {}),
+                } : (fullId !== undefined ? { fullId, filter : {} } : {})),
                 ...(fullId !== undefined ? { fullId } : {}) }
 
         console.log('Payload',payload)
