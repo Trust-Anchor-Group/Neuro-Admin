@@ -104,9 +104,8 @@ export default function KYCSettings() {
   }, [settings, originalSettings]);
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-8">
+    <div className="bg-white rounded-2xl">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">KYC settings</h2>
-
       {message.text && (
         <div
           className={`p-3 mb-6 rounded-md text-sm text-center ${
