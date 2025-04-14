@@ -1,62 +1,147 @@
 "use client";
 
-import React, { useState } from "react";
 import Image from "next/image";
-import config from "@/config/config";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import config from "@/config/config";
 
-const QuickLogin = dynamic(() => import('@/components/quickLogin/QuickLogin'), { ssr: false });
+const QuickLogin = dynamic(() => import("@/components/quickLogin/QuickLogin"), { ssr: false });
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [showQR, setShowQR] = useState(false); // 🚀 Controls QR display
-
-  const handleLoginSuccess = () => {
-    router.push('/landingpage');
-  };
+  const [showQR, setShowQR] = useState(false);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-6">
-      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md text-center border border-gray-200">
+    <div className="min-h-screen bg-[#F5F6F7] shadow-[0px_0px_10px_0px_rgba(24,31,37,0.05)] font-grotesk">
+         {/* <Image
+        src="/backgroundSvg.svg"
+        alt="Background pattern"
+        fill
+        className="absolute inset-0 z-0"
+        priority
+        unoptimized
+      /> */}
+      <header className="h-20 px-8 flex items-center border-b border-gray-200 bg-white">
+        <Image
+          src="/NeuroLogo.svg"
+          alt="Neuro logo"
+          width={140}
+          height={40}
+          unoptimized
+        />
+      </header>
 
-        <Image src="/neuroAdminLogo.svg" alt="Neuro Admin" width={80} height={80} className="mx-auto mb-4" />
-        <h1 className="text-3xl font-bold text-gray-800">Welcome Back</h1>
-        <p className="text-gray-500 text-sm mt-2">Log in securely using your Neuro-Access App</p>
-
-        {!showQR ? (
-          <div className="mt-6">
-            <button
-              onClick={() => setShowQR(true)}
-              className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-md transition-all"
-            >
-              Login with QR Code
-            </button>
-          </div>
-        ) : (
-          <div className="mt-6 flex flex-col items-center">
-            <QuickLogin
-              neuron={config.api.agent.host}
-              purpose="Login to Neuro-admin"
-              active={true}
-              onLoginSuccess={handleLoginSuccess}
+      <main className="flex justify-center items-center px-4 py-12">
+        <div className="bg-[#FCFCFC] rounded-[1.5rem] shadow-[0px_4px_10px_0px_rgba(24,31,37,0.05)] w-full max-w-7xl flex flex-col md:flex-row items-center justify-center px-6 py-12 gap-12">
+          {/* Left side */}
+          <div className="flex flex-col items-center">
+            <Image
+              src="/Neuro-Access-preview.png"
+              alt="Phone preview"
+              width={260}
+              height={500}
+              className="mb-6"
+              unoptimized
             />
-            <button
-              onClick={() => setShowQR(false)}
-              className="mt-4 px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold shadow transition"
-            >
-              Cancel
-            </button>
+            <span className="text-sm text-gray-600 mb-2">Get the app today</span>
+            <div className="flex gap-2">
+              <a
+                href="https://play.google.com/store/apps/details?id=com.tag.NeuroAccess"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src="/Google-play-button.png"
+                  alt="Google Play"
+                  width={130}
+                  height={40}
+                  unoptimized
+                />
+              </a>
+              <a
+                href="https://apps.apple.com/us/app/neuro-access/id6476126341"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Image
+                  src="/app-store-button.png"
+                  alt="App Store"
+                  width={120}
+                  height={40}
+                  unoptimized
+                />
+              </a>
+            </div>
           </div>
-        )}
 
-        <p className="text-gray-500 text-sm mt-6">
-          Don’t have the app?{' '}
-          <a href="https://play.google.com/store/apps/details?id=com.tag.NeuroAccess&pcampaignid=web_share" className="text-blue-500 font-medium hover:underline">
-            Download it here
-          </a>
-        </p>
-      </div>
+          {/* Right side */}
+          <div className="flex flex-col items-center w-full max-w-md">
+            <Image
+              src="/NeuroLogo.svg"
+              alt="Neuro logo"
+              width={140}
+              height={40}
+              className="mb-6"
+              unoptimized
+            />
+
+            {showQR ? (
+              <>
+                <QuickLogin
+                  neuron={config.api.agent.host}
+                  purpose="Login to Neuro-admin"
+                  active={true}
+                  onLoginSuccess={() => window.location.href = "/landingpage"}
+                />
+                <button
+                  onClick={() => setShowQR(false)}
+                  className="mt-6 text-sm font-medium text-gray-600 hover:text-gray-800"
+                >
+                  Cancel login
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="w-[280px] h-[280px] bg-[#F5F5F5] rounded-xl relative flex items-center justify-center mb-6">
+                  {/* Text Centered in the QR box */}
+                  <div className="absolute z-10 flex flex-col items-center text-center px-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Welcome!</h3>
+                    <p className="text-sm text-gray-500">
+                      Log in securely with the Neuro-Access app
+                    </p>
+                  </div>
+                  <Image
+                    src="/simple-Qr.png"
+                    alt="QR Placeholder"
+                    width={250}
+                    height={250}
+                    className="opacity-20"
+                    unoptimized
+                  />
+                </div>
+
+                <button
+                  onClick={() => setShowQR(true)}
+                  className="w-full bg-[#8F40D4] hover:bg-[#722FAD] text-white py-3 rounded-lg text-sm font-semibold shadow"
+                >
+                  🔍 Start login
+                </button>
+              </>
+            )}
+
+            <p className="text-sm text-gray-500 mt-4 text-center">
+              Don’t have the app?{" "}
+              <a
+                href="https://play.google.com/store/apps/details?id=com.tag.NeuroAccess"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-purple-600 hover:underline font-medium"
+              >
+                Download it here
+              </a>
+            </p>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
