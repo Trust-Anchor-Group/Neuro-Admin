@@ -10,7 +10,7 @@ const menuItems = [
     title: "Access",
     icon: <FaRegUser size={20} />,
     subItems: [
-      { label: "ID applications", href: "/neuro-access" },
+      { label: "ID applications", href: "/list/access/pending-ids" },
       { label: "Accounts", href: "/list/access" },
     ],
   },
@@ -135,7 +135,7 @@ const Menu = () => {
       </div>
    <Link href="/neuro-access" className="p-4 flex items-center justify-center">
       <div className="mb-4 px-4 flex justify-center">
-        <Image src="/neuroAdminLogo.svg" alt="Neuro Logo" width={open ? 80 : 32} height={open ? 80 : 32} />
+        <Image src="/NeuroLogo.svg" alt="Neuro Logo" width={open ? 80 : 32} height={open ? 80 : 32} />
       </div>
       </Link>
     </div>
