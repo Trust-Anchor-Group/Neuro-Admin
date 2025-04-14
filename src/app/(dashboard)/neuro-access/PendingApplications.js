@@ -13,7 +13,6 @@ export default function PendingApplications() {
           offset: 0,
           maxCount: 10,
           state: "Created",
-          createdFrom: 1704078000,
            filter: {}, 
         };
 
@@ -36,7 +35,7 @@ export default function PendingApplications() {
         }
 
         // Extract relevant data & keep the last 6
-        const formattedApps = data.data.slice(0, 3).map((app) => ({
+        const formattedApps = data.data.slice(0, 6).map((app) => ({
           id: app.id,
           name: app.name || "Unknown User",
           submittedAt: `${app.createdDate} ${app.createdTime}`, // Combining date and time
