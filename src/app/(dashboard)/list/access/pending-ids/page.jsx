@@ -4,7 +4,7 @@ import { theme } from '@/components/access/accountTableList'
 import { ThemeProvider } from '@mui/material'
 import React, { Suspense} from 'react'
 
-const AccessPage = () => {
+const PendingIDs = () => {
   
 //Suspense so that useSearchParams works
 
@@ -19,4 +19,4 @@ const AccessPage = () => {
   )
 }
 
-export default AccessPage
+export default PendingIDs
