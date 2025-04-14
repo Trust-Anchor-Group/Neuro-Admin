@@ -31,7 +31,7 @@ const config = {
                 activeGreen:"#085E50",
                 obsoletedRed:"#A81123",
                 aprovedPurple:"#8F40D4",
-                figmaPurple: "#722fad",,
+                figmaPurple: "#722fad",
                 neuroTextBlack:"#181F25",
                 neuroOrange:"#F18334",
                 neuroDarkOrange:"#A84700",
