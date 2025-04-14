@@ -30,7 +30,5 @@ export function middleware(request) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!api|login|_next/static|_next/image|favicon.ico|serviceworker.js|.*\\.map$).*)',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|NeuroLogo.svg|app-store-button.png|Google-play-button.png|Neuro-Access-preview.png|simple-Qr.png).*)'],
 };
