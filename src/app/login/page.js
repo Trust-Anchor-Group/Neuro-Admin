@@ -4,7 +4,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import config from "@/config/config";
-
+import { FaQrcode } from "react-icons/fa";
 const QuickLogin = dynamic(() => import("@/components/quickLogin/QuickLogin"), { ssr: false });
 
 export default function LoginPage() {
@@ -30,8 +30,8 @@ export default function LoginPage() {
         />
       </header>
 
-      <main className="flex justify-center items-center px-4 py-12">
-        <div className="bg-[#FCFCFC] rounded-[1.5rem] shadow-[0px_4px_10px_0px_rgba(24,31,37,0.05)] w-full max-w-7xl flex flex-col md:flex-row items-center justify-center px-6 py-12 gap-12">
+      <main className="flex justify-center items-center px-4 py-2">
+        <div className="bg-[#FCFCFC] rounded-[1.5rem] shadow-[0px_4px_10px_0px_rgba(24,31,37,0.05)] w-full max-w-4xl flex flex-col md:flex-row items-center justify-center px-2 py-2 gap-12">
           {/* Left side */}
           <div className="flex flex-col items-center">
             <Image
@@ -120,11 +120,12 @@ export default function LoginPage() {
                 </div>
 
                 <button
-                  onClick={() => setShowQR(true)}
-                  className="w-full bg-[#8F40D4] hover:bg-[#722FAD] text-white py-3 rounded-lg text-sm font-semibold shadow"
-                >
-                  🔍 Start login
-                </button>
+              onClick={() => setShowQR(true)}
+              className="flex items-center gap-4 bg-[#8F40D4] hover:bg-[#722FAD] text-white px-7 py-3 rounded-lg text-sm font-semibold shadow"
+            >
+              <FaQrcode className="text-lg" />
+              Start Login
+            </button>
               </>
             )}
 
