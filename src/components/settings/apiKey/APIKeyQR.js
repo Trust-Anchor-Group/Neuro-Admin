@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaDownload, FaCalendarAlt, FaSyncAlt } from "react-icons/fa";
+import { FaDownload, FaSyncAlt } from "react-icons/fa";
 
 export default function APIKeyQR({ apiKey }) {
   const [qrData, setQrData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [expires, setExpires] = useState(Math.floor(Date.now() / 1000) + 86400); // Default: 24 hours from now
+  const [expires, setExpires] = useState(Math.floor(Date.now() / 1000) + 86400);
 
   useEffect(() => {
-    generateQR(); 
+    generateQR();
   }, [apiKey]);
 
   async function generateQR() {
@@ -20,15 +20,10 @@ export default function APIKeyQR({ apiKey }) {
       const response = await fetch("/api/settings/api-keys/qrcode-generated", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          apiKey: apiKey,
-          expires: expires,
-        }),
+        body: JSON.stringify({ apiKey, expires }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to generate QR code");
-      }
+      if (!response.ok) throw new Error("Failed to generate QR code");
 
       const data = await response.json();
       setQrData(data.data);
@@ -49,51 +44,129 @@ export default function APIKeyQR({ apiKey }) {
     document.body.removeChild(link);
   }
 
-  return (
-    <div className="flex flex-col bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-300 mt-6">
-      <h3 className="text-xl font-semibold text-gray-700 mb-4">QR Code for API Key</h3>
+  function shareQR() {
+    if (navigator.share && qrData?.url) {
+      fetch(qrData.url)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const file = new File([blob], "APIKey_QR.png", { type: blob.type });
+          navigator.share({
+            title: "API Key QR",
+            files: [file],
+          });
+        })
+        .catch((err) => console.error("Share failed", err));
+    } else {
+      alert("Sharing is not supported on this device.");
+    }
+  }
 
-      {/* Expiry Date Input */}
-      <div className="flex items-center gap-3 mb-4">
-        <label className="text-gray-700 font-medium flex items-center gap-2">
-          <FaCalendarAlt className="text-gray-500" />
-          Expiry Date:
-        </label>
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl shadow-md p-6">
+      <h3 className="text-lg font-bold text-gray-900 mb-3">API key QR-code</h3>
+
+      <label className="block text-sm text-gray-500 mb-2">
+        QR-code expiration date & time (YYYY-MM-DD, Time)
+      </label>
+
+      <div className="grid grid-cols-4 gap-2 mb-4">
         <input
-          type="datetime-local"
-          value={new Date(expires * 1000).toISOString().slice(0, 16)}
-          onChange={(e) => setExpires(Math.floor(new Date(e.target.value).getTime() / 1000))}
-          className="px-4 py-2 border border-gray-300 rounded-lg bg-white"
+          className="bg-gray-100 text-center rounded-lg py-2 px-3 text-sm border"
+          placeholder="YYYY"
+          maxLength={4}
+          value={new Date(expires * 1000).getFullYear()}
+          onChange={(e) => {
+            const newDate = new Date(expires * 1000);
+            newDate.setFullYear(+e.target.value);
+            setExpires(Math.floor(newDate.getTime() / 1000));
+          }}
         />
-        <button
-          onClick={generateQR}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-        >
-          <FaSyncAlt /> Generate
-        </button>
+        <input
+          className="bg-gray-100 text-center rounded-lg py-2 px-3 text-sm border"
+          placeholder="MM"
+          maxLength={2}
+          value={(new Date(expires * 1000).getMonth() + 1).toString().padStart(2, "0")}
+          onChange={(e) => {
+            const newDate = new Date(expires * 1000);
+            newDate.setMonth(+e.target.value - 1);
+            setExpires(Math.floor(newDate.getTime() / 1000));
+          }}
+        />
+        <input
+          className="bg-gray-100 text-center rounded-lg py-2 px-3 text-sm border"
+          placeholder="DD"
+          maxLength={2}
+          value={new Date(expires * 1000).getDate().toString().padStart(2, "0")}
+          onChange={(e) => {
+            const newDate = new Date(expires * 1000);
+            newDate.setDate(+e.target.value);
+            setExpires(Math.floor(newDate.getTime() / 1000));
+          }}
+        />
+        <input
+          className="bg-gray-100 text-center rounded-lg py-2 px-3 text-sm border"
+          placeholder="Time"
+          value={new Date(expires * 1000).toTimeString().slice(0, 5)}
+          onChange={(e) => {
+            const [h, m] = e.target.value.split(":".map(Number));
+            const newDate = new Date(expires * 1000);
+            newDate.setHours(h);
+            newDate.setMinutes(m);
+            setExpires(Math.floor(newDate.getTime() / 1000));
+          }}
+        />
       </div>
 
-      {/* QR Code Display */}
+      <button
+        onClick={generateQR}
+        className="w-full bg-[#722FAD] hover:bg-[#5e2491] text-white font-semibold py-2 rounded-lg text-sm flex justify-center items-center gap-2 mb-6"
+      >
+        <FaSyncAlt /> Generate QR-code
+      </button>
+
       {loading ? (
-        <p className="text-gray-500 text-center">Generating QR Code...</p>
+        <div className="text-center text-gray-500">Loading QR code...</div>
       ) : qrData ? (
-        <div className="flex flex-col items-center">
+        <div className="bg-[#F9F9F9] p-6 rounded-xl flex flex-col items-center">
           <img
             src={qrData.url}
-            alt="API Key QR Code"
+            alt="QR Code"
             width={qrData.width}
             height={qrData.height}
-            className="rounded-lg shadow-md"
+            className="mb-4"
           />
-          <button
-            onClick={downloadQR}
-            className="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center gap-2"
-          >
-            <FaDownload /> Download QR Code
-          </button>
+          <p className="text-gray-500 text-sm mb-4">Scan the QR code to access the Neuron</p>
+          <div className="flex gap-4 w-full">
+            <button
+              onClick={downloadQR}
+              className="flex-1 flex items-center justify-center gap-2 text-[#722FAD] bg-[#E9DDF8] hover:bg-[#dbc9f1] text-sm font-medium px-4 py-2 rounded-lg"
+            >
+              <FaDownload /> Download QR-code
+            </button>
+            <button
+              onClick={shareQR}
+              className="flex-1 flex items-center justify-center gap-2 text-[#722FAD] bg-[#E9DDF8] hover:bg-[#dbc9f1] text-sm font-medium px-4 py-2 rounded-lg"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 2.25l-7.5 4.5m0 0l7.5 4.5m-7.5-4.5v13.5"
+                />
+              </svg>
+              Share QR-code
+            </button>
+          </div>
         </div>
       ) : (
-        <p className="text-red-500 text-center">Failed to load QR Code</p>
+        <p className="text-center text-red-500">Failed to load QR code</p>
       )}
     </div>
   );
