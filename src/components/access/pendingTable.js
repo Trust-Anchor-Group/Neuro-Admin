@@ -12,7 +12,7 @@ import { StatusIcon } from "./StatusIcon.jsx";
       muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" },color: "rgba(24, 31, 37, 0.6)",
       fontWeight: 500, } },
     },  
-        { accessorKey: "account", header: "Account", size: 200,
+        { accessorKey: "account", header: "Account", size: 100,
           muiTableHeadCellProps: {
             sx: {
               color: "rgba(24, 31, 37, 0.6)",
@@ -27,11 +27,16 @@ import { StatusIcon } from "./StatusIcon.jsx";
             fontWeight: 500, },       }
             ,
         },
-        { accessorKey: "city", header: "Location", size: 200, 
+        { accessorKey: "city", header: "Location", size: 100, 
           muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
           muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" },   color: "rgba(24, 31, 37, 0.6)",
           fontWeight: 500, } },
       },
+      { accessorKey: "createdDate", header: "Created", size: 100, 
+        muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" } } },
+        muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" },color: "rgba(24, 31, 37, 0.6)",
+        fontWeight: 500, } },
+    },
      
     ]
 

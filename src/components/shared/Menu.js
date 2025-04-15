@@ -22,12 +22,12 @@ const menuItems = [
         dropdown: true,
         subItems: [
           {
-            label: "Accounts",
-            href: "/list/access",
-          },
-          {
             label: "ID\u00A0Applications",
             href: "/list/access/pending-ids",
+          },
+          {
+            label: "Accounts",
+            href: "/list/access",
           },
         ],
       },

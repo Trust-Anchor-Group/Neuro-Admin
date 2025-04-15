@@ -14,7 +14,7 @@ export async function POST(request) {
             maxCount,
             offset: offset || 0,
             'strictSearch':"true",
-            filter: filter.FIRST === '' ? {} : filter
+            filter: (filter?.FIRST ?? '') === '' ? {} : filter
         };
 
         if (state) payload.state = state; 

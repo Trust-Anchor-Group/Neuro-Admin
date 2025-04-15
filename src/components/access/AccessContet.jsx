@@ -1,6 +1,6 @@
 import { PaginatedList } from '@/components/access/PaginatedList'
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import config from '@/config/config';
 import { userColoumnsAccount,customCellAcountTable,accountActions } from './accountTableList.js'
 import {userColoumnsPending,customCellPendingTable,pendingActions} from './pendingTable.js'
@@ -24,10 +24,13 @@ export const AccessContet = () => {
     const [actionButtonName, setActionButtonName] = useState('')
     const [buttonName, setButtonName] = useState('')
     const [id, setId] = useState('')
+    const isFetchingRef = useRef(false)
 
     const [totalPages, setTotalPages] = useState(0)
     async function getData() {
-      setLoading(true);
+      if (isFetchingRef.current) return
+      isFetchingRef.current = true
+      setLoading(true)
       try {
           if (pathname.includes('pending-ids')) {
               const requestBody = {
@@ -65,11 +68,12 @@ export const AccessContet = () => {
           console.error(error);
       } finally {
           setLoading(false);
+          isFetchingRef.current = false
       }
   }
     
     useEffect(() => {
-     if(!pathname) return
+   
       getData();
   }, [page, query,filterAccount,pathname]);
     
@@ -99,59 +103,52 @@ function onToggleHandler(id,btnName,btnText){
     const prevPage = page - 1 > 0 ? page - 1 : 1
 
     return (
-      <div>
-          <div className=''>
+            <div className="relative">
+            {/* Din faktiska innehåll visas alltid */}
+            {pathname === '/list/access' && (
+              <PaginatedList 
+                userList={userList} 
+                page={page}
+                totalPages={totalPages}
+                prevPage={prevPage}
+                limit={limit}
+                customCellRenderers={customCellAcountTable}
+                userColoumns={userColoumnsAccount}
+                pending={false}
+                filterAccount={filterAccount}
+          />
+        )}
 
-            <div className=''>
-                       {
-                         loading ? (
-                           <div className='flex justify-center items-center mt-12'>
-                             <FaSpinner className='animate-spin text-5xl'/>
-                           </div>
-                         ) :
-                         <>
-                       {pathname === '/list/access' && (
-                         <div className=''>
-                         <PaginatedList 
-                                 userList={userList} 
-                                 page={page}
-                                 totalPages={totalPages}
-                                 prevPage={prevPage}
-                                 limit={limit}
-                                 customCellRenderers={customCellAcountTable}
-                                 userColoumns={userColoumnsAccount}
-                                 pending={false}
-                                 filterAccount={filterAccount}
-                             />
-                         </div>
-                         )}
-                              {
-                               toggle &&
-                                         <Modal 
-                                             text={`Are you sure you want to ${buttonName}?`}
-                                             setToggle={setToggle}
-                                             onHandleModal={onHandleModal}/>
-                               }
-                                             
-                         {pathname === '/list/access/pending-ids' && (
-                           <div>
-                             <PaginatedList 
-                                 userList={userList} 
-                                 page={page}
-                                 totalPages={totalPages}
-                                 prevPage={prevPage}
-                                 limit={limit}
-                                 customCellRenderers={customCellPendingTable}
-                                 userColoumns={userColoumnsPending}
-                                 renderRowActions={(props) => pendingActions({...props,onToggleHandler})}
-                                 pending={true}
-                                 />
-                             </div>
-                         )}
-                         </>
-                       }
-            </div>
+              {pathname === '/list/access/pending-ids' && (
+                <PaginatedList 
+                  userList={userList} 
+                  page={page}
+                  totalPages={totalPages}
+                  prevPage={prevPage}
+                  limit={limit}
+                  customCellRenderers={customCellPendingTable}
+                  userColoumns={userColoumnsPending}
+                  renderRowActions={(props) => pendingActions({...props,onToggleHandler})}
+                  pending={true}
+          />
+        )}
+
+        {/* Modal */}
+        {toggle && (
+          <Modal 
+            text={`Are you sure you want to ${buttonName}?`}
+            setToggle={setToggle}
+            onHandleModal={onHandleModal}
+          />
+        )}
+
+        {/* Loading overlay */}
+        {loading && (
+          <div className="absolute inset-0 bg-white/50  flex items-center justify-center z-50">
+            <FaSpinner className="animate-spin text-4xl text-gray-500" />
           </div>
+        )}
       </div>
+
     )
   }

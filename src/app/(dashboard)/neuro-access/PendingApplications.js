@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function PendingApplications() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isFetchingRef = useRef(false);
 
   useEffect(() => {
     async function fetchPendingApplications() {
+      if (isFetchingRef.current) return
+      isFetchingRef.current = true
       try {
         const requestBody = {
           offset: 0,
@@ -48,6 +51,7 @@ export default function PendingApplications() {
         console.error("Error fetching pending applications:", error);
       } finally {
         setLoading(false);
+        isFetchingRef.current = false
       }
     }
 
