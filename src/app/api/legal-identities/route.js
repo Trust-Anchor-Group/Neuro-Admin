@@ -13,7 +13,8 @@ export async function POST(request) {
         const payload = {
             maxCount,
             offset: offset || 0,
-            filter: filter.FIRST === '' ? {} : filter
+            'strictSearch':"true",
+            filter: (filter?.FIRST ?? '') === '' ? {} : filter
         };
 
         if (state) payload.state = state; 

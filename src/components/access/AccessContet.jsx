@@ -1,139 +1,154 @@
 import { PaginatedList } from '@/components/access/PaginatedList'
-import { useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation';
+import React, { useEffect, useRef, useState } from 'react'
 import config from '@/config/config';
 import { userColoumnsAccount,customCellAcountTable,accountActions } from './accountTableList.js'
 import {userColoumnsPending,customCellPendingTable,pendingActions} from './pendingTable.js'
-import { FaSpinner } from 'react-icons/fa';
+import { FaHourglassHalf, FaSpinner, FaUserFriends } from 'react-icons/fa';
 import Link from 'next/link.js';
+import { Modal } from '../shared/Modal.jsx';
+import { pendingAction } from './pendingFetch.js';
 
 
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
-    const tab = searchParams.get('tab') || 'current'
+    const pathname = usePathname()
+    const filterAccount = searchParams.get('filter-accounts') || 'all'
     const query = searchParams.get('query') || ''
     const [toggle, setToggle] = useState(false)
     const [loading, setLoading] = useState(false)
     const [userList, setUserList] = useState(null)
     let limit = 10
     const page = Number(searchParams.get('page') || 1)
+    const [actionButtonName, setActionButtonName] = useState('')
+    const [buttonName, setButtonName] = useState('')
+    const [id, setId] = useState('')
+    const isFetchingRef = useRef(false)
 
     const [totalPages, setTotalPages] = useState(0)
+    async function getData() {
+      if (isFetchingRef.current) return
+      isFetchingRef.current = true
+      setLoading(true)
+      try {
+          if (pathname.includes('pending-ids')) {
+              const requestBody = {
+                  offset: (page - 1) * limit,
+                  maxCount: limit,
+                  state: "Created",
+                  
+                  filter: {
+                    FIRST:query
+                  },
+              };
+
+              const res = await fetch("/api/legal-identities", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(requestBody),
+              });
+
+              if (!res.ok) throw new Error("Failed to fetch pending applications");
+              const data = await res.json();
+              setUserList(data.data || []);
+              setTotalPages(data.totalPages || 38);
+          } else {
+              const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
+              const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+              if (!res.ok) throw new Error("Could not fetch userList");
+              
+              const data = await res.json();
+
+              setUserList(data.data || []);
+              console.log(data)
+              setTotalPages(data.totalPages || 38);
+          }
+      } catch (error) {
+          console.error(error);
+      } finally {
+          setLoading(false);
+          isFetchingRef.current = false
+      }
+  }
     
     useEffect(() => {
-      async function getData() {
-          setLoading(true);
-          try {
-              if (tab === 'pending') {
-                  const requestBody = {
-                      offset: (page - 1) * limit,
-                      maxCount: limit,
-                      state: "Created",
-                      createdFrom: 1704078000,
-                      filter: {
-                        FIRST:query
-                      },
-                  };
-
-                  const res = await fetch("/api/legal-identities", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify(requestBody),
-                  });
-
-                  if (!res.ok) throw new Error("Failed to fetch pending applications");
-                  const data = await res.json();
-                  setUserList(data.data || []);
-                  setTotalPages(data.totalPages || 38);
-              } else {
-                  const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}`;
-                  const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
-                  if (!res.ok) throw new Error("Could not fetch userList");
-                  const data = await res.json();
-                  setUserList(data.data || []);
-                  console.log(data)
-                  setTotalPages(data.totalPages || 38);
-              }
-          } catch (error) {
-              console.error(error);
-          } finally {
-              setLoading(false);
-          }
-      }
+   
       getData();
-  }, [page, query, tab]);
+  }, [page, query,filterAccount,pathname]);
     
-  
+  async function onHandleModal(){
+    try {
+        await pendingAction(id,actionButtonName)
+        getData()
+        setToggle(false)
+     } catch (error) {
+         console.log(error)
+     }
+}
+
+
+
+
+
+function onToggleHandler(id,btnName,btnText){
+    setToggle((prev => !prev))
+    setActionButtonName(btnName)
+    setButtonName(btnText)
+    setId(id)
+}
  
   
   
     const prevPage = page - 1 > 0 ? page - 1 : 1
 
     return (
-      <div>
-          <div className='p-5 max-sm:p-0'>
-            <div className='flex justify-between items-center'>
-              <div>
-                      <h1 className="mb-2 text-xl font-semibold md:text-3xl">Accounts</h1>
-                      <p className='text-lg opacity-70 max-sm:text-sm'>Manage user accounts and permissions</p>
-                  </div>
-            </div>
-            <nav className="grid grid-cols-2 w-full md:w-[50%] gap-5 py-1 px-2 mt-5 bg-gray-200 text-center rounded-lg">
-                    <Link href="/list/access/?tab=current&page=1">
-                    <p className={`text-lg ${tab === 'current' ? 'bg-white/90 rounded-lg duration-300' : 'text-gray-600'}`}>Accounts</p>
-                    </Link>
-                    <Link href="/list/access/?tab=pending&page=1">
-                    <p className={`text-lg ${tab === 'pending' ? 'bg-white/90 rounded-lg duration-300' : 'text-gray-600'}`}>Pending&nbsp;Applications</p>
-                    </Link>
-                </nav>
-            <div className=''>
-                       {
-                         loading ? (
-                           <div className='flex justify-center items-center mt-12'>
-                             <FaSpinner className='animate-spin text-5xl'/>
-                           </div>
-                         ) :
-                         <>
-                       {tab === 'current' && (
-                         <div className=''>
-                         <PaginatedList 
-                                 userList={userList} 
-                                 page={page}
-                                 totalPages={totalPages}
-                                 prevPage={prevPage}
-                                 limit={limit}
-                                 customCellRenderers={customCellAcountTable}
-                                 userColoumns={userColoumnsAccount}
-                             />
-                         </div>
-                         )}
-                              {
-                               toggle &&
-                                         <Modal 
-                                             text={`Are you sure you want to ${buttonName}?`}
-                                             setToggle={setToggle}
-                                             onHandleModal={onHandleModal}/>
-                               }
-                                             
-                         {tab === 'pending' && (
-                           <div>
-                             <PaginatedList 
-                                 userList={userList} 
-                                 page={page}
-                                 totalPages={totalPages}
-                                 prevPage={prevPage}
-                                 limit={limit}
-                                 customCellRenderers={customCellPendingTable}
-                                 userColoumns={userColoumnsPending}
-                                 renderRowActions={pendingActions}
-                                 />
-                             </div>
-                         )}
-                         </>
-                       }
-            </div>
+            <div className="relative">
+            {/* Din faktiska innehåll visas alltid */}
+            {pathname === '/list/access' && (
+              <PaginatedList 
+                userList={userList} 
+                page={page}
+                totalPages={totalPages}
+                prevPage={prevPage}
+                limit={limit}
+                customCellRenderers={customCellAcountTable}
+                userColoumns={userColoumnsAccount}
+                pending={false}
+                filterAccount={filterAccount}
+          />
+        )}
+
+              {pathname === '/list/access/pending-ids' && (
+                <PaginatedList 
+                  userList={userList} 
+                  page={page}
+                  totalPages={totalPages}
+                  prevPage={prevPage}
+                  limit={limit}
+                  customCellRenderers={customCellPendingTable}
+                  userColoumns={userColoumnsPending}
+                  renderRowActions={(props) => pendingActions({...props,onToggleHandler})}
+                  pending={true}
+          />
+        )}
+
+        {/* Modal */}
+        {toggle && (
+          <Modal 
+            text={`Are you sure you want to ${buttonName}?`}
+            setToggle={setToggle}
+            onHandleModal={onHandleModal}
+          />
+        )}
+
+        {/* Loading overlay */}
+        {loading && (
+          <div className="absolute inset-0 bg-white/50  flex items-center justify-center z-50">
+            <FaSpinner className="animate-spin text-4xl text-gray-500" />
           </div>
+        )}
       </div>
+
     )
   }

@@ -8,9 +8,18 @@ export async function GET(req) {
         const { searchParams } = new URL(req.url)
         const page = parseInt(searchParams.get('page') || '1', 10) //§ Get the page number, default to 1
         const limit = parseInt(searchParams.get('limit') || '5', 10) // Get the limit of users per page, default to 5
-
+        const filterAccount = searchParams.get('filter')
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
 
+        let fullId 
+        if(filterAccount === 'hasID'){
+            fullId = true
+        } else if( filterAccount === 'noID'){
+            fullId = false
+        } else {
+            fullId = undefined
+        }
+        console.log('Full Id variabel', fullId)
         const cookieStore = await cookies();
         const clientCookieObject = cookieStore.get('HttpSessionID');
         const clientCookie = clientCookieObject
@@ -18,16 +27,22 @@ export async function GET(req) {
             : null;
 
         const payload = {
-            'maxCount':limit,
-            'offset': (page - 1) * limit,
+            maxCount: limit,
+            offset: (page - 1) * limit,
             ...(query ? {
-                'filter': {
-                    "ACCOUNT": query
-                }
-            } : {}),
-        };
+                fullTextSearch: query,
+                state: "Approved"
+            } : {})
+            /*...(query ? {
+                'strictSearch': "true",
+                filter: {
+                    'FIRST': query
+                },
+            } : (fullId !== undefined ? { fullId, filter: {} } : {})),
+            ...(fullId !== undefined ? { fullId } : {}) */
+        }
 
-
+        console.log('Payload',payload)
         const { host } = config.api.agent;
 
         const url = `https://${host}/LegalIdentities.ws`;
@@ -43,8 +58,18 @@ export async function GET(req) {
         });
 
 
+        if (!res.ok) {
+            // Log the response body for more detailed error information
+            const errorText = await res.text();
+            console.error('Error response text:', errorText);
+
+            // You can decide how to handle the error based on the content.
+            return NextResponse.json({ message: `Error: ${res.status}, ${errorText}` }, { status: 500 });
+        }
 
         const data = await res.json()
+        console.log('Data repsonse',data)
+        console.log('Response Data',res.status)
 
 
         const response = {

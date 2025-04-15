@@ -64,7 +64,7 @@ const Navbar = () => {
     <div className="flex items-center justify-between bg-white shadow-md p-4 rounded-lg border-b border-gray-200">
       {/* Left Section: Welcome Message */}
       <div className="flex items-center gap-3">
-        {user ? (
+        {/* {user ? (
           <>
           {avatarUrl && (
             <Image src={avatarUrl} alt="User Avatar" width={32} height={32}  className="w-10 h-10 rounded-full shadow-md" />
@@ -76,7 +76,7 @@ const Navbar = () => {
           </>
         ) : (
           <p className="text-gray-600 font-medium">Welcome to Neuro-Access</p>
-        )}
+        )} */}
       </div>
 
       {/* Icons and User Dropdown */}

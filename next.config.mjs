@@ -18,12 +18,27 @@ const nextConfig = {
     NEXT_PUBLIC_AGENT_HOST: process.env.NEXT_PUBLIC_AGENT_HOST,
     JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
   },
-  images:{
-    domains:['images.unsplash.com',
-        "plus.unsplash.com",
-        "res.cloudinary.com",
-      'api.dicebear.com']
-  }
+ images: {
+   dangerouslyAllowSVG: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'plus.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

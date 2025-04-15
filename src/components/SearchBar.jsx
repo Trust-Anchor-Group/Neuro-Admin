@@ -10,7 +10,7 @@
 
 'use client'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React from 'react'
+import React, { useRef } from 'react'
 import { FaSearch } from 'react-icons/fa'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -19,12 +19,12 @@ const SearchBar = ({placeholder,classNameText}) => {
 const searchParams = useSearchParams() // Get search parameters from the URL
 const pathName = usePathname() // Get the current path
 const { replace } = useRouter() // To navigate when the query changes
-
+const inputRef = useRef(null)
 
 const handleSearch = useDebouncedCallback((searchTerm) =>{
        // Create a URLSearchParams object to modify the query parameters
     const params = new URLSearchParams(searchParams)
-    console.log(searchTerm)
+
     // If we have a search term, set it in the URL query, otherwise delete it
     if(searchTerm){
         params.set('query',searchTerm)
@@ -34,16 +34,21 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
 
     // Replace the current URL with the updated query string
     replace(`${pathName}?${params.toString()}`)
+
+    setTimeout(() => {
+      inputRef.current?.focus()
+    }, 0);
 },1000)
 
   return (
     <div className='relative'>
         <input type="text"
+        ref={inputRef}
         className={classNameText}
         placeholder={placeholder}
         onChange={(e) => handleSearch(e.target.value)}
         defaultValue={searchParams.get('query')?.toString()} />
-         <FaSearch className='text-gray-400 absolute left-[1%] top-[32%] h-[30px] w-[20px] max-md:left-[4%]'/> 
+         <FaSearch className='text-gray-400 absolute left-[4%] top-[1vh] h-[30px] w-[20px] block max-sm:hidden'/> 
     </div>
   )
 }

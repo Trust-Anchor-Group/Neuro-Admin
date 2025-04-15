@@ -1,19 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function PendingApplications() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isFetchingRef = useRef(false);
 
   useEffect(() => {
     async function fetchPendingApplications() {
+      if (isFetchingRef.current) return
+      isFetchingRef.current = true
       try {
         const requestBody = {
           offset: 0,
           maxCount: 10,
           state: "Created",
-          createdFrom: 1704078000,
            filter: {}, 
         };
 
@@ -36,7 +38,7 @@ export default function PendingApplications() {
         }
 
         // Extract relevant data & keep the last 6
-        const formattedApps = data.data.slice(0, 3).map((app) => ({
+        const formattedApps = data.data.slice(0, 6).map((app) => ({
           id: app.id,
           name: app.name || "Unknown User",
           submittedAt: `${app.createdDate} ${app.createdTime}`, // Combining date and time
@@ -48,6 +50,7 @@ export default function PendingApplications() {
         console.error("Error fetching pending applications:", error);
       } finally {
         setLoading(false);
+        isFetchingRef.current = false
       }
     }
 
