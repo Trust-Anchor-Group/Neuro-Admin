@@ -18,10 +18,8 @@ export default function SessionPing() {
         }
 
         const data = await response.json();
-        console.log("✅ Ping Successful:", data);
+        console.log("✅ Ping Successful:");
 
-        // const newExpiry = data.ServerTimeMs + 3600 * 1000;
-        // sessionStorage.setItem("AgentAPI.RefreshTimerExpires", newExpiry);
       } catch (error) {
         console.error("❌ Error pinging session:", error);
       }
