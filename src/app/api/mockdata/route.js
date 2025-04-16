@@ -26,16 +26,21 @@ export async function GET(req) {
             ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
             : null;
 
-            const payload = {
-                maxCount: limit,
-                offset: (page - 1) * limit,
-                ...(query ? {
-                    'strictSearch':"true",
-                    filter: {
-                        'FIRST': query
-                    },
-                } : (fullId !== undefined ? { fullId, filter : {} } : {})),
-                ...(fullId !== undefined ? { fullId } : {}) }
+        const payload = {
+            maxCount: limit,
+            offset: (page - 1) * limit,
+            ...(query ? {
+                fullTextSearch: query,
+                state: "Approved"
+            } : {})
+            /*...(query ? {
+                'strictSearch': "true",
+                filter: {
+                    'FIRST': query
+                },
+            } : (fullId !== undefined ? { fullId, filter: {} } : {})),
+            ...(fullId !== undefined ? { fullId } : {}) */
+        }
 
         console.log('Payload',payload)
         const { host } = config.api.agent;
