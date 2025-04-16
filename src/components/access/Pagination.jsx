@@ -33,7 +33,7 @@ export const Pagination = ({ page, prevPage, totalPages, limit }) => {
           {page !== 1 && (
             <>
               <Link
-                className='p-2 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
+                className='p-3   transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
                 href={buildPaginationURL(1)}
               >
                 1
@@ -46,11 +46,11 @@ export const Pagination = ({ page, prevPage, totalPages, limit }) => {
             </>
           )}
 
-          <p className='bg-neuroPurpleLight text-neuroPurpleDark p-2'>{page}</p>
+          <p className='bg-neuroPurpleLight text-neuroPurpleDark  p-3'>{page}</p>
 
           {(page + 1 <= totalPages) && (
             <Link
-              className='p-2 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
+              className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
               href={buildPaginationURL(page + 1)}
             >
               {page + 1}
@@ -59,7 +59,7 @@ export const Pagination = ({ page, prevPage, totalPages, limit }) => {
 
           {(page + 2 <= totalPages) && (
             <Link
-              className='p-2 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
+              className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
               href={buildPaginationURL(page + 2)}
             >
               {page + 2}
@@ -74,7 +74,7 @@ export const Pagination = ({ page, prevPage, totalPages, limit }) => {
         </div>
 
         <Link
-          className='p-2 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
+          className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
           href={buildPaginationURL(totalPages)}
         >
           <p>{maxCount}</p>

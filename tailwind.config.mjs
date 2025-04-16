@@ -35,7 +35,8 @@ const config = {
                 neuroTextBlack:"#181F25",
                 neuroOrange:"#F18334",
                 neuroDarkOrange:"#A84700",
-                neuroRed:"#F2495C"
+                neuroRed:"#F2495C",
+                neuroTextBlack:"#181F25"
             },
             boxShadow: {
                 fancy: "0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)",
@@ -46,6 +47,11 @@ const config = {
                 mono: ["Roboto Mono", "monospace"],
                 grotesk: ['Space Grotesk', 'sans-serif'],
             },
+            fontSize:{
+                text16:'16px',
+                text20:'20px',
+                text28:'28px'
+            }
         },
     },
     plugins: [],

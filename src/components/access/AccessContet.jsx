@@ -99,11 +99,14 @@ function onToggleHandler(id,btnName,btnText){
 }
  
   
+const filteredColumns = filterAccount === 'noID'
+  ? userColoumnsAccount.filter(col => col.accessorKey !== 'name' && col.accessorKey !== 'state')
+  : userColoumnsAccount;
   
     const prevPage = page - 1 > 0 ? page - 1 : 1
 
     return (
-            <div className="relative">
+            <div className="relative px-5">
             {/* Din faktiska innehåll visas alltid */}
             {pathname === '/list/access' && (
               <PaginatedList 
@@ -113,7 +116,7 @@ function onToggleHandler(id,btnName,btnText){
                 prevPage={prevPage}
                 limit={limit}
                 customCellRenderers={customCellAcountTable}
-                userColoumns={userColoumnsAccount}
+                userColoumns={filteredColumns}
                 pending={false}
                 filterAccount={filterAccount}
           />

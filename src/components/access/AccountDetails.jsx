@@ -17,7 +17,7 @@ export const AccountDetails = ({user}) => {
 
                        
                           
-                                <p className='text-3xl font-semibold'>{user.data.account || 'N/A'}</p>
+                                <p className='text-text28 font-semibold'>{user.data.account || 'N/A'}</p>
                                 <p>{user.data.properties.FIRST ? '' : <span className='bg-neuroDarkGray/20 text-neuroDarkGray/70 font-semibold py-1 px-2 rounded-lg'>No ID</span>}</p>
                             
                         </div>

@@ -62,8 +62,8 @@ if(!user){
                                     <div>
                                     <p className='text-3xl font-semibold'>{user.data.properties.FIRST +
                                 ' ' + user.data.properties.LAST || 'N/A'}</p>
-                                <p className='text-xl text-neuroDarkGray/70 '>{user.data.account || 'N/A'}</p>
-                                <p className='border-t-2 pt-2 text-neuroDarkGray/70'>Application made 2025-04-08</p>
+                                <p className='text-text16 text-neuroDarkGray/70 '>{user.data.account || 'N/A'}</p>
+                                <p className='text-text16 border-t-2 pt-2 text-neuroDarkGray/70'>Application made 2025-04-08</p>
                                     </div>
                                     
                             </div>

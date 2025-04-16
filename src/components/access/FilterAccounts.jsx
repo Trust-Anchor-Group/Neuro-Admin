@@ -20,10 +20,10 @@ export const FilterAccounts = () => {
         setFilterNames('All')
         break;
       case 'hasID':
-        setFilterNames('Has ID')
+        setFilterNames('Verified ID')
         break
         case 'noID':
-          setFilterNames('No ID')
+          setFilterNames('Unverified ID')
       default:
         break;
     }
@@ -60,9 +60,9 @@ export const FilterAccounts = () => {
                             <Link className='transition-all border pl-2 hover:bg-neuroGray'
                              href={'/list/access/?filter-accounts=all'}>All</Link>                          
                             <Link className='transition-all border pl-2 hover:bg-neuroGray' 
-                             href={'/list/access/?filter-accounts=hasID'}>Has ID</Link>                       
+                             href={'/list/access/?filter-accounts=hasID'}>Verified ID</Link>                       
                             <Link className='transition-all border pl-2 hover:bg-neuroGray'  
-                            href={'/list/access/?filter-accounts=noID'}>No ID</Link>                       
+                            href={'/list/access/?filter-accounts=noID'}>Unverified ID</Link>                       
                         </div>
                     )
                 }

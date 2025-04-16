@@ -65,7 +65,7 @@ export default function DetailPageContent() {
 
     return (
         <div className=''>
-            <div className='border-b-2 flex items-center pb-5'>
+            <div className='border-b-2 flex items-center p-5'>
                 {
                     user && (
                         <div className='flex items-center gap-5 max-sm:flex-col'>
@@ -118,14 +118,14 @@ export default function DetailPageContent() {
                                     
                 <nav className="grid grid-cols-2 w-full py-3 text-center rounded-lg font-semibold">
                     <Link href={`/list/access/detailpage/${id}/?tab=details&page=1`}>
-                        <div className={`flex items-center justify-center rounded-xl gap-2 py-2 border-2 text-lg ${tab === 'details' ?
+                        <div className={`flex items-center justify-center text-text16 rounded-xl gap-2 py-2 border-2  ${tab === 'details' ?
                             'bg-neuroPurpleLight text-neuroPurpleDark  duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
                                 <FaUser className='max-md:hidden' size={14} /><span>Account</span></div>
                     </Link>
                     <Link href={`/list/access/detailpage/${id}/?tab=identity&page=1`}>
-                    <div className={`flex items-center justify-center rounded-xl gap-2 py-2 border text-lg ${tab === 'identity' ?
+                    <div className={`flex items-center justify-center rounded-xl gap-2 py-2 border text-text16 ${tab === 'identity' ?
                         'bg-neuroPurpleLight text-neuroPurpleDark duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
-                         <FaShieldAlt className='max-md:hidden'/><span>ID&nbsp;application</span></div>
+                         <FaShieldAlt className='max-md:hidden'/><span>Identity</span></div>
                     </Link>
                                 
                     </nav>

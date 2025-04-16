@@ -27,7 +27,7 @@ export const ActivityDetailspage = ({tab}) => {
     {tab === 'details' && (
         <>
             <div className='flex flex-col w-full bg-white h-[300px] border-2 rounded-xl p-5'>
-                <p className='text-neuroDarkGray/70 mb-5 font-semibold'>Account Activity</p>
+                <p className='text-neuroTextBlack mb-5 text-text20 font-semibold'>Account Activity</p>
                 {/* {accountActivityArray.map((item, index) => (
                     <div className='bg-neuroGray/70 rounded-xl mt-2 p-3' key={index}>
                         <div className='flex justify-between items-center'>
@@ -49,7 +49,7 @@ export const ActivityDetailspage = ({tab}) => {
     {tab === 'identity' && (
         <>
             <div className='flex flex-col w-full h-[300px] bg-white border-2 rounded-xl p-5'>
-                <p className='text-neuroDarkGray/70 mb-5 font-semibold'>Identity Activity</p>
+                <p className='text-neuroTextBlack mb-5 text-text20 font-semibold'>Identity Activity</p>
                 {/* {accountActivityArray.map((item, index) => (
                     <div className='bg-neuroGray/70 rounded-xl mt-2 p-3' key={index}>
                         <div className='flex justify-between items-center'>

@@ -38,8 +38,8 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
 
                 {
                     pending ? (
-                        <p className='text-xl font-semibold pb-4'>ID applications</p>
-                    ) : <p className='text-xl font-semibold pb-4'>Accounts</p>
+                        <p className='text-text20 font-semibold pb-4'>ID applications</p>
+                    ) : <p className='text-text20 font-semibold pb-4'>Accounts</p>
                     
                 }
                 </div>

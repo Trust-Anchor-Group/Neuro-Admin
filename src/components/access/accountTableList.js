@@ -1,7 +1,9 @@
+
 import Link from "next/link";
 import { FaBan, FaCheck, FaExclamationTriangle, FaEye, FaPlusCircle, FaTimes, FaTimesCircle, FaTrash, FaUser, FaUserCircle } from "react-icons/fa";
 import { createTheme } from "@mui/material/styles";
 import { StatusIcon } from "./StatusIcon";
+import { useSearchParams } from "next/navigation";
 
 export const theme = createTheme({
   typography: {
@@ -9,7 +11,7 @@ export const theme = createTheme({
   },
 });
 
-
+ 
 
     //Decide what columns you should have in your table
    export const userColoumnsAccount = [
@@ -65,18 +67,9 @@ export const theme = createTheme({
       
         account: ({ cell, row }) => {
        
-          if(row.original.name !== ''){
-            return <div>
-             
-                <p className="font-semibold">{row.original.account}</p>
-                
-            
-            </div>
-          }
-         return <div>
-            
-             <p className="">-</p>  
-       </div>
+        
+
+      
       }}
     
 
