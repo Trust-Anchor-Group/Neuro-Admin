@@ -66,7 +66,7 @@ import { StatusIcon } from "./StatusIcon.jsx";
 
      const arrayActions = [
           {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve'},
-          {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Reject'},
+          {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Deny Application'},
         ]
   
     

@@ -27,6 +27,8 @@ export const AccessContet = () => {
     const isFetchingRef = useRef(false)
 
     const [totalPages, setTotalPages] = useState(0)
+  
+    //fetch data depending if you are in ID application or accounts
     async function getData() {
       if (isFetchingRef.current) return
       isFetchingRef.current = true
@@ -52,6 +54,7 @@ export const AccessContet = () => {
               if (!res.ok) throw new Error("Failed to fetch pending applications");
               const data = await res.json();
               setUserList(data.data || []);
+              console.log('ID application',data)
               setTotalPages(data.totalPages || 38);
           } else {
               const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
@@ -61,7 +64,7 @@ export const AccessContet = () => {
               const data = await res.json();
 
               setUserList(data.data || []);
-              console.log(data)
+              console.log('Accounts',data)
               setTotalPages(data.totalPages || 38);
           }
       } catch (error) {
@@ -98,7 +101,7 @@ function onToggleHandler(id,btnName,btnText){
     setId(id)
 }
  
-  
+   {/* To hide Id name and State column in Accounts page if you filter for Unverifed ID */}  
 const filteredColumns = filterAccount === 'noID'
   ? userColoumnsAccount.filter(col => col.accessorKey !== 'name' && col.accessorKey !== 'state')
   : userColoumnsAccount;
@@ -107,7 +110,7 @@ const filteredColumns = filterAccount === 'noID'
 
     return (
             <div className="relative px-5">
-            {/* Din faktiska innehåll visas alltid */}
+           
             {pathname === '/list/access' && (
               <PaginatedList 
                 userList={userList} 

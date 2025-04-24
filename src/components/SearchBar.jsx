@@ -24,12 +24,14 @@ const inputRef = useRef(null)
 const handleSearch = useDebouncedCallback((searchTerm) =>{
        // Create a URLSearchParams object to modify the query parameters
     const params = new URLSearchParams(searchParams)
-
+    console.log('Params',searchParams)
     // If we have a search term, set it in the URL query, otherwise delete it
     if(searchTerm){
         params.set('query',searchTerm)
+        params.set('page','1')
     }else{
         params.delete('query')
+        params.set('page','1')
     }
 
     // Replace the current URL with the updated query string
@@ -38,7 +40,7 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
     setTimeout(() => {
       inputRef.current?.focus()
     }, 0);
-},1000)
+},200)
 
   return (
     <div className='relative'>

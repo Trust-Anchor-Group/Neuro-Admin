@@ -16,10 +16,39 @@ export default function DetailPageContent() {
     const searchParams = useSearchParams()
     
     const tab = searchParams.get('tab') || 'details'
-
     
     const router = useRouter()
     
+    async function getAccounts(){
+        try {
+            const url = `${config.protocol}://${config.origin}/api/account`;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({  userName: id })
+            })
+            
+            if (!res.ok) {
+                const errorText = await res.text()
+                console.error('Fetch error details:', errorText)
+                throw new Error('Failed to fetch user')
+            }
+            
+            const data = await res.json()
+            console.log('New Account',data)
+        
+            setUser(data)
+  
+        } catch (error) {
+            console.error('Error fetching user:', error)
+            setUser(undefined) 
+        } finally {
+            setLoading(false) 
+        }
+    }
     
     async function getData() {
         try {
@@ -52,11 +81,22 @@ export default function DetailPageContent() {
         }
     }
     useEffect(() => {
-
-        if (id) {
-            getData()
+        if (!id) {
+            console.log('No ID found');
+            return;
         }
-    }, [id])
+        // Check if its Account with userName or Id
+        const isEmail = id.includes('%40');
+  
+
+        if (!isEmail) {
+            getAccounts();
+ 
+        } else {
+            getData();
+   
+        }
+    }, [id]);
 
 
 
@@ -64,11 +104,10 @@ export default function DetailPageContent() {
 
 
     return (
-        <div className=''>
-            <div className='border-b-2 flex items-center p-5'>
-                {
-                    user && (
-                        <div className='flex items-center gap-5 max-sm:flex-col'>
+        <div className='p-5'>
+              
+                
+                        <div className='flex mb-5 gap-5 max-sm:flex-col'>
                             <div className=''>
                                 <button aria-label='Back to Access Page' className='flex 
                                 items-center gap-5 border-2 p-2 rounded-lg' onClick={() => router.push('/list/access')}>
@@ -76,21 +115,34 @@ export default function DetailPageContent() {
                                     Back
                                 </button>
                             </div>
-                            <div className='flex flex-col gap-3 max-sm:items-center'>
-                                <div className='flex items-center gap-2'>
-                                    <p className='text-3xl font-semibold'>{user.data.properties.FIRST || user.data.account}</p>
-                                    <p className='text-3xl font-semibold'>{user.data.properties.LAST || ''}</p>
+                            
+                            { user?.data?.properties  ?
+                            <div className='flex flex-col max-sm:items-center'>
+                                <div className='flex items-center gap-2'>   
+                                    <p className='text-3xl font-semibold max-sm:text-lg'>{user.data.properties.FIRST || user.data.account}</p>
+                                    <p className='text-3xl font-semibold max-sm:text-lg'>{user.data.properties.LAST || ''}</p>
                                 </div>
                                 <div>
-                                    <p className='text-xl opacity-50'>{user.data.properties.EMAIL}</p>
+                                    <p className='text-xl opacity-50 max-sm:text-sm'>{user.data.properties.EMAIL}</p>
                                 </div>
+                            </div> 
+                            :               
+                            <div className='flex flex-col max-sm:items-center'>
+                            <div className='flex items-center gap-2'>
+                                    <p className='text-3xl font-semibold max-sm:text-lg'>{user?.data?.account?.userName}</p>
                             </div>
+                            <div>
+                                <p className='text-xl opacity-50 max-sm:text-sm'>{user?.data?.account?.eMail}</p>
+                            </div>
+                        </div> 
+                            }
                         </div>
                         
-                    )
-                }
+             
+        <div className=' flex items-center '>
+          
             </div>
-            <div className='grid grid-cols-2 max-md:grid-cols-1'>
+            <div className='grid grid-cols-2 gap-5 max-md:grid-cols-1'>
 
             {
                 loading ? (
@@ -116,20 +168,22 @@ export default function DetailPageContent() {
            } 
              <div className=''>
                                     
-                <nav className="grid grid-cols-2 w-full py-3 text-center rounded-lg font-semibold">
+                <nav className="grid grid-cols-2 w-full text-center rounded-lg bg-white/90 font-semibold">
                     <Link href={`/list/access/detailpage/${id}/?tab=details&page=1`}>
-                        <div className={`flex items-center justify-center text-text16 rounded-xl gap-2 py-2 border-2  ${tab === 'details' ?
-                            'bg-neuroPurpleLight text-neuroPurpleDark  duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
+                        <div className={`flex items-center justify-center text-text16 rounded-lg gap-2 py-3  ${tab === 'details' ?
+                            'bg-aprovedPurple/15 text-neuroPurpleDark  duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
                                 <FaUser className='max-md:hidden' size={14} /><span>Account</span></div>
                     </Link>
                     <Link href={`/list/access/detailpage/${id}/?tab=identity&page=1`}>
-                    <div className={`flex items-center justify-center rounded-xl gap-2 py-2 border text-text16 ${tab === 'identity' ?
-                        'bg-neuroPurpleLight text-neuroPurpleDark duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
+                    <div className={`flex items-center justify-center rounded-lg gap-2 py-3 text-text16 ${tab === 'identity' ?
+                        'bg-aprovedPurple/15 text-neuroPurpleDark duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
                          <FaShieldAlt className='max-md:hidden'/><span>Identity</span></div>
                     </Link>
                                 
                     </nav>
+                    <div className='pt-5'>
                         <ActivityDetailspage tab={tab}/>
+                    </div>
             </div>
         </div>
     </div>

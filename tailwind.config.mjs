@@ -36,7 +36,7 @@ const config = {
                 neuroOrange:"#F18334",
                 neuroDarkOrange:"#A84700",
                 neuroRed:"#F2495C",
-                neuroTextBlack:"#181F25"
+                neuroButtonGray:"#DFE1E3"
             },
             boxShadow: {
                 fancy: "0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)",

@@ -27,12 +27,12 @@ if(!user){
 }
 
   return (
-    <div className='p-3 pb-12 max-md:grid-cols-1'>
+    <div className='pb-12 max-md:grid-cols-1 max-sm:pb-0'>
     <div className='bg-white border-2 rounded-xl p-6 pt-8  max-md:col-span-1 max-sm:p-0
     max-sm:pb-5 max-sm:overflow-auto'>
         
         {
-           user && user.data.properties.FIRST ? (
+           user?.data?.properties?.FIRST ? (
                 <div className=''>
                     <div className='grid grid-cols-1 gap-1 max-sm:grid-cols-1 max-sm:px-5'>
                         <div className='flex items-center gap-3 pb-4 max-sm:flex-col max-sm:mt-5'>
@@ -106,11 +106,11 @@ if(!user){
                     </div>
                 </div> 
             ) : (
-                <div className='flex flex-col gap-5 justify-center items-center'>
-                <FaExclamationTriangle size={55} color="orange" />
-                <h1 className='text-xl font-semibold'>
+                <div className='flex flex-col gap-5 justify-center items-center max-sm:p-5'>
+                <FaExclamationTriangle className='size-20 max-sm:size-12'  color="orange" />
+                <h1 className='text-xl font-semibold max-sm:text-sm'>
                 Account&nbsp;does&nbsp;not&nbsp;have&nbsp;any&nbsp;Id</h1>
-                <div className='text-gray-500 text-lg'>
+                <div className='text-gray-500 text-lg text-center max-sm:text-sm'>
                     <p>This account doesn't have an identity verification yet.</p>
                 </div>
             </div>

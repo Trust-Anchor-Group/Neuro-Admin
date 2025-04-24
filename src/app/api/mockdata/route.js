@@ -19,33 +19,25 @@ export async function GET(req) {
         } else {
             fullId = undefined
         }
-        console.log('Full Id variabel', fullId)
         const cookieStore = await cookies();
         const clientCookieObject = cookieStore.get('HttpSessionID');
         const clientCookie = clientCookieObject
             ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
             : null;
 
-        const payload = {
-            maxCount: limit,
-            offset: (page - 1) * limit,
-            ...(query ? {
-                fullTextSearch: query,
-                state: "Approved"
-            } : {})
-            /*...(query ? {
-                'strictSearch': "true",
-                filter: {
-                    'FIRST': query
-                },
-            } : (fullId !== undefined ? { fullId, filter: {} } : {})),
-            ...(fullId !== undefined ? { fullId } : {}) */
-        }
+            const payload = {
+                maxCount:limit,
+                offset:(page - 1) * limit,
+                ...(query ? {
+                    strictSearch:false,
+                    fullTextSearch:query
+                } : {} ),
+            };
 
         console.log('Payload',payload)
         const { host } = config.api.agent;
 
-        const url = `https://${host}/LegalIdentities.ws`;
+        const url = `https://${host}/na-api/Accounts.ws`;
 
         const res = await fetch(url, {
             method: 'POST',

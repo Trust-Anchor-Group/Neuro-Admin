@@ -2,12 +2,12 @@
 import DetailPageContent from '@/components/access/DetailPageContent'
 import React, { Suspense} from 'react'
 
-const DetailPage = () => {
+const DetailPage = ({params}) => {
   
   return (
-    <div>
+    <div className=''>
       <Suspense fallback={<div>Loading...</div>}>
-        <DetailPageContent/>
+        <DetailPageContent params={params}/>
       </Suspense>
     </div>
   )

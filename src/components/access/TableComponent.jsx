@@ -5,11 +5,13 @@ import {
 } from "material-react-table";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { usePathname } from "next/navigation";
 
 
 const TableComponent = ({data = [], columns = [],enableSorting = false, enableRowActions, renderRowActionMenuItems,
   customCellRenderers = {},}) => {
-
+    
+    const pathname = usePathname()
 
   const modifiedColumns = columns.map((col) => ({
     ...col,
@@ -32,7 +34,15 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     renderRowActionMenuItems: renderRowActionMenuItems || undefined,
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
-        window.location.href = `/list/access/detailpage/${row.original.id}`;
+        if (!pathname.includes('pending-ids')) {
+          const checkId = row.original.latestLegalId?.length
+            ? row.original.latestLegalId
+            : row.original.userName;
+      
+          window.location.href = `/list/access/detailpage/${checkId}`;
+        } else {
+          window.location.href = `/list/access/detailpage/${row.original.id}`;
+        }
       },
       sx: {
         cursor: 'pointer',

@@ -8,7 +8,7 @@ export async function POST(request) {
         const clientCookie = request.headers.get("Cookie");
         console.log('Från Pending',filter.FIRST)
         const { host } = config.api.agent;
-        const url = `https://${host}/LegalIdentities.ws`;
+        const url = `https://${host}/na-api/LegalIdentities.ws`;
 
         const payload = {
             maxCount,
