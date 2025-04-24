@@ -21,7 +21,7 @@ export const theme = createTheme({
       muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" },color: "rgba(24, 31, 37, 0.6)",
       fontWeight: 500, } },
     },  
-    { accessorKey: "state", header: "Identity", size: 50, 
+    { accessorKey: "latestLegalIdState", header: "Identity", size: 50, 
       muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" }, textAlign: "center",},},
       muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" },color: "rgba(24, 31, 37, 0.6)",
       fontWeight: 500, } },
