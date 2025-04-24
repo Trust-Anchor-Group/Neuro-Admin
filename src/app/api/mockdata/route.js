@@ -37,7 +37,7 @@ export async function GET(req) {
         console.log('Payload',payload)
         const { host } = config.api.agent;
 
-        const url = `https://${host}/na-api/Accounts.ws`;
+        const url = `https://${host}/Accounts.ws`;
 
         const res = await fetch(url, {
             method: 'POST',
