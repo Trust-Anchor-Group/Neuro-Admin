@@ -28,7 +28,7 @@ const menuItems = [
 ]
 
 const Menu = () => {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const [hoveredItem, setHoveredItem] = useState(null)
 
   return (
@@ -54,20 +54,28 @@ const Menu = () => {
               </div>
             </div>
           )}
+            {
+              open &&
           <button
             onClick={() => setOpen(!open)}
-            className={`absolute top-[70px] ${
-              open ? '-right-3' : 'right-1/2 translate-x-1/2'
-            } bg-gray-100 text-purple-600 rounded p-1 shadow z-20`}
+            className={`absolute top-[13vh] -right-[1vw] bg-gray-100 text-purple-600 rounded p-1 shadow z-20 hover:bg-purple-600 hover:text-gray-100`}
           >
-            {open ? <FaChevronLeft size={16} /> : <FaChevronRight size={16} />}
+             <FaChevronLeft size={16} /> 
+
           </button>
+            }
         </div>
 
-        <nav className="mt-6 px-2">
+        <nav className=" flex flex-col items-center gap-3 py-3 px-2 ">
+        { !open &&
+          <button className='bg-gray-100 text-purple-600 rounded p-1 shadow z-20 transition-all hover:bg-purple-600 hover:text-gray-100' onClick={() => setOpen(prev => !prev)}>
+            <FaChevronRight className=''  size={16} />
+          </button>
+        }
+
           {menuItems.map((item, idx) => (
             <div
-              key={item.title}
+              key={idx}
               className="relative"
               onMouseEnter={() => setHoveredItem(idx)}
               onMouseLeave={() => setHoveredItem(null)}
@@ -75,8 +83,8 @@ const Menu = () => {
               {item.href ? (
                 // Wrap the entire clickable area with Link for items with href
                 <Link
-                  href={item.href}
-                  className="flex items-center gap-3 py-3 px-2 text-gray-700 rounded hover:bg-purple-100 hover:text-purple-700 cursor-pointer transition-all"
+                href={item.href}
+                className="flex items-center gap-3 text-gray-700 rounded hover:bg-purple-100 hover:text-purple-700 cursor-pointer transition-all"
                 >
                   <span className="text-lg text-gray-600">{item.icon}</span>
                   {open && (

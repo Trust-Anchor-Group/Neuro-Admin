@@ -54,7 +54,7 @@ export const theme = createTheme({
 
     //Special actions a column should/could have
    export const customCellAcountTable = {
-        state: ({ cell,row }) => {
+    latestLegalIdState: ({ cell,row }) => {
            const state = cell.getValue()
           if (state === "Approved") return <StatusIcon  text="Active Id" color="text-activeGreen" bgColor={'bg-activeGreen/20'} />;
            if (state === "Compromised") return <StatusIcon  text="Compromised" color="text-orange-500" bgColor={'bg-orange-500/30'} />;
