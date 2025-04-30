@@ -1,10 +1,16 @@
 "use client";
 
+import { LinkToPage } from "@/components/shared/LinkToPage";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { FaSignOutAlt } from "react-icons/fa";
 import { FiShield, FiBox, FiCreditCard, FiServer, FiArrowRight, FiLock } from "react-icons/fi";
 
 const LandingPage = () => {
+
+    const router = useRouter()
+
     const [neuroArray] = useState([
         {
             title: "Neuro-Access",
@@ -16,11 +22,11 @@ const LandingPage = () => {
         },
         {
             title: "Neuro-Assets",
-            href: "",
+            href: "/neuro-assets",
             icon: FiBox,
             iconColor: "text-green-600",
             text: "Asset management system",
-            locked: true,
+            locked: false,
         },
         {
             title: "Neuro-Pay",
@@ -39,9 +45,17 @@ const LandingPage = () => {
             locked: true,
         },
     ]);
+    const handleLogout = () => {
+        router.push('/api/auth/logout');
+        sessionStorage.removeItem("neuroUser"); 
+         
+      };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-white">
+        <div className=" px-6 bg-white">      
+            <div className="w-full flex justify-end mt-4 mb-8">
+            <LinkToPage handleLogout={handleLogout} title={'Logout'} icon={<FaSignOutAlt />}/>
+            </div>          
             <div className="text-center">
                 <h1 className="text-6xl font-extrabold text-gray-900 tracking-tight">Neuro</h1>
                 <h2 className="text-3xl font-semibold text-gray-700 mt-2">Admin Dashboard</h2>

@@ -86,6 +86,14 @@ const AssetOrdersTable = ({ orders, isLoading }) => {
       enableColumnFilters
       enableSorting
       enablePagination
+      muiTableBodyRowProps={({ row }) => ({
+        onClick: () => {
+          window.location.href = `/neuro-assets/detailpage/${row.original.id}`;
+        },
+        sx: {
+          cursor: 'pointer',
+        },
+      })}
       muiTableProps={{
         sx: { boxShadow: 2, borderRadius: 2 },
       }}

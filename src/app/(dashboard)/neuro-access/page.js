@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { FaIdCard, FaUserShield, FaFileSignature, FaWallet, FaSignInAlt } from "react-icons/fa";
-import RecentActivity from "./RecentActivity";
-import PendingApplications from "./PendingApplications";
+import RecentActivity from "../../../components/access/dashboard/RecentActivity";
+import PendingApplications from "../../../components/access/dashboard/PendingApplications";
 
 export default function DashboardPage() {
   // Mock statistics

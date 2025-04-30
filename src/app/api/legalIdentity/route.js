@@ -13,7 +13,7 @@ export async function POST(request) {
     const payload = {
         id:decodedUserId
     };
-    console.log(payload)
+    console.log('LegalId Fetch',payload)
     try {
 
         const response = await fetch(url, {

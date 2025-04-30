@@ -34,7 +34,7 @@ export const AccessContet = () => {
       isFetchingRef.current = true
       setLoading(true)
       try {
-          if (pathname.includes('pending-ids')) {
+          if (pathname.includes('id-application')) {
               const requestBody = {
                   offset: (page - 1) * limit,
                   maxCount: limit,
@@ -111,7 +111,7 @@ const filteredColumns = filterAccount === 'noID'
     return (
             <div className="relative px-5">
            
-            {pathname === '/list/access' && (
+            {pathname === '/neuro-access/account' && (
               <PaginatedList 
                 userList={userList} 
                 page={page}
@@ -125,7 +125,7 @@ const filteredColumns = filterAccount === 'noID'
           />
         )}
 
-              {pathname === '/list/access/pending-ids' && (
+              {pathname === '/neuro-access/id-application' && (
                 <PaginatedList 
                   userList={userList} 
                   page={page}

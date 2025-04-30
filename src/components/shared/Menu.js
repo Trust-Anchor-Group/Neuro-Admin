@@ -11,25 +11,13 @@ import {
 } from 'react-icons/fa'
 import Image from 'next/image'
 
-const menuItems = [
-  {
-    title: 'Access',
-    icon: <FaRegUser size={20} />,
-    subItems: [
-      { label: 'ID applications', href: '/list/access/pending-ids' },
-      { label: 'Accounts', href: '/list/access' },
-    ],
-  },
-  {
-    title: 'Access settings',
-    icon: <FaCog size={20} />,
-    href: '/settings',
-  },
-]
 
-const Menu = () => {
+
+const Menu = ({menuItems}) => {
   const [open, setOpen] = useState(false)
   const [hoveredItem, setHoveredItem] = useState(null)
+
+
 
   return (
     <div
@@ -66,9 +54,9 @@ const Menu = () => {
             }
         </div>
 
-        <nav className=" flex flex-col items-center gap-3 py-3 px-2 ">
+        <nav className="flex flex-col items-center justify-center gap-3 py-3 ">
         { !open &&
-          <button className='bg-gray-100 text-purple-600 rounded p-1 shadow z-20 transition-all hover:bg-purple-600 hover:text-gray-100' onClick={() => setOpen(prev => !prev)}>
+          <button className='bg-gray-100 text-purple-600 rounded p-2 shadow z-20 transition-all hover:bg-purple-600 hover:text-gray-100' onClick={() => setOpen(prev => !prev)}>
             <FaChevronRight className=''  size={16} />
           </button>
         }
@@ -93,7 +81,7 @@ const Menu = () => {
                 </Link>
               ) : (
                 // Render as a div for items with subItems
-                <div className="flex items-center gap-3 py-3 px-2 text-gray-700 rounded hover:bg-purple-100 hover:text-purple-700 cursor-pointer transition-all">
+                <div className="flex items-center gap-3 px-2 text-gray-700 rounded hover:bg-purple-100 hover:text-purple-700 cursor-pointer transition-all">
                   <span className="text-lg text-gray-600">{item.icon}</span>
                   {open && (
                     <span className="text-sm font-medium">{item.title}</span>
