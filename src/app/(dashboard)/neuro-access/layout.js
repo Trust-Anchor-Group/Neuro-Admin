@@ -10,10 +10,6 @@ import { FaCog, FaHome, FaRegUser, FaThLarge } from "react-icons/fa";
 export default function DashboardLayout({ children }) {
 
     const menuItems = [
-      {title:'All services',
-      icon:<FaHome size={20}/>,
-      href:'/landingpage',
-      },
       {
         title:'Dashboard',
         icon:<FaThLarge/>,

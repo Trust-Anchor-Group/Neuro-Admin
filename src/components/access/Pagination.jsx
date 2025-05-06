@@ -4,9 +4,9 @@ import { useSearchParams } from 'next/navigation'
 import React from 'react'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 
-export const Pagination = ({ page, prevPage, totalPages, limit }) => {
+export const Pagination = ({ page, prevPage, totalPages }) => {
   const searchParams = useSearchParams()
-  const maxCount = totalPages * limit
+  const maxCount = totalPages
 
   const buildPaginationURL = (newPage) => {
     const params = new URLSearchParams(searchParams.toString())

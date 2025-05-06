@@ -23,7 +23,6 @@ export const AccountDetails = ({ userData,fieldsToShow }) => {
       created: formattedDate,
     };
 
-    console.log('ResolveData',resolvedData)
 
   return (
     <div className="max-md:grid-cols-1">

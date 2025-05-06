@@ -34,7 +34,6 @@ export async function GET(req) {
                 } : {} ),
             };
 
-        console.log('Payload',payload)
         const { host } = config.api.agent;
 
         const url = `https://${host}/Accounts.ws`;

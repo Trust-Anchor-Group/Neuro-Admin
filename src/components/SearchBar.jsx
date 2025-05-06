@@ -43,15 +43,17 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
 },200)
 
   return (
-    <div className='relative'>
-        <input type="text"
-        ref={inputRef}
-        className={classNameText}
-        placeholder={placeholder}
-        onChange={(e) => handleSearch(e.target.value)}
-        defaultValue={searchParams.get('query')?.toString()} />
-         <FaSearch className='text-gray-400 absolute left-[4%] top-[1vh] h-[30px] w-[20px] block max-sm:hidden'/> 
-    </div>
+    <div className="relative w-full">
+    <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+    <input
+      type="text"
+      ref={inputRef}
+      className={`pl-10 pr-4 py-2 w-full ${classNameText}`} 
+      placeholder={placeholder}
+      onChange={(e) => handleSearch(e.target.value)}
+      defaultValue={searchParams.get('query')?.toString()}
+    />
+  </div>
   )
 }
 

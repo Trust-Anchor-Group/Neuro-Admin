@@ -52,7 +52,7 @@ const LandingPage = () => {
       };
 
     return (
-        <div className=" px-6 bg-white">      
+        <div className="flex flex-col justify-center h-screen px-6 bg-white">      
             <div className="w-full flex justify-end mt-4 mb-8">
             <LinkToPage handleLogout={handleLogout} title={'Logout'} icon={<FaSignOutAlt />}/>
             </div>          
