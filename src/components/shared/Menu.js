@@ -96,7 +96,7 @@ const Menu = ({ menuItems }) => {
 
               {item.subItems && !open && hoveredItem === idx && (
                 <div className="absolute left-full top-0 bg-white shadow-lg rounded-lg text-sm p-2 z-30 ml-0">
-                  <div className="font-semibold text-purple-600 pb-1 border-b mb-1">
+                  <div className="font-semibold text-purple-600 pb-1 border-b-2 mb-1">
                     {item.title}
                   </div>
                   {item.subItems.map((subItem) => (
@@ -114,20 +114,20 @@ const Menu = ({ menuItems }) => {
           ))}
 
           <div
-            className="relative"
+            className="relative "
             onMouseEnter={() => setHoveredItem(-1)}
             onMouseLeave={() => setHoveredItem(null)}
           >
             <Link
-              className="text-gray-700 rounded hover:bg-purple-100 hover:text-purple-700 cursor-pointer transition-all p-2"
+              className=""
               href="/landingpage"
             >
               <FaHome size={20} />
             </Link>
             {hoveredItem === -1 && !open && (
               <div className="absolute left-full top-0 bg-white shadow-lg rounded-lg text-sm p-2 z-30 ml-0">
-                <span className="text-purple-700 font-semibold px-4 py-1 transition-all cursor-pointer hover:bg-gray-200 hover:rounded-md">
-                  All Services
+                <span className="text-purple-700 font-semibold  transition-all cursor-pointer hover:bg-gray-200 hover:rounded-md">
+                  All&nbsp;Services
                 </span>
               </div>
             )}

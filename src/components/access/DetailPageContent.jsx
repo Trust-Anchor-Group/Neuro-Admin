@@ -3,7 +3,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import config from '@/config/config';
 import { FaArrowLeft, FaShieldAlt, FaSpinner, FaUser} from 'react-icons/fa'
-import { AccountDetails } from '@/components/shared/AccountDetails';
+import { AccountDetails, DisplayDetails } from '@/components/shared/DisplayDetails';
 import Link from 'next/link';
 import { Identity } from '@/components/access/Identity';
 import { ActivityDetailspage } from './ActivityDetailspage';
@@ -159,9 +159,10 @@ export default function DetailPageContent() {
                 ) :
                 <>
               {tab === 'details' && (
-                  <AccountDetails 
+                  <DisplayDetails 
                   fieldsToShow={fieldsToShow}
-                  userData={CreateUserData(user)}/>
+                  userData={CreateUserData(user)}
+                  title={'Account Information'}/>
                 )
                 
             }

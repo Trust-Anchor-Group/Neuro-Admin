@@ -1,5 +1,5 @@
 'use client'
-import { AccountDetails } from '@/components/shared/AccountDetails'
+import { AccountDetails, DisplayDetails } from '@/components/shared/DisplayDetails'
 import { CreateUserData } from '@/components/shared/CreateUserData'
 import config from '@/config/config'
 import Image from 'next/image'
@@ -75,9 +75,10 @@ const ProfilePage = () => {
     <div className='relative grid grid-cols-4 gap-5 p-5'>
       <div className='col-span-3'>
 
-        <AccountDetails 
+        <DisplayDetails 
           fieldsToShow={fieldsToShow}
-          userData={CreateUserData(user)}/>
+          userData={CreateUserData(user)}
+          title={'Account Information'}/>
       </div>
              {loading && (
                   <div className="absolute inset-0 bg-white/50  flex items-center justify-center z-50">
