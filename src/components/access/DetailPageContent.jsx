@@ -15,7 +15,7 @@ export default function DetailPageContent() {
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
     const searchParams = useSearchParams()
-    
+    const [isAccount, setIsAccount] = useState(false)
     const tab = searchParams.get('tab') || 'details'
     
     const router = useRouter()
@@ -40,7 +40,8 @@ export default function DetailPageContent() {
             
             const data = await res.json()
             console.log('New Account',data)
-        
+            
+            setIsAccount(true)
             setUser(data)
   
         } catch (error) {
@@ -72,7 +73,7 @@ export default function DetailPageContent() {
             const data = await res.json()
             console.log('New ID',data)
         
-            setUser(data)
+            setUser(data.data)
   
         } catch (error) {
             console.error('Error fetching user:', error)
@@ -102,13 +103,27 @@ export default function DetailPageContent() {
 
     const fieldsToShow = [
         { label: "Account", key: "account" },
-        { label: "Email", key: "email" },
-        { label: "Phone", key: "phone" },
-        { label: "Location", key: "country" },
+        { label: "Email", key: "properties.EMAIL" },
+        { label: "Country", key: "properties.COUNTRY" },
         { label: "Created", key: "created" }
       ];
-    
 
+      const fieldsToShowIdentity = [
+        { label: "First Name", key: "properties.LAST" },
+        { label: "Nationality", key: "properties.COUNTRY" },
+        { label: "Address", key: "properties.ADDR" },
+        { label: "Date of birth", key: "properties.PNR" },
+        { label: "Phone", key: "properties.PHONE" },
+        
+      ];
+    
+      const fieldsToShowWithNoID = [
+        { label: "Account", key: "data.account.userName" },
+        { label: "Email", key: "data.account.eMail" },
+        { label: "Country", key: "data.account.country" },
+        { label: "Phone", key: "data.account.phoneNr" },
+        { label: "Created", key: "data.account.created" },
+      ];
 
     return (
         <div className='p-5'>
@@ -160,8 +175,8 @@ export default function DetailPageContent() {
                 <>
               {tab === 'details' && (
                   <DisplayDetails 
-                  fieldsToShow={fieldsToShow}
-                  userData={CreateUserData(user)}
+                  fieldsToShow={isAccount ? fieldsToShowWithNoID : fieldsToShow}
+                  userData={user}
                   title={'Account Information'}/>
                 )
                 
@@ -170,6 +185,7 @@ export default function DetailPageContent() {
                   tab === 'identity' && (
                       <Identity user={user}
                       id={id} getData={getData}
+                      fieldsToShow={fieldsToShowIdentity}
                  />
                      
                     )

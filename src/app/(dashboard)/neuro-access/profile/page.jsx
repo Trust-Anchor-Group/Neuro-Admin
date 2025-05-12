@@ -5,6 +5,7 @@ import config from '@/config/config'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
 import { FaSpinner } from 'react-icons/fa'
+import { Identity } from '@/components/access/Identity'
 
 const ProfilePage = () => {
 
@@ -37,7 +38,7 @@ const ProfilePage = () => {
           const data = await res.json()
           console.log('New ID, Profile Page',data)
       
-          setUser(data)
+          setUser(data.data)
           console.log(user)
 
       } catch (error) {
@@ -58,27 +59,22 @@ const ProfilePage = () => {
       }
     }, []);
 
-    const fieldsToShow = [
-      { label: "Full name", key: "name" },
-      { label: "Account", key: "account" },
-      { label: "Email", key: "email" },
-      { label: "Phone", key: "phone" },
-      { label: "Location", key: "country" },
-      { label: "Created", key: "created" }
+    const fieldsToShowIdentity = [
+      { label: "First Name", key: "properties.LAST" },
+      { label: "Nationality", key: "properties.COUNTRY" },
+      { label: "Address", key: "properties.ADDR" },
+      { label: "Date of birth", key: "properties.PNR" },
+      { label: "Phone", key: "properties.PHONE" },
+      
     ];
-  
-    // Logga fieldsToShow för att kontrollera om strukturen är korrekt
 
 
 
   return (
     <div className='relative grid grid-cols-4 gap-5 p-5'>
       <div className='col-span-3'>
-
-        <DisplayDetails 
-          fieldsToShow={fieldsToShow}
-          userData={CreateUserData(user)}
-          title={'Account Information'}/>
+      <Identity user={user} fieldsToShow={fieldsToShowIdentity}
+          />
       </div>
              {loading && (
                   <div className="absolute inset-0 bg-white/50  flex items-center justify-center z-50">
@@ -89,7 +85,7 @@ const ProfilePage = () => {
                     {
                       user && (
                         <div className='flex justify-end'>
-                          <span>{user.data.state}</span>
+                          <span>{user.state}</span>
                         </div>
                       )
                     }

@@ -1,54 +1,40 @@
 import React from 'react';
 import { InputField } from '../access/InputField';
+import imageLogoExample from '@/app/(dashboard)/neuro-assets/neuroAdminLogo.svg'
+import Image from 'next/image';
+import { dateConverter } from './ConvertDate';
 
 export const DisplayDetails = ({ userData,fieldsToShow,title,headTitle }) => {
     if (!userData) return <p>No data available</p>;
 
-  const date = userData.created
-    ? new Date(userData.created)
-    : null;
-
-  const formattedDate = date
-    ? date.toLocaleDateString("sv-SE", {
-        hour: "2-digit",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        minute: "2-digit",
-      })
-    : "N/A";
-
-    const resolvedData = {
-      ...userData,
-      created: formattedDate,
-    };
-
 
   return (
     <div className="max-md:grid-cols-1">
-      <div className="bg-white border-2 rounded-xl p-6 pt-8 max-md:col-span-1 max-sm:p-0 max-sm:pb-5 max-sm:overflow-auto">
+      <div className="bg-white border-2 rounded-xl p-6 max-md:col-span-1 max-sm:p-0 max-sm:pb-5 max-sm:overflow-auto">
         <div className="grid grid-cols-1 gap-5 max-sm:grid-cols-1 max-sm:px-5">
           <div className="flex justify-between items-center gap-3 max-sm:flex-col max-sm:mt-5">
             <p className="text-text28 font-semibold max-sm:text-xl">
               {userData.account}
             </p>
-            {/* {!userData.email && (
-              <span className="bg-neuroDarkGray/20 text-neuroDarkGray/70 font-semibold py-1 px-2 rounded-lg">
-                No ID
-              </span>
-            )} */}
           </div>
               {
                 headTitle && (
-                  <div className='flex border-b-2 pb-5'>
-                    <div className='bg-black w-[100px] h-[100px]'></div>
+                  <div className='flex justify-between border-b-2 pb-5'>
+                        <div className='flex gap-10'>
+                            <Image
+                            className='w-[100px] h-[100px]'
+                            src={imageLogoExample}
+                            width={1200}
+                            height={1200}
+                            alt='Logo'/>
+                            <div className=''>
+                            <h1 className=' text-2xl font-semibold' >{headTitle.title}</h1>
+                            <p className='text16 text-neuroTextBlack/65'>{headTitle.created}</p>
+                            </div>
+                        </div>
                     <div className=''>
-                    <h1>{headTitle.title}</h1>
-                    <p>{headTitle.credit}</p>
-                    </div>
-                    <div className=''>
-                    <p>{headTitle.created}</p>
-                    <p>{headTitle.tons}</p>
+                    <p className='text-2xl font-semibold '>{headTitle.credit}</p>
+                    <p className='text16 text-neuroTextBlack/65'>{headTitle.tons}</p>
                     </div>
                   </div>
                 )
@@ -58,11 +44,21 @@ export const DisplayDetails = ({ userData,fieldsToShow,title,headTitle }) => {
               {title}
             </h2>
             {fieldsToShow?.map((item, key) => {
+              //Make "properties.EMAIL" Work
+              let value = item.key.split('.').reduce((obj, keyPart) => obj && obj[keyPart], userData);
+              //Check Date and make the date to the right format
+   
+                let unixTimestamp = null;
+                if (item.key.includes('created')) {
+                    unixTimestamp = value; 
+                }
+            
+                const formattedDate = unixTimestamp ? dateConverter(unixTimestamp) : null;
               return (
                 <InputField
                   key={key}
-                  labelText={item.label}  
-                  name={resolvedData[item.key] || "N/A"} 
+                  labelText={item.label}
+                  name={formattedDate || value || "N/A"} 
                 />
               );
             })}
