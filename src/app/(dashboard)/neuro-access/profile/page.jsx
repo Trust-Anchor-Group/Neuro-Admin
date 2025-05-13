@@ -1,5 +1,5 @@
 'use client'
-import { AccountDetails, DisplayDetails } from '@/components/shared/DisplayDetails'
+import { AccountDetails, DisplayDetails } from '@/components/access/Buttons/DisplayDetails'
 import { CreateUserData } from '@/components/shared/CreateUserData'
 import config from '@/config/config'
 import Image from 'next/image'
@@ -68,11 +68,18 @@ const ProfilePage = () => {
       
     ];
 
+    const fieldsToShow = [
+      { label: "First Name", key: "properties.LAST" },
+      { label: "Nationality", key: "properties.COUNTRY" },
+      { label: "Address", key: "properties.ADDR" },
+      { label: "Date of birth", key: "properties.PNR" },
+      { label: "Phone", key: "properties.PHONE" },
+    ]
 
 
   return (
-    <div className='relative grid grid-cols-4 gap-5 p-5'>
-      <div className='col-span-3'>
+    <div className='relative grid grid-cols-2 gap-5 p-5'>
+      <div className=''>
       <Identity user={user} fieldsToShow={fieldsToShowIdentity}
           />
       </div>
@@ -82,34 +89,9 @@ const ProfilePage = () => {
                   </div>
         )}
            <div className='flex flex-col  bg-white border-2 rounded-xl p-5 gap-3 max-sm:flex-col max-sm:mt-5'>
-                    {
-                      user && (
-                        <div className='flex justify-end'>
-                          <span>{user.state}</span>
-                        </div>
-                      )
-                    }
-                    {
-                    user && user?.data?.attachments?.length === 0 ?
-                      <div className='rounded-xl overflow-hidden'>
-                        <Image
-                         className='w-full h-full object-cover'
-                         src={`https://res.cloudinary.com/drkty7j9v/image/upload/v1737114626/profil-ezgif.com-avif-to-jpg-converter_jkimmv.jpg`}
-                         width={1200}
-                         height={1200}
-                        alt='Profile'
-                        />
-                       </div>:               
-                        <div className='w-full h-[200px] rounded-md overflow-hidden'>
-                           <Image
-                           className='w-full h-full object-cover'
-                            src={`data:image/png;base64,${user?.data?.attachments[0]?.data}`}
-                            width={1200}
-                            height={1200}
-                            alt='Profile'
-                               />
-                         </div>
-                       }
+            <div className='bg-neuroGray/70 rounded-xl p-5 overflow-auto'>
+             
+            </div>
              </div>
     </div>
   )

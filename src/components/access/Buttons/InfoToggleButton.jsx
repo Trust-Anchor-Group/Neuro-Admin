@@ -6,7 +6,7 @@ export const InfoToggleButton = ({infoToggle,setIntoToggle,title}) => {
     <div>
         {
           (
-          <div className={`flex justify-between ${infoToggle === true ? 'border-b-2 pb-5' :''}`} >
+          <div className={`flex justify-between ${infoToggle === true ? 'border-b-2 pb-4' :''}`} >
             <h2 className='font-semibold text-neuroDarkGray/70'>{title}</h2>
             <button onClick={() => setIntoToggle(prev => !prev)}>{infoToggle ? <FaChevronDown color='#6e6e6e' /> 
             : <FaChevronUp color='#6e6e6e' />}</button>

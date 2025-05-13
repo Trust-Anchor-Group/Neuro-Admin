@@ -1,8 +1,9 @@
 import React from 'react';
-import { InputField } from '../access/InputField';
+import { InputField } from '../InputField';
 import imageLogoExample from '@/app/(dashboard)/neuro-assets/neuroAdminLogo.svg'
 import Image from 'next/image';
-import { dateConverter } from './ConvertDate';
+import { dateConverter } from '../../shared/ConvertDate';
+import { MapOutInput } from '../../shared/MapOutInput';
 
 export const DisplayDetails = ({ userData,fieldsToShow,title,headTitle }) => {
     if (!userData) return <p>No data available</p>;
@@ -43,26 +44,7 @@ export const DisplayDetails = ({ userData,fieldsToShow,title,headTitle }) => {
             <h2 className="font-semibold text-neuroDarkGray/70 border-b-2 pb-2">
               {title}
             </h2>
-            {fieldsToShow?.map((item, key) => {
-              //Make "properties.EMAIL" Work
-              let value = item.key.split('.').reduce((obj, keyPart) => obj && obj[keyPart], userData);
-              //Check Date and make the date to the right format
-   
-                let unixTimestamp = null;
-                if (item.key.includes('created')) {
-                    unixTimestamp = value; 
-                }
-            
-                const formattedDate = unixTimestamp ? dateConverter(unixTimestamp) : null;
-              return (
-                <InputField
-                  key={key}
-                  labelText={item.label}
-                  name={formattedDate || value || "N/A"} 
-                />
-              );
-            })}
-
+              <MapOutInput fieldsToShow={fieldsToShow} user={userData}/>
           </div>
         </div>
       </div>

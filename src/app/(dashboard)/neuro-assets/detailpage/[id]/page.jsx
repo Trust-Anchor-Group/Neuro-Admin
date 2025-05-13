@@ -1,4 +1,4 @@
-import { DisplayDetails } from '@/components/shared/DisplayDetails'
+import { DisplayDetails } from '@/components/access/Buttons/DisplayDetails'
 import React from 'react'
 
 const DetailPageAssets = () => {

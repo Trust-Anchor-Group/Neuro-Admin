@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import { Modal } from '../shared/Modal';
-import { InputField } from './InputField';
 import Image from 'next/image';
 import { FaBan, FaCheck, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaFileAlt, FaSignInAlt, FaTimes, FaTimesCircle } from 'react-icons/fa';
 import { DetailpageStatus } from './DetailpageStatus';
-import { ActionButtons } from './ActionButtons';
+import { ActionButtons } from './Buttons/ActionButtons';
 import { dateConverter } from '../shared/ConvertDate';
-import { InfoToggleButton } from './InfoToggleButton';
+import { InfoToggleButton } from './Buttons/InfoToggleButton';
+import { MapOutInput } from '../shared/MapOutInput';
+import { PopUpButton } from './Buttons/PopUpButton';
 
 export const Identity = ({user,id,getData,fieldsToShow}) => {
 
@@ -75,35 +75,18 @@ if(!user){
                                 
                                 
                         </div>
-                        <div className='bg-neuroGray/70 rounded-xl p-5 overflow-auto'>
+                        <div className='bg-neuroGray/70 rounded-xl p-4 overflow-auto'>
                           <InfoToggleButton infoToggle={infoToggle} setIntoToggle={setIntoToggle} title={'Identity Information'}/>
-                        {infoToggle && fieldsToShow?.map((item, key) => {
-                                //Make "properties.EMAIL" Work
-                                let value = item.key.split('.').reduce((obj, keyPart) => obj && obj[keyPart], user);
-                                //Check Date and make the date to the right format
-                    
-                                    let unixTimestamp = null;
-                                    if (item.key.includes('created')) {
-                                        unixTimestamp = value; 
-                                    }
-                                
-                                    const formattedDate = unixTimestamp ? dateConverter(unixTimestamp) : null;
-                                return (
-                                    <InputField
-                                    key={key}
-                                    labelText={item.label}
-                                    name={formattedDate || value || "N/A"} 
-                                    />
-                                );
-                                })}
-
+                        {infoToggle && 
+                            <MapOutInput fieldsToShow={fieldsToShow} user={user}/> }
                         </div>
-                        <div className='bg-neuroGray/70 rounded-xl p-5 overflow-auto'>
+                        <div className='bg-neuroGray/70 rounded-xl p-4 mt-5 overflow-auto'>
                           <InfoToggleButton infoToggle={infoToggleMetaData} setIntoToggle={setIntoToggleMetaData} title={'Identity Information'}/>
                         </div>
                         <div className='mt-5'>
-                                {   id &&
-                                            <ActionButtons user={user} adminActions={adminActions} id={id} getData={getData}/>
+                                {   id ?
+                                    <ActionButtons user={user} adminActions={adminActions} id={id} getData={getData}/>
+                                    : <PopUpButton title={'Edit Information'}/>
                                 }
                         </div>
                     </div>
