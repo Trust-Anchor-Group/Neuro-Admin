@@ -2,7 +2,7 @@ import React from 'react'
 import TableComponent from './TableComponent';
 import { Pagination } from './Pagination';
 import SearchBar from '../SearchBar';
-import { FilterAccounts } from './FilterAccounts';
+import { Filter} from '../shared/Filter';
 import Link from 'next/link';
 
 export const PaginatedList = ({ userList, page, prevPage, totalPages,
@@ -46,11 +46,48 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-2'>
                     <SearchBar placeholder={'Search...'} classNameText={'border-2 rounded-md py-2 pr-10 pl-12 text-sm max-sm:pr-0 max-sm:pl-2'} />
+                    {/* FilterAccount */}
                     { pending === false && 
                     <div className='hidden md:block'>
-                        <FilterAccounts pending={pending} filterAccount={filterAccount}/>
+                        <Filter linkArray={[
+                            {
+                                linkHref:'/neuro-access/account?filter-accounts=all',
+                                text:'All'
+                            },
+                            {
+                                linkHref:'/neuro-access/account?filter-accounts=hasID',
+                                text:'Active Id'
+                            },
+                            {
+                                linkHref:'/neuro-access/account?filter-accounts=noID',
+                                text:'No Id'
+                            }
+                        ]}
+                        isFilterAccount={true}
+                        absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
+                        size={'w-[170px]'}/>
                     </div>
                     }
+                     <div className='hidden md:block'>
+                    {/* FilterLimit */}
+                        <Filter linkArray={[
+                            {
+                                linkHref:`/neuro-access/account?limit=10`,
+                                text:'10'
+                            },
+                            {
+                                linkHref:`/neuro-access/account?limit=25`,
+                                text:'25'
+                            },
+                            {
+                                linkHref:`/neuro-access/account?limit=50`,
+                                text:'50'
+                            },
+                        ]}
+                        isFilterAccount={false}
+                        absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
+                        size={'w-[100px]'}/>
+                    </div>
                     </div>
                     <div className='hidden md:block'>
                         <Pagination page={page} prevPage={prevPage} totalPages={totalPages} limit={limit} />                

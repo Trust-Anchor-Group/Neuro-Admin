@@ -5,29 +5,29 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
-export const FilterAccounts = () => {
+export const LimitFilter = () => {
 
   const searchParams = useSearchParams()
-  const filterAccount = searchParams.get('filter-accounts') || 'all'
+  const limitFilter = searchParams.get('limit') || '50'
   const [toggle, setToggle] = useState(false)
   const [filterNames, setFilterNames] = useState('')
 
   const filterRef = useRef(null)
 
   useEffect(() => {
-    switch (filterAccount) {
+    switch (limitFilter) {
       case 'all':
         setFilterNames('All')
         break;
       case 'hasID':
-        setFilterNames('Verified ID')
+        setFilterNames('Active Id')
         break
         case 'noID':
-          setFilterNames('Unverified ID')
+          setFilterNames('No Id')
       default:
         break;
     }
-  }, [filterAccount])
+  }, [limitFilter])
 
   useEffect(() => {
     
@@ -58,11 +58,11 @@ export const FilterAccounts = () => {
                      toggle && (
                         <div className='absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer' ref={filterRef}>   
                             <Link className='transition-all border pl-2 hover:bg-neuroGray'
-                             href={'/list/access/?filter-accounts=all'}>All</Link>                          
+                             href={'/neuro-access/account?filter-accounts=all'}>All</Link>                          
                             <Link className='transition-all border pl-2 hover:bg-neuroGray' 
-                             href={'/list/access/?filter-accounts=hasID'}>Verified ID</Link>                       
+                             href={'/neuro-access/account?filter-accounts=hasID'}>Active Id</Link>                       
                             <Link className='transition-all border pl-2 hover:bg-neuroGray'  
-                            href={'/list/access/?filter-accounts=noID'}>Unverified ID</Link>                       
+                            href={'/neuro-access/account?filter-accounts=noID'}>No Id</Link>                       
                         </div>
                     )
                 }

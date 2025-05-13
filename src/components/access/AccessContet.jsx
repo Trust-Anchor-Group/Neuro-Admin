@@ -19,7 +19,7 @@ export const AccessContet = () => {
     const [toggle, setToggle] = useState(false)
     const [loading, setLoading] = useState(false)
     const [userList, setUserList] = useState(null)
-    let limit = 10
+    const limit = searchParams.get('limit') || '50'
     const page = Number(searchParams.get('page') || 1)
     const [actionButtonName, setActionButtonName] = useState('')
     const [buttonName, setButtonName] = useState('')
@@ -34,7 +34,7 @@ export const AccessContet = () => {
       isFetchingRef.current = true
       setLoading(true)
       try {
-          if (pathname.includes('pending-ids')) {
+          if (pathname.includes('id-application')) {
               const requestBody = {
                   offset: (page - 1) * limit,
                   maxCount: limit,
@@ -55,7 +55,7 @@ export const AccessContet = () => {
               const data = await res.json();
               setUserList(data.data || []);
               console.log('ID application',data)
-              setTotalPages(data.totalPages || 38);
+              setTotalPages(data.totalPages || 1);
           } else {
               const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
               const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
@@ -78,7 +78,7 @@ export const AccessContet = () => {
     useEffect(() => {
    
       getData();
-  }, [page, query,filterAccount,pathname]);
+  }, [page, query,filterAccount,pathname,limit]);
     
   async function onHandleModal(){
     try {
@@ -111,7 +111,7 @@ const filteredColumns = filterAccount === 'noID'
     return (
             <div className="relative px-5">
            
-            {pathname === '/list/access' && (
+            {pathname === '/neuro-access/account' && (
               <PaginatedList 
                 userList={userList} 
                 page={page}
@@ -125,7 +125,7 @@ const filteredColumns = filterAccount === 'noID'
           />
         )}
 
-              {pathname === '/list/access/pending-ids' && (
+              {pathname === '/neuro-access/id-application' && (
                 <PaginatedList 
                   userList={userList} 
                   page={page}

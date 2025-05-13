@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { FaEnvelope, FaBullhorn, FaChevronDown } from "react-icons/fa";
+import { FaEnvelope, FaBullhorn, FaChevronDown, FaUser, FaTachometerAlt, FaSignOutAlt, FaThLarge } from "react-icons/fa";
 import LogoutBtn from "../logoutBtn/LogoutBtn";
 import { useRouter } from 'next/navigation';
+import Link from "next/link";
+import { LinkToPage } from "./LinkToPage";
 
 // const generateAvatarUrl = (seed) => {
 //   return `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(seed)}`;
@@ -32,24 +34,53 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState("");
   const router = useRouter();
+  const isFetchingRef = useRef(false)
 
    useEffect(() => {
-    const storedUser = sessionStorage.getItem("neuroUser");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-
-      fetchUserImage(parsedUser.legalId).then((imageUrl) => {
-        if (imageUrl) {
-          setAvatarUrl(imageUrl);
-        } else {
-          // fallback to generated avatar
-          const fallback = `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(parsedUser.name || "defaultUser")}`;
-          setAvatarUrl(fallback);
-        }
-      });
+    try {
+      const storedUser = sessionStorage.getItem("neuroUser");
+      if (isFetchingRef.current) return
+      isFetchingRef.current = true
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+    
+        setUser(parsedUser);
+  
+        fetchUserImage(parsedUser.pictureId).then((imageUrl) => {
+          if (imageUrl) {
+            setAvatarUrl(imageUrl);
+          } else {
+            // fallback to generated avatar
+            const fallback = `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(parsedUser.name || "defaultUser")}`;
+            setAvatarUrl(fallback);
+          }
+        });
+      }
+    } catch (error) {
+      throw new Error('Error in fetching Navbar image',error)
+    } finally{
+      isFetchingRef.current = false
     }
+
   }, []);
+
+  const filterRef = useRef(null)
+
+    useEffect(() => {
+      
+      const handleClickOutSide = (e) => {
+        if(filterRef.current && !filterRef.current.contains(e.target)){
+          setDropdownOpen(false)
+        }
+      }
+  
+      document.addEventListener('mousedown',handleClickOutSide)
+  
+      return () => {
+        document.removeEventListener('mousedown',handleClickOutSide)
+      }
+  
+    }, [])
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
@@ -102,7 +133,7 @@ const Navbar = () => {
         </div> */}
 
         {/* User Dropdown */}
-        <div className="relative">
+        <div ref={filterRef} className="relative">
           <div
             onClick={toggleDropdown}
             className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors rounded-full px-4 py-2 cursor-pointer"
@@ -117,13 +148,12 @@ const Navbar = () => {
           </div>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50">
-              <ul className="py-2">
+            <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg z-50">
+              <ul className="">
                 {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Profile</li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Settings</li> */}
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700" onClick={handleLogout}>
-                Logout
-                </li>
+                <LinkToPage hrefName={'/neuro-access/profile'} title={'Profile'} icon={<FaUser />}/>
+                <LinkToPage handleLogout={handleLogout} title={'Logout'} icon={<FaSignOutAlt />}/>
               </ul>
             </div>
           )}

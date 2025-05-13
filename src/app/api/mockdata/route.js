@@ -32,12 +32,27 @@ export async function GET(req) {
                     strictSearch:false,
                     fullTextSearch:query,
                 } : {} ),
-            };
+            }
 
-        console.log('Payload',payload)
+
         const { host } = config.api.agent;
 
         const url = `https://${host}/Accounts.ws`;
+
+            const responseTotalPages = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cookie': clientCookie,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify()
+            });   
+
+            const dataResponseTotalPages = await responseTotalPages.json()
+            console.log('Total Pages',dataResponseTotalPages)
+
+
 
         const res = await fetch(url, {
             method: 'POST',
@@ -60,13 +75,14 @@ export async function GET(req) {
         }
 
         const data = await res.json()
-        console.log('Data repsonse',data)
-        console.log('Response Data',res.status)
+        console.log('Data Accounts',data)
+        console.log('Response Accounts',res.response)
 
 
-        const response = {
-            data: data,
-        }
+         const response = {
+             data: data,
+             totalPages:dataResponseTotalPages
+         }
 
 
         return NextResponse.json(response, { status: 200 })

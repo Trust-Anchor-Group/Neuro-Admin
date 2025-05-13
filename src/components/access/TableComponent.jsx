@@ -34,14 +34,14 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     renderRowActionMenuItems: renderRowActionMenuItems || undefined,
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
-        if (!pathname.includes('pending-ids')) {
+        if (!pathname.includes('id-application')) {
           const checkId = row.original.latestLegalId?.length
             ? row.original.latestLegalId
             : row.original.userName;
       
-          window.location.href = `/list/access/detailpage/${checkId}`;
+          window.location.href = `/neuro-access/detailpage/${checkId}`;
         } else {
-          window.location.href = `/list/access/detailpage/${row.original.id}`;
+          window.location.href = `/neuro-access/detailpage/${row.original.id}`;
         }
       },
       sx: {

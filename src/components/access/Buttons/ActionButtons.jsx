@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Modal } from '../shared/Modal'
-import { pendingAction } from './pendingFetch'
+import { Modal } from '@/components/shared/Modal'
+import { pendingAction } from '../pendingFetch'
 
 export const ActionButtons = ({user,adminActions,id,getData}) => {
 
@@ -31,12 +31,12 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
   return (
     <div>
                  {
-                user && user.data.state === 'Created' && (
+                user && user.state === 'Created' && (
                     
                 <div className='mt-10 max-sm:p-5'>    
                       {
                           toggle &&
-                                            <Modal 
+                                            <Modal
                                             text={`Are you sure you want to ${buttonName}?`}
                                             setToggle={setToggle}
                                             onHandleModal={onHandleModal}/>
@@ -69,7 +69,7 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
 
 
                         {
-                user && user.data.state === 'Obsoleted' && (
+                user && user.state === 'Obsoleted' && (
                     
                 <div className='mt-10 max-sm:p-5'>    
                       {
@@ -106,7 +106,7 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
                 ) }
 
                 {
-                user && !['Created', 'Obsoleted'].includes(user.data.state) && (
+                user && !['Created', 'Obsoleted'].includes(user.state) && (
                     <div className='mt-10 max-sm:p-5'>    
                     {
                         toggle &&

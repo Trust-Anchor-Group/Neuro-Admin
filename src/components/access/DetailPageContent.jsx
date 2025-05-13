@@ -2,19 +2,20 @@
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import config from '@/config/config';
-import { FaArrowLeft, FaBan, FaCheck, FaExclamationTriangle, FaFileAlt, FaIdBadge, FaShieldAlt, FaSignInAlt, FaSpinner, FaTimesCircle, FaUser, FaUserFriends } from 'react-icons/fa'
-import { pendingAction } from '@/components/access/pendingFetch';
-import { AccountDetails } from '@/components/access/AccountDetails';
+import { FaArrowLeft, FaShieldAlt, FaSpinner, FaUser} from 'react-icons/fa'
+import { AccountDetails, DisplayDetails } from '@/components/access/Buttons/DisplayDetails';
 import Link from 'next/link';
 import { Identity } from '@/components/access/Identity';
 import { ActivityDetailspage } from './ActivityDetailspage';
+import { CreateUserData } from '../shared/CreateUserData';
+
 
 export default function DetailPageContent() {
     const { id } = useParams()
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
     const searchParams = useSearchParams()
-    
+    const [isAccount, setIsAccount] = useState(false)
     const tab = searchParams.get('tab') || 'details'
     
     const router = useRouter()
@@ -39,7 +40,8 @@ export default function DetailPageContent() {
             
             const data = await res.json()
             console.log('New Account',data)
-        
+            
+            setIsAccount(true)
             setUser(data)
   
         } catch (error) {
@@ -71,7 +73,7 @@ export default function DetailPageContent() {
             const data = await res.json()
             console.log('New ID',data)
         
-            setUser(data)
+            setUser(data.data)
   
         } catch (error) {
             console.error('Error fetching user:', error)
@@ -99,9 +101,29 @@ export default function DetailPageContent() {
     }, [id]);
 
 
+    const fieldsToShow = [
+        { label: "Account", key: "account" },
+        { label: "Email", key: "properties.EMAIL" },
+        { label: "Country", key: "properties.COUNTRY" },
+        { label: "Created", key: "created" }
+      ];
 
+      const fieldsToShowIdentity = [
+        { label: "First Name", key: "properties.LAST" },
+        { label: "Nationality", key: "properties.COUNTRY" },
+        { label: "Address", key: "properties.ADDR" },
+        { label: "Date of birth", key: "properties.PNR" },
+        { label: "Phone", key: "properties.PHONE" },
+        
+      ];
     
-
+      const fieldsToShowWithNoID = [
+        { label: "Account", key: "data.account.userName" },
+        { label: "Email", key: "data.account.eMail" },
+        { label: "Country", key: "data.account.country" },
+        { label: "Phone", key: "data.account.phoneNr" },
+        { label: "Created", key: "data.account.created" },
+      ];
 
     return (
         <div className='p-5'>
@@ -110,7 +132,7 @@ export default function DetailPageContent() {
                         <div className='flex mb-5 gap-5 max-sm:flex-col'>
                             <div className=''>
                                 <button aria-label='Back to Access Page' className='flex 
-                                items-center gap-5 border-2 p-2 rounded-lg' onClick={() => router.push('/list/access')}>
+                                items-center gap-5 border-2 p-2 rounded-lg' onClick={() => router.push('/neuro-access/account')}>
                                     <FaArrowLeft className='transition-opacity size-5 hover:opacity-50'/>
                                     Back
                                 </button>
@@ -152,7 +174,10 @@ export default function DetailPageContent() {
                 ) :
                 <>
               {tab === 'details' && (
-                  <AccountDetails user={user}/>
+                  <DisplayDetails 
+                  fieldsToShow={isAccount ? fieldsToShowWithNoID : fieldsToShow}
+                  userData={user}
+                  title={'Account Information'}/>
                 )
                 
             }
@@ -160,6 +185,7 @@ export default function DetailPageContent() {
                   tab === 'identity' && (
                       <Identity user={user}
                       id={id} getData={getData}
+                      fieldsToShow={fieldsToShowIdentity}
                  />
                      
                     )
@@ -169,12 +195,12 @@ export default function DetailPageContent() {
              <div className=''>
                                     
                 <nav className="grid grid-cols-2 w-full text-center rounded-lg bg-white/90 font-semibold">
-                    <Link href={`/list/access/detailpage/${id}/?tab=details&page=1`}>
+                    <Link href={`/neuro-access/detailpage/${id}/?tab=details&page=1`}>
                         <div className={`flex items-center justify-center text-text16 rounded-lg gap-2 py-3  ${tab === 'details' ?
                             'bg-aprovedPurple/15 text-neuroPurpleDark  duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
                                 <FaUser className='max-md:hidden' size={14} /><span>Account</span></div>
                     </Link>
-                    <Link href={`/list/access/detailpage/${id}/?tab=identity&page=1`}>
+                    <Link href={`/neuro-access/detailpage/${id}/?tab=identity&page=1`}>
                     <div className={`flex items-center justify-center rounded-lg gap-2 py-3 text-text16 ${tab === 'identity' ?
                         'bg-aprovedPurple/15 text-neuroPurpleDark duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
                          <FaShieldAlt className='max-md:hidden'/><span>Identity</span></div>
