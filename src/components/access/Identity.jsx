@@ -1,17 +1,35 @@
 import React, { useState } from 'react'
 import Image from 'next/image';
-import { FaBan, FaCheck, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaFileAlt, FaSignInAlt, FaTimes, FaTimesCircle } from 'react-icons/fa';
+import { FaBan, FaCheck, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaFileAlt, FaSignInAlt, FaTimes, FaTimesCircle, FaXbox } from 'react-icons/fa';
 import { DetailpageStatus } from './DetailpageStatus';
 import { ActionButtons } from './Buttons/ActionButtons';
 import { dateConverter } from '../shared/ConvertDate';
 import { InfoToggleButton } from './Buttons/InfoToggleButton';
 import { MapOutInput } from '../shared/MapOutInput';
 import { PopUpButton } from './Buttons/PopUpButton';
+import { DisplayDetails } from './Buttons/DisplayDetails';
+import { ImageComponent } from './ImageComponent';
+import { InputField } from './InputField';
 
-export const Identity = ({user,id,getData,fieldsToShow}) => {
+export const Identity = ({user,id,getData,fieldsToShow,onSubmitHandler}) => {
 
 const [infoToggle, setIntoToggle] = useState(true)
 const [infoToggleMetaData, setIntoToggleMetaData] = useState(false)
+const [modalToggle, setModalToggle] = useState(false)
+  const [form, setForm] = useState({
+    email:''
+  })
+
+useEffect(() => {
+    if(user){
+        setForm(prev => ({...prev,email:user.properties.EMAIL}))
+    }
+}, [user])
+
+
+function onHandleChange(field, value){
+    setForm(prev => ({...prev,[field]:value}))
+}
 
 
 const adminActions = [
@@ -39,27 +57,7 @@ if(!user){
                 <div className=''>
                     <div className='grid grid-cols-1 gap-1 max-sm:grid-cols-1 max-sm:px-5'>
                         <div className='flex items-center gap-3 pb-4 max-sm:flex-col max-sm:mt-5'>
-                        {
-                                 user && user.attachments.length === 0 ?
-                                 <div className='w-[100px] h-[100px] rounded-xl overflow-hidden'>
-                                <Image
-                                    className='w-full h-full object-cover'
-                                    src={`https://res.cloudinary.com/drkty7j9v/image/upload/v1737114626/profil-ezgif.com-avif-to-jpg-converter_jkimmv.jpg`}
-                                    width={1200}
-                                    height={1200}
-                                    alt='Profile'
-                                    />
-                            </div>:               
-                                <div className='w-[128px] h-[128px] rounded-xl overflow-hidden'>
-                                    <Image
-                                        className='w-full h-full object-cover'
-                                        src={`data:image/png;base64,${user.attachments[0].data}`}
-                                        width={1200}
-                                        height={1200}
-                                        alt='Profile'
-                                        />
-                                </div>
-                            }
+                            <ImageComponent user={user}/>
                             <div className='flex flex-col pl-2 gap-2 max-md:text-center '>
                                     <DetailpageStatus user={user} adminActions={adminActions}/>
                                     <div>
@@ -86,9 +84,50 @@ if(!user){
                         <div className='mt-5'>
                                 {   id ?
                                     <ActionButtons user={user} adminActions={adminActions} id={id} getData={getData}/>
-                                    : <PopUpButton title={'Edit Information'}/>
+                                    : <PopUpButton title={'Edit Information'} setToggle={setModalToggle}/>
                                 }
                         </div>
+                        {
+                        modalToggle && user && (
+                            <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+                            <div className="bg-white p-6 rounded-lg shadow-lg w-[512px] max-h-[90vh] overflow-y-auto">
+                                <div className='flex justify-between border-b-2 border-neuroButtonGray pb-3'>
+                                    <h2 className='text-xl font-semibold '>Edit personal information</h2>
+                                </div>
+                                <form onSubmit={onSubmitHandler} className='mt-5'>
+                                    <h3 className='font-semibold'>Profile Page</h3>
+                                    <div className='flex justify-center'>
+                                        <ImageComponent user={user}/>
+                                    </div>
+                                    <div>
+                                        <InputField labelText={'Account name'} name={user.account} profil={true}/>
+                                        <p className='text-neuroTextBlack/65 mb-5'>Account name cannot be changed</p>
+                                        <div className='grid grid-cols-2 gap-5'>
+                                        <InputField labelText={'First name'} name={user.properties.FIRST} profil={true}/>
+                                        <InputField labelText={'Last name'} name={user.properties.LAST} profil={true}/>
+                                        </div>
+                                        <p className='text-neuroTextBlack/65 mb-5'>Name cannot be changed from your Neuro-Access ID</p>
+                                        <InputField labelText={'Nationality'} name={user.properties.COUNTRY} profil={true}/>
+                                        <p className='text-neuroTextBlack/65 mb-5'>Nationality be changed from your Neuro-Access ID</p>
+                                        <InputField labelText={'Personal number'} name={user.properties.PNR} profil={true}/>
+                                        <p className='text-neuroTextBlack/65 mb-5'>Personal number cannot be changed from your Neuro-Access ID</p>
+                                        <InputField labelText={'Email'} name={user.properties.EMAIL} editAble={true} value={form.email}
+                                        onChange={value => onHandleChange('email',value)}/>
+                                        <InputField phoneInput={user.properties.PHONE}/>
+                                        <div className='grid grid-cols-2 gap-3 mt-5'>
+                                            <button
+                                            onClick={() => setModalToggle()} className='bg-neuroRed/20 text-obsoletedRed
+                                            rounded-lg cursor-pointer py-1 transition-opacity font-semibold hover:opacity-70' aria-label='Close modal'>Cancel</button>
+                                            <button aria-label='Submit' 
+                                            className='bg-neuroPurpleLight text-neuroPurpleDark
+                                            rounded-lg cursor-pointer py-1 transition-opacity font-semibold hover:opacity-70'>Save changes</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            </div>
+                        )
+                        }
                     </div>
                 </div> 
             ) : (

@@ -76,11 +76,14 @@ const ProfilePage = () => {
       { label: "Phone", key: "properties.PHONE" },
     ]
 
+    function onSubmitHandler(){
+
+    }
 
   return (
     <div className='relative grid grid-cols-2 gap-5 p-5'>
       <div className=''>
-      <Identity user={user} fieldsToShow={fieldsToShowIdentity}
+      <Identity user={user} fieldsToShow={fieldsToShowIdentity} onSubmitHandler={onSubmitHandler}
           />
       </div>
              {loading && (

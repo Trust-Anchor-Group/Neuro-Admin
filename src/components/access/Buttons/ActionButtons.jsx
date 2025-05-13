@@ -36,10 +36,10 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
                 <div className='mt-10 max-sm:p-5'>    
                       {
                           toggle &&
-                                            <Modal
-                                            text={`Are you sure you want to ${buttonName}?`}
-                                            setToggle={setToggle}
-                                            onHandleModal={onHandleModal}/>
+                            <Modal
+                            text={`Are you sure you want to ${buttonName}?`}
+                            setToggle={setToggle}
+                            onHandleModal={onHandleModal}/>
                          }
                 
                 <div className='grid grid-cols-2 gap-2 max-sm:grid-cols-1'>
