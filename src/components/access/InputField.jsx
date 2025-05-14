@@ -1,10 +1,11 @@
+'use client'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
 import { FaRegCopy } from 'react-icons/fa'
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css';
 
-export const InputField = ({labelText,name,profil,phoneInput,editAble,value,onChange}) => {
+export const InputField = ({labelText,name,profil,phoneInput,editAble,value,onChange,setForm}) => {
  
   const [phone, setPhone] = useState('')
 
@@ -42,8 +43,8 @@ export const InputField = ({labelText,name,profil,phoneInput,editAble,value,onCh
       <PhoneInput
         className='bg-neuroInputBackground text-neuroTextBlack/65'
         country={'se'}
-        value={phone}
-        onChange={setPhone}
+        value={value}
+        onChange={(e) => onChange(e)}
         enableSearch
         buttonClass='!bg-neuroInputBackground'
         inputClass="!w-full !bg-neuroInputBackground !text-neuroTextBlack/65 !font-semibold "

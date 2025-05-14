@@ -7,7 +7,6 @@ import { AccountDetails, DisplayDetails } from '@/components/access/Buttons/Disp
 import Link from 'next/link';
 import { Identity } from '@/components/access/Identity';
 import { ActivityDetailspage } from './ActivityDetailspage';
-import { CreateUserData } from '../shared/CreateUserData';
 
 
 export default function DetailPageContent() {
@@ -105,6 +104,7 @@ export default function DetailPageContent() {
         { label: "Account", key: "account" },
         { label: "Email", key: "properties.EMAIL" },
         { label: "Country", key: "properties.COUNTRY" },
+        { label: "Phone", key: "properties.PHONE" },
         { label: "Created", key: "created" }
       ];
 

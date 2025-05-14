@@ -1,9 +1,12 @@
+'use client'
 import React from 'react'
 import TableComponent from './TableComponent';
 import { Pagination } from './Pagination';
 import SearchBar from '../SearchBar';
 import { Filter} from '../shared/Filter';
 import Link from 'next/link';
+import { ThemeProvider } from '@mui/material';
+import { theme } from './accountTableList';
 
 export const PaginatedList = ({ userList, page, prevPage, totalPages,
     limit,
@@ -94,6 +97,7 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
                     </div>
                 </div>
             </div>
+            <ThemeProvider theme={theme}>
                 <TableComponent
                     data={userList}
                     columns={userColoumns}
@@ -101,7 +105,8 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
                     enableGlobalFilter={false}
                     customCellRenderers={customCellRenderers}
                     renderRowActionMenuItems={renderRowActions}
-                />
+                    />
+            </ThemeProvider>
                 <div className='block py-2 md:hidden'>
                         <Pagination page={page} prevPage={prevPage} totalPages={totalPages} limit={limit} />                
                 </div>

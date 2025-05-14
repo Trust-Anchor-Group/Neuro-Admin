@@ -1,3 +1,4 @@
+'use client'
 import { PaginatedList } from '@/components/access/PaginatedList'
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'

@@ -1,9 +1,6 @@
-
-import Link from "next/link";
-import { FaBan, FaCheck, FaExclamationTriangle, FaEye, FaPlusCircle, FaTimes, FaTimesCircle, FaTrash, FaUser, FaUserCircle } from "react-icons/fa";
 import { createTheme } from "@mui/material/styles";
 import { StatusIcon } from "./StatusIcon";
-import { useSearchParams } from "next/navigation";
+
 
 export const theme = createTheme({
   typography: {

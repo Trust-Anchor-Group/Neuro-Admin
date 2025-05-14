@@ -51,6 +51,7 @@ const config = {
             fontSize:{
                 text16:'16px',
                 text20:'20px',
+                text26:'26px',
                 text28:'28px'
             }
         },
