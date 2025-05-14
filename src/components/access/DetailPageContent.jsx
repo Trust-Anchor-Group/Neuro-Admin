@@ -41,7 +41,7 @@ export default function DetailPageContent() {
             console.log('New Account',data)
             
             setIsAccount(true)
-            setUser(data)
+            setUser(data.data)
   
         } catch (error) {
             console.error('Error fetching user:', error)
@@ -118,11 +118,11 @@ export default function DetailPageContent() {
       ];
     
       const fieldsToShowWithNoID = [
-        { label: "Account", key: "data.account.userName" },
-        { label: "Email", key: "data.account.eMail" },
-        { label: "Country", key: "data.account.country" },
-        { label: "Phone", key: "data.account.phoneNr" },
-        { label: "Created", key: "data.account.created" },
+        { label: "Account", key: "data.userName" },
+        { label: "Email", key: "data.eMail" },
+        { label: "Country", key: "data.country" },
+        { label: "Phone", key: "data.phoneNr" },
+        { label: "Created", key: "data.created" },
       ];
 
     return (
@@ -137,27 +137,6 @@ export default function DetailPageContent() {
                     Back
                 </button>
             </div>
-            
-            { user?.data?.properties  ?
-            <div className='flex flex-col max-sm:items-center'>
-                <div className='flex items-center gap-2'>   
-                    <p className='text-3xl font-semibold max-sm:text-lg'>{user.data.properties.FIRST || user.data.account}</p>
-                    <p className='text-3xl font-semibold max-sm:text-lg'>{user.data.properties.LAST || ''}</p>
-                </div>
-                <div>
-                    <p className='text-xl opacity-50 max-sm:text-sm'>{user.data.properties.EMAIL}</p>
-                </div>
-            </div> 
-            :               
-            <div className='flex flex-col max-sm:items-center'>
-            <div className='flex items-center gap-2'>
-                    <p className='text-3xl font-semibold max-sm:text-lg'>{user?.data?.account?.userName}</p>
-            </div>
-            <div>
-                <p className='text-xl opacity-50 max-sm:text-sm'>{user?.data?.account?.eMail}</p>
-            </div>
-        </div> 
-            }
         </div>
                         
              
