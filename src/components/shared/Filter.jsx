@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
-export const Filter = ({linkArray,isFilterAccount,absoluteClassName,size}) => {
+export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,noUrlParam,selectArray}) => {
 
   const searchParams = useSearchParams()
   const filtered = isFilterAccount ? searchParams.get('filter-accounts') || 'all' : searchParams.get('limit') || '50'
@@ -15,26 +15,30 @@ export const Filter = ({linkArray,isFilterAccount,absoluteClassName,size}) => {
   const filterRef = useRef(null)
 
   useEffect(() => {
-    switch (filtered) {
-      case 'all':
-        setFilterNames('All')
-        break;
-      case 'hasID':
-        setFilterNames('Active Id')
-        break
-        case 'noID':
-          setFilterNames('No Id')
+    if(noUrlParam){
+      setFilterNames(text)
+    } else {
+      switch (filtered) {
+        case 'all':
+          setFilterNames('All')
+          break;
+        case 'hasID':
+          setFilterNames('Active Id')
           break
-          case '50':
-            setFilterNames('50')
-            break;
-          case '25':
-            setFilterNames('25')
+          case 'noID':
+            setFilterNames('No Id')
             break
-            case '10':
-              setFilterNames('10')
-      default:
-        break;
+            case '50':
+              setFilterNames('50')
+              break;
+            case '25':
+              setFilterNames('25')
+              break
+              case '10':
+                setFilterNames('10')
+        default:
+          break;
+      }
     }
   }, [filtered])
 
@@ -69,12 +73,19 @@ export const Filter = ({linkArray,isFilterAccount,absoluteClassName,size}) => {
                             {
                               linkArray.map((item,index) => (
                                 <Link key={index} className='transition-all border pl-2 hover:bg-neuroGray'
-                                href={item.linkHref}>{item.text}</Link>  
+                                href={item?.linkHref}>{item.text}</Link>  
                               )                          
                               )
                             }                     
                         </div>
                     )
+                }
+                {
+                  toggle && selectArray && (
+                    <div className={absoluteClassName} ref={filterRef}>
+
+                    </div>
+                  )
                 }
         </div>
 

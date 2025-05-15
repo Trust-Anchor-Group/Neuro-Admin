@@ -3,8 +3,6 @@
 import Menu from "@/components/shared/Menu";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import Image from "next/image";
-import Link from "next/link";
 import { FaCog, FaHome, FaRegUser, FaThLarge } from "react-icons/fa";
 
 export default function DashboardLayout({ children }) {

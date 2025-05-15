@@ -85,7 +85,8 @@ if(!user){
                             onSubmitHandler={onSubmitHandler}
                             form={form}
                             onHandleChange={onHandleChange}
-                            setModalToggle={setModalToggle}/>
+                            setModalToggle={setModalToggle}
+                            isEditProfile={true}/>
                         )
                         }
                     </div>

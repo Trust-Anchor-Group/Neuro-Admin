@@ -1,12 +1,15 @@
 import React from 'react'
 import { ImageComponent } from './ImageComponent'
 import { InputField } from './InputField'
+import { Filter } from '../shared/Filter'
 
-export const ProfileEditModal = ({user,onSubmitHandler,form,onHandleChange,setModalToggle}) => {
+export const ProfileEditModal = ({user,onSubmitHandler,form,onHandleChange,setModalToggle,isEditProfile}) => {
   return (
     <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-[512px] max-h-[90vh] overflow-y-auto">
-                <div className='flex justify-between border-b-2 border-neuroButtonGray pb-3'>
+              {
+                isEditProfile ? <>
+                   <div className='flex justify-between border-b-2 border-neuroButtonGray pb-3'>
                     <h2 className='text-xl font-semibold '>Edit personal information</h2>
                 </div>
                 <form onSubmit={(e) => onSubmitHandler(e)} className='mt-5'>
@@ -31,7 +34,7 @@ export const ProfileEditModal = ({user,onSubmitHandler,form,onHandleChange,setMo
                     <InputField phoneInput={true} value={form.phone} onChange={value => onHandleChange('phone',value)}/>
                     <div className='grid grid-cols-2 gap-3 mt-5'>
                         <button
-                        onClick={() => setModalToggle()} className='bg-neuroRed/20 text-obsoletedRed
+                        onClick={() => setModalToggle(false)} className='bg-neuroRed/20 text-obsoletedRed
                         rounded-lg cursor-pointer py-1 transition-opacity font-semibold hover:opacity-70' aria-label='Close modal'>Cancel</button>
                         <button aria-label='Submit' 
                         className='bg-neuroPurpleLight text-neuroPurpleDark
@@ -39,6 +42,31 @@ export const ProfileEditModal = ({user,onSubmitHandler,form,onHandleChange,setMo
                     </div>
                     </div>
                 </form>
+                </> : <>
+                   <div className='flex justify-between border-b-2 border-neuroButtonGray pb-3'>
+                    <h2 className='text-xl font-semibold '>Edit personal information</h2>
+                </div>
+                <form onSubmit={(e) => onSubmitHandler(e)} className='mt-5'>
+                    <div>
+                    <Filter selectArray={<>
+                        <select></select>
+                        </>}
+                    isFilterAccount={true}
+                    absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
+                    size={'w-[170px]'}/>
+                    <div className='grid grid-cols-2 gap-3 mt-5'>
+                        <button
+                        onClick={() => setModalToggle(false)} className='bg-neuroRed/20 text-obsoletedRed
+                        rounded-lg cursor-pointer py-1 transition-opacity font-semibold hover:opacity-70' aria-label='Close modal'>Cancel</button>
+                        <button aria-label='Submit' 
+                        className='bg-neuroPurpleLight text-neuroPurpleDark
+                        rounded-lg cursor-pointer py-1 transition-opacity font-semibold hover:opacity-70'>Save changes</button>
+                    </div>
+                    </div>
+                </form>
+                </>
+
+              }
             </div>
                </div>
   )

@@ -7,12 +7,13 @@ import { LocalizationSettings } from '@/components/access/LocalizationSettings'
 import { InputField } from '@/components/access/InputField'
 import { ProfileEditModal } from '@/components/access/ProfileEditModal'
 import { PopUpButton } from '@/components/access/Buttons/PopUpButton'
+import { useTranslation } from 'next-i18next'
 
 const ProfileContent = ({profileData}) => {
-
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(false)
     const [modalToggle, setModalToggle] = useState(false)
+    const [modalToggleClient, setModalToggleClient] = useState(false)
 
     useEffect(() => {
         if(profileData){
@@ -22,11 +23,11 @@ const ProfileContent = ({profileData}) => {
     
 
     const fieldsToShowIdentity = [
-      { label: "First Name", key: "properties.FIRST" },
-      { label: "Nationality", key: "properties.COUNTRY" },
-      { label: "Address", key: "properties.ADDR" },
-      { label: "Date of birth", key: "properties.PNR" },
-      { label: "Phone", key: "properties.PHONE" },
+      { label: "firstName", key: "properties.FIRST" },
+      { label: "nationality", key: "properties.COUNTRY" },
+      { label: "address", key: "properties.ADDR" },
+      { label: "dateOfBirth", key: "properties.PNR" },
+      { label: "phone", key: "properties.PHONE" },
       
     ];
 
@@ -75,29 +76,22 @@ function onHandleChange(field, value){
            <div className='flex flex-col  bg-white border-2 rounded-xl p-5 gap-3 max-sm:flex-col max-sm:mt-5'>
             <h2 className='text-text26 font-semibold'>System</h2>
             <div className='bg-neuroGray/70 rounded-xl p-5 overflow-auto'>
-              <p>User data</p>
-              <p>Last login:</p>
-            </div>
-            <div className='bg-neuroGray/70 rounded-xl p-5 overflow-auto'>
                 <InputField labelText={'Langauge'} name={'English'}/>
                <LocalizationSettings/>
                 <InputField labelText={'Default theme'} name={'Timed'}/>
                 <InputField labelText={'Notafication window'} name={'Weekdays'}/>
                 <InputField labelText={'Email notifactions'} name={'Important only'}/>
                 {
-                  modalToggle && user && 
+                  modalToggleClient && user &&
                   (
                       <ProfileEditModal 
-                      user={user} 
-                      onSubmitHandler={onSubmitHandler}
-                      form={form}
-                      onHandleChange={onHandleChange}
-                      setModalToggle={setModalToggle}/>
+                      setModalToggle={setModalToggleClient}
+                      isEditProfile={false}/>
                   )
                   
                 }
             </div>
-                <PopUpButton title={'Edit Information'} setToggle={setModalToggle}/>
+                <PopUpButton title={'Edit Information'} setToggle={setModalToggleClient}/>
              </div>
     </div>
   )
