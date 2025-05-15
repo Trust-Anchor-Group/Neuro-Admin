@@ -1,5 +1,4 @@
 'use client'
-import config from '@/config/config'
 import React, { useEffect, useRef, useState } from 'react'
 import { FaSpinner } from 'react-icons/fa'
 import { Identity } from '@/components/access/Identity'
@@ -7,7 +6,6 @@ import { LocalizationSettings } from '@/components/access/LocalizationSettings'
 import { InputField } from '@/components/access/InputField'
 import { ProfileEditModal } from '@/components/access/ProfileEditModal'
 import { PopUpButton } from '@/components/access/Buttons/PopUpButton'
-import { useTranslation } from 'next-i18next'
 
 const ProfileContent = ({profileData}) => {
     const [user, setUser] = useState(null)
@@ -79,8 +77,6 @@ function onHandleChange(field, value){
                 <InputField labelText={'Langauge'} name={'English'}/>
                <LocalizationSettings/>
                 <InputField labelText={'Default theme'} name={'Timed'}/>
-                <InputField labelText={'Notafication window'} name={'Weekdays'}/>
-                <InputField labelText={'Email notifactions'} name={'Important only'}/>
                 {
                   modalToggleClient && user &&
                   (
