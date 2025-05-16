@@ -3,7 +3,7 @@ import { ImageComponent } from './ImageComponent'
 import { InputField } from './InputField'
 import { Filter } from '../shared/Filter'
 
-export const ProfileEditModal = ({user,onSubmitHandler,form,onHandleChange,setModalToggle,isEditProfile}) => {
+export const ProfileEditModal = ({user,onSubmitHandler,form,onHandleChange,setModalToggle,isEditProfile,errorMessage}) => {
   return (
     <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-[512px] max-h-[90vh] overflow-y-auto">
@@ -31,6 +31,7 @@ export const ProfileEditModal = ({user,onSubmitHandler,form,onHandleChange,setMo
                     <p className='text-neuroTextBlack/60 mb-5'>Personal number cannot be changed from your Neuro-Access ID</p>
                     <InputField labelText={'Email'} name={user.properties.EMAIL} editAble={true} value={form.email}
                     onChange={value => onHandleChange('email',value)}/>
+                    <p className='text-red-500 font-semibold'>{errorMessage}</p>
                     <InputField phoneInput={true} value={form.phone} onChange={value => onHandleChange('phone',value)}/>
                     </div>
                     <div className='grid grid-cols-2 gap-3 mt-5'>
@@ -63,32 +64,6 @@ export const ProfileEditModal = ({user,onSubmitHandler,form,onHandleChange,setMo
                       absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
                       size={'w-full'}/>
                       </div> 
-                    <div>
-                    <label className='text-neuroTextBlack/60'>Your timezone</label>
-                    <Filter 
-                    noUrlParam={true}
-                    selectArray={[
-                      {value:'en',label:'English'},
-                      {value:'sv',label:'Svenska'},
-                      {value:'br',label:'Português'},                  
-                    ]}
-                    isFilterAccount={true}
-                    absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
-                    size={'w-full'}/>
-                    </div>
-                      <div>
-                    <label className='text-neuroTextBlack/60'>Your timezone</label>
-                    <Filter 
-                    noUrlParam={true}
-                    selectArray={[
-                      {value:'en',label:'English'},
-                      {value:'sv',label:'Svenska'},
-                      {value:'br',label:'Português'},                  
-                    ]}
-                    isFilterAccount={true}
-                    absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
-                    size={'w-full'}/>
-                    </div>
                     
                       </div>
                     <div className='grid grid-cols-2 gap-3 mt-5'>

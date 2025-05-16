@@ -4,7 +4,10 @@ import { cookies } from 'next/headers'
 
    export async function fetchProfile(id) {
       try {
-        const clientCookies = await cookies(); 
+        const clientCookies = await cookies();
+            const { host } = config.api.agent;
+
+            const urlAccount = `https://${host}/account.ws`;
           const url = `${config.protocol}://${config.origin}/api/legalIdentity`;
           const res = await fetch(url, {
               method: 'POST',
@@ -23,8 +26,35 @@ import { cookies } from 'next/headers'
               throw new Error('Failed to fetch user')
           }
           
-          const data = await res.json()
+          let data = await res.json()
+          
+          const userName = await data.data.account
 
+          const payload={
+            'userName':userName
+          }
+                console.log('PAYLOAD',payload)
+          
+                
+        const response = await fetch(urlAccount, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Cookie': clientCookies ,
+                'Accept': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(payload),
+            mode: 'cors'
+        });
+
+        const dataResponse = await response.json()
+ 
+  
+
+        const password = dataResponse.account.password
+        data = {...data,password}
+        console.log('Data',data)
           return data
 
       } catch (error) {
