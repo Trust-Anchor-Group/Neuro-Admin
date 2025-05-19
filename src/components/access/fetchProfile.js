@@ -4,7 +4,10 @@ import { cookies } from 'next/headers'
 
    export async function fetchProfile(id) {
       try {
-        const clientCookies = await cookies(); 
+        const clientCookies = await cookies();
+            const { host } = config.api.agent;
+
+            const urlAccount = `https://${host}/account.ws`;
           const url = `${config.protocol}://${config.origin}/api/legalIdentity`;
           const res = await fetch(url, {
               method: 'POST',
@@ -23,26 +26,35 @@ import { cookies } from 'next/headers'
               throw new Error('Failed to fetch user')
           }
           
-          const data = await res.json()
-         
-          console.log('NEW ID PROFILE',data)
-          console.log('GET EMAIL',data?.properties?.EMAIL)
+          let data = await res.json()
+          
+          const userName = await data.data.account
 
-          const attachments = data.attachments && data.attachments.length > 0 ? data.attachments[0].data : null;
+          const payload={
+            'userName':userName
+          }
+                console.log('PAYLOAD',payload)
+          
+                
+        const response = await fetch(urlAccount, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Cookie': clientCookies ,
+                'Accept': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(payload),
+            mode: 'cors'
+        });
 
-        //   const filteredData = {
-        //     account:data.account,
-        //     email:data.properties?.EMAIL,
-        //     phone:data.properties.PHONE,
-        //     firstName:data.properties.FIRST,
-        //     lastName:data.properties.LAST,
-        //     PNR:data.properties.PNR,
-        //     country:data.properties.COUNTRY,
-        //     attachments:attachments
-        //   }
+        const dataResponse = await response.json()
+ 
+  
 
-        //   console.log('Data Filtered ProilePage',filteredData)
-
+        const password = dataResponse.account.password
+        data = {...data,password}
+        console.log('Data',data)
           return data
 
       } catch (error) {

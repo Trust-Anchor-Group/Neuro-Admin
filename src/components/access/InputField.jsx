@@ -18,9 +18,9 @@ export const InputField = ({labelText,name,profil,phoneInput,editAble,value,onCh
   if(editAble){
     return (
         <div>
-        <label className='text-md text-neuroTextBlack/65 font-semibold'>{labelText}</label>
+        <label className='text-md text-neuroTextBlack/60 font-semibold'>{labelText}</label>
         <input type='text' className='text-text16 max-sm:text-md py-3 my-2 pl-4 font-semibold border
-         rounded-lg w-full bg-neuroInputBackground text-neuroTextBlack/65' value={value} onChange={e => onChange(e.target.value)}/>
+         rounded-lg w-full bg-neuroInputBackground text-neuroTextBlack/60' value={value} onChange={e => onChange(e.target.value)}/>
       </div>
     )
   }
@@ -29,26 +29,26 @@ export const InputField = ({labelText,name,profil,phoneInput,editAble,value,onCh
   if(profil){
     return (
       <div>
-        <label className='text-md text-neuroTextBlack/65 font-semibold'>{labelText}</label>
-        <p className='text-text16 max-sm:text-md py-3 my-2 pl-4 font-semibold border
-         rounded-lg w-full bg-neuroInputBackground text-neuroTextBlack/65'>{name}</p>
+        <label className='text-md text-neuroTextBlack/60 font-semibold'>{labelText}</label>
+        <p className='text-text16 max-sm:text-md py-3 pl-4 font-semibold border
+         rounded-lg w-full bg-neuroInputBackground text-neuroTextBlack/60'>{name}</p>
       </div>
     )
   }
 
   if(phoneInput){
     return (
-      <div>
-    <label className="text-md text-neuroTextBlack/65 font-semibold b-4">Phone number</label>
+      <div className=''>
+    <label className="text-md text-neuroTextBlack/60 font-semibold b-4">Phone number</label>
       <PhoneInput
-        className='bg-neuroInputBackground text-neuroTextBlack/65'
+        className='bg-neuroInputBackground text-neuroTextBlack/60'
         country={'se'}
         value={value}
         onChange={(e) => onChange(e)}
         enableSearch
         buttonClass='!bg-neuroInputBackground'
-        inputClass="!w-full !bg-neuroInputBackground !text-neuroTextBlack/65 !font-semibold "
-        containerClass="!w-full !bg-neuroInputBackground !text-neuroTextBlack/65 !font-semibold "
+        inputClass="!w-full !bg-neuroInputBackground !text-neuroTextBlack/60 !font-semibold "
+        containerClass="!w-full !bg-neuroInputBackground !text-neuroTextBlack/60 !font-semibold  "
       />
       </div>
     )
@@ -56,7 +56,7 @@ export const InputField = ({labelText,name,profil,phoneInput,editAble,value,onCh
 
   return (
     <div className='grid grid-cols-2 items-center justify-center border-b-2 animate-fade-in'>
-        <label className='text-text16 text-neuroTextBlack/65 my-2'>{labelText}:</label>
+        <label className='text-text16 text-neuroTextBlack/60 my-2'>{labelText}:</label>
         <p className='text-text16 max-sm:text-md my-2'>{name}</p>
     </div>
   )

@@ -55,7 +55,7 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
                         <Filter linkArray={[
                             {
                                 linkHref:'/neuro-access/account?filter-accounts=all',
-                                text:'All'
+                                text:'All',
                             },
                             {
                                 linkHref:'/neuro-access/account?filter-accounts=hasID',

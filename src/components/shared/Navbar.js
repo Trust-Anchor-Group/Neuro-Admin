@@ -46,7 +46,7 @@ const Navbar = () => {
     
         setUser(parsedUser);
   
-        fetchUserImage(parsedUser.pictureId).then((imageUrl) => {
+        fetchUserImage(parsedUser?.pictureId).then((imageUrl) => {
           if (imageUrl) {
             setAvatarUrl(imageUrl);
           } else {
@@ -152,7 +152,7 @@ const Navbar = () => {
               <ul className="">
                 {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Profile</li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Settings</li> */}
-                <LinkToPage hrefName={`/neuro-access/profile/${user.legalId}`} title={'Profile'} icon={<FaUser />}/>
+                <LinkToPage hrefName={`/neuro-access/profile/${user?.legalId}`} title={'Profile'} icon={<FaUser />}/>
                 <LinkToPage handleLogout={handleLogout} title={'Logout'} icon={<FaSignOutAlt />}/>
               </ul>
             </div>

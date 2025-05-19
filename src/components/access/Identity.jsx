@@ -12,7 +12,8 @@ import { ImageComponent } from './ImageComponent';
 import { InputField } from './InputField';
 import { ProfileEditModal } from './ProfileEditModal';
 
-export const Identity = ({user,id,getData,fieldsToShow,onSubmitHandler,form,setForm,modalToggle,setModalToggle,onHandleChange}) => {
+export const Identity = ({user,id,getData,fieldsToShow,onSubmitHandler,
+    form,setForm,modalToggle,setModalToggle,onHandleChange,fieldsToShowMetaData,errorMessage}) => {
 
 const [infoToggle, setIntoToggle] = useState(true)
 const [infoToggleMetaData, setIntoToggleMetaData] = useState(false)
@@ -70,7 +71,9 @@ if(!user){
                             <MapOutInput fieldsToShow={fieldsToShow} user={user}/> }
                         </div>
                         <div className='bg-neuroGray/70 rounded-xl p-4 mt-5 overflow-auto'>
-                          <InfoToggleButton infoToggle={infoToggleMetaData} setIntoToggle={setIntoToggleMetaData} title={'Identity Information'}/>
+                          <InfoToggleButton infoToggle={infoToggleMetaData} setIntoToggle={setIntoToggleMetaData} title={'Identity metadata'}/>
+                          {infoToggleMetaData &&
+                          <MapOutInput fieldsToShow={fieldsToShowMetaData} user={user} />}
                         </div>
                         <div className='mt-5'>
                                 {   id ?
@@ -85,7 +88,9 @@ if(!user){
                             onSubmitHandler={onSubmitHandler}
                             form={form}
                             onHandleChange={onHandleChange}
-                            setModalToggle={setModalToggle}/>
+                            setModalToggle={setModalToggle}
+                            errorMessage={errorMessage}
+                            isEditProfile={true}/>
                         )
                         }
                     </div>

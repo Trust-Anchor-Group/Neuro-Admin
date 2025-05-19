@@ -75,12 +75,24 @@ export async function GET(req) {
         }
 
         const data = await res.json()
-        console.log('Data Accounts',data)
-        console.log('Response Accounts',res.response)
 
+
+        const filteredData = data.map((item) => {
+           return {
+                country:item.country,
+                created:item.created,
+                email:item.eMail,
+                firstName:item.firstName,
+                lastNames:item.lastName,
+                latestLegalId:item.latestLegalId,
+                latestLegalIdState:item.latestLegalIdState,
+                phoneNr:item.phoneNr,
+                userName:item.userName
+            }
+        })
 
          const response = {
-             data: data,
+             data: filteredData,
              totalPages:dataResponseTotalPages
          }
 
