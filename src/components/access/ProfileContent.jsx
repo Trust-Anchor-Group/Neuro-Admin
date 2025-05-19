@@ -63,12 +63,25 @@ function onHandleChange(field, value){
     setForm(prev => ({...prev,[field]:value}))
 }
 
-    function onSubmitHandler(e){
+   async function onSubmitHandler(e){
       e.preventDefault()
       setErrorMessage('')
       
        Validate(form,setErrorMessage)
      console.log('Formulär',form) 
+
+     try {
+      const res = await fetch('/api/updateAccount',{
+        method:'POST',
+        headers:{
+          'Content':'application/json'
+        },
+        body: JSON.stringify('')
+      })
+     } catch (error) {
+      
+     }
+
     }
 
   return (
