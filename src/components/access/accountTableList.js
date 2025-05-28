@@ -18,7 +18,7 @@ export const theme = createTheme({
       muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" },color: "rgba(24, 31, 37, 0.6)",
       fontWeight: 500, } },
     },  
-    { accessorKey: "latestLegalIdState", header: "Identity", size: 50, 
+    { accessorKey: "latestLegalIdState", header: "Identity status", size: 50, 
       muiTableBodyCellProps: { sx: { display: { xs: "none", sm: "table-cell" }, textAlign: "center",},},
       muiTableHeadCellProps: { sx: { display: { xs: "none", sm: "table-cell" },color: "rgba(24, 31, 37, 0.6)",
       fontWeight: 500, } },
@@ -53,7 +53,8 @@ export const theme = createTheme({
    export const customCellAcountTable = {
     latestLegalIdState: ({ cell,row }) => {
            const state = cell.getValue()
-          if (state === "Approved") return <StatusIcon  text="Active Id" color="text-activeGreen" bgColor={'bg-activeGreen/20'} />;
+           
+          if (state === "Approved") return <StatusIcon  text="Approved" color="text-activeGreen" bgColor={'bg-activeGreen/20'} />;
            if (state === "Compromised") return <StatusIcon  text="Compromised" color="text-orange-500" bgColor={'bg-orange-500/30'} />;
            if (state === "Created") return <StatusIcon  text="Id pending" color="text-neuroDarkOrange" bgColor={'bg-neuroOrange/20'} />;
            if (state === "Obsoleted") return <StatusIcon text="Obsoleted" color="text-obsoletedRed" bgColor={'bg-obsoletedRed/20'} />;

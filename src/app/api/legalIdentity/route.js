@@ -40,7 +40,7 @@ export async function POST(request) {
                 Id:data.id,
                 account:data.account,
                 created:data.created,
-                attachments:data.attachments[0].data,
+                attachments:data?.attachments[0]?.data,
                 properties:{
                  COUNTRY:data.properties.COUNTRY,
                  EMAIL:data.properties.EMAIL,

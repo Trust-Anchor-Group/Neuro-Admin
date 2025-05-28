@@ -5,13 +5,17 @@ import {
 } from "material-react-table";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 
 const TableComponent = ({data = [], columns = [],enableSorting = false, enableRowActions, renderRowActionMenuItems,
   customCellRenderers = {},}) => {
     
     const pathname = usePathname()
+    const searchParams = useSearchParams()
+    const params = new URLSearchParams(searchParams)
+    const pathnameWithFilter = `${pathname}?${params}`
+
 
   const modifiedColumns = columns.map((col) => ({
     ...col,
@@ -39,9 +43,9 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
             ? row.original.latestLegalId
             : row.original.userName;
       
-          window.location.href = `/neuro-access/detailpage/${checkId}`;
+          window.location.href = `/neuro-access/detailpage/${checkId}?ref=${encodeURIComponent(pathnameWithFilter)}`;
         } else {
-          window.location.href = `/neuro-access/detailpage/${row.original.id}`;
+          window.location.href = `/neuro-access/detailpage/${row.original.id}?ref=${encodeURIComponent(pathnameWithFilter)}`;
         }
       },
       sx: {

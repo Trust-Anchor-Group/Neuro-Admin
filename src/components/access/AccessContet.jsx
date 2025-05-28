@@ -9,13 +9,16 @@ import { FaHourglassHalf, FaSpinner, FaUserFriends } from 'react-icons/fa';
 import Link from 'next/link.js';
 import { Modal } from '../shared/Modal.jsx';
 import { pendingAction } from './pendingFetch.js';
+import { getModalText } from '@/utils/getModalText.js';
 
 
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
     const pathname = usePathname()
-    const filterAccount = searchParams.get('filter-accounts') || 'all'
+    const params = new URLSearchParams(searchParams)
+    const pathnameWithFilter = `${pathname}?${params}`
+    const filterAccount = searchParams.get('filter') || 'all'
     const query = searchParams.get('query') || ''
     const [toggle, setToggle] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -122,7 +125,7 @@ const filteredColumns = filterAccount === 'noID'
                 customCellRenderers={customCellAcountTable}
                 userColoumns={filteredColumns}
                 pending={false}
-                filterAccount={filterAccount}
+                query={query}
           />
         )}
 
@@ -135,7 +138,7 @@ const filteredColumns = filterAccount === 'noID'
                   limit={limit}
                   customCellRenderers={customCellPendingTable}
                   userColoumns={userColoumnsPending}
-                  renderRowActions={(props) => pendingActions({...props,onToggleHandler})}
+                  renderRowActions={(props) => pendingActions({...props,onToggleHandler,pathnameWithFilter})}
                   pending={true}
           />
         )}
@@ -143,7 +146,7 @@ const filteredColumns = filterAccount === 'noID'
         {/* Modal */}
         {toggle && (
           <Modal 
-            text={`Are you sure you want to ${buttonName}?`}
+            text={getModalText(actionButtonName, buttonName)}
             setToggle={setToggle}
             onHandleModal={onHandleModal}
           />

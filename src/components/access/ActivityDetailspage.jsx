@@ -28,6 +28,7 @@ export const ActivityDetailspage = ({tab}) => {
         <>
             <div className='flex flex-col w-full bg-white h-[300px] border-2 rounded-xl p-5'>
                 <p className='text-neuroTextBlack mb-5 text-text20 font-semibold max-sm:text-center max-sm:text-lg'>Account Activity</p>
+                <h2 className='h-screen flex justify-center items-center text-gray-500 text-xl'>Coming soon</h2>
                 {/* {accountActivityArray.map((item, index) => (
                     <div className='bg-neuroGray/70 rounded-xl mt-2 p-3' key={index}>
                         <div className='flex justify-between items-center'>
@@ -50,6 +51,7 @@ export const ActivityDetailspage = ({tab}) => {
         <>
             <div className='flex flex-col w-full h-[300px] bg-white border-2 rounded-xl p-5'>
                 <p className='text-neuroTextBlack mb-5 text-text20 font-semibold max-sm:text-center max-sm:text-lg'>Identity Activity</p>
+                <h2 className='text-center text-gray-500 text-xl'>Coming soon</h2>
                 {/* {accountActivityArray.map((item, index) => (
                     <div className='bg-neuroGray/70 rounded-xl mt-2 p-3' key={index}>
                         <div className='flex justify-between items-center'>

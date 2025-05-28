@@ -8,7 +8,7 @@ import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,noUrlParam,selectArray}) => {
 
   const searchParams = useSearchParams()
-  const filtered = isFilterAccount ? searchParams.get('filter-accounts') || 'all' : searchParams.get('limit') || '50'
+  const filtered = isFilterAccount ? searchParams.get('filter') || 'all' : searchParams.get('limit') || '50'
   const [toggle, setToggle] = useState(false)
   const [filterNames, setFilterNames] = useState(selectArray?.[0]?.value || '')
   const [selectedValue, setSelectedValue] = useState()
@@ -30,7 +30,7 @@ export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,noUrlP
         setFilterNames('All')
         break
       case 'hasID':
-        setFilterNames('Active Id')
+        setFilterNames('Has Id')
         break
       case 'noID':
         setFilterNames('No Id')
@@ -83,7 +83,9 @@ function handleSelect(value){
                         <div className={absoluteClassName} ref={filterRef}>   
                             {
                               linkArray.map((item,index) => (
-                                <Link key={index} className='transition-all border pl-2 hover:bg-neuroGray'
+                                <Link key={index} onClick={() => {return setTimeout(() => {
+                                  setToggle(false)
+                                }, 200);}} className='transition-all border pl-2 hover:bg-neuroGray'
                                 href={item?.linkHref}>{item.text}</Link>  
                               )                          
                               )
