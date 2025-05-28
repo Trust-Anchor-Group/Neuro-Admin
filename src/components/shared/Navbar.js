@@ -3,9 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { FaEnvelope, FaBullhorn, FaChevronDown, FaUser, FaTachometerAlt, FaSignOutAlt, FaThLarge } from "react-icons/fa";
-import LogoutBtn from "../logoutBtn/LogoutBtn";
 import { useRouter } from 'next/navigation';
-import Link from "next/link";
 import { LinkToPage } from "./LinkToPage";
 
 // const generateAvatarUrl = (seed) => {
@@ -152,7 +150,7 @@ const Navbar = () => {
               <ul className="">
                 {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Profile</li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Settings</li> */}
-                <LinkToPage hrefName={`/neuro-access/profile/${user?.legalId}`} title={'Profile'} icon={<FaUser />}/>
+                <LinkToPage hrefName={`/neuro-access/profile/${user?.legalId}`} setToggle={setDropdownOpen} title={'Profile'} icon={<FaUser />}/>
                 <LinkToPage handleLogout={handleLogout} title={'Logout'} icon={<FaSignOutAlt />}/>
               </ul>
             </div>

@@ -10,7 +10,7 @@ export async function GET(req) {
         const limit = parseInt(searchParams.get('limit') || '5', 10) // Get the limit of users per page, default to 5
         const filterAccount = searchParams.get('filter')
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
-
+  
         let fullId 
         if(filterAccount === 'hasID'){
             fullId = true
@@ -28,13 +28,15 @@ export async function GET(req) {
             const payload = {
                 maxCount:limit,
                 offset:(page - 1) * limit,
+                fullId:fullId,
                 ...(query ? {
                     strictSearch:false,
                     fullTextSearch:query,
-                } : {} ),
+                    
+                } : {filter:{}} ),
             }
 
-
+            console.log('PAYLOAD',payload)
         const { host } = config.api.agent;
 
         const url = `https://${host}/Accounts.ws`;
@@ -75,7 +77,7 @@ export async function GET(req) {
         }
 
         const data = await res.json()
-
+    
 
         const filteredData = data.map((item) => {
            return {

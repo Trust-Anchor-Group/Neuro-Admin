@@ -5,9 +5,7 @@ import { cookies } from 'next/headers'
    export async function fetchProfile(id) {
       try {
         const clientCookies = await cookies();
-            const { host } = config.api.agent;
-
-            const urlAccount = `https://${host}/account.ws`;
+         
           const url = `${config.protocol}://${config.origin}/api/legalIdentity`;
           const res = await fetch(url, {
               method: 'POST',
@@ -27,34 +25,27 @@ import { cookies } from 'next/headers'
           }
           
           let data = await res.json()
-          
-          const userName = await data.data.account
 
-          const payload={
-            'userName':userName
-          }
-                console.log('PAYLOAD',payload)
-          
-                
-        const response = await fetch(urlAccount, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Cookie': clientCookies ,
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify(payload),
-            mode: 'cors'
-        });
+          console.log('Profile DATa',data)
+        // let filterData
+        //               filterData = {
+        //         Id:data.id,
+        //         account:data.account,
+        //         created:data.created,
+        //         attachments:data?.attachments[0]?.data,
+        //         properties:{
+        //          COUNTRY:data.properties.COUNTRY,
+        //          EMAIL:data.properties.EMAIL,
+        //          PHONE:data.properties.PHONE,
+        //          CITY:data.properties.CITY,
+        //          FIRST:data.properties.FIRST,
+        //          LAST:data.properties.LAST,
+        //          PNR:data.properties.PNR,
+        //          ADDR:data.properties.ADDR   
+        //         },
+        //         state:data.state
+        //     }
 
-        const dataResponse = await response.json()
- 
-  
-
-        const password = dataResponse.account.password
-        data = {...data,password}
-        console.log('Data',data)
           return data
 
       } catch (error) {

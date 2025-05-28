@@ -7,6 +7,7 @@ import { AccountDetails, DisplayDetails } from '@/components/access/Buttons/Disp
 import Link from 'next/link';
 import { Identity } from '@/components/access/Identity';
 import { ActivityDetailspage } from './ActivityDetailspage';
+import { TabNavigation } from '../shared/TabNavigation';
 
 
 export default function DetailPageContent() {
@@ -15,8 +16,9 @@ export default function DetailPageContent() {
     const [loading, setLoading] = useState(true)
     const searchParams = useSearchParams()
     const [isAccount, setIsAccount] = useState(false)
+    const ref = searchParams.get('ref')
     const tab = searchParams.get('tab') || 'details'
-    
+    const [backPath, setBackPath] = useState(null)
     const router = useRouter()
     
     async function getAccounts(){
@@ -50,7 +52,7 @@ export default function DetailPageContent() {
             setLoading(false) 
         }
     }
-    
+
     async function getData() {
         try {
             const url = `${config.protocol}://${config.origin}/api/legalIdentity`;
@@ -76,7 +78,6 @@ export default function DetailPageContent() {
   
         } catch (error) {
             console.error('Error fetching user:', error)
-            setUser(undefined) 
         } finally {
             setLoading(false) 
         }
@@ -99,6 +100,16 @@ export default function DetailPageContent() {
         }
     }, [id]);
 
+    useEffect(() => {
+      if(ref){
+        setBackPath(ref)
+      }
+    }, [])
+    
+  const fieldsToShowMetadata = [
+    { label: "ID status", key: "state" },
+    { label: "ID created", key: "created" },
+  ]
 
     const fieldsToShow = [
         { label: "Account", key: "account" },
@@ -132,7 +143,7 @@ export default function DetailPageContent() {
         <div className='flex mb-5 gap-5 max-sm:flex-col'>
             <div className=''>
                 <button aria-label='Back to Access Page' className='flex 
-                items-center gap-5 border-2 p-2 rounded-lg' onClick={() => router.push('/neuro-access/account')}>
+                items-center gap-5 border-2 p-2 rounded-lg' onClick={() => backPath ? router.push(backPath) : router.back()}>
                     <FaArrowLeft className='transition-opacity size-5 hover:opacity-50'/>
                     Back
                 </button>
@@ -165,6 +176,7 @@ export default function DetailPageContent() {
                       <Identity user={user}
                       id={id} getData={getData}
                       fieldsToShow={fieldsToShowIdentity}
+                       fieldsToShowMetaData={fieldsToShowMetadata}
                  />
                      
                     )
@@ -172,20 +184,24 @@ export default function DetailPageContent() {
               </>
            } 
              <div className=''>
-                                    
-                <nav className="grid grid-cols-2 w-full text-center rounded-lg bg-white/90 font-semibold">
-                    <Link href={`/neuro-access/detailpage/${id}/?tab=details&page=1`}>
-                        <div className={`flex items-center justify-center text-text16 rounded-lg gap-2 py-3  ${tab === 'details' ?
-                            'bg-aprovedPurple/15 text-neuroPurpleDark  duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
-                                <FaUser className='max-md:hidden' size={14} /><span>Account</span></div>
-                    </Link>
-                    <Link href={`/neuro-access/detailpage/${id}/?tab=identity&page=1`}>
-                    <div className={`flex items-center justify-center rounded-lg gap-2 py-3 text-text16 ${tab === 'identity' ?
-                        'bg-aprovedPurple/15 text-neuroPurpleDark duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
-                         <FaShieldAlt className='max-md:hidden'/><span>Identity</span></div>
-                    </Link>
-                                
-                    </nav>
+                    <TabNavigation tab={tab} id={id} gridCols={'grid-cols-2'} tabArray={[
+                        {
+                            title:'Account',
+                            href:'/neuro-access/detailpage',
+                            tabDesination:'details&page',
+                            icon:FaUser,
+                            tabRef:'details'
+                        },
+                        {   
+                            title:'Identity',
+                            href:'/neuro-access/detailpage',
+                            tabDesination:'identity',
+                            icon:FaShieldAlt,
+                            tabRef:'identity'
+
+                        }
+                    ]}/> 
+
                     <div className='pt-5'>
                         <ActivityDetailspage tab={tab}/>
                     </div>

@@ -135,11 +135,7 @@ export default function APIKeys() {
           onPaginationChange={setPagination}
           positionPagination="top"
           enableBottomToolbar={false}
-          enableColumnActions={false}
-          paginationDisplayMode="pages"
-          columnResizeMode="onChange"
-          layoutMode="grid"
-          enableColumnResizing
+          enableColumnActions={false}     
           muiPaginationProps={{
             shape: 'rounded',
             showFirstButton: false,
