@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import AgentAPI from 'agent-api';
 import { CircularProgress, Typography } from '@mui/material';
-import config from '@/config/config';
 
 function CreateGUID() {
   function Segment() {
@@ -118,7 +117,6 @@ export default function QuickLogin({
   };
 
   const signatureReceived = (signatureData) => {
-    console.log('[Login] Successful Signature Received:', signatureData);
     setSuccess(true);
     if (onLoginSuccess) onLoginSuccess();
      if (signatureData?.Properties && signatureData?.Attachments) {
@@ -132,22 +130,45 @@ export default function QuickLogin({
     }
   };
 
-  const evaluateEvent = (event) => {
+  const evaluateEvent = async (event) => {
     if (!event?.type) return;
 
-    console.log('[Event] Received:', event.type, event.data);
 
     if (
       event.type === 'SignatureReceived' ||
       event.type === 'SignatureReceivedBE'
     ) {
       signatureReceived(event.data);
+      sessionStorage.setItem("signatureReceived", JSON.stringify(event.data));
 
-      if (event.type === 'SignatureReceivedBE' && event.data.AgentApiToken) {
-        console.log('[AgentAPI] Setting Host and JWT.');
-        AgentAPI.IO.SetHost(event.data.Domain, true);
+      // Set host regardless
+      AgentAPI.IO.SetHost(neuron, true);
+      console.log(
+        '[AgentAPI] Host set to', event.data.Domain)
+      console.log('[AgentAPI] host env:', neuron);
+
+      if (event.data.AgentApiToken) {
+        console.log('[AgentAPI] AgentApiToken received in event. Authenticating directly.');
         AgentAPI.Account.SaveSessionToken(event.data.AgentApiToken, 3600, 1800);
         AgentAPI.Account.AuthenticateJwt(event.data.AgentApiToken);
+      } else if (event.type === 'SignatureReceivedBE') {
+        console.log('[QuickLogin] No AgentApiToken in event — calling /Account/QuickLogin fallback');
+
+        try {
+          const res = await fetch('/api/auth/quickLogin/token', {
+            method: 'POST',
+            credentials: 'include',
+          });
+
+          if (!res.ok) throw new Error(await res.text());
+
+          const { jwt } = await res.json();
+
+          AgentAPI.Account.SaveSessionToken(jwt, 3600, 1800);
+          AgentAPI.Account.AuthenticateJwt(jwt);
+        } catch (err) {
+          console.error('[QuickLogin] Fallback token request failed:', err);
+        }
       }
     }
   };
@@ -169,20 +190,19 @@ export default function QuickLogin({
         }
       }
     };
-    console.log('config.origin:', config.origin); 
     const uri = `/api/auth/quickLogin/session`;
     xhttp.open('POST', uri, true);
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.withCredentials = true;
-    xhttp.send(
-      JSON.stringify({
-        agentApiTimeout: 3600, // Requesting Agent API Token
-        serviceId: serviceIdRef.current || '',
-        tab: TabID,
-        mode: 'image',
-        purpose,
-      })
-    );
+    const body = JSON.stringify({
+      agentApiTimeout: 3600,
+      serviceId: serviceIdRef.current ,
+      tab: TabID,
+      mode: 'image',
+      purpose,
+    });
+
+    xhttp.send(body);
   };
 
   useEffect(() => {
