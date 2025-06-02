@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
-export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,noUrlParam,selectArray}) => {
+export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,selectArray}) => {
 
   const searchParams = useSearchParams()
   const filtered = isFilterAccount ? searchParams.get('filter') || 'all' : searchParams.get('limit') || '50'
@@ -16,12 +16,7 @@ export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,noUrlP
   const filterRef = useRef(null)
 
   useEffect(() => {
-  if (noUrlParam && selectArray && selectedValue) {
-    const selectedItem = selectArray.find(item => item.value === selectedValue)
-    setFilterNames(selectedItem ? selectedItem.label : '')
-
-  }   
-   else if(selectArray?.length > 0){
+ if(selectArray?.length > 0){
       setFilterNames(selectArray[0].label)
     } 
   else {
@@ -48,7 +43,7 @@ export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,noUrlP
         break
     }
   }
-}, [filtered, selectArray, selectedValue, noUrlParam])
+}, [filtered, selectArray, selectedValue])
   useEffect(() => {
     
     const handleClickOutSide = (e) => {
@@ -83,9 +78,7 @@ function handleSelect(value){
                         <div className={absoluteClassName} ref={filterRef}>   
                             {
                               linkArray.map((item,index) => (
-                                <Link key={index} onClick={() => {return setTimeout(() => {
-                                  setToggle(false)
-                                }, 200);}} className='transition-all border pl-2 hover:bg-neuroGray'
+                                <Link key={index} onClick={() => setToggle(false)} className='transition-all border pl-2 hover:bg-neuroGray'
                                 href={item?.linkHref}>{item.text}</Link>  
                               )                          
                               )

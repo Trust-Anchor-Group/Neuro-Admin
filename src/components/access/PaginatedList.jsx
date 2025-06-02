@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import TableComponent from './TableComponent';
 import { Pagination } from './Pagination';
 import SearchBar from '../SearchBar';
@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { ThemeProvider } from '@mui/material';
 import { theme } from './accountTableList';
 import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 export const PaginatedList = ({ userList, page, prevPage, totalPages,
     limit,
@@ -19,10 +20,12 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
     }) => {
 
 const searchParams = useSearchParams()
+const [showFallback, setShowFallback] = useState(false)
 
 const buildUrlWithParams = (key, value) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
+    params.set('page',1)
     if (key !== 'query' && query) {
       params.set('query', query); // preserve query
     }
@@ -33,7 +36,17 @@ const buildUrlWithParams = (key, value) => {
     //  and <Pagination /> inside a <div className="relative">.
     //  This ensures that the table and pagination are always rendered together, preventing layout issues.
 
-    if (!userList) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowFallback(true)
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, []);
+
+  
+
+    if (!userList && showFallback) {
         return (
             <div className="">
                 <div className='flex justify-center items-center h-screen'>
@@ -93,14 +106,17 @@ const buildUrlWithParams = (key, value) => {
                 </div>
             </div>
             <ThemeProvider theme={theme}>
+                {
+                    userList &&
                 <TableComponent
-                    data={userList}
-                    columns={userColoumns}
-                    enableRowActions={true}
-                    enableGlobalFilter={false}
-                    customCellRenderers={customCellRenderers}
-                    renderRowActionMenuItems={renderRowActions}
-                    />
+                data={userList}
+                columns={userColoumns}
+                enableRowActions={true}
+                enableGlobalFilter={false}
+                customCellRenderers={customCellRenderers}
+                renderRowActionMenuItems={renderRowActions}
+                />
+            }
             </ThemeProvider>
                 <div className='block py-2 md:hidden'>
                         <Pagination page={page} prevPage={prevPage} totalPages={totalPages} limit={limit} />                

@@ -18,7 +18,7 @@ export default function DetailPageContent() {
     const [isAccount, setIsAccount] = useState(false)
     const ref = searchParams.get('ref')
     const tab = searchParams.get('tab') || 'details'
-    const [backPath, setBackPath] = useState(null)
+    const [backPath, setBackPath] = useState(null) // To track Params from previous page
     const router = useRouter()
     
     async function getAccounts(){
@@ -151,16 +151,16 @@ export default function DetailPageContent() {
         </div>
                         
              
-        <div className=' flex items-center '>
+        <div className='flex items-center '>
           
             </div>
             <div className='grid grid-cols-2 gap-5 max-md:grid-cols-1'>
 
             {
                 loading ? (
-                    <div className='flex justify-center items-center mt-12'>
-                    <FaSpinner className='animate-spin text-5xl'/>
-                </div>
+                     <div className="absolute inset-1 bg-white/50  flex items-center justify-center z-50">
+                       <FaSpinner className="animate-spin text-4xl text-gray-500" />
+                     </div>
                 ) :
                 <>
               {tab === 'details' && (
@@ -183,29 +183,32 @@ export default function DetailPageContent() {
                 }
               </>
            } 
-             <div className=''>
-                    <TabNavigation tab={tab} id={id} gridCols={'grid-cols-2'} tabArray={[
+                <div className='flex flex-col gap-5'>
+                <div className=''>
+                    <TabNavigation
+                    tab={tab}
+                    id={id}
+                    gridCols='grid-cols-2'
+                    tabArray={[
                         {
-                            title:'Account',
-                            href:'/neuro-access/detailpage',
-                            tabDesination:'details&page',
-                            icon:FaUser,
-                            tabRef:'details'
+                        title: 'Account',
+                        href: '/neuro-access/detailpage',
+                        tabDesination: 'details&page',
+                        icon: FaUser,
+                        tabRef: 'details',
                         },
-                        {   
-                            title:'Identity',
-                            href:'/neuro-access/detailpage',
-                            tabDesination:'identity',
-                            icon:FaShieldAlt,
-                            tabRef:'identity'
-
-                        }
-                    ]}/> 
-
-                    <div className='pt-5'>
-                        <ActivityDetailspage tab={tab}/>
-                    </div>
-            </div>
+                        {
+                        title: 'Identity',
+                        href: '/neuro-access/detailpage',
+                        tabDesination: 'identity',
+                        icon: FaShieldAlt,
+                        tabRef: 'identity',
+                        },
+                    ]}
+                    />
+                </div>
+                    <ActivityDetailspage tab={tab} />
+                </div>
         </div>
     </div>
     )
