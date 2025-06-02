@@ -24,8 +24,7 @@ export const ProfileEditModal = ({ user, setModalToggle, isEditProfile }) => {
               </div>
 
               <div className='flex flex-col gap-3 border-b-2 border-neuroButtonGray pb-3 mt-3'>
-                <InputField labelText={'Account name'} name={user.account} profil={true} />
-                <div className='grid grid-cols-2 gap-5'>
+                <div className='grid grid-cols-2 mt-5 gap-5'>
                   <InputField labelText={'First name'} name={user.properties.FIRST} profil={true} />
                   <InputField labelText={'Last name'} name={user.properties.LAST} profil={true} />
                 </div>

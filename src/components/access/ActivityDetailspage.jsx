@@ -25,9 +25,9 @@ export const ActivityDetailspage = ({tab}) => {
     <div className='h-full '>
     {tab === 'details' && (
         <>
-            <div className=' bg-white border-2 rounded-xl h-full p-5'>
-                <p className='text-neuroTextBlack mb-5 text-text20 font-semibold max-sm:text-center max-sm:text-lg'>Account Activity</p>
-                <h2 className='flex justify-center items-center text-gray-500 text-xl'>Coming soon</h2>
+            <div className='relative flex justify-center items-center bg-white border-2 rounded-xl h-full p-5'>
+                <p className='absolute top-[3vh] left-[2vw] text-neuroTextBlack mb-5 text-text20 font-semibold max-sm:text-center max-sm:text-lg'>Account Activity</p>
+                <h2 className=' text-gray-500 text-xl'>Coming soon</h2>
                 {/* {accountActivityArray.map((item, index) => (
                     <div className='bg-neuroGray/70 rounded-xl mt-2 p-3' key={index}>
                         <div className='flex justify-between items-center'>
@@ -48,8 +48,8 @@ export const ActivityDetailspage = ({tab}) => {
     )}
     {tab === 'identity' && (
         <>
-            <div className='flex flex-col h-full bg-white border-2 rounded-xl p-5'>
-                <p className='text-neuroTextBlack mb-5 text-text20 font-semibold max-sm:text-center max-sm:text-lg'>Identity Activity</p>
+            <div className='relative flex items-center justify-center h-full bg-white border-2 rounded-xl p-5'>
+                <p className='absolute top-[3vh] left-[2vw] text-neuroTextBlack mb-5 text-text20 font-semibold max-sm:text-center max-sm:text-lg'>Identity Activity</p>
                 <h2 className='text-center text-gray-500 text-xl'>Coming soon</h2>
                 {/* {accountActivityArray.map((item, index) => (
                     <div className='bg-neuroGray/70 rounded-xl mt-2 p-3' key={index}>

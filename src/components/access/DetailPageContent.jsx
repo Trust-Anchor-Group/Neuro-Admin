@@ -184,7 +184,7 @@ export default function DetailPageContent() {
               </>
            } 
                 <div className='flex flex-col gap-5'>
-                <div className=''>
+           
                     <TabNavigation
                     tab={tab}
                     id={id}
@@ -206,7 +206,6 @@ export default function DetailPageContent() {
                         },
                     ]}
                     />
-                </div>
                     <ActivityDetailspage tab={tab} />
                 </div>
         </div>

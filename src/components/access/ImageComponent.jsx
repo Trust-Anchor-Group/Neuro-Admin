@@ -2,6 +2,7 @@ import Image from 'next/image'
 import React from 'react'
 
 export const ImageComponent = ({user}) => {
+
   return (
     <div>
     {
@@ -9,13 +10,22 @@ export const ImageComponent = ({user}) => {
         <div className='w-[128px] h-[128px] rounded-3xl overflow-hidden'>
             <Image
                 className='w-full h-full object-cover'
-                src={`data:image/png;base64,${user?.attachments}`}
+                src={`data:image/png;base64,${user?.attachments}`} 
                 width={1200}
                 height={1200}
                 alt='Profile'
                 />
-        </div>
-            :               
+        </div> :
+            user?.imageUrl ? 
+                       <div className='w-[128px] h-[128px] rounded-3xl overflow-hidden'>
+            <Image
+                className='w-full h-full object-cover'
+                src={`${user?.imageUrl?.imageUrl}`} 
+                width={1200}
+                height={1200}
+                alt='Profile'
+                />
+        </div> :           
           <div className='w-[128px] h-[128px] rounded-3xl overflow-hidden'>
         <Image
             className='w-full h-full object-cover'

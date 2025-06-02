@@ -129,6 +129,7 @@ export default function QuickLogin({
       };
 
       sessionStorage.setItem("neuroUser", JSON.stringify(userData));
+      sessionStorage.setItem('profile',JSON.stringify(signatureData))
     }
   };
 

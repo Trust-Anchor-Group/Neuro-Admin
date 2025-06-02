@@ -25,26 +25,7 @@ import { cookies } from 'next/headers'
           }
           
           let data = await res.json()
-
-          console.log('Profile DATa',data)
-        // let filterData
-        //               filterData = {
-        //         Id:data.id,
-        //         account:data.account,
-        //         created:data.created,
-        //         attachments:data?.attachments[0]?.data,
-        //         properties:{
-        //          COUNTRY:data.properties.COUNTRY,
-        //          EMAIL:data.properties.EMAIL,
-        //          PHONE:data.properties.PHONE,
-        //          CITY:data.properties.CITY,
-        //          FIRST:data.properties.FIRST,
-        //          LAST:data.properties.LAST,
-        //          PNR:data.properties.PNR,
-        //          ADDR:data.properties.ADDR   
-        //         },
-        //         state:data.state
-        //     }
+          console.log('DATA',data)
 
           return data
 
