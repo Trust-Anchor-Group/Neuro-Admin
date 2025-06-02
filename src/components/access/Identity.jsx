@@ -35,13 +35,13 @@ export const Identity = ({
   }
 
   return (
-    <section className="pb-12">
+    <section className="">
       <article
         className="bg-white border-2 rounded-xl shadow-sm p-6 pt-8"
         aria-labelledby="identity-heading"
       >
         {user?.properties?.FIRST ? (
-          <div className="grid grid-cols-1 gap-1 max-sm:px-5">
+          <div className="grid grid-cols-1 gap-1 h-full max-sm:px-5">
             <header className="flex items-center gap-3 pb-4 max-sm:flex-col max-sm:mt-5">
               <ImageComponent user={user} />
               <div className="flex flex-col pl-2 gap-2 max-md:text-center">
@@ -89,7 +89,7 @@ export const Identity = ({
               }
             </section>
 
-            <footer className="mt-5">
+            <footer className="">
               {id ? (
                 <ActionButtons
                   user={user}
@@ -114,7 +114,8 @@ export const Identity = ({
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-5 justify-center items-center max-sm:p-5">
+          <div className=''>
+          <div className="flex flex-col justify-center items-center h-[50vh] max-sm:p-5">
             <FaExclamationTriangle className="size-20 max-sm:size-12" color="orange" />
             <h1 className="text-xl font-semibold max-sm:text-sm">
               Account does not have any ID
@@ -122,6 +123,7 @@ export const Identity = ({
             <div className="text-gray-500 text-lg text-center max-sm:text-sm">
               <p>This account doesn't have an identity verification yet.</p>
             </div>
+          </div>
           </div>
         )}
       </article>

@@ -10,7 +10,7 @@ export const DisplayDetails = ({ userData,fieldsToShow,title,header }) => {
 
 
   return (
-    <div className="max-md:grid-cols-1">
+    <div className="flex flex-col h-full max-md:grid-cols-1">
       <div className="bg-white border rounded-xl shadow-sm p-6 max-md:col-span-1 max-sm:p-0 max-sm:pb-5 max-sm:overflow-auto">
         <div className="grid grid-cols-1 gap-5 max-sm:grid-cols-1 max-sm:px-5">
           <div className="flex justify-between items-center gap-3 max-sm:flex-col max-sm:mt-5">

@@ -21,7 +21,6 @@ export const AccessContet = () => {
     const filterAccount = searchParams.get('filter') || 'all'
     const query = searchParams.get('query') || ''
     const [toggle, setToggle] = useState(false)
-    const [loading, setLoading] = useState(false)
     const [userList, setUserList] = useState(null)
     const limit = searchParams.get('limit') || '50'
     const page = Number(searchParams.get('page') || 1)
@@ -36,7 +35,6 @@ export const AccessContet = () => {
     async function getData() {
       if (isFetchingRef.current) return
       isFetchingRef.current = true
-      setLoading(true)
       try {
           if (pathname.includes('id-application')) {
               const requestBody = {
@@ -63,6 +61,7 @@ export const AccessContet = () => {
           } else {
               const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
               const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+
               if (!res.ok) throw new Error("Could not fetch userList");
               
               const data = await res.json();
@@ -74,7 +73,7 @@ export const AccessContet = () => {
       } catch (error) {
           console.error(error);
       } finally {
-          setLoading(false);
+
           isFetchingRef.current = false
       }
   }
@@ -117,7 +116,7 @@ const filteredColumns = filterAccount === 'noID'
            
             {pathname === '/neuro-access/account' && (
               <PaginatedList 
-                userList={userList} 
+                userList={Array.isArray(userList) ? userList:[]} 
                 page={page}
                 totalPages={totalPages}
                 prevPage={prevPage}
@@ -131,7 +130,7 @@ const filteredColumns = filterAccount === 'noID'
 
               {pathname === '/neuro-access/id-application' && (
                 <PaginatedList 
-                  userList={userList} 
+                  userList={Array.isArray(userList) ? userList:[]} 
                   page={page}
                   totalPages={totalPages}
                   prevPage={prevPage}
@@ -152,12 +151,7 @@ const filteredColumns = filterAccount === 'noID'
           />
         )}
 
-        {/* Loading overlay */}
-        {loading && (
-          <div className="absolute inset-0 bg-white/50  flex items-center justify-center z-50">
-            <FaSpinner className="animate-spin text-4xl text-gray-500" />
-          </div>
-        )}
+
       </div>
 
     )

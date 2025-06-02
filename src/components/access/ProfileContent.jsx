@@ -13,7 +13,6 @@ const ProfileContent = ({ profileData }) => {
   const [loading, setLoading] = useState(false)
   const [modalToggle, setModalToggle] = useState(false)
   const [modalToggleClient, setModalToggleClient] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     if (profileData) {
@@ -33,31 +32,6 @@ const ProfileContent = ({ profileData }) => {
     { label: "ID status", key: "state" },
     { label: "ID created", key: "created" },
   ]
-
-  const [form, setForm] = useState({
-    userName: '',
-    email: '',
-    password: '',
-    phone: '',
-    enabled: ''
-  })
-
-  useEffect(() => {
-    if (user) {
-      setForm({
-        userName: user.account,
-        email: user.properties.EMAIL,
-        password: '',
-        phone: user.properties.PHONE,
-        enabled: ''
-      })
-    }
-  }, [user])
-
-  function onHandleChange(field, value) {
-    setForm(prev => ({ ...prev, [field]: value }))
-  }
-
 
   return (
     <main className='relative grid grid-cols-2 gap-5 p-5 max-md:grid-cols-1'>
