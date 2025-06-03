@@ -29,10 +29,12 @@ export default function KYCSettings() {
       if (!AgentAPI || !AgentAPI.Legal?.GetApplicationAttributes) return;
       try {
         const data = await AgentAPI.Legal.GetApplicationAttributes();
+        console.log("📄 Fetched KYC settings:", data);
         const formattedSettings = {
           peerReview: data.peerReview ?? false,
           nrReviewers: data.nrReviewers ?? 2,
           nrPhotos: data.nrPhotos ?? 1,
+          requirePhotos: data.nrPhotos > 0, 
           requiredFields: [
             { id: "FIRST", label: "First name", required: data.Required?.includes("FIRST") },
             { id: "MID", label: "Middle name", required: data.Required?.includes("MID") },
@@ -75,7 +77,27 @@ export default function KYCSettings() {
   };
 
   const saveSettings = useCallback(async () => {
-    if (!settings || JSON.stringify(settings) === originalSettings) return;
+    if (!settings) return;
+
+    const hasChanges =
+      JSON.stringify({
+        allowPeerReview: settings.peerReview,
+        nrReviewersToApprove: settings.nrReviewers.toString(),
+        nrPhotosRequired: settings.nrPhotos.toString(),
+        requiredFields: settings.requiredFields
+          .filter((f) => f.required)
+          .map((f) => f.id),
+      }) !==
+      JSON.stringify({
+        allowPeerReview: JSON.parse(originalSettings).peerReview,
+        nrReviewersToApprove: JSON.parse(originalSettings).nrReviewers.toString(),
+        nrPhotosRequired: JSON.parse(originalSettings).nrPhotos.toString(),
+        requiredFields: JSON.parse(originalSettings).requiredFields
+          .filter((f) => f.required)
+          .map((f) => f.id),
+      });
+
+    if (!hasChanges) return;
     setSaving(true);
     try {
       const payload = {
@@ -139,7 +161,7 @@ export default function KYCSettings() {
             </div>
 
             <div className="space-y-4 pt-4">
-              <Checkbox label="Require photos" checked={settings.requirePhotos} onChange={() => toggleSetting("requirePhotos")} />
+                <Checkbox label="Require photos" checked={settings.requirePhotos} onChange={() => toggleSetting("requirePhotos")} />
               {settings.requirePhotos && (
                 <div className="pl-6">
                   <Input
