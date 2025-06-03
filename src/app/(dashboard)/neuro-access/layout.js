@@ -1,23 +1,15 @@
 "use client";
-
 import Menu from "@/components/shared/Menu";
 import Navbar from "@/components/shared/Navbar";
-import Footer from "@/components/shared/Footer";
-import Image from "next/image";
-import Link from "next/link";
-import { FaCog, FaHome, FaRegUser, FaThLarge } from "react-icons/fa";
+import { MdOutlineDocumentScanner, MdOutlineSettings } from "react-icons/md";
 
 export default function DashboardLayout({ children }) {
 
     const menuItems = [
-      {
-        title:'Dashboard',
-        icon:<FaThLarge/>,
-        href:'/neuro-access',
-      },
+    
       {
         title: 'Access',
-        icon: <FaRegUser size={20} />,
+        icon: <MdOutlineDocumentScanner size={20} />,
         subItems: [
           { label: 'ID applications', href: '/neuro-access/id-application' },
           { label: 'Accounts', href: '/neuro-access/account' },
@@ -25,7 +17,7 @@ export default function DashboardLayout({ children }) {
       },
       {
         title: 'Access settings',
-        icon: <FaCog size={20} />,
+        icon: <MdOutlineSettings size={20} />,
         href: '/neuro-access/settings',
       },
     ]
@@ -42,7 +34,7 @@ export default function DashboardLayout({ children }) {
         <Navbar />
         <div className="flex-1 pb-6">{children}</div>
 
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </div>
   );
