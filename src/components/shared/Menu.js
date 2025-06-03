@@ -9,9 +9,16 @@ const Menu = ({ menuItems }) => {
   const [open, setOpen] = useState(true);
   const [hoveredItem, setHoveredItem] = useState(null);
   const [isClient, setIsClient] = useState(false);
+  const [host, setHost] = useState('');
 
   useEffect(() => {
     setIsClient(true);
+  }, []);
+  useEffect(() => {
+    const storedHost = sessionStorage.getItem("AgentAPI.Host");
+    if (storedHost) {
+      setHost(storedHost);
+    }
   }, []);
 
   if (!isClient) return null;
@@ -26,7 +33,7 @@ const Menu = ({ menuItems }) => {
           {open && (
             <div className="text-center w-full mb-4">
               <div className="bg-[#FCFCFC] py-2 px-4 rounded-lg text-sm text-[#181f259e]">
-                Current neuron
+                {host}
               </div>
             </div>
           )}
