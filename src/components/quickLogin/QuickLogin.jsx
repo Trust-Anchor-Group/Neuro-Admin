@@ -123,7 +123,7 @@ export default function QuickLogin({
       const userData = {
         name: `${signatureData.Properties.FIRST} ${signatureData.Properties.LAST}`,
         legalId: signatureData.Id,
-        pictureId:signatureData.Attachments[0].Id
+        pictureId:signatureData.Attachments[0].Id,
       };
 
       sessionStorage.setItem("neuroUser", JSON.stringify(userData));

@@ -5,39 +5,45 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
-export const Filter = ({linkArray,isFilterAccount,absoluteClassName,size}) => {
+export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,selectArray}) => {
 
   const searchParams = useSearchParams()
-  const filtered = isFilterAccount ? searchParams.get('filter-accounts') || 'all' : searchParams.get('limit') || '50'
+  const filtered = isFilterAccount ? searchParams.get('filter') || 'all' : searchParams.get('limit') || '50'
   const [toggle, setToggle] = useState(false)
-  const [filterNames, setFilterNames] = useState('')
+  const [filterNames, setFilterNames] = useState(selectArray?.[0]?.value || '')
+  const [selectedValue, setSelectedValue] = useState()
 
   const filterRef = useRef(null)
 
   useEffect(() => {
+ if(selectArray?.length > 0){
+      setFilterNames(selectArray[0].label)
+    } 
+  else {
     switch (filtered) {
       case 'all':
         setFilterNames('All')
-        break;
-      case 'hasID':
-        setFilterNames('Active Id')
         break
-        case 'noID':
-          setFilterNames('No Id')
-          break
-          case '50':
-            setFilterNames('50')
-            break;
-          case '25':
-            setFilterNames('25')
-            break
-            case '10':
-              setFilterNames('10')
+      case 'hasID':
+        setFilterNames('Has Id')
+        break
+      case 'noID':
+        setFilterNames('No Id')
+        break
+      case '50':
+        setFilterNames('50')
+        break
+      case '25':
+        setFilterNames('25')
+        break
+      case '10':
+        setFilterNames('10')
+        break
       default:
-        break;
+        break
     }
-  }, [filtered])
-
+  }
+}, [filtered, selectArray, selectedValue])
   useEffect(() => {
     
     const handleClickOutSide = (e) => {
@@ -54,12 +60,16 @@ export const Filter = ({linkArray,isFilterAccount,absoluteClassName,size}) => {
 
   }, [])
   
+function handleSelect(value){
+  setSelectedValue(value)
+  setToggle(false)
+}
   
 
   return (
     <div>
         <div className={`relative flex items-center py-1.5 justify-between bg-neuroGray/70 border rounded-md ${size}`}>
-          <span className='ml-2 text-gray-500 '>{filterNames}</span>
+          <span className='ml-2 text-neuroTextBlack '>{filterNames}</span>
           <button className='mr-2' onClick={() => setToggle(prev => !prev)}>
             {toggle === false ? <FaChevronDown color='#6e6e6e' /> : <FaChevronUp color='#6e6e6e' />}
             </button>  
@@ -68,13 +78,27 @@ export const Filter = ({linkArray,isFilterAccount,absoluteClassName,size}) => {
                         <div className={absoluteClassName} ref={filterRef}>   
                             {
                               linkArray.map((item,index) => (
-                                <Link key={index} className='transition-all border pl-2 hover:bg-neuroGray'
-                                href={item.linkHref}>{item.text}</Link>  
+                                <Link key={index} onClick={() => setToggle(false)} className='transition-all border pl-2 hover:bg-neuroGray'
+                                href={item?.linkHref}>{item.text}</Link>  
                               )                          
                               )
                             }                     
                         </div>
                     )
+                }
+                {
+                  toggle && selectArray && (
+                    <div className={absoluteClassName} ref={filterRef}>
+                        {selectArray.map(({value,label},index)=> (
+                          <button
+                          onClick={() => handleSelect(value)}
+                          key={index}
+                          className="block w-full text-left px-2 py-1 text-lg text-neuroTextBlack hover:bg-neuroGray">
+                            {label}
+                          </button>
+                        ))}
+                    </div>
+                  )
                 }
         </div>
 

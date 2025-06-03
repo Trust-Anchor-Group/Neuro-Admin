@@ -11,6 +11,7 @@ const Menu = ({ menuItems }) => {
   const [isClient, setIsClient] = useState(false);
   const [host, setHost] = useState('');
 
+
   useEffect(() => {
     setIsClient(true);
   }, []);

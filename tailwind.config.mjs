@@ -36,7 +36,8 @@ const config = {
                 neuroOrange:"#F18334",
                 neuroDarkOrange:"#A84700",
                 neuroRed:"#F2495C",
-                neuroButtonGray:"#DFE1E3"
+                neuroButtonGray:"#DFE1E3",
+                neuroInputBackground:"#F5F6F7"
             },
             boxShadow: {
                 fancy: "0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)",
@@ -50,6 +51,7 @@ const config = {
             fontSize:{
                 text16:'16px',
                 text20:'20px',
+                text26:'26px',
                 text28:'28px'
             }
         },

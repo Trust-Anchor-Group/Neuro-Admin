@@ -3,6 +3,13 @@ import { InputField } from '../access/InputField';
 import { dateConverter } from './ConvertDate';
 
 export const MapOutInput = ({fieldsToShow,user}) => {
+  console.log('Field to Show',fieldsToShow)
+
+  if (!fieldsToShow || !Array.isArray(fieldsToShow)) {
+  console.warn('fieldsToShow is missing or not an array:', fieldsToShow);
+  return null;
+}
+
   return (
     <div>
         {

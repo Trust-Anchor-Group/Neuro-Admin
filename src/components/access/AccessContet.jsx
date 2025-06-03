@@ -1,3 +1,4 @@
+'use client'
 import { PaginatedList } from '@/components/access/PaginatedList'
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
@@ -8,16 +9,18 @@ import { FaHourglassHalf, FaSpinner, FaUserFriends } from 'react-icons/fa';
 import Link from 'next/link.js';
 import { Modal } from '../shared/Modal.jsx';
 import { pendingAction } from './pendingFetch.js';
+import { getModalText } from '@/utils/getModalText.js';
 
 
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
     const pathname = usePathname()
-    const filterAccount = searchParams.get('filter-accounts') || 'all'
+    const params = new URLSearchParams(searchParams)
+    const pathnameWithFilter = `${pathname}?${params}`
+    const filterAccount = searchParams.get('filter') || 'all'
     const query = searchParams.get('query') || ''
     const [toggle, setToggle] = useState(false)
-    const [loading, setLoading] = useState(false)
     const [userList, setUserList] = useState(null)
     const limit = searchParams.get('limit') || '50'
     const page = Number(searchParams.get('page') || 1)
@@ -32,7 +35,6 @@ export const AccessContet = () => {
     async function getData() {
       if (isFetchingRef.current) return
       isFetchingRef.current = true
-      setLoading(true)
       try {
           if (pathname.includes('id-application')) {
               const requestBody = {
@@ -59,6 +61,7 @@ export const AccessContet = () => {
           } else {
               const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
               const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
+
               if (!res.ok) throw new Error("Could not fetch userList");
               
               const data = await res.json();
@@ -70,7 +73,7 @@ export const AccessContet = () => {
       } catch (error) {
           console.error(error);
       } finally {
-          setLoading(false);
+
           isFetchingRef.current = false
       }
   }
@@ -113,7 +116,7 @@ const filteredColumns = filterAccount === 'noID'
            
             {pathname === '/neuro-access/account' && (
               <PaginatedList 
-                userList={userList} 
+                userList={Array.isArray(userList) ? userList:[]} 
                 page={page}
                 totalPages={totalPages}
                 prevPage={prevPage}
@@ -121,20 +124,20 @@ const filteredColumns = filterAccount === 'noID'
                 customCellRenderers={customCellAcountTable}
                 userColoumns={filteredColumns}
                 pending={false}
-                filterAccount={filterAccount}
+                query={query}
           />
         )}
 
               {pathname === '/neuro-access/id-application' && (
                 <PaginatedList 
-                  userList={userList} 
+                  userList={Array.isArray(userList) ? userList:[]} 
                   page={page}
                   totalPages={totalPages}
                   prevPage={prevPage}
                   limit={limit}
                   customCellRenderers={customCellPendingTable}
                   userColoumns={userColoumnsPending}
-                  renderRowActions={(props) => pendingActions({...props,onToggleHandler})}
+                  renderRowActions={(props) => pendingActions({...props,onToggleHandler,pathnameWithFilter})}
                   pending={true}
           />
         )}
@@ -142,18 +145,13 @@ const filteredColumns = filterAccount === 'noID'
         {/* Modal */}
         {toggle && (
           <Modal 
-            text={`Are you sure you want to ${buttonName}?`}
+            text={getModalText(actionButtonName, buttonName)}
             setToggle={setToggle}
             onHandleModal={onHandleModal}
           />
         )}
 
-        {/* Loading overlay */}
-        {loading && (
-          <div className="absolute inset-0 bg-white/50  flex items-center justify-center z-50">
-            <FaSpinner className="animate-spin text-4xl text-gray-500" />
-          </div>
-        )}
+
       </div>
 
     )

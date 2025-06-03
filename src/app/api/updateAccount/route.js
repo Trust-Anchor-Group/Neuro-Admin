@@ -4,24 +4,24 @@ import ResponseModel from "@/models/ResponseModel";
 export async function POST(request) {
 
     const requestData = await request.json();
-    const { legalIdentity } = requestData;
+    const { UserName, Password, EMail, PhoneNr, Enabled} = requestData;
     const clientCookie = request.headers.get('Cookie');
-    const decodedUserId = decodeURIComponent(legalIdentity);
     const { host } = config.api.agent;
-    const url = `https://${host}/legalIdentity.ws`;
+    const url = `https://${host}/UpdateAccount`;
 
-    const payload = {
-        id:decodedUserId
-    };
-    console.log('LegalId Fetch',payload)
+    const payload = `UserName=${encodeURIComponent(UserName)}&Password=${encodeURIComponent(Password)}&EMail=${encodeURIComponent(EMail)}&PhoneNr=${encodeURIComponent(PhoneNr)}&Enabled=${encodeURIComponent(Enabled)}&FtpRootFolder=&FtpMaxStorage=`;
+
+    
+    console.log(payload)
+
     try {
 
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Cookie': clientCookie,
-                'Accept': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Cookie': clientCookie
             },
             credentials: 'include',
             body: JSON.stringify(payload),
@@ -30,29 +30,9 @@ export async function POST(request) {
 
         const contentType = response.headers.get('content-type');
         let data;
-        let filterData
 
         if (contentType.includes('application/json')) {
             data = await response.json();
-           
-
-            filterData = {
-                Id:data.id,
-                account:data.account,
-                created:data.created,
-                attachments:data?.attachments[0]?.data,
-                properties:{
-                 COUNTRY:data.properties.COUNTRY,
-                 EMAIL:data.properties.EMAIL,
-                 PHONE:data.properties.PHONE,
-                 CITY:data.properties.CITY,
-                 FIRST:data.properties.FIRST,
-                 LAST:data.properties.LAST,
-                 PNR:data.properties.PNR,
-                 ADDR:data.properties.ADDR   
-                },
-                state:data.state
-            }
         } else {
             data = await response.text();
         }
@@ -66,7 +46,7 @@ export async function POST(request) {
             });
         }
 
-        return new Response(JSON.stringify(new ResponseModel(200, 'Legal Identity returned', filterData)), {
+        return new Response(JSON.stringify(new ResponseModel(200, 'status of LegalID succerfully changed', data)), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',

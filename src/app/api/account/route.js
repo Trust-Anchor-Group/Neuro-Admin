@@ -32,9 +32,18 @@ export async function POST(request) {
 
         const contentType = response.headers.get('content-type');
         let data;
+        let filteredData
 
         if (contentType.includes('application/json')) {
             data = await response.json();
+            filteredData = {
+                country:data.account.country,
+                firstName:data.account.firstName,
+                lastNames:data.account.lastNames,
+                eMail:data.account.eMail,
+                userName:data.account.userName,
+                created:data.account.created
+            }
         } else {
             data = await response.text();
         }
@@ -48,7 +57,7 @@ export async function POST(request) {
             });
         }
 
-        return new Response(JSON.stringify(new ResponseModel(200, 'Account returned', data)), {
+        return new Response(JSON.stringify(new ResponseModel(200, 'Account returned', {data:filteredData})), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',

@@ -7,7 +7,7 @@ import { AccountDetails, DisplayDetails } from '@/components/access/Buttons/Disp
 import Link from 'next/link';
 import { Identity } from '@/components/access/Identity';
 import { ActivityDetailspage } from './ActivityDetailspage';
-import { CreateUserData } from '../shared/CreateUserData';
+import { TabNavigation } from '../shared/TabNavigation';
 
 
 export default function DetailPageContent() {
@@ -16,8 +16,9 @@ export default function DetailPageContent() {
     const [loading, setLoading] = useState(true)
     const searchParams = useSearchParams()
     const [isAccount, setIsAccount] = useState(false)
+    const ref = searchParams.get('ref')
     const tab = searchParams.get('tab') || 'details'
-    
+    const [backPath, setBackPath] = useState(null) // To track Params from previous page
     const router = useRouter()
     
     async function getAccounts(){
@@ -42,7 +43,7 @@ export default function DetailPageContent() {
             console.log('New Account',data)
             
             setIsAccount(true)
-            setUser(data)
+            setUser(data.data)
   
         } catch (error) {
             console.error('Error fetching user:', error)
@@ -51,7 +52,7 @@ export default function DetailPageContent() {
             setLoading(false) 
         }
     }
-    
+
     async function getData() {
         try {
             const url = `${config.protocol}://${config.origin}/api/legalIdentity`;
@@ -77,7 +78,6 @@ export default function DetailPageContent() {
   
         } catch (error) {
             console.error('Error fetching user:', error)
-            setUser(undefined) 
         } finally {
             setLoading(false) 
         }
@@ -100,11 +100,22 @@ export default function DetailPageContent() {
         }
     }, [id]);
 
+    useEffect(() => {
+      if(ref){
+        setBackPath(ref)
+      }
+    }, [])
+    
+  const fieldsToShowMetadata = [
+    { label: "ID status", key: "state" },
+    { label: "ID created", key: "created" },
+  ]
 
     const fieldsToShow = [
         { label: "Account", key: "account" },
         { label: "Email", key: "properties.EMAIL" },
         { label: "Country", key: "properties.COUNTRY" },
+        { label: "Phone", key: "properties.PHONE" },
         { label: "Created", key: "created" }
       ];
 
@@ -118,59 +129,38 @@ export default function DetailPageContent() {
       ];
     
       const fieldsToShowWithNoID = [
-        { label: "Account", key: "data.account.userName" },
-        { label: "Email", key: "data.account.eMail" },
-        { label: "Country", key: "data.account.country" },
-        { label: "Phone", key: "data.account.phoneNr" },
-        { label: "Created", key: "data.account.created" },
+        { label: "Account", key: "data.userName" },
+        { label: "Email", key: "data.eMail" },
+        { label: "Country", key: "data.country" },
+        { label: "Phone", key: "data.phoneNr" },
+        { label: "Created", key: "data.created" },
       ];
 
     return (
         <div className='p-5'>
-              
-                
-                        <div className='flex mb-5 gap-5 max-sm:flex-col'>
-                            <div className=''>
-                                <button aria-label='Back to Access Page' className='flex 
-                                items-center gap-5 border-2 p-2 rounded-lg' onClick={() => router.push('/neuro-access/account')}>
-                                    <FaArrowLeft className='transition-opacity size-5 hover:opacity-50'/>
-                                    Back
-                                </button>
-                            </div>
-                            
-                            { user?.data?.properties  ?
-                            <div className='flex flex-col max-sm:items-center'>
-                                <div className='flex items-center gap-2'>   
-                                    <p className='text-3xl font-semibold max-sm:text-lg'>{user.data.properties.FIRST || user.data.account}</p>
-                                    <p className='text-3xl font-semibold max-sm:text-lg'>{user.data.properties.LAST || ''}</p>
-                                </div>
-                                <div>
-                                    <p className='text-xl opacity-50 max-sm:text-sm'>{user.data.properties.EMAIL}</p>
-                                </div>
-                            </div> 
-                            :               
-                            <div className='flex flex-col max-sm:items-center'>
-                            <div className='flex items-center gap-2'>
-                                    <p className='text-3xl font-semibold max-sm:text-lg'>{user?.data?.account?.userName}</p>
-                            </div>
-                            <div>
-                                <p className='text-xl opacity-50 max-sm:text-sm'>{user?.data?.account?.eMail}</p>
-                            </div>
-                        </div> 
-                            }
-                        </div>
+
+
+        <div className='flex mb-5 gap-5 max-sm:flex-col'>
+            <div className=''>
+                <button aria-label='Back to Access Page' className='flex 
+                items-center gap-5 border-2 p-2 rounded-lg' onClick={() => backPath ? router.push(backPath) : router.back()}>
+                    <FaArrowLeft className='transition-opacity size-5 hover:opacity-50'/>
+                    Back
+                </button>
+            </div>
+        </div>
                         
              
-        <div className=' flex items-center '>
+        <div className='flex items-center '>
           
             </div>
             <div className='grid grid-cols-2 gap-5 max-md:grid-cols-1'>
 
             {
                 loading ? (
-                    <div className='flex justify-center items-center mt-12'>
-                    <FaSpinner className='animate-spin text-5xl'/>
-                </div>
+                     <div className="absolute inset-1 bg-white/50  flex items-center justify-center z-50">
+                       <FaSpinner className="animate-spin text-4xl text-gray-500" />
+                     </div>
                 ) :
                 <>
               {tab === 'details' && (
@@ -186,31 +176,39 @@ export default function DetailPageContent() {
                       <Identity user={user}
                       id={id} getData={getData}
                       fieldsToShow={fieldsToShowIdentity}
+                       fieldsToShowMetaData={fieldsToShowMetadata}
                  />
                      
                     )
                 }
               </>
            } 
-             <div className=''>
-                                    
-                <nav className="grid grid-cols-2 w-full text-center rounded-lg bg-white/90 font-semibold">
-                    <Link href={`/neuro-access/detailpage/${id}/?tab=details&page=1`}>
-                        <div className={`flex items-center justify-center text-text16 rounded-lg gap-2 py-3  ${tab === 'details' ?
-                            'bg-aprovedPurple/15 text-neuroPurpleDark  duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
-                                <FaUser className='max-md:hidden' size={14} /><span>Account</span></div>
-                    </Link>
-                    <Link href={`/neuro-access/detailpage/${id}/?tab=identity&page=1`}>
-                    <div className={`flex items-center justify-center rounded-lg gap-2 py-3 text-text16 ${tab === 'identity' ?
-                        'bg-aprovedPurple/15 text-neuroPurpleDark duration-300' : 'bg-white/90 text-neuroTextBlack/60'}`}>
-                         <FaShieldAlt className='max-md:hidden'/><span>Identity</span></div>
-                    </Link>
-                                
-                    </nav>
-                    <div className='pt-5'>
-                        <ActivityDetailspage tab={tab}/>
-                    </div>
-            </div>
+                <div className='flex flex-col gap-5'>
+                <div className=''>
+                    <TabNavigation
+                    tab={tab}
+                    id={id}
+                    gridCols='grid-cols-2'
+                    tabArray={[
+                        {
+                        title: 'Account',
+                        href: '/neuro-access/detailpage',
+                        tabDesination: 'details&page',
+                        icon: FaUser,
+                        tabRef: 'details',
+                        },
+                        {
+                        title: 'Identity',
+                        href: '/neuro-access/detailpage',
+                        tabDesination: 'identity',
+                        icon: FaShieldAlt,
+                        tabRef: 'identity',
+                        },
+                    ]}
+                    />
+                </div>
+                    <ActivityDetailspage tab={tab} />
+                </div>
         </div>
     </div>
     )
