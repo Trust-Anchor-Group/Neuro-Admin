@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import config from "@/config/config";
 import { FaQrcode } from "react-icons/fa";
+import { useRouter } from 'next/navigation';
 
 const QuickLogin = dynamic(
   () => import("@/components/quickLogin/QuickLogin"),
@@ -13,7 +14,7 @@ const QuickLogin = dynamic(
 
 export default function LoginPage() {
   const [showQR, setShowQR] = useState(false);
-
+  const router = useRouter();
   return (
     <div
       style={{
@@ -107,9 +108,7 @@ export default function LoginPage() {
                   neuron={config.api.agent.host}
                   purpose="Login to Neuro-admin"
                   active
-                  onLoginSuccess={() =>
-                    (window.location.href = "/landingpage")
-                  }
+                  onLoginSuccess={() => router.push('/landingpage')}
                 />
                 <button
                   onClick={() => setShowQR(false)}
