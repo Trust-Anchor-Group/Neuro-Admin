@@ -72,7 +72,7 @@ export const Pagination = ({ page, prevPage, totalPages,limit }) => {
         </div>
 
         {
-          maxCount !== 1 ? (
+          maxCount !== 1 && maxCount !== page ? (
                 <div className='flex gap-[2px] text-gray-500 max-sm:hidden'>
                 <span>•</span>
                 <span>•</span>
@@ -81,16 +81,13 @@ export const Pagination = ({ page, prevPage, totalPages,limit }) => {
                 ) : ''
               }
 
-          { maxCount !== 1 ? (
-        <Link
-          className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
-          href={buildPaginationURL(maxCount)}
-        >
-
-            <p>{maxCount}</p>  
-           
-        </Link>) :''
-          }
+        {(maxCount !== 1 && maxCount !== page) && (
+          <Link className='' href={buildPaginationURL(maxCount)}>
+            <p className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'>
+              {maxCount}
+            </p>  
+          </Link>
+        )}
       </div>
 
       <div>

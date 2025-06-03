@@ -43,25 +43,44 @@ import { MdAssignment } from 'react-icons/md'
     //Special actions a column should/could have
    export const customCellPendingTable = {
     account: ({ cell, row }) => {
-       
-      if(row.original.name !== ''){
-        return <div>
-          
-            <p className="font-semibold">{row.original.name}</p>
-            <p className="
-              ">{row.original.account}</p>
-        
-        </div>
-      }
-     return <div>
-
-   
-         <p className="
-   ">{row.original.account}</p>
-  
-    
-   </div>
-  }
+       const account = row.original.account
+      if(account){
+        return (
+          <p>{account}</p>
+        )
+      } else {
+        <p>-</p>
+      } 
+  },
+     name: ({ cell, row }) => {
+       const name = row.original.name
+      if(name){
+        return (
+          <p>{name}</p>
+        )
+      } else {
+        <p>-</p>
+      }}
+      ,     
+      "other.EMAIL": ({ cell, row }) => {
+       const email = row.original.other.EMAIL
+        return email ? (
+          <p title={email}>
+            {email.length > 20 ? `${email.slice(0, 20)}...` : email}
+          </p>
+        ) : (
+          <p>-</p>
+        );
+    },
+         city: ({ cell, row }) => {
+       const city = row.original.city
+      if(city){
+        return (
+          <p>{city}</p>
+        )
+      } else {
+        <p>-</p>
+      }}
       }
 
      const arrayActions = [
