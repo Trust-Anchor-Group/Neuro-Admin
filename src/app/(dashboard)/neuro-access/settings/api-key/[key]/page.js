@@ -45,7 +45,8 @@ export default function APIKeyDetails() {
     <div className="min-h-screen px-6 py-12 bg-[#FAFAFA] font-grotesk">
        
       <div className="max-w-6xl mx-auto">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-500 hover:text-gray-800 mb-6">
+          <button onClick={() => router.push("/neuro-access/settings?tab=api")}
+           className="flex items-center gap-2 text-gray-500 hover:text-gray-800 mb-6">
           <FaArrowLeft /> Back to API Keys
         </button>
 
