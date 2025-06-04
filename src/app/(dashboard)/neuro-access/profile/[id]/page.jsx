@@ -10,7 +10,7 @@ const ProfilePage = async ({params}) => {
 
   return (
     <div>
-      <ProfileContent profileData={profileData} />
+      <ProfileContent/>
     </div>
   )
 }

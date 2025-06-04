@@ -1,8 +1,5 @@
 import React from 'react';
-import { InputField } from '../InputField';
-
 import Image from 'next/image';
-import { dateConverter } from '../../shared/ConvertDate';
 import { MapOutInput } from '../../shared/MapOutInput';
 
 export const DisplayDetails = ({ userData,fieldsToShow,title,header }) => {

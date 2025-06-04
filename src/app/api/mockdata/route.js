@@ -10,7 +10,7 @@ export async function GET(req) {
         const limit = parseInt(searchParams.get('limit') || '5', 10) // Get the limit of users per page, default to 5
         const filterAccount = searchParams.get('filter')
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
-  
+        
         let fullId 
         if(filterAccount === 'hasID'){
             fullId = true
@@ -24,8 +24,9 @@ export async function GET(req) {
         const clientCookie = clientCookieObject
             ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
             : null;
+     
 
-            const payload = {
+        const payload = {
                 maxCount:limit,
                 offset:(page - 1) * limit,
                 fullId:fullId,
@@ -35,8 +36,10 @@ export async function GET(req) {
                     
                 } : {filter:{}} ),
             }
+        
 
-            console.log('PAYLOAD',payload)
+            
+
         const { host } = config.api.agent;
 
         const url = `https://${host}/Accounts.ws`;
@@ -48,13 +51,21 @@ export async function GET(req) {
                     'Cookie': clientCookie,
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify()
+                body: JSON.stringify(filterAccount.includes('hasID') || filterAccount.includes('noID') ? {maxCount:1000,offset:0} : '')
             });   
 
-            const dataResponseTotalPages = await responseTotalPages.json()
-            console.log('Total Pages',dataResponseTotalPages)
-
-
+            const dataResponseTotalItems = await responseTotalPages.json()
+            let filteredTotalpage
+            
+            if (fullId === true) {
+            const firstName = dataResponseTotalItems.filter(item => item.firstName !== '');
+            filteredTotalpage = firstName.length;
+            } else if (fullId === false) {
+            const firstName = dataResponseTotalItems.filter(item => item.firstName === '');
+            filteredTotalpage = firstName.length;
+            } else {
+            filteredTotalpage = dataResponseTotalItems
+            }
 
         const res = await fetch(url, {
             method: 'POST',
@@ -77,7 +88,6 @@ export async function GET(req) {
         }
 
         const data = await res.json()
-    
 
         const filteredData = data.map((item) => {
            return {
@@ -92,10 +102,10 @@ export async function GET(req) {
                 userName:item.userName
             }
         })
-
+      
          const response = {
              data: filteredData,
-             totalPages:dataResponseTotalPages
+             totalPages:query ? data.length : filteredTotalpage 
          }
 
 

@@ -34,7 +34,7 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
                  {
                 user && user.state === 'Created' && (
                     
-                <div className='mt-10 max-sm:p-5'>    
+                <div className='mt-5 max-sm:p-5'>    
                       {
                           toggle &&
                             <Modal
@@ -72,7 +72,7 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
                         {
                 user && user.state === 'Obsoleted' && (
                     
-                <div className='mt-10 max-sm:p-5'>    
+                <div className='mt-5 max-sm:p-5'>    
                       {
                           toggle &&
                                             <Modal 
@@ -108,7 +108,7 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
 
                 {
                 user && !['Created', 'Obsoleted'].includes(user.state) && (
-                    <div className='mt-10 max-sm:p-5'>    
+                    <div className='mt-5 max-sm:p-5'>    
                     {
                         toggle &&
                         <Modal 

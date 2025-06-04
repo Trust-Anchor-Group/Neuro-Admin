@@ -24,11 +24,12 @@ const inputRef = useRef(null)
 const handleSearch = useDebouncedCallback((searchTerm) =>{
        // Create a URLSearchParams object to modify the query parameters
     const params = new URLSearchParams(searchParams)
-    console.log('Params',searchParams)
     // If we have a search term, set it in the URL query, otherwise delete it
     if(searchTerm){
         params.set('query',searchTerm)
         params.set('page','1')
+        params.set('filter','all')
+        params.set('limit','50')
     }else{
         params.delete('query')
         params.set('page','1')
