@@ -68,7 +68,7 @@ function handleSelect(value){
 
   return (
     <div>
-        <div className={`relative flex items-center py-1.5 justify-between bg-neuroGray/70 border rounded-md ${size}`}>
+        <div className={`relative z-20 flex items-center py-1.5 justify-between bg-neuroGray/70 border rounded-md ${size}`}>
           <span className='ml-2 text-neuroTextBlack '>{filterNames}</span>
           <button className='mr-2' onClick={() => setToggle(prev => !prev)}>
             {toggle === false ? <FaChevronDown color='#6e6e6e' /> : <FaChevronUp color='#6e6e6e' />}
