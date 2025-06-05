@@ -9,7 +9,6 @@ export async function POST(request) {
 
     const { host } = config.api.agent;
     const url = `https://${host}/NeuroFeatures.ws`;
-
     const payload = {
         maxCount,
         ...(offset ? {offset} : {offset: 0}),

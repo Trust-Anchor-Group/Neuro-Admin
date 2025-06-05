@@ -24,12 +24,15 @@ const inputRef = useRef(null)
 const handleSearch = useDebouncedCallback((searchTerm) =>{
        // Create a URLSearchParams object to modify the query parameters
     const params = new URLSearchParams(searchParams)
-
     // If we have a search term, set it in the URL query, otherwise delete it
     if(searchTerm){
         params.set('query',searchTerm)
+        params.set('page','1')
+        params.set('filter','all')
+        params.set('limit','50')
     }else{
         params.delete('query')
+        params.set('page','1')
     }
 
     // Replace the current URL with the updated query string
@@ -38,18 +41,20 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
     setTimeout(() => {
       inputRef.current?.focus()
     }, 0);
-},1000)
+},200)
 
   return (
-    <div className='relative'>
-        <input type="text"
-        ref={inputRef}
-        className={classNameText}
-        placeholder={placeholder}
-        onChange={(e) => handleSearch(e.target.value)}
-        defaultValue={searchParams.get('query')?.toString()} />
-         <FaSearch className='text-gray-400 absolute left-[4%] top-[1vh] h-[30px] w-[20px] block max-sm:hidden'/> 
-    </div>
+    <div className="relative w-full z-20">
+    <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+    <input
+      type="text"
+      ref={inputRef}
+      className={`pl-10 pr-4 py-2 w-full ${classNameText}`} 
+      placeholder={placeholder}
+      onChange={(e) => handleSearch(e.target.value)}
+      defaultValue={searchParams.get('query')?.toString()}
+    />
+  </div>
   )
 }
 

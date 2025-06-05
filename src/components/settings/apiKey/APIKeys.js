@@ -58,7 +58,7 @@ export default function APIKeys() {
     navigator.clipboard.writeText(key)
   }
   const handleRowClick = (key) => {
-    router.push(`/settings/api-key/${key}`);
+    router.push(`/neuro-access/settings/api-key/${key}`);
   };
   const columns = useMemo(
     () => [
@@ -135,11 +135,7 @@ export default function APIKeys() {
           onPaginationChange={setPagination}
           positionPagination="top"
           enableBottomToolbar={false}
-          enableColumnActions={false}
-          paginationDisplayMode="pages"
-          columnResizeMode="onChange"
-          layoutMode="grid"
-          enableColumnResizing
+          enableColumnActions={false}     
           muiPaginationProps={{
             shape: 'rounded',
             showFirstButton: false,

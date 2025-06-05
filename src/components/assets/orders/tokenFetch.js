@@ -1,4 +1,5 @@
- export async function fetchTokensClientSide(maxCount = 10, offset = 0) {
+
+export async function fetchTokensClientSide(maxCount = 10, offset = 0) {
   const response = await fetch('/api/tokens', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -5,10 +5,17 @@ import {
 } from "material-react-table";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 
 const TableComponent = ({data = [], columns = [],enableSorting = false, enableRowActions, renderRowActionMenuItems,
   customCellRenderers = {},}) => {
+    
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
+    const params = new URLSearchParams(searchParams)
+    const pathnameWithFilter = `${pathname}?${params}`
+    const router = useRouter()
 
 
   const modifiedColumns = columns.map((col) => ({
@@ -32,7 +39,15 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     renderRowActionMenuItems: renderRowActionMenuItems || undefined,
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
-        window.location.href = `/list/access/detailpage/${row.original.id}`;
+        if (!pathname.includes('id-application')) {
+          const checkId = row.original.latestLegalId?.length
+            ? row.original.latestLegalId
+            : row.original.userName;
+      
+          router.push(`/neuro-access/detailpage/${checkId}?ref=${encodeURIComponent(pathnameWithFilter)}`)
+        } else {
+          router.push(`/neuro-access/detailpage/${row.original.id}?ref=${encodeURIComponent(pathnameWithFilter)}`)
+        }
       },
       sx: {
         cursor: 'pointer',
@@ -45,12 +60,21 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
         fontWeight: 500 
       } : {}, 
     }),
+    
+    muiTablePaperProps: ({ table }) => ({
+  //not sx
+  style: {
+    zIndex: table.getState().isFullScreen ? 0 : undefined,
+  },
+}),
+
     muiTopToolbarProps: {
       sx: {
         marginTop: "100px", // Flyttar ned knapparna
       },
     }
   });
+  
   
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>

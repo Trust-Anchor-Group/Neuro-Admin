@@ -12,6 +12,12 @@ const AssetOrdersTable = ({ orders, isLoading }) => {
         accessorKey: "id",
         header: "Token ID",
         size: 300,
+        Cell:({cell})=> {
+          const id = cell.getValue()
+          const slicedId = id.slice(0,10)
+          return slicedId
+
+        }
       },
       {
         accessorKey: "assetName",
@@ -86,20 +92,84 @@ const AssetOrdersTable = ({ orders, isLoading }) => {
       enableColumnFilters
       enableSorting
       enablePagination
-      muiTableProps={{
-        sx: { boxShadow: 2, borderRadius: 2 },
-      }}
-      muiTableBodyProps={{
-        sx: { "& tr:hover": { backgroundColor: "#f5f5f5" } },
-      }}
-      muiTableContainerProps={{
-        sx: { maxHeight: "600px" }, // Set max height for scrollable table
-      }}
-      initialState={{
-        pagination: { pageSize: 5, pageIndex: 0 }, // Default page size
-        sorting: [{ id: "orderDate", desc: true }], // Default sorting by date
-      }}
-    />
+     positionPagination="top"
+          enableBottomToolbar={false}
+          enableColumnActions={false}
+          paginationDisplayMode="pages"
+          columnResizeMode="onChange"
+          layoutMode="grid"
+          enableColumnResizing
+          muiPaginationProps={{
+            shape: 'rounded',
+            showFirstButton: false,
+            showLastButton: false,
+            sx: {
+              '& .MuiPagination-ul': {
+                justifyContent: 'flex-end',
+                gap: '8px',
+                padding: '8px',
+              },
+              '& .MuiPaginationItem-root': {
+                borderRadius: '4px',
+                minWidth: '32px',
+                height: '32px',
+                fontSize: '14px',
+                fontWeight: 500,
+                fontFamily: '"Space Grotesk", sans-serif',
+                color: '#4B5563',
+              },
+              '& .Mui-selected': {
+                backgroundColor: '#E9DDF8 !important',
+                color: '#722FAD !important',
+                fontWeight: 600,
+              },
+              '& .MuiPaginationItem-ellipsis': {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '35px',
+                color: '#9CA3AF',
+                paddingBottom: '1rem',
+                borderRadius: '4px',
+              },
+
+              '& .MuiPaginationItem-icon': {
+                color: '#9CA3AF',
+              },
+            },
+          }}
+          muiTablePaperProps={{ elevation: 0 }}
+          muiTableContainerProps={{
+            sx: { borderRadius: '16px', overflow: 'hidden' },
+          }}
+          muiTableHeadCellProps={{
+            sx: {
+              backgroundColor: '#F9FAFB',
+              color: '#4B5563',
+              fontSize: '13px',
+              fontWeight: 600,
+              textTransform: 'none',
+              fontFamily: '"Space Grotesk", sans-serif',
+            },
+          }}
+          muiTableBodyCellProps={{
+            sx: {
+              fontSize: '14px',
+              borderBottom: '1px solid #E5E7EB',
+              paddingTop: '12px',
+              paddingBottom: '12px',
+              fontFamily: '"Space Grotesk", sans-serif',
+            },
+          }}
+      muiTableBodyRowProps={({ row }) => ({
+        onClick: () => {
+          window.location.href = `/neuro-assets/detailpage/${row.original.id}`;
+        },
+        sx: {
+          cursor: 'pointer',
+        },
+      })}
+      />
   );
 };
 

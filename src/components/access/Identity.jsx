@@ -1,124 +1,132 @@
-import React, { useState } from 'react'
-import { Modal } from '../shared/Modal';
-import { InputField } from './InputField';
-import Image from 'next/image';
-import { FaBan, FaCheck, FaChevronDown, FaChevronUp, FaExclamationTriangle, FaFileAlt, FaSignInAlt, FaTimes, FaTimesCircle } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaExclamationTriangle } from 'react-icons/fa';
 import { DetailpageStatus } from './DetailpageStatus';
-import { ActionButtons } from './ActionButtons';
+import { ActionButtons } from './Buttons/ActionButtons';
+import { dateConverter } from '../shared/ConvertDate';
+import { InfoToggleButton } from './Buttons/InfoToggleButton';
+import { MapOutInput } from '../shared/MapOutInput';
+import { PopUpButton } from './Buttons/PopUpButton';
+import { ImageComponent } from './ImageComponent';
+import { ProfileEditModal } from './ProfileEditModal';
 
-export const Identity = ({user,id,getData}) => {
+export const Identity = ({
+  user, id, getData, fieldsToShow,
+ modalToggle, setModalToggle,
+  fieldsToShowMetaData
+}) => {
+  const [infoToggle, setIntoToggle] = useState(true);
+  const [infoToggleMetaData, setIntoToggleMetaData] = useState(false);
 
-const [infoToggle, setIntoToggle] = useState(true)
+  const adminActions = [
+    { actionTitle: 'Rejected', bgColor: 'bg-neuroRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: 'Deny ID application' },
+    { actionTitle: 'Approved', bgColor: 'bg-neuroPurpleLight', icon: FaExclamationTriangle, textColor: 'text-neuroPurpleDark', name: 'Approve ID application' },
+    { actionTitle: 'Compromised', bgColor: 'bg-neuroDarkOrange/20', icon: FaExclamationTriangle, textColor: 'text-neuroDarkOrange', name: 'Compromise Id' },
+    { actionTitle: 'Obsoleted', bgColor: 'bg-obsoletedRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: 'Obsolete Id' },
+  ];
 
-
-const adminActions = [
-    {actionTitle:'Rejected', bgColor:'bg-neuroRed/20', icon:FaTimes,textColor:'text-obsoletedRed',name:'Deny\u00A0ID\u00A0application'},
-    {actionTitle:'Approved', bgColor:'bg-neuroPurpleLight', icon:FaCheck,textColor:'text-neuroPurpleDark',name:'Approve\u00A0ID\u00A0application'},
-    {actionTitle:'Compromised', bgColor:'bg-neuroDarkOrange/20', icon:FaExclamationTriangle,textColor:'text-neuroDarkOrange',name:'Compromise'},
-    {actionTitle:'Obsoleted', bgColor:'bg-obsoletedRed/20', icon:FaTimesCircle,textColor:'text-obsoletedRed',name:'Obsolete'},
-]
-
-if(!user){
-    return <div className='p-3 pb-12 max-md:grid-cols-1'>
-        <p className='bg-white border-2 rounded-xl p-6 py-12 text-center  max-md:col-span-1 max-sm:p-0
-        max-sm:pb-5 max-sm:overflow-auto'>No available data</p>
-
-    </div>
-}
+  if (!user) {
+    return (
+      <section className="p-3 pb-12">
+        <article className="bg-white border-2 rounded-xl p-6 py-12 text-center">
+          <p>No available data</p>
+        </article>
+      </section>
+    );
+  }
 
   return (
-    <div className='p-3 pb-12 max-md:grid-cols-1'>
-    <div className='bg-white border-2 rounded-xl p-6 pt-8  max-md:col-span-1 max-sm:p-0
-    max-sm:pb-5 max-sm:overflow-auto'>
-        
-        {
-           user && user.data.properties.FIRST ? (
-                <div className=''>
-                    <div className='grid grid-cols-1 gap-1 max-sm:grid-cols-1 max-sm:px-5'>
-                        <div className='flex items-center gap-3 pb-4 max-sm:flex-col max-sm:mt-5'>
-                        {
-                                 user && user.data.attachments.length === 0 ?
-                                 <div className='w-[100px] h-[100px] rounded-xl overflow-hidden'>
-                                <Image
-                                    className='w-full h-full object-cover'
-                                    src={`https://res.cloudinary.com/drkty7j9v/image/upload/v1737114626/profil-ezgif.com-avif-to-jpg-converter_jkimmv.jpg`}
-                                    width={1200}
-                                    height={1200}
-                                    alt='Profile'
-                                    />
-                            </div>:               
-                                <div className='w-[128px] h-[128px] rounded-xl overflow-hidden'>
-                                    <Image
-                                        className='w-full h-full object-cover'
-                                        src={`data:image/png;base64,${user.data.attachments[0].data}`}
-                                        width={1200}
-                                        height={1200}
-                                        alt='Profile'
-                                        />
-                                </div>
-                            }
-                            <div className='flex flex-col pl-2 gap-2 max-md:text-center '>
-                                    <DetailpageStatus user={user} adminActions={adminActions}/>
-                                    <div>
-                                    <p className='text-3xl font-semibold'>{user.data.properties.FIRST +
-                                ' ' + user.data.properties.LAST || 'N/A'}</p>
-                                <p className='text-xl text-neuroDarkGray/70 '>{user.data.account || 'N/A'}</p>
-                                <p className='border-t-2 pt-2 text-neuroDarkGray/70'>Application made 2025-04-08</p>
-                                    </div>
-                                    
-                            </div>
-                                
-                                
-                        </div>
-                        <div className='bg-neuroGray/70 rounded-xl p-5 overflow-auto'>
-                           {
-                           infoToggle ? (
-                            <div className='flex justify-between border-b-2 pb-2'>
-                            <h2 className='font-semibold text-neuroDarkGray/70'>Identity Information</h2>
-                             <button onClick={() => setIntoToggle(prev => !prev)}><FaChevronDown color='#6e6e6e' /></button>
-                            </div>
-                           ) :
-                           <div className='flex justify-between border-b-2 pb-2'>
-                               <h2 className='font-semibold text-neuroDarkGray/70'>Identity Information</h2>
-                            <button onClick={() => setIntoToggle(prev => !prev)}> <FaChevronUp color='#6e6e6e' /></button>
-                        </div>
-                           }
-                           {
-                               infoToggle ? (
-                                <div className='transition-all delay-300 animate-fade-in'>
-                                <InputField labelText={'First name'} name={user.data.properties.FIRST || 'N/A'}/>
-                                <InputField labelText={'Last name'} name={user.data.properties.LAST || 'N/A'}/>
-                                <InputField labelText={'Nationality'} name={user.data.properties.COUNTRY || 'N/A'}/>
-                                <InputField labelText={'Adress'} name={user.data.properties.ADDR|| 'N/A'}/>
-                                <InputField labelText={'Nationality'} name={user.data.properties.PNR || 'N/A'}/>
-                                <InputField labelText={'Date of birth'} name={user.data.properties.EMAIL || 'N/A'}/>
-                                <InputField labelText={'Phone Number'} name={user.data.properties.PHONE || 'N/A'}/>
-                                </div>
-                            ) : ''
-                                   
-                         }
-
-                        </div>
-                        <div className='mt-5'>
-                            <ActionButtons user={user} adminActions={adminActions} id={id} getData={getData}/>
-
-                        </div>
-                    </div>
-                </div> 
-            ) : (
-                <div className='flex flex-col gap-5 justify-center items-center'>
-                <FaExclamationTriangle size={55} color="orange" />
-                <h1 className='text-xl font-semibold'>
-                Account&nbsp;does&nbsp;not&nbsp;have&nbsp;any&nbsp;Id</h1>
-                <div className='text-gray-500 text-lg'>
-                    <p>This account doesn't have an identity verification yet.</p>
+    <section className="">
+      <article
+        className="bg-white border-2 rounded-xl shadow-sm p-6 pt-8"
+        aria-labelledby="identity-heading"
+      >
+        {user?.properties?.FIRST ? (
+          <div className="grid grid-cols-1 gap-1 h-full max-sm:px-5">
+            <header className="flex items-center gap-3 pb-4 max-sm:flex-col max-sm:mt-5">
+              <ImageComponent user={user} />
+              <div className="flex flex-col pl-2 gap-2 max-md:text-center">
+                <DetailpageStatus user={user} adminActions={adminActions} />
+                <div>
+                  <h1 id="identity-heading" className="text-3xl font-semibold">
+                    {user.properties.FIRST + ' ' + user.properties.LAST || 'N/A'}
+                  </h1>
+                  <p className="text-text16 text-neuroDarkGray/70">
+                    {user.account || ''}
+                  </p>
+                  <div className="border-t-2 pt-2 text-text16 text-neuroDarkGray/70 w-full">
+                    {user.state.includes('Created') ? 'Application made ' : 'Registered '}
+                    {dateConverter(user.created)}
+                  </div>
                 </div>
+              </div>
+            </header>
+
+            <section
+              className="bg-neuroGray/70 rounded-xl p-4 overflow-auto"
+              aria-labelledby="identity-info-heading"
+            >
+              <h2 id="identity-info-heading" className="sr-only">Identity Information</h2>
+              <InfoToggleButton
+                infoToggle={infoToggle}
+                setIntoToggle={setIntoToggle}
+                title="Identity Information"
+              />
+              {infoToggle && <MapOutInput fieldsToShow={fieldsToShow} user={user} />}
+            </section>
+
+            <section
+              className="bg-neuroGray/70 rounded-xl p-4 mt-5 overflow-auto"
+              aria-labelledby="identity-meta-heading"
+            >
+              <h2 id="identity-meta-heading" className="sr-only">Identity Metadata</h2>
+              <InfoToggleButton
+                infoToggle={infoToggleMetaData}
+                setIntoToggle={setIntoToggleMetaData}
+                title="Identity metadata"
+              />
+              {infoToggleMetaData && 
+                <MapOutInput fieldsToShow={fieldsToShowMetaData} user={user} />
+              }
+            </section>
+
+            <footer className="">
+              {id ? (
+                <ActionButtons
+                  user={user}
+                  adminActions={adminActions}
+                  id={id}
+                  getData={getData}
+                />
+              ) : (
+                <PopUpButton
+                  title="View more Information"
+                  setToggle={setModalToggle}
+                  />
+              )}
+            </footer>
+
+            {modalToggle && user && (
+              <ProfileEditModal
+                user={user}
+                setModalToggle={setModalToggle}
+                isEditProfile={true}
+              />
+            )}
+          </div>
+        ) : (
+          <div className=''>
+          <div className="flex flex-col justify-center items-center h-[50vh] max-sm:p-5">
+            <FaExclamationTriangle className="size-20 max-sm:size-12" color="orange" />
+            <h1 className="text-xl font-semibold max-sm:text-sm">
+              Account does not have any ID
+            </h1>
+            <div className="text-gray-500 text-lg text-center max-sm:text-sm">
+              <p>This account doesn't have an identity verification yet.</p>
             </div>
-            )
-            
-        }
-    </div>
-   
-</div>
-  )
-}
+          </div>
+          </div>
+        )}
+      </article>
+    </section>
+  );
+};

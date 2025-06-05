@@ -1,11 +1,23 @@
 import React from 'react'
-import { FaRegCopy } from 'react-icons/fa'
 
-export const InputField = ({labelText,name}) => {
+export const InputField = ({labelText,name,profil}) => {
+ 
+
+  if(profil){
+    return (
+      <div>
+        <label className='text-md text-neuroTextBlack/60 font-semibold'>{labelText}</label>
+        <p className='text-text16 max-sm:text-md py-3 pl-4 font-semibold border
+         rounded-lg w-full bg-neuroInputBackground text-neuroTextBlack/60'>{name}</p>
+      </div>
+    )
+  }
+
+
   return (
-    <div className='grid grid-cols-2 items-center justify-center border-b-2'>
-        <label className='text-gray-500 my-2'>{labelText}:</label>
-        <p className='text-lg max-sm:text-md my-2'>{name}</p>
+    <div className='grid grid-cols-3 items-center justify-center border-b-2 animate-fade-in'>
+        <label className='text-text16 text-neuroTextBlack/60 my-2'>{labelText}:</label>
+        <p className='text-text16 max-sm:text-md my-2'>{name}</p>
     </div>
   )
 }

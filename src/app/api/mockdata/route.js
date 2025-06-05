@@ -10,7 +10,7 @@ export async function GET(req) {
         const limit = parseInt(searchParams.get('limit') || '5', 10) // Get the limit of users per page, default to 5
         const filterAccount = searchParams.get('filter')
         const query = searchParams.get('query')?.toLowerCase() || '' // Get the search query, default to an empty string
-
+        
         let fullId 
         if(filterAccount === 'hasID'){
             fullId = true
@@ -19,33 +19,53 @@ export async function GET(req) {
         } else {
             fullId = undefined
         }
-        console.log('Full Id variabel', fullId)
         const cookieStore = await cookies();
         const clientCookieObject = cookieStore.get('HttpSessionID');
         const clientCookie = clientCookieObject
             ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
             : null;
+     
 
         const payload = {
-            maxCount: limit,
-            offset: (page - 1) * limit,
-            ...(query ? {
-                fullTextSearch: query,
-                state: "Approved"
-            } : {})
-            /*...(query ? {
-                'strictSearch': "true",
-                filter: {
-                    'FIRST': query
-                },
-            } : (fullId !== undefined ? { fullId, filter: {} } : {})),
-            ...(fullId !== undefined ? { fullId } : {}) */
-        }
+                maxCount:limit,
+                offset:(page - 1) * limit,
+                fullId:fullId,
+                ...(query ? {
+                    strictSearch:false,
+                    fullTextSearch:query,
+                    
+                } : {filter:{}} ),
+            }
+        
 
-        console.log('Payload',payload)
+            
+
         const { host } = config.api.agent;
 
-        const url = `https://${host}/LegalIdentities.ws`;
+        const url = `https://${host}/Accounts.ws`;
+
+            const responseTotalPages = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cookie': clientCookie,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(filterAccount.includes('hasID') || filterAccount.includes('noID') ? {maxCount:1000,offset:0} : '')
+            });   
+
+            const dataResponseTotalItems = await responseTotalPages.json()
+            let filteredTotalpage
+            
+            if (fullId === true) {
+            const firstName = dataResponseTotalItems.filter(item => item.firstName !== '');
+            filteredTotalpage = firstName.length;
+            } else if (fullId === false) {
+            const firstName = dataResponseTotalItems.filter(item => item.firstName === '');
+            filteredTotalpage = firstName.length;
+            } else {
+            filteredTotalpage = dataResponseTotalItems
+            }
 
         const res = await fetch(url, {
             method: 'POST',
@@ -68,13 +88,25 @@ export async function GET(req) {
         }
 
         const data = await res.json()
-        console.log('Data repsonse',data)
-        console.log('Response Data',res.status)
 
-
-        const response = {
-            data: data,
-        }
+        const filteredData = data.map((item) => {
+           return {
+                country:item.country,
+                created:item.created,
+                email:item.eMail,
+                firstName:item.firstName,
+                lastNames:item.lastName,
+                latestLegalId:item.latestLegalId,
+                latestLegalIdState:item.latestLegalIdState,
+                phoneNr:item.phoneNr,
+                userName:item.userName
+            }
+        })
+      
+         const response = {
+             data: filteredData,
+             totalPages:query ? data.length : filteredTotalpage 
+         }
 
 
         return NextResponse.json(response, { status: 200 })

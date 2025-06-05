@@ -1,79 +1,200 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import React, { useState } from "react";
-import { FiShield, FiBox, FiCreditCard, FiServer, FiArrowRight, FiLock } from "react-icons/fi";
+import { MdEmojiTransportation, MdAccountBalance, MdOutlineTimeline, MdOutlineSecurity, MdDocumentScanner, MdOutlineStorage, MdLockOutline } from "react-icons/md";
+import Navbar from "@/components/shared/Navbar";
 
-const LandingPage = () => {
-    const [neuroArray] = useState([
-        {
-            title: "Neuro-Access",
-            href: "/neuro-access",
-            icon: FiShield,
-            iconColor: "text-blue-600",
-            text: "Identity and access management",
-            locked: false,
-        },
-        {
-            title: "Neuro-Assets",
-            href: "",
-            icon: FiBox,
-            iconColor: "text-green-600",
-            text: "Asset management system",
-            locked: true,
-        },
-        {
-            title: "Neuro-Pay",
-            href: "",
-            icon: FiCreditCard,
-            iconColor: "text-purple-600",
-            text: "Payment processing platform",
-            locked: true,
-        },
-        {
-            title: "Neuro",
-            href: "",
-            icon: FiServer,
-            iconColor: "text-gray-600",
-            text: "Server management console",
-            locked: true,
-        },
-    ]);
+const services = [
+   
+    {
+        title: "Neuro-Access",
+        description: "Identity and access management",
+        icon: MdOutlineSecurity,
+        iconColor: "text-[#8B5CF6]",
+        iconBg: "bg-[#F3E8FF]",
+        href: "/neuro-access",
+        status: "Active",
+        locked: false,
+    },
+    {
+        title: "Neuro-Carbon",
+        description: "Climate compensation management",
+        icon: MdDocumentScanner,
+        iconColor: "text-[#8B5CF6]",
+        iconBg: "bg-[#F3E8FF]",
+        href: "/neuro-carbon",
+        status: "Learn more",
+        locked: true,
+    },
+    {
+        title: "Neuro-Monitor",
+        description: "Asset and process monitoring",
+        icon: MdOutlineTimeline,
+        iconColor: "text-[#8B5CF6]",
+        iconBg: "bg-[#F3E8FF]",
+        href: "/neuro-monitor",
+        status: "Active",
+        locked: false,
+    },
+    {
+        title: "Neuro-Payments",
+        description: "Payment monitoring and management",
+        icon: MdAccountBalance,
+        iconColor: "text-gray-400",
+        iconBg: "bg-gray-100",
+        href: "#",
+        status: "Learn more",
+        locked: true,
+    },
+    {
+        title: "Neuro-Leasing",
+        description: "Leasing management portal",
+        icon: MdEmojiTransportation,
+        iconColor: "text-gray-400",
+        iconBg: "bg-gray-100",
+        href: "#",
+        status: "Learn more",
+        locked: true,
+    },
+    {
+        title: "Neuron management",
+        description: "Server management console",
+        icon: MdOutlineStorage,
+        iconColor: "text-gray-400",
+        iconBg: "bg-gray-100",
+        href: "#",
+        status: "Learn more",
+        locked: true,
+    },
+];
 
+export default function LandingPage() {
+    const [host, setHost] = useState(null);
+    const [neuroLogo, setNeuroLogo] = useState(false);
+
+    useEffect(() => {
+       setNeuroLogo(true);
+            const storedUser = sessionStorage.getItem("AgentAPI.Host");
+        if (storedUser) {
+            setHost(storedUser);
+        }
+    }, []);
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-white">
-            <div className="text-center">
-                <h1 className="text-6xl font-extrabold text-gray-900 tracking-tight">Neuro</h1>
-                <h2 className="text-3xl font-semibold text-gray-700 mt-2">Admin Dashboard</h2>
-                <p className="text-lg text-gray-500 mt-4 max-w-lg mx-auto">
-                    Select a service to manage from the options below
-                </p>
-            </div>
+        <div className="relative min-h-screen w-full bg-[#F5F6F7] font-sans overflow-x-hidden">
+            <Navbar neuroLogo={true} />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-16 max-w-7xl">
-                {neuroArray.map((item, index) => (
-                    <Link href={item.href} key={index} className={`relative group ${item.locked ? "cursor-not-allowed opacity-50" : ""}`}>
-                        <div className="flex flex-col justify-between p-8 h-56 bg-white rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl">
-                            <div className="flex justify-between items-center">
-                                <item.icon size={32} className={`${item.iconColor} group-hover:scale-110 transition-all duration-200`} />
-                                {item.locked && <FiLock size={24} className="text-gray-400" />}
+            {/* Background Pattern */}
+           <div className="absolute inset-0 z-0 bg-[url('/backgroundSvg.svg')] bg-no-repeat bg-cover bg-center opacity-100 filter contrast-[0.6] brightness-[1]" />
+            <div >
+            <div className="relative z-10 max-w-[1240px] mx-auto px-6 pt-14 pb-24">
+                {/* Header */}
+                <div className="mb-12 text-center">
+                    <h1 className="text-[24px] font-bold text-gray-900">
+                        Welcome to <span className="font-semibold">Neuro-Admin</span>
+                    </h1>
+                    <p className="text-[14px] text-gray-500 mt-1">
+                        Please select where you would like to enter
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-[460px_1fr] gap-[48px] items-start">
+                    {/* Left Section: EcoTech + Destination stacked vertically */}
+                    <div className="flex flex-col gap-[24px]">
+                        {/* EcoTech Card */}
+                        <div className="rounded-[16px] bg-[#FCFCFC] shadow-[0px_4px_10px_rgba(24,31,37,0.05)] px-[24px] py-[20px] flex justify-between items-center">
+                            <div className="flex items-center gap-4">
+                                <div className="w-[64px] h-[64px] rounded-full bg-green-100 flex items-center justify-center">
+                                    <img src={`https://api.dicebear.com/8.x/pixel-art/svg?seed="defaultUser"}`} alt="EcoTech" className="w-[48px] h-[48px] object-contain" />
+
+                                </div>
+                                <div>
+                                    <h2 className="text-[20px] font-bold text-gray-900 leading-tight">{host}</h2>
+                                    <p className="text-[14px] text-gray-500 mt-[4px]">Subtext</p>
+                                </div>
                             </div>
+                            <div className="text-gray-500 pr-[4px]">▼</div>
+                        </div>
 
-                            <div className="flex-1">
-                                <p className="text-2xl font-semibold text-gray-900">{item.title}</p>
-                                <p className="text-gray-500 text-md leading-relaxed">{item.text}</p>
-                            </div>
-
-                            <div className="flex items-center justify-between text-blue-600 font-semibold mt-4 cursor-pointer transition-all group-hover:text-blue-700">
-                                <span>Manage</span>
-                                <FiArrowRight size={18} />
+                        {/* Destination Card */}
+                        <div className="rounded-[16px] bg-[#DFE1E3] shadow-[inset_0_0_10px_rgba(24, 31, 37, 0.10)] px-[24px] py-[20px]">
+                            <label className="text-[14px] text-gray-700 font-medium block mb-2">Destination</label>
+                            <div className="relative">
+                                <select className="w-full appearance-none rounded-[8px] bg-white py-[12px] px-[16px] text-[16px] text-gray-900 font-medium focus:outline-none">
+                                    <option>Main - {host}</option>
+                                </select>
+                                <div className="absolute inset-y-0 right-4 flex items-center text-gray-600 text-sm pointer-events-none">▼</div>
                             </div>
                         </div>
-                    </Link>
-                ))}
-            </div>
+                    </div>
+
+                    {/* Right Section: Service Grid */}
+                    <div className="relative">
+                        {/* Manage services button */}
+                        <div className="absolute top-[-60px] right-0 text-sm bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow-sm text-gray-700 flex items-center gap-1">
+                            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v.01M12 12v.01M12 18v.01" />
+                            </svg>
+                            Manage services
+                        </div>
+
+                        {/* Grid of service cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[32px]">
+                            {services.map((item, index) => (
+                                <Link
+                                    key={index}
+                                    href={item.locked ? "#" : item.href}
+                                    className={`group rounded-[16px] border border-gray-200 bg-white p-[24px] w-full h-[240px] flex flex-col justify-between transition duration-200 ${item.locked
+                                            ? "opacity-50 hover:opacity-100 "
+                                            : "hover:shadow-md"
+                                        }`}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        {item.locked ? (
+                                            <div className="flex items-center gap-[6px] px-[12px] py-[8px] rounded-full bg-[#DFE1E3]">
+                                                <item.icon size={18} className="text-gray-700" />
+                                                <MdLockOutline size={16} className="text-gray-400" />
+                                            </div>
+                                        ) : (
+                                            <div className={`p-[10px] rounded-full ${item.iconBg}`}>
+                                                <item.icon size={20} className={item.iconColor} />
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex-1">
+                                        <h3
+                                            className={`text-[16px] font-semibold ${item.locked ? "text-gray-400" : "text-gray-900"
+                                                }`}
+                                        >
+                                            {item.title}
+                                        </h3>
+
+                                        {/* Divider */}
+                                        <div className="h-[1px] bg-gray-200 my-[6px] w-full" />
+
+                                        <p
+                                            className={`text-[14px] leading-[1.4] ${item.locked ? "text-gray-400" : "text-gray-500"
+                                                }`}
+                                        >
+                                            {item.description}
+                                        </p>
+                                    </div>
+
+                                    {/* Learn more or status */}
+                                    <p
+                                        className={`text-[12px] mt-4 ${item.locked ? "text-gray-400" : "text-gray-500"
+                                            }`}
+                                    >
+                                        {item.status}
+                                    </p>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div> 
         </div>
     );
-};
-
-export default LandingPage;
+}

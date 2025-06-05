@@ -13,7 +13,7 @@ export async function POST(request) {
     const payload = {
         id:decodedUserId
     };
-    console.log(payload)
+    console.log('LegalId Fetch',payload)
     try {
 
         const response = await fetch(url, {
@@ -30,9 +30,29 @@ export async function POST(request) {
 
         const contentType = response.headers.get('content-type');
         let data;
+        let filterData
 
         if (contentType.includes('application/json')) {
             data = await response.json();
+           
+
+            filterData = {
+                Id:data.id,
+                account:data.account,
+                created:data.created,
+                attachments:data?.attachments[0]?.data,
+                properties:{
+                 COUNTRY:data.properties.COUNTRY,
+                 EMAIL:data.properties.EMAIL,
+                 PHONE:data.properties.PHONE,
+                 CITY:data.properties.CITY,
+                 FIRST:data.properties.FIRST,
+                 LAST:data.properties.LAST,
+                 PNR:data.properties.PNR,
+                 ADDR:data.properties.ADDR   
+                },
+                state:data.state
+            }
         } else {
             data = await response.text();
         }
@@ -46,7 +66,7 @@ export async function POST(request) {
             });
         }
 
-        return new Response(JSON.stringify(new ResponseModel(200, 'Legal Identity returned', data)), {
+        return new Response(JSON.stringify(new ResponseModel(200, 'Legal Identity returned', filterData)), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
