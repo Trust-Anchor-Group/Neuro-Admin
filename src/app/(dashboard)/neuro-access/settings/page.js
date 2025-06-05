@@ -1,7 +1,6 @@
-import dynamic from "next/dynamic";
+export const dynamic = 'force-dynamic'; 
 
-const SettingsPageClient = dynamic(() => import("./SettingsPageClient"));
-
+import SettingsPageClient from './SettingsPageClient'; 
 
 export default function SettingsPage() {
   return <SettingsPageClient />;
