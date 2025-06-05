@@ -147,29 +147,29 @@ export default function QuickLogin({
         '[AgentAPI] Host set to', event.data.Domain)
       console.log('[AgentAPI] host env:', neuron);
 
-      if (event.data.AgentApiToken) {
-        console.log('[AgentAPI] AgentApiToken received in event. Authenticating directly.');
-        AgentAPI.Account.SaveSessionToken(event.data.AgentApiToken, 3600, 1800);
-        AgentAPI.Account.AuthenticateJwt(event.data.AgentApiToken);
-      } else if (event.type === 'SignatureReceivedBE') {
-        console.log('[QuickLogin] No AgentApiToken in event — calling /Account/QuickLogin fallback');
+      // if (event.data.AgentApiToken) {
+      //   console.log('[AgentAPI] AgentApiToken received in event. Authenticating directly.');
+      //   AgentAPI.Account.SaveSessionToken(event.data.AgentApiToken, 3600, 1800);
+      //   AgentAPI.Account.AuthenticateJwt(event.data.AgentApiToken);
+      // } else if (event.type === 'SignatureReceivedBE') {
+      //   console.log('[QuickLogin] No AgentApiToken in event — calling /Account/QuickLogin fallback');
 
-        try {
-          const res = await fetch('/api/auth/quickLogin/token', {
-            method: 'POST',
-            credentials: 'include',
-          });
+      //   try {
+      //     const res = await fetch('/api/auth/quickLogin/token', {
+      //       method: 'POST',
+      //       credentials: 'include',
+      //     });
 
-          if (!res.ok) throw new Error(await res.text());
+      //     if (!res.ok) throw new Error(await res.text());
 
-          const { jwt } = await res.json();
+      //     const { jwt } = await res.json();
 
-          AgentAPI.Account.SaveSessionToken(jwt, 3600, 1800);
-          AgentAPI.Account.AuthenticateJwt(jwt);
-        } catch (err) {
-          console.error('[QuickLogin] Fallback token request failed:', err);
-        }
-      }
+      //     AgentAPI.Account.SaveSessionToken(jwt, 3600, 1800);
+      //     AgentAPI.Account.AuthenticateJwt(jwt);
+      //   } catch (err) {
+      //     console.error('[QuickLogin] Fallback token request failed:', err);
+      //   }
+      // }
     }
   };
 
