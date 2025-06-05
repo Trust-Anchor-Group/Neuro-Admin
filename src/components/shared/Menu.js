@@ -56,7 +56,7 @@ const Menu = ({ menuItems }) => {
         <nav className="flex flex-col items-center justify-center gap-4 py-3">
           {!open && (
             <button
-              className="bg-gray-100 text-purple-600 rounded p-2 shadow z-20 transition-all hover:bg-purple-600 hover:text-white"
+              className="bg-gray-100 text-purple-600 rounded p-2 shadow transition-all hover:bg-purple-600 hover:text-white"
               onClick={() => setOpen(true)}
             >
               <FaChevronRight size={16} />

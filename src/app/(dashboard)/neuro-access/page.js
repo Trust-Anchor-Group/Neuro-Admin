@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { FaIdCard, FaUserShield, FaFileSignature, FaWallet, FaSignInAlt } from "react-icons/fa";
-import RecentActivity from "../../../components/access/dashboard/RecentActivity";
 import PendingApplications from "../../../components/access/dashboard/PendingApplications";
 
 export default function DashboardPage() {

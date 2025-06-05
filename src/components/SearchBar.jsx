@@ -44,7 +44,7 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
 },200)
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full z-20">
     <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
     <input
       type="text"

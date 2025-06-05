@@ -1,5 +1,5 @@
 'use client'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import config from '@/config/config';
 import { FaArrowLeft, FaShieldAlt, FaSpinner, FaUser} from 'react-icons/fa'
@@ -17,10 +17,12 @@ export default function DetailPageContent() {
     const searchParams = useSearchParams()
     const [isAccount, setIsAccount] = useState(false)
     const ref = searchParams.get('ref')
-    const tab = searchParams.get('tab') || 'details'
+    const urlTab = searchParams.get('tab');
+    const pathname = usePathname();
+    const [tab, setTab] = useState('details')
     const [backPath, setBackPath] = useState(null) // To track Params from previous page
     const router = useRouter()
-    
+    console.log(backPath)
     async function getAccounts(){
         try {
             const url = `${config.protocol}://${config.origin}/api/account`;
@@ -105,7 +107,28 @@ export default function DetailPageContent() {
         setBackPath(ref)
       }
     }, [])
+
+    useEffect(() => {
+ 
+  if (!urlTab) {
+    const newTab =
+  ref && (ref.includes('/account') || ref.includes('/id-application'))
+    ? 'details'
+    : 'identity';
+    console.log(newTab)
+    console.log(ref)
+    setTab(newTab);
+
+ 
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('tab', newTab);
+    router.replace(`${pathname}?${newParams.toString()}`);
+  } else {
+    setTab(urlTab);
+  }
+}, [urlTab, ref]);
     
+
   const fieldsToShowMetadata = [
     { label: "ID status", key: "state" },
     { label: "ID created", key: "created" },
