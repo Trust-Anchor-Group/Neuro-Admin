@@ -5,20 +5,47 @@ import { Identity } from '@/components/access/Identity'
 import { LocalizationSettings } from '@/components/access/LocalizationSettings'
 import { InputField } from '@/components/access/InputField'
 import { ProfileEditModal } from '@/components/access/ProfileEditModal'
-import { PopUpButton } from '@/components/access/Buttons/PopUpButton'
-import { Validate } from '../shared/validate'
+import { fetchUserImage } from '@/utils/fetchUserImage'
 
-const ProfileContent = ({ profileData }) => {
+const ProfileContent = () => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(false)
   const [modalToggle, setModalToggle] = useState(false)
   const [modalToggleClient, setModalToggleClient] = useState(false)
 
   useEffect(() => {
-    if (profileData) {
-      setUser(profileData.data)
+    const storedProfile = sessionStorage.getItem('profile')
+    if (storedProfile) {
+      const data = JSON.parse(storedProfile)
+      console.log('Klientdata', data)
+      fetchUserImage(data?.Attachments[0].Id).then((imageUrl) => {
+        if(imageUrl){
+         
+           const filterData = {
+                Id:data.Id,
+                created:data.Created,
+                imageUrl:{imageUrl},
+                properties:{
+                 COUNTRY:data.Properties.COUNTRY,
+                 EMAIL:data.Properties.EMAIL,
+                 PHONE:data.Properties.PHONE,
+                 CITY:data.Properties.CITY,
+                 FIRST:data.Properties.FIRST,
+                 LAST:data.Properties.LAST,
+                 PNR:data.Properties.PNR,
+                 ADDR:data.Properties.ADDR   
+                },
+                state:data.State
+            }
+      setUser(filterData)
+        }else{
+          throw new Error('Could not get the Image')
+        }
+      })
+
+ 
     }
-  }, [profileData])
+  }, [])
 
   const fieldsToShowIdentity = [
     { label: "First Name", key: "properties.FIRST" },

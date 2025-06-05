@@ -1,11 +1,24 @@
 "use client";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 
 export default function PendingApplications() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const isFetchingRef = useRef(false);
+   
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const params = new URLSearchParams(searchParams)
+  const pathnameWithFilter = `${pathname}?${params}`
+  const router = useRouter()
+
+function handleNavigate(id) {
+  const encodedRef = encodeURIComponent(pathnameWithFilter);
+  router.push(`/neuro-access/detailpage/${id}?ref=${encodedRef}&tab=identity`);
+}
+
 
   useEffect(() => {
     async function fetchPendingApplications() {
@@ -68,7 +81,7 @@ export default function PendingApplications() {
       ) : (
         <ul className="divide-y divide-gray-300">
           {applications.map((app) => (
-            <li key={app.id} className="py-4 flex justify-between items-center hover:bg-gray-100 p-3 rounded-lg transition-all">
+            <li onClick={() => handleNavigate(app.id)} key={app.id} className="py-4 flex cursor-pointer justify-between items-center hover:bg-gray-100 p-3 rounded-lg transition-all">
               <div>
                 <p className="text-gray-800 font-semibold">{app.name}</p>
                 <p className="text-gray-500 text-sm">{app.submittedAt}</p>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { FaEnvelope, FaBullhorn, FaChevronDown, FaUser, FaTachometerAlt, FaSignOutAlt, FaThLarge } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
 import { LinkToPage } from "./LinkToPage";
+import { fetchUserImage } from "@/utils/fetchUserImage";
 
 // const generateAvatarUrl = (seed) => {
 //   return `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(seed)}`;
@@ -103,10 +104,10 @@ const Navbar = ({ neuroLogo }) => {
       <div className="flex items-center gap-6">
        
         {/* User Dropdown */}
-        <div ref={filterRef} className="relative">
+        <div ref={filterRef} className="relative pr-5">
           <div
             onClick={toggleDropdown}
-            className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 transition-colors rounded-full px-4 py-2 cursor-pointer"
+            className="flex items-center gap-2   cursor-pointer"
           
           >
              {avatarUrl && (
@@ -114,11 +115,10 @@ const Navbar = ({ neuroLogo }) => {
           )}
 
             <span className="text-gray-700 font-medium hidden md:block">{user?.name?.split(" ")[0] || "User"}</span>
-            <FaChevronDown className="text-gray-500 text-sm transition-transform" />
           </div>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-lg z-50">
+            <div className="absolute right-0 mt-2 bg-white shadow-lg animate-fade-in rounded-lg z-50">
               <ul className="">
                 {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Profile</li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Settings</li> */}

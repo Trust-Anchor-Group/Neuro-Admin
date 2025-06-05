@@ -24,11 +24,12 @@ const inputRef = useRef(null)
 const handleSearch = useDebouncedCallback((searchTerm) =>{
        // Create a URLSearchParams object to modify the query parameters
     const params = new URLSearchParams(searchParams)
-    console.log('Params',searchParams)
     // If we have a search term, set it in the URL query, otherwise delete it
     if(searchTerm){
         params.set('query',searchTerm)
         params.set('page','1')
+        params.set('filter','all')
+        params.set('limit','50')
     }else{
         params.delete('query')
         params.set('page','1')
@@ -43,7 +44,7 @@ const handleSearch = useDebouncedCallback((searchTerm) =>{
 },200)
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full z-20">
     <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
     <input
       type="text"

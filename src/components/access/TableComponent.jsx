@@ -60,12 +60,21 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
         fontWeight: 500 
       } : {}, 
     }),
+    
+    muiTablePaperProps: ({ table }) => ({
+  //not sx
+  style: {
+    zIndex: table.getState().isFullScreen ? 0 : undefined,
+  },
+}),
+
     muiTopToolbarProps: {
       sx: {
         marginTop: "100px", // Flyttar ned knapparna
       },
     }
   });
+  
   
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>

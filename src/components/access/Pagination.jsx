@@ -39,20 +39,36 @@ export const Pagination = ({ page, prevPage, totalPages,limit }) => {
                 1
               </Link>
               {
-                maxCount !== 1 ? (
+                maxCount !== 1 && page !== 2 && page !== 3 && (
                 <div className='flex gap-[2px] text-gray-500 max-sm:hidden'>
                 <span>•</span>
                 <span>•</span>
                 <span>•</span>
               </div>
-                ) : ''
+                )
               }
             </>
           )}
+          
+      
 
-          <p className='bg-neuroPurpleLight text-neuroPurpleDark  p-3'>{page}</p>
+          {// Next page
+          (page - 1 > 1 ) && (
+            <Link
+              className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
+              href={buildPaginationURL(page - 1)}
+            >
+              {page - 1}
+            </Link>
+          )}
 
-          {(page + 1 <= maxCount) && (
+              {
+            // Current page
+            <p className='bg-neuroPurpleLight text-neuroPurpleDark  p-3'>{page}</p>
+          }
+
+          {// Third page
+          (page + 1 <= maxCount) && (
             <Link
               className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
               href={buildPaginationURL(page + 1)}
@@ -60,41 +76,31 @@ export const Pagination = ({ page, prevPage, totalPages,limit }) => {
               {page + 1}
             </Link>
           )}
-
-          {(page + 2 <= maxCount) && (
-            <Link
-              className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
-              href={buildPaginationURL(page + 2)}
-            >
-              {page + 2}
-            </Link>
-          )}
         </div>
 
         {
-          maxCount !== 1 ? (
+          maxCount > 3 && (page + 2 < maxCount)  && (
                 <div className='flex gap-[2px] text-gray-500 max-sm:hidden'>
                 <span>•</span>
                 <span>•</span>
                 <span>•</span>
               </div>
-                ) : ''
+                ) 
               }
 
-          { maxCount !== 1 ? (
-        <Link
-          className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'
-          href={buildPaginationURL(maxCount)}
-        >
-
-            <p>{maxCount}</p>  
-           
-        </Link>) :''
-          }
+        {// Last page
+        (maxCount > 3 && (page + 1 < maxCount)) && (
+          <Link className='' href={buildPaginationURL(maxCount)}>
+            <p className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'>
+              {maxCount}
+            </p>  
+          </Link>
+        )}
       </div>
 
       <div>
-        {page === maxCount ? (
+        {// Arrow right
+        page === maxCount ? (
           <div className='flex justify-center items-center gap-2'>
             <FiChevronRight className='text-gray-300' size={20} />
           </div>

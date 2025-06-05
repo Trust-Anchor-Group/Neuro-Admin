@@ -51,7 +51,7 @@ export const Identity = ({
                     {user.properties.FIRST + ' ' + user.properties.LAST || 'N/A'}
                   </h1>
                   <p className="text-text16 text-neuroDarkGray/70">
-                    {user.account || 'N/A'}
+                    {user.account || ''}
                   </p>
                   <div className="border-t-2 pt-2 text-text16 text-neuroDarkGray/70 w-full">
                     {user.state.includes('Created') ? 'Application made ' : 'Registered '}
@@ -101,7 +101,7 @@ export const Identity = ({
                 <PopUpButton
                   title="View more Information"
                   setToggle={setModalToggle}
-                />
+                  />
               )}
             </footer>
 

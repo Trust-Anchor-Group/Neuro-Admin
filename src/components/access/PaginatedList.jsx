@@ -61,7 +61,7 @@ const buildUrlWithParams = (key, value) => {
         <div className="mt-5 rounded-md overflow-hidden">
            
             <div className="relative">
-            <div className="absolute top-0 left-0 w-full p-5 z-10">
+            <div className="absolute top-0 left-0 w-full p-5">
                 <div className='flex justify-between'>
 
                 {

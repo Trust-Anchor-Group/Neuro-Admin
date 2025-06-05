@@ -112,7 +112,7 @@ const filteredColumns = filterAccount === 'noID'
     const prevPage = page - 1 > 0 ? page - 1 : 1
 
     return (
-            <div className="relative px-5">
+            <div className="px-5">
            
             {pathname === '/neuro-access/account' && (
               <PaginatedList 
