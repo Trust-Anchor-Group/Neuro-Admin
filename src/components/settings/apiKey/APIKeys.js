@@ -58,7 +58,7 @@ export default function APIKeys() {
     navigator.clipboard.writeText(key)
   }
   const handleRowClick = (key) => {
-    router.push(`/settings/api-key/${key}`);
+    router.push(`/neuro-access/settings/api-key/${key}`);
   };
   const columns = useMemo(
     () => [

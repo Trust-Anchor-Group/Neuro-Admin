@@ -141,19 +141,19 @@ useEffect(() => {
 							)}
 						</div>
 
-						<div className="space-y-4 pt-4">
-							<Checkbox label="Require photos" checked={settings.requirePhotos} onChange={() => toggleSetting("requirePhotos")} />
-							{settings.requirePhotos && (
-								<div className="pl-6">
-									<Input
-										label="Min. number of photos required"
-										value={settings.nrPhotos}
-										onChange={(v) => setSettings({ ...settings, nrPhotos: Number(v) })}
-									/>
-								</div>
-							)}
-						</div>
-					</section>
+            <div className="space-y-4 pt-4">
+                <Checkbox label="Require photos" checked={settings.requirePhotos} onChange={() => toggleSetting("requirePhotos")} />
+              {settings.requirePhotos && (
+                <div className="pl-6">
+                  <Input
+                    label="Min. number of photos required"
+                    value={settings.nrPhotos}
+                    onChange={(v) => setSettings({ ...settings, nrPhotos: Number(v) })}
+                  />
+                </div>
+              )}
+            </div>
+          </section>
 
 					{/* Required fields */}
 					<section className="bg-gray-50 rounded-xl border border-gray-200 p-6">

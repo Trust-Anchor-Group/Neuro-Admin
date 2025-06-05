@@ -1,5 +1,5 @@
 "use client";
-
+import { Suspense } from "react";
 import { useState } from "react";
 import PendingApplications from "../../../components/access/dashboard/PendingApplications";
 
@@ -29,7 +29,9 @@ export default function DashboardPage() {
 
       {/* Pending Applications & Recent Activity */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <PendingApplications />
+        <Suspense fallback={<div>Loading pending applications...</div>}>
+          <PendingApplications />
+        </Suspense>
         {/* <RecentActivity /> */}
       </div>
     </div>
