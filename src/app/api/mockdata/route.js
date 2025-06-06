@@ -50,7 +50,10 @@ export async function GET(req) {
                     'Content-Type': 'application/json',
                     'Cookie': clientCookie,
                     'Accept': 'application/json'
+                    
                 },
+                credentials: "include",
+                mode: "cors",
                 body: JSON.stringify(filterAccount.includes('hasID') || filterAccount.includes('noID') ? {maxCount:1000,offset:0} : '')
             });   
 
