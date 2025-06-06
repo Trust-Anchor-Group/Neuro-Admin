@@ -59,7 +59,7 @@ export const AccessContet = () => {
               console.log('ID application',data)
               setTotalPages(data.totalPages || 1);
           } else {
-              const url = `${config.protocol}://${config.origin}/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
+              const url = `/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
               const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
 
               if (!res.ok) throw new Error("Could not fetch userList");
