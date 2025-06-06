@@ -144,7 +144,8 @@ export const theme = createTheme({
         {statusComponent}
       </Box>
     );
-  },
+     },
+     
       firstName:({row}) => {
         const firstName = row.original.firstName
         const lastName = row.original.lastNames
@@ -155,7 +156,28 @@ export const theme = createTheme({
         } else {
           return <p>-</p>
         }
-      },
+     },
+     userName: ({ row }) => {
+       const userName = row.original.userName;
+       if (userName) {
+         const displayName = userName.length > 20 ? `${userName.slice(0, 20)}...` : userName;
+         return (
+           <p
+             title={userName}
+             style={{
+               maxWidth: '170px',
+               overflow: 'hidden',
+               textOverflow: 'ellipsis',
+               whiteSpace: 'nowrap',
+             }}
+           >
+             {displayName}
+           </p>
+         );
+       } else {
+         return <p>-</p>;
+       }
+    },
       created: ({ row }) => {
         const createdTimestamp = row.original.created;
         if (!createdTimestamp) return <span>-</span>;
@@ -180,13 +202,7 @@ export const theme = createTheme({
           <p>-</p>
         );
       },
-      userName: ({row}) => {
-        const userName = row.original.userName
-        if(userName){
-          return <p>{userName}</p>
-        } else
-        <p>-</p>
-      }
+  
       }
     
 
