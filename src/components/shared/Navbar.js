@@ -94,7 +94,9 @@ const Navbar = ({ neuroLogo }) => {
 
       {/* Left Section: Welcome Message */}
       {neuroLogo && (
-        <Image src="/NeuroLogo.svg" alt="Neuro" width={80} height={80}  />
+        <Image src="/NeuroLogo.svg" alt="Neuro" width={80} height={80}
+          unoptimized
+        />
       )}
       <div className="flex items-center gap-3">
        
