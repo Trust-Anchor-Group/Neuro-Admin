@@ -17,13 +17,10 @@ export default function LoginPage() {
   const router = useRouter();
   return (
     <div
-      style={{
-        backgroundImage: "url('/Login-page-background.png')",
-        backgroundSize: "110% auto",
-        backgroundPosition: "center",
-      }}
       className="relative min-h-screen font-grotesk overflow-hidden"
     >
+      <div className="absolute inset-0 z-0 bg-[url('/backgroundSvg.svg')] bg-no-repeat bg-cover bg-center opacity-100 filter contrast-[0.6] brightness-[1]" />
+
       {/* HEADER */}
       <header className="relative z-10 h-20 px-8 flex items-center border-b border-gray-200 bg-white">
         <Image

@@ -34,8 +34,8 @@ const services = [
         iconColor: "text-[#8B5CF6]",
         iconBg: "bg-[#F3E8FF]",
         href: "/neuro-monitor",
-        status: "Active",
-        locked: false,
+        status: "Learn more",
+        locked: true,
     },
     {
         title: "Neuro-Payments",
