@@ -34,7 +34,6 @@ export default function DashboardLayout({ children }) {
         <Navbar />
         <div className="flex-1 pb-6">{children}</div>
 
-        {/* <Footer /> */}
       </div>
     </div>
   );
