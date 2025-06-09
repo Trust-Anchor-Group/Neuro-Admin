@@ -6,8 +6,8 @@ export async function POST(request) {
     const requestData = await request.json();
     const { legalId } = requestData;
     let dimension;
-    if (requestData.dimension > 120 || !requestData.dimension) {
-        dimension = 120
+    if (requestData.dimension > 110 || !requestData.dimension) {
+        dimension = 110
     } else {
         dimension = requestData.dimension;
     }
