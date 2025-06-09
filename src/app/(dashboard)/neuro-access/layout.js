@@ -10,6 +10,7 @@ export default function DashboardLayout({ children }) {
       {
         title: 'Access',
         icon: <MdOutlineDocumentScanner size={20} />,
+        href:'/neuro-access',
         subItems: [
           { label: 'ID applications', href: '/neuro-access/id-application' },
           { label: 'Accounts', href: '/neuro-access/account' },

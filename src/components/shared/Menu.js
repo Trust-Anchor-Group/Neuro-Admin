@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
@@ -10,11 +10,26 @@ const Menu = ({ menuItems }) => {
   const [hoveredItem, setHoveredItem] = useState(null);
   const [isClient, setIsClient] = useState(false);
   const [host, setHost] = useState('');
+  const filterRef = useRef(null);
+  const hideTimeoutRef = useRef(null);
 
+  useEffect(() => {
+    const handleClickOutSide = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) {
+        setHoveredItem(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutSide);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutSide);
+    };
+  }, []);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
   useEffect(() => {
     const storedHost = sessionStorage.getItem("AgentAPI.Host");
     if (storedHost) {
@@ -26,10 +41,11 @@ const Menu = ({ menuItems }) => {
 
   return (
     <aside
+      ref={filterRef}
       className={`h-screen shadow-md border-r border-gray-200 transition-all duration-300 flex flex-col justify-between ${open ? 'w-64 bg-[#FCFCFC]' : 'w-16'
         }`}
     >
-      <div >
+      <div>
         <div className="flex flex-col items-center px-3 py-4 border-b relative bg-[#F5F6F7]">
           {open && (
             <div className="text-center w-full mb-4">
@@ -39,9 +55,8 @@ const Menu = ({ menuItems }) => {
             </div>
           )}
 
-          {/* Shrinkable Logo centered with equal spacing above/below */}
           <div
-            className={`relative transition-all  ${open ? 'w-16 aspect-[1/1]' : 'w-10 aspect-[1/1] my-1'
+            className={`relative transition-all ${open ? 'w-16 aspect-[1/1]' : 'w-10 aspect-[1/1] my-1'
               }`}
           >
             <Image
@@ -52,14 +67,16 @@ const Menu = ({ menuItems }) => {
               unoptimized
             />
           </div>
+
           {open && (
-            <div className="w-full px-2 ">
+            <div className="w-full px-2">
               <div className="bg-[#FCFCFC] p-2 rounded-lg text-sm text-center">
                 <strong className="block">Neuro Admin</strong>
                 <span className="text-xs text-gray-400">Access</span>
               </div>
             </div>
           )}
+
           {open && (
             <button
               onClick={() => setOpen(false)}
@@ -70,6 +87,7 @@ const Menu = ({ menuItems }) => {
             </button>
           )}
         </div>
+
         {/* Navigation */}
         <nav className={`px-2 py-3 flex flex-col gap-4 ${open ? 'items-start' : 'items-center'}`}>
           {!open && (
@@ -86,9 +104,16 @@ const Menu = ({ menuItems }) => {
             {menuItems.map((item, idx) => (
               <li
                 key={idx}
-                onMouseEnter={() => setHoveredItem(idx)}
-                onMouseLeave={() => setHoveredItem(null)}
                 className="relative w-full"
+                onMouseEnter={() => {
+                  clearTimeout(hideTimeoutRef.current);
+                  setHoveredItem(idx);
+                }}
+                onMouseLeave={() => {
+                  hideTimeoutRef.current = setTimeout(() => {
+                    setHoveredItem(null);
+                  }, 200);
+                }}
               >
                 <Link
                   href={item.href || '#'}
@@ -98,6 +123,7 @@ const Menu = ({ menuItems }) => {
                   {open && <span>{item.title}</span>}
                 </Link>
 
+                {/* Inline submenu (if menu is open) */}
                 {item.subItems && open && (
                   <ul className="ml-6 mt-1 space-y-1 text-sm">
                     {item.subItems.map((subItem) => (
@@ -113,8 +139,20 @@ const Menu = ({ menuItems }) => {
                   </ul>
                 )}
 
+                {/* Floating submenu (if menu is collapsed and hovered) */}
                 {item.subItems && !open && hoveredItem === idx && (
-                  <ul className="absolute left-full top-0 ml-2 bg-white shadow-lg rounded-lg text-sm p-2 z-30">
+                  <ul
+                    className="absolute left-full top-0 ml-2 bg-white shadow-lg rounded-lg text-sm p-2 z-30"
+                    onMouseEnter={() => {
+                      clearTimeout(hideTimeoutRef.current);
+                      setHoveredItem(idx);
+                    }}
+                    onMouseLeave={() => {
+                      hideTimeoutRef.current = setTimeout(() => {
+                        setHoveredItem(null);
+                      }, 200);
+                    }}
+                  >
                     <li className="font-semibold text-purple-600 pb-1 border-b mb-1">
                       {item.title}
                     </li>
@@ -136,7 +174,6 @@ const Menu = ({ menuItems }) => {
         </nav>
       </div>
 
-      {/* Footer Logo — optional or removed if redundant */}
       <footer className="p-4">
         <Link href="/landingpage" className="flex justify-center">
           <Image

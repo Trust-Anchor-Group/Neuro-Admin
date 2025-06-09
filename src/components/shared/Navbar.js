@@ -90,7 +90,7 @@ const Navbar = ({ neuroLogo }) => {
   };
 
   return (
-    <div className="relative z-20 flex items-center justify-between bg-white shadow-md p-4 rounded-lg border-b border-gray-200">
+    <div className="relative z-20 flex items-center justify-between bg-white shadow-md p-4  border-b border-gray-200">
 
       {/* Left Section: Welcome Message */}
       {neuroLogo && (
