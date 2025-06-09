@@ -146,7 +146,7 @@ export default function DetailPageContent() {
         { label: "First Name", key: "properties.LAST" },
         { label: "Nationality", key: "properties.COUNTRY" },
         { label: "Address", key: "properties.ADDR" },
-        { label: "Date of birth", key: "properties.PNR" },
+        { label: "Personal number", key: "properties.PNR" },
         { label: "Phone", key: "properties.PHONE" },
         
       ];

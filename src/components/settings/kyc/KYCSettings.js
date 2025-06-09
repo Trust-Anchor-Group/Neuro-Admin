@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
+import { FaCheckCircle, FaExclamationCircle, FaExclamationTriangle } from "react-icons/fa";
 
 export default function KYCSettings() {
 	const [settings, setSettings] = useState(null);
@@ -20,6 +20,10 @@ useEffect(() => {
 					"Accept": "application/json",
 				},
 			});
+
+			if(res.status === 403){
+				return setSettings(null)
+			}
 
 			if (!res.ok) {
 				throw new Error("Failed to fetch settings");
@@ -54,7 +58,7 @@ useEffect(() => {
 			setOriginalSettings(JSON.stringify(formattedSettings));
 		} catch (error) {
 			console.error("Failed to fetch peer review settings", error);
-			setMessage({ type: "error", text: "Failed to load settings." });
+			setMessage({ type: "error", text: "Failed to load KYC settings." });
 		} finally {
 			setLoading(false);
 		}
@@ -120,10 +124,8 @@ useEffect(() => {
 				</div>
 			)}
 
-			{loading ? (
-				<p className="text-gray-500">Loading settings...</p>
-			) : (
-				<>
+			{settings ? (
+								<>
 					{/* Peer review settings */}
 					<section className="bg-gray-50 rounded-xl border border-gray-200 p-6 mb-6">
 						<h3 className="text-sm font-semibold text-gray-600 mb-4">Peer review settings</h3>
@@ -193,7 +195,20 @@ useEffect(() => {
 							Save settings
 						</button>
 					</div>
-				</>
+				</> 
+			) : (		
+				 <div className=''>
+						  <div className="flex flex-col justify-center items-center h-[50vh] max-sm:p-5">
+							<FaExclamationTriangle className="size-20 max-sm:size-12" color="orange" />
+							<h1 className="text-xl font-semibold max-sm:text-sm">
+							  Unauthorized
+							</h1>
+							<div className="text-gray-500 text-lg text-center max-sm:text-sm">
+							  <p>Administrator privileges are required to manage KYC settings. 
+								<br></br>Please contact your administrator for further help.</p>
+							</div>
+						  </div>
+						  </div>
 			)}
 		</div>
 	);

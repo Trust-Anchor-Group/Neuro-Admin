@@ -89,7 +89,7 @@ export const Pagination = ({ page, prevPage, totalPages,limit }) => {
               }
 
         {// Last page
-        (maxCount > 3 && (page + 1 < maxCount)) && (
+        (maxCount >= 3 && (page + 1 < maxCount)) && (
           <Link className='' href={buildPaginationURL(maxCount)}>
             <p className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'>
               {maxCount}

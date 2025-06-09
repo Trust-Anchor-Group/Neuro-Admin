@@ -34,6 +34,7 @@ const Navbar = ({ neuroLogo }) => {
   const [avatarUrl, setAvatarUrl] = useState("");
   const router = useRouter();
   const isFetchingRef = useRef(false)
+  const hideTimeoutRef = useRef(null);
 
    useEffect(() => {
     try {
@@ -90,7 +91,7 @@ const Navbar = ({ neuroLogo }) => {
   };
 
   return (
-    <div className="relative z-20 flex items-center justify-between bg-white shadow-md p-4  border-b border-gray-200">
+    <div className="relative z-20 flex items-center justify-between bg-white shadow-md border-b border-gray-200">
 
       {/* Left Section: Welcome Message */}
       {neuroLogo && (
@@ -103,10 +104,21 @@ const Navbar = ({ neuroLogo }) => {
       </div>
 
       {/* Icons and User Dropdown */}
-      <div className="flex items-center gap-6">
+      <div ref={filterRef}
+            onMouseEnter={() => {
+              clearTimeout(hideTimeoutRef.current);
+              setDropdownOpen(true)
+                }}
+        onMouseLeave={() => {
+                  hideTimeoutRef.current = setTimeout(() => {
+                    setDropdownOpen(false);
+                  }, 200);
+                }} 
+      className="flex items-center cursor-pointer py-4 px-6 hover:bg-neuroButtonGray gap-6">
        
         {/* User Dropdown */}
-        <div ref={filterRef} className="relative pr-5">
+        <div 
+  className="relative    pr-5">
           <div
             onClick={toggleDropdown}
             className="flex items-center gap-2   cursor-pointer"
@@ -120,7 +132,7 @@ const Navbar = ({ neuroLogo }) => {
           </div>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 bg-white shadow-lg animate-fade-in rounded-lg z-50">
+            <div className="absolute top-[150%] right-[-20%]  w-[140%]   bg-white shadow-lg animate-fade-in z-50">
               <ul className="">
                 {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Profile</li>
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Settings</li> */}

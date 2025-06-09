@@ -110,17 +110,17 @@ export default function LandingPage() {
                                 </div>
                                 <div>
                                     <h2 className="text-[20px] font-bold text-gray-900 leading-tight">{host}</h2>
-                                    <p className="text-[14px] text-gray-500 mt-[4px]">Subtext</p>
+                                    <p className="text-[14px] text-gray-500 mt-[4px]">Current Neuron</p>
                                 </div>
                             </div>
-                            <div className="text-gray-500 pr-[4px]">▼</div>
+                            {/* <div className="text-gray-500 pr-[4px]">▼</div> */}
                         </div>
 
                         {/* Destination Card */}
                         <div className="rounded-[16px] bg-[#DFE1E3] shadow-[inset_0_0_10px_rgba(24, 31, 37, 0.10)] px-[24px] py-[20px]">
                             <label className="text-[14px] text-gray-700 font-medium block mb-2">Destination</label>
                             <div className="relative">
-                                <select className="w-full appearance-none rounded-[8px] bg-white py-[12px] px-[16px] text-[16px] text-gray-900 font-medium focus:outline-none">
+                                <select className="w-full appearance-none rounded-[8px] cursor-pointer bg-white py-[12px] px-[16px] text-[16px] text-gray-900 font-medium focus:outline-none">
                                     <option>Main - {host}</option>
                                 </select>
                                 <div className="absolute inset-y-0 right-4 flex items-center text-gray-600 text-sm pointer-events-none">▼</div>

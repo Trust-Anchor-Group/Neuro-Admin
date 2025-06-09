@@ -17,7 +17,6 @@ const ProfileContent = () => {
     const storedProfile = sessionStorage.getItem('profile')
     if (storedProfile) {
       const data = JSON.parse(storedProfile)
-      console.log('Klientdata', data)
       fetchUserImage(data?.Attachments[0].Id).then((imageUrl) => {
         if(imageUrl){
          
