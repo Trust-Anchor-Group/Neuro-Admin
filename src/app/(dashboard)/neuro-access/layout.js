@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }) {
         ],
       },
       {
-        title: 'Access settings',
+        title: 'Access\u00A0settings',
         icon: <MdOutlineSettings size={20} />,
         href: '/neuro-access/settings',
       },

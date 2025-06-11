@@ -69,7 +69,7 @@ const Menu = ({ menuItems }) => {
           </div>
 
           {open && (
-            <div className="w-full px-2">
+            <div className="w-full px-2 mb-4">
               <div className="bg-[#FCFCFC] p-2 rounded-lg text-sm text-center">
                 <strong className="block">Neuro Admin</strong>
                 <span className="text-xs text-gray-400">Access</span>
@@ -81,7 +81,7 @@ const Menu = ({ menuItems }) => {
             <button
               onClick={() => setOpen(false)}
               aria-label="Collapse sidebar"
-              className="absolute top-[25vh] -right-[1vw] bg-gray-100 text-purple-600 rounded p-1 shadow z-20 hover:bg-purple-600 hover:text-white"
+              className="absolute bottom-[-7%] right-0 bg-neuroButtonGray text-purple-600 rounded-l p-2 shadow z-20 hover:bg-purple-600 hover:text-white"
             >
               <FaChevronLeft size={16} />
             </button>
@@ -89,18 +89,18 @@ const Menu = ({ menuItems }) => {
         </div>
 
         {/* Navigation */}
-        <nav className={`px-2 py-3 flex flex-col gap-4 ${open ? 'items-start' : 'items-center'}`}>
+        <nav className={`px-2.5 py-3 relative flex flex-col gap-4 ${open ? 'items-start' : 'items-center'}`}>
           {!open && (
             <button
               onClick={() => setOpen(true)}
               aria-label="Expand sidebar"
-              className="bg-gray-100 text-purple-600 rounded p-2 shadow hover:bg-purple-600 hover:text-white"
+              className="bg-neuroButtonGray absolute top-[-10%] right-[25%] text-purple-600 rounded p-2 shadow hover:bg-purple-600 hover:text-white"
             >
               <FaChevronRight size={16} />
             </button>
           )}
 
-          <ul className="w-full space-y-2">
+          <ul className="w-full space-y-2 mt-5">
             {menuItems.map((item, idx) => (
               <li
                 key={idx}
@@ -115,14 +115,17 @@ const Menu = ({ menuItems }) => {
                   }, 200);
                 }}
               >
+                <div className='border-t pt-3'>
+
                 <Link
                   href={item.href || '#'}
-                  className="flex items-center gap-3 text-[#181F25] text-base font-medium rounded hover:bg-purple-100 hover:text-purple-700 px-2 py-2 w-full"
-                >
-                  <span>{item.icon}</span>
+                  className="flex  text-center gap-3 text-[#181F25] text-base font-medium rounded hover:bg-purple-100 hover:text-purple-700 p-3 w-full"
+                  >
+                    <span className=''>{item.icon}</span>
                   {open && <span>{item.title}</span>}
                 </Link>
 
+                </div>
                 {/* Inline submenu (if menu is open) */}
                 {item.subItems && open && (
                   <ul className="ml-6 mt-1 space-y-1 text-sm">
@@ -140,9 +143,9 @@ const Menu = ({ menuItems }) => {
                 )}
 
                 {/* Floating submenu (if menu is collapsed and hovered) */}
-                {item.subItems && !open && hoveredItem === idx && (
+                {item && !open && hoveredItem === idx && (
                   <ul
-                    className="absolute left-full top-0 ml-2 bg-white shadow-lg rounded-lg text-sm p-2 z-30"
+                    className="absolute left-full top-3 ml-2 bg-white shadow-lg rounded-lg text-sm p-2 z-30"
                     onMouseEnter={() => {
                       clearTimeout(hideTimeoutRef.current);
                       setHoveredItem(idx);
@@ -153,10 +156,12 @@ const Menu = ({ menuItems }) => {
                       }, 200);
                     }}
                   >
-                    <li className="font-semibold text-purple-600 pb-1 border-b mb-1">
+                    <li className={`font-semibold text-purple-600  ${item.subItems ? 'border-b pb-1 mb-1' : ''}  `}>
+                      <Link href={item.href}>
                       {item.title}
+                      </Link>
                     </li>
-                    {item.subItems.map((subItem) => (
+                    {item.subItems && item.subItems.map((subItem) => (
                       <li key={subItem.label}>
                         <Link
                           href={subItem.href}
@@ -165,7 +170,7 @@ const Menu = ({ menuItems }) => {
                           {subItem.label}
                         </Link>
                       </li>
-                    ))}
+                    )) }
                   </ul>
                 )}
               </li>
