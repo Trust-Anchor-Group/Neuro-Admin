@@ -10,14 +10,7 @@ export async function POST(request) {
     const { host } = config.api.agent;
     const url = `https://${host}/Accounts.ws`; 
 
-    const payload = {
-        maxCount,
-        offset,
-        ...(query ? {
-            'filter':query
-        } : {} ),
-        strictSearch
-    };
+    const payload = {};
 
     console.log(payload)
 
