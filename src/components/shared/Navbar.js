@@ -104,45 +104,60 @@ const Navbar = ({ neuroLogo }) => {
       </div>
 
       {/* Icons and User Dropdown */}
-      <div ref={filterRef}
-            onMouseEnter={() => {
-              clearTimeout(hideTimeoutRef.current);
-              setDropdownOpen(true)
-                }}
-        onMouseLeave={() => {
-                  hideTimeoutRef.current = setTimeout(() => {
-                    setDropdownOpen(false);
-                  }, 200);
-                }} 
-      className="flex items-center cursor-pointer py-4 px-6 hover:bg-neuroButtonGray gap-6">
-       
-        {/* User Dropdown */}
-        <div 
-  className="relative    pr-5">
-          <div
-            onClick={toggleDropdown}
-            className="flex items-center gap-2   cursor-pointer"
-          
-          >
-             {avatarUrl && (
-           <Image src={avatarUrl} alt="User Avatar" width={32} height={32} className="rounded-full shadow-sm" />
-          )}
+<div 
+  ref={filterRef}
+  onMouseEnter={() => {
+    clearTimeout(hideTimeoutRef.current);
+    setDropdownOpen(true);
+  }}
+  onMouseLeave={() => {
+    hideTimeoutRef.current = setTimeout(() => {
+      setDropdownOpen(false);
+    }, 200);
+  }}
+  className="relative flex items-center cursor-pointer mr-6 py-4 px-6 hover:bg-neuroButtonGray gap-6"
+>
+  {/* Hover bridge to prevent accidental close */}
+  {dropdownOpen && (
+    <div className="absolute top-full left-0 w-full h-6 z-20" />
+  )}
 
-            <span className="text-gray-700 font-medium hidden md:block">{user?.name?.split(" ")[0] || "User"}</span>
-          </div>
+  {/* User Dropdown */}
+  <div className="relative pr-5">
+    <div className="flex items-center gap-2 cursor-pointer">
+      {avatarUrl && (
+        <Image
+          src={avatarUrl}
+          alt="User Avatar"
+          width={32}
+          height={32}
+          className="rounded-full shadow-sm"
+        />
+      )}
+      <span className="text-gray-700 font-medium hidden md:block">
+        {user?.name?.split(" ")[0] || "User"}
+      </span>
+    </div>
 
-          {dropdownOpen && (
-            <div className="absolute top-[150%] right-[-20%]  w-[140%]   bg-white shadow-lg animate-fade-in z-50">
-              <ul className="">
-                {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Profile</li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">Settings</li> */}
-                <LinkToPage hrefName={`/neuro-access/profile/${user?.legalId}`} setToggle={setDropdownOpen} title={'Profile'} icon={<FaUser />}/>
-                <LinkToPage handleLogout={handleLogout} title={'Logout'} icon={<FaSignOutAlt />}/>
-              </ul>
-            </div>
-          )}
-        </div>
+    {dropdownOpen && (
+      <div className="absolute top-[170%] right-[-20%] w-[140%] rounded-md bg-white shadow-lg animate-fade-in z-50">
+        <ul>
+          <LinkToPage
+            hrefName={`/neuro-access/profile/${user?.legalId}`}
+            setToggle={setDropdownOpen}
+            title={"Profile"}
+            icon={<FaUser />}
+          />
+          <LinkToPage
+            handleLogout={handleLogout}
+            title={"Logout"}
+            icon={<FaSignOutAlt />}
+          />
+        </ul>
       </div>
+    )}
+  </div>
+</div>
     </div>
   );
 };

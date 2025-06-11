@@ -26,6 +26,8 @@ export default function APIKeyDetails() {
         if (!response.ok) throw new Error("Failed to fetch API key details");
 
         const data = await response.json();
+
+     
         setApiKeyDetails(data.data);
       } catch (error) {
         console.error("Error fetching API key details:", error);
