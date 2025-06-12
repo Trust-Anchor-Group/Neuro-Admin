@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [showQR, setShowQR] = useState(false);
   const router = useRouter();
   async function checkLogin() {
-    const res = await fetch('http://localhost:3000/api/accounts', {
+    const res = await fetch('/api/accounts', {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
       credentials: 'include',
@@ -26,8 +26,9 @@ export default function LoginPage() {
 
     if (res.status === 403) {
       router.push('/403')
+    }else{
+      router.push('/landingpage')
     }
-    router.push('/landingpage')
 
   }
 

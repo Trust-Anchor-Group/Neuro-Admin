@@ -18,6 +18,7 @@
     "@tanstack/react-table": "^8.21.2",
     "agent-api": "github:Trust-Anchor-Group/AgentApiJavascript#npm-package",
     "dayjs": "^1.11.13",
+    "emailjs-com": "^3.2.0",
     "jsonwebtoken": "^9.0.2",
     "mapbox-gl": "^3.9.3",
     "material-react-table": "^3.2.0",

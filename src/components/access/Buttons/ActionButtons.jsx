@@ -1,23 +1,46 @@
 import React, { useEffect, useState } from 'react'
+import emailjs from 'emailjs-com';
 import { Modal } from '@/components/shared/Modal'
 import { pendingAction } from '../pendingFetch'
 import { getModalText } from '@/utils/getModalText'
+import { messageEmail } from '@/utils/messageEmail';
 
 export const ActionButtons = ({user,adminActions,id,getData}) => {
-
-
 
     const [toggle, setToggle] = useState(false)
     const [actionButtonName, setActionButtonName] = useState('')
     const [buttonName, setButtonName] = useState('')
+    const [loading, setLoading] = useState(false)
 
             async function onHandleModal(){
+                setLoading(true)
                 try {
-                    await pendingAction(id,actionButtonName)
-                    getData()
-                    setToggle(false)
+                const changeState = await pendingAction(id,actionButtonName)
+                    
+                if(changeState.status === 200){
+                
+                const { title, message } = messageEmail(actionButtonName)
+
+                const result = await emailjs.send(
+                    process.env.NEXT_PUBLIC_EMAILJ_SERVICE_ID,
+                    process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
+                    {
+                    to_email: user.properties.EMAIL,
+                    name: user.properties.FIRST,
+                    title,
+                    message
+                    },
+                    process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+                );
+                
+                getData()
+                setToggle(false)
+
+                }
                  } catch (error) {
                      console.log(error)
+                 }finally{
+                    setLoading(false)
                  }
             }
         
@@ -31,6 +54,7 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
 
   return (
     <div>
+
                  {
                 user && user.state === 'Created' && (
                     
@@ -40,7 +64,8 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
                             <Modal
                             text={getModalText(actionButtonName, buttonName)}
                             setToggle={setToggle}
-                            onHandleModal={onHandleModal}/>
+                            onHandleModal={onHandleModal}
+                            loading={loading}/>
                          }
                 
                 <div className='grid grid-cols-2 gap-2 max-sm:grid-cols-1'>
@@ -78,7 +103,8 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
                                             <Modal 
                                             text={getModalText(actionButtonName, buttonName)}
                                             setToggle={setToggle}
-                                            onHandleModal={onHandleModal}/>
+                                            onHandleModal={onHandleModal}
+                                            loading={loading}/>
                          }
                 
                 <div className='grid grid-cols-2 gap-2 max-sm:grid-cols-1'>
@@ -115,6 +141,7 @@ export const ActionButtons = ({user,adminActions,id,getData}) => {
                         text={getModalText(actionButtonName, buttonName)}
                         setToggle={setToggle}
                         onHandleModal={onHandleModal}
+                        loading={loading}
                         />
                     }
 

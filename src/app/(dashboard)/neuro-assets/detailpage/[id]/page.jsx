@@ -7,6 +7,11 @@ import React from 'react'
 import { FaCertificate, FaChartLine, FaRegFileAlt } from 'react-icons/fa';
 import { StatusBox } from '@/components/assets/StatusBox';
 import { PartiesBox } from '@/components/assets/PartiesBox';
+import Image from 'next/image';
+import certificateImage from '../../../../../../public/certificate.jpg'
+import { PdfButton } from '@/components/assets/PdfButton';
+
+
 
 
 const DetailPageAssets = () => {
@@ -97,7 +102,7 @@ const DetailPageAssets = () => {
           header={headTitle}/>
          </div>
       
-             <div className='col-start-4 col-end-5 row-sta'>
+             <div className='col-start-4 col-end-5'>
             <StatusBox statusCard={statusCard}/>
             </div> 
             <div className='col-start-4 col-end-5 row-start-2 row-end-4'>
@@ -110,11 +115,16 @@ const DetailPageAssets = () => {
       }
             {
               tab === 'certificate' &&
-              <DisplayDetails
-              fieldsToShow={fieldsToShow}
-              userData={userData}
-              title={'Order details'}
-              headTitle={headTitle}/>
+              <div className='mx-auto w-full h-[60%] border-2 bg-white p-5 rounded-lg '>
+              <h1 className='font-semibold text-xl mb-5'>Order certificate</h1>
+                <Image
+                className='bg-gray-100 p-4 rounded-lg'
+                src={certificateImage}
+                width={1200}
+                height={1200}
+                alt='certificate'/>
+                <PdfButton/>
+              </div>
             }
             {
               tab === 'process' &&

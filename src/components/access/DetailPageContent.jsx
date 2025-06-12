@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import config from '@/config/config';
 import { FaArrowLeft, FaShieldAlt, FaSpinner, FaUser} from 'react-icons/fa'
 import { AccountDetails, DisplayDetails } from '@/components/access/Buttons/DisplayDetails';
-import Link from 'next/link';
 import { Identity } from '@/components/access/Identity';
 import { ActivityDetailspage } from './ActivityDetailspage';
 import { TabNavigation } from '../shared/TabNavigation';

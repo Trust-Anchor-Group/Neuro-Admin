@@ -11,6 +11,7 @@ export default function NeuroAssetsLayout({ children }) {
         {
           title: 'Assets',
           icon: <FaRegFileAlt />,
+          href:'/neuro-assets',
           subItems: [
             { label: 'Orders', href: '/neuro-assets/orders' },
             { label: 'Clients', href: '/neuro-assets/orders' },
