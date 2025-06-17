@@ -18,7 +18,9 @@ console.log('[QuickLogin] Session Cookie:', host);
     },
     body: JSON.stringify({ seconds: 3600 }),
   });
-
+  console.log('EMAILJS_SERVICE_ID:', process.env.EMAILJS_SERVICE_ID)
+  console.log('EMAILJS_PUBLIC_KEY:', !!process.env.EMAILJS_PUBLIC_KEY)
+  console.log('EMAILJS_TEMPLATE_ID:', process.env.EMAILJS_TEMPLATE_ID)    
   const contentType = response.headers.get('content-type');
   const result = contentType?.includes('application/json')
     ? await response.json()
