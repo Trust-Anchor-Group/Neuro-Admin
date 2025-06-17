@@ -15,6 +15,23 @@ const QuickLogin = dynamic(
 export default function LoginPage() {
   const [showQR, setShowQR] = useState(false);
   const router = useRouter();
+  async function checkLogin() {
+    const res = await fetch('/api/accounts', {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json' },
+      credentials: 'include',
+      body:"{}"
+    })
+
+
+    if (res.status === 403) {
+      router.push('/403')
+    }else{
+      router.push('/landingpage')
+    }
+
+  }
+
   return (
     <div
       className="relative min-h-screen font-grotesk overflow-hidden"
@@ -36,11 +53,11 @@ export default function LoginPage() {
       <main className="relative z-10 flex justify-center items-center px-4 pt-20 pb-10">
         {/* LOGIN CARD */}
         <div className="bg-[#FCFCFC] rounded-[1.5rem] shadow-[0px_4px_10px_rgba(24,31,37,0.05)] w-full max-w-6xl flex flex-col md:flex-row px-12 py-10 gap-16">
-          
+
           {/* LEFT COLUMN: phone + badges */}
           <div className="order-2 md:order-1 md:w-1/2 flex justify-end">
             <div className="flex flex-col md:flex-row items-center md:items-start bg-gray-100 p-10 rounded-2xl">
-              
+
               {/* Phone mockup (hidden on mobile, visible from md up) */}
               <Image
                 src="/Neuro-Access-preview.png"
@@ -105,7 +122,7 @@ export default function LoginPage() {
                   neuron={config.api.agent.host}
                   purpose="Login to Neuro-admin"
                   active
-                  onLoginSuccess={() => router.push('/landingpage')}
+                  onLoginSuccess={() => checkLogin()}
                 />
                 <button
                   onClick={() => setShowQR(false)}

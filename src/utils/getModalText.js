@@ -1,14 +1,21 @@
 export function getModalText(action, label) {
+  let textState
+  let textVerifiedEmail
   switch (action) {
     case 'Approved':
-      return `Are you sure you want to approve this id application?`
+      textState = `Are you sure you want to approve this id application?`
+      textVerifiedEmail = `The user will be notified by email.`
     case 'Rejected':
-      return `Are you sure you want to reject this id application?`
+      textState = `Are you sure you want to reject this id application?`
+      textVerifiedEmail = `The user will be notified by email.`
     case 'Compromised':
-      return `Are you sure you want to change this identity to compromised?`
+      textState = `Are you sure you want to change this identity to compromised?`
+      textVerifiedEmail = `The user will be notified by email.`
     case 'Obsoleted':
-      return `Are you sure you want to change this identity to obsoleted?`
+      textState =`Are you sure you want to change this identity to obsoleted?`
+      textVerifiedEmail = `The user will be notified by email.`
     default:
-      return `Are you sure you want to proceed with the action: ${label}?`
   }
+
+  return {textState,textVerifiedEmail}
 }

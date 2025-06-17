@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
@@ -10,11 +10,26 @@ const Menu = ({ menuItems }) => {
   const [hoveredItem, setHoveredItem] = useState(null);
   const [isClient, setIsClient] = useState(false);
   const [host, setHost] = useState('');
+  const filterRef = useRef(null);
+  const hideTimeoutRef = useRef(null);
 
+  useEffect(() => {
+    const handleClickOutSide = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) {
+        setHoveredItem(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutSide);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutSide);
+    };
+  }, []);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
   useEffect(() => {
     const storedHost = sessionStorage.getItem("AgentAPI.Host");
     if (storedHost) {
@@ -26,10 +41,11 @@ const Menu = ({ menuItems }) => {
 
   return (
     <aside
+      ref={filterRef}
       className={`h-screen shadow-md border-r border-gray-200 transition-all duration-300 flex flex-col justify-between ${open ? 'w-64 bg-[#FCFCFC]' : 'w-16'
         }`}
     >
-      <div >
+      <div>
         <div className="flex flex-col items-center px-3 py-4 border-b relative bg-[#F5F6F7]">
           {open && (
             <div className="text-center w-full mb-4">
@@ -39,9 +55,8 @@ const Menu = ({ menuItems }) => {
             </div>
           )}
 
-          {/* Shrinkable Logo centered with equal spacing above/below */}
           <div
-            className={`relative transition-all  ${open ? 'w-16 aspect-[1/1]' : 'w-10 aspect-[1/1] my-1'
+            className={`relative transition-all ${open ? 'w-16 aspect-[1/1]' : 'w-10 aspect-[1/1] my-1'
               }`}
           >
             <Image
@@ -52,52 +67,66 @@ const Menu = ({ menuItems }) => {
               unoptimized
             />
           </div>
+
           {open && (
-            <div className="w-full px-2 ">
+            <div className="w-full px-2 mb-4">
               <div className="bg-[#FCFCFC] p-2 rounded-lg text-sm text-center">
                 <strong className="block">Neuro Admin</strong>
                 <span className="text-xs text-gray-400">Access</span>
               </div>
             </div>
           )}
+
           {open && (
             <button
               onClick={() => setOpen(false)}
               aria-label="Collapse sidebar"
-              className="absolute top-[25vh] -right-[1vw] bg-gray-100 text-purple-600 rounded p-1 shadow z-20 hover:bg-purple-600 hover:text-white"
+              className="absolute bottom-[-7%] right-0 bg-neuroButtonGray text-purple-600 rounded-l p-2 shadow z-20 hover:bg-purple-600 hover:text-white"
             >
               <FaChevronLeft size={16} />
             </button>
           )}
         </div>
+
         {/* Navigation */}
-        <nav className={`px-2 py-3 flex flex-col gap-4 ${open ? 'items-start' : 'items-center'}`}>
+        <nav className={`px-2.5 py-3 relative flex flex-col gap-4 ${open ? 'items-start' : 'items-center'}`}>
           {!open && (
             <button
               onClick={() => setOpen(true)}
               aria-label="Expand sidebar"
-              className="bg-gray-100 text-purple-600 rounded p-2 shadow hover:bg-purple-600 hover:text-white"
+              className="bg-neuroButtonGray absolute top-[-10%] right-[25%] text-purple-600 rounded p-2 shadow hover:bg-purple-600 hover:text-white"
             >
               <FaChevronRight size={16} />
             </button>
           )}
 
-          <ul className="w-full space-y-2">
+          <ul className="w-full space-y-2 mt-5">
             {menuItems.map((item, idx) => (
               <li
                 key={idx}
-                onMouseEnter={() => setHoveredItem(idx)}
-                onMouseLeave={() => setHoveredItem(null)}
                 className="relative w-full"
+                onMouseEnter={() => {
+                  clearTimeout(hideTimeoutRef.current);
+                  setHoveredItem(idx);
+                }}
+                onMouseLeave={() => {
+                  hideTimeoutRef.current = setTimeout(() => {
+                    setHoveredItem(null);
+                  }, 200);
+                }}
               >
+                <div className='border-t pt-3'>
+
                 <Link
                   href={item.href || '#'}
-                  className="flex items-center gap-3 text-[#181F25] text-base font-medium rounded hover:bg-purple-100 hover:text-purple-700 px-2 py-2 w-full"
-                >
-                  <span>{item.icon}</span>
+                  className="flex  text-center gap-3 text-[#181F25] text-base font-medium rounded hover:bg-purple-100 hover:text-purple-700 p-3 w-full"
+                  >
+                    <span className=''>{item.icon}</span>
                   {open && <span>{item.title}</span>}
                 </Link>
 
+                </div>
+                {/* Inline submenu (if menu is open) */}
                 {item.subItems && open && (
                   <ul className="ml-6 mt-1 space-y-1 text-sm">
                     {item.subItems.map((subItem) => (
@@ -113,12 +142,26 @@ const Menu = ({ menuItems }) => {
                   </ul>
                 )}
 
-                {item.subItems && !open && hoveredItem === idx && (
-                  <ul className="absolute left-full top-0 ml-2 bg-white shadow-lg rounded-lg text-sm p-2 z-30">
-                    <li className="font-semibold text-purple-600 pb-1 border-b mb-1">
+                {/* Floating submenu (if menu is collapsed and hovered) */}
+                {item && !open && hoveredItem === idx && (
+                  <ul
+                    className="absolute left-full top-3 ml-2 bg-white shadow-lg rounded-lg text-sm p-2 z-30"
+                    onMouseEnter={() => {
+                      clearTimeout(hideTimeoutRef.current);
+                      setHoveredItem(idx);
+                    }}
+                    onMouseLeave={() => {
+                      hideTimeoutRef.current = setTimeout(() => {
+                        setHoveredItem(null);
+                      }, 200);
+                    }}
+                  >
+                    <li className={`font-semibold text-purple-600  ${item.subItems ? 'border-b pb-1 mb-1' : ''}  `}>
+                      <Link href={item.href}>
                       {item.title}
+                      </Link>
                     </li>
-                    {item.subItems.map((subItem) => (
+                    {item.subItems && item.subItems.map((subItem) => (
                       <li key={subItem.label}>
                         <Link
                           href={subItem.href}
@@ -127,7 +170,7 @@ const Menu = ({ menuItems }) => {
                           {subItem.label}
                         </Link>
                       </li>
-                    ))}
+                    )) }
                   </ul>
                 )}
               </li>
@@ -136,7 +179,6 @@ const Menu = ({ menuItems }) => {
         </nav>
       </div>
 
-      {/* Footer Logo — optional or removed if redundant */}
       <footer className="p-4">
         <Link href="/landingpage" className="flex justify-center">
           <Image

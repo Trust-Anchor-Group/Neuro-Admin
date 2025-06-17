@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import config from '@/config/config';
 import { FaArrowLeft, FaShieldAlt, FaSpinner, FaUser} from 'react-icons/fa'
 import { AccountDetails, DisplayDetails } from '@/components/access/Buttons/DisplayDetails';
-import Link from 'next/link';
 import { Identity } from '@/components/access/Identity';
 import { ActivityDetailspage } from './ActivityDetailspage';
 import { TabNavigation } from '../shared/TabNavigation';
@@ -146,7 +145,7 @@ export default function DetailPageContent() {
         { label: "First Name", key: "properties.LAST" },
         { label: "Nationality", key: "properties.COUNTRY" },
         { label: "Address", key: "properties.ADDR" },
-        { label: "Date of birth", key: "properties.PNR" },
+        { label: "Personal number", key: "properties.PNR" },
         { label: "Phone", key: "properties.PHONE" },
         
       ];

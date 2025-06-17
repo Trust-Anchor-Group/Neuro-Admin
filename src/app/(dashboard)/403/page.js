@@ -22,7 +22,7 @@ export default function Custom403() {
         No authorization found.
       </h2>
       <p className="text-gray-600 mb-8 max-w-md">
-        This page is not publicly available. To access it, please log in first.
+        This page is not publicly available.
       </p>
 
       <Link

@@ -9,6 +9,15 @@ export default function SettingsPageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [tab, setTab] = useState("kyc");
+  const [hideKyc, setHideKyc] = useState('')
+
+  useEffect(() => {
+      const storedUser = sessionStorage.getItem("AgentAPI.Host");
+      if (storedUser) {   
+        setHideKyc(storedUser)
+      }
+  }, [])
+  
 
   useEffect(() => {
     const urlTab = searchParams.get("tab");
@@ -20,12 +29,15 @@ export default function SettingsPageClient() {
       <h1 className="text-3xl font-bold text-gray-800 mb-4">Settings</h1>
 
       <div className="flex border-b">
-        <button
+        {
+          hideKyc !== 'neuron.kikkin.io' &&
+          <button
           className={`px-4 py-2 text-lg font-medium ${tab === "kyc" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"}`}
           onClick={() => router.push("/neuro-access/settings?tab=kyc")}
-        >
+          >
           KYC Settings
         </button>
+        }
         <button
           className={`px-4 py-2 text-lg font-medium ${tab === "api" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"}`}
           onClick={() => router.push("/neuro-access/settings?tab=api")}
@@ -35,7 +47,7 @@ export default function SettingsPageClient() {
       </div>
 
       <div className="mt-6 bg-white shadow-md rounded-lg p-6">
-        {tab === "kyc" ? <KYCSettings /> : <APIKeys />}
+        {tab === "kyc" && hideKyc !== 'neuron.kikkin.io' ? <KYCSettings /> : <APIKeys />}
       </div>
     </div>
   );

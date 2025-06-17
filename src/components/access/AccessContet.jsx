@@ -67,7 +67,7 @@ export const AccessContet = () => {
               const data = await res.json();
 
               setUserList(data.data || []);
-              console.log('Accounts',data)
+
               setTotalPages(data.totalPages || 38);
           }
       } catch (error) {

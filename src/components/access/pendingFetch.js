@@ -1,10 +1,11 @@
+import { NextResponse } from "next/server";
 
 
 export async function pendingAction(userId,clickedState){
     console.log("User ID:", userId);  // Ensure this is correct and being passed
     console.log("Clicked State:", clickedState); 
     try {
-        const res = await fetch(`http://localhost:3000/api/legalIdStatus`, {
+        const res = await fetch(`/api/legalIdStatus`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -18,9 +19,8 @@ export async function pendingAction(userId,clickedState){
 
           const data = await res.json()
           console.log(data)
-          if(res.status === 200){
-            
-          }
+     
+          return NextResponse.json({messsage:data.message},{status:data.stateCode})
 
     } catch (error) {
         throw new Error(`Could not post fetch state ${error}`)

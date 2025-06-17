@@ -4,9 +4,9 @@ import React, { Suspense } from 'react'
 
 const ProfilePage = async ({params}) => {
 
-  const resolvedParams = await params
-  const id = resolvedParams?.id
-  const profileData = await fetchProfile(id)
+  // const resolvedParams = await params
+  // const id = resolvedParams?.id
+  // const profileData = await fetchProfile(id)
 
   return (
     <div>

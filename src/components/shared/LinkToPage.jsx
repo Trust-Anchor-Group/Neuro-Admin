@@ -10,7 +10,7 @@ export const LinkToPage = ({hrefName,title,handleLogout,icon,setToggle}) => {
     onClick={handleLogout ? handleLogout : () => {return setTimeout(() => {
       setToggle(false)
     }, 200);}} 
-    className='flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700'>{icon}
+    className='flex items-center gap-5 px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700'>{icon}
     <span>
     {title}
     </span>

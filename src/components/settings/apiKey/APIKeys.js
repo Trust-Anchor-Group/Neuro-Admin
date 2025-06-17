@@ -28,6 +28,7 @@ export default function APIKeys() {
         })
 
         const data = await response.json()
+     
         const formatted = data.data.map((key, index) => ({
           id: offset + index + 1,
           name: `API key ${offset + index + 1}`,

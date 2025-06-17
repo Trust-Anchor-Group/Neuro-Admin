@@ -15,7 +15,8 @@ export const Pagination = ({ page, prevPage, totalPages,limit }) => {
   }
 
   return (
-    <div className='absolute bottom-[3vh] right-[3vw] z-50 flex gap-2 justify-between items-center max-sm:right-[6vw] max-sm:bottom-[2.4vh] max-sm:gap-0'>
+    <div className='absolute bottom-[3vh] right-[3vw]yy
+     flex gap-2 justify-between items-center max-sm:right-[6vw] max-sm:bottom-[2.4vh] max-sm:gap-0'>
       <div className='flex gap-2 justify-center items-center'>
         {page === 1 ? (
           <div className='flex justify-center items-center gap-2'>
@@ -89,7 +90,7 @@ export const Pagination = ({ page, prevPage, totalPages,limit }) => {
               }
 
         {// Last page
-        (maxCount > 3 && (page + 1 < maxCount)) && (
+        (maxCount >= 3 && (page + 1 < maxCount)) && (
           <Link className='' href={buildPaginationURL(maxCount)}>
             <p className='p-3 transition-all hover:bg-neuroPurpleLight hover:text-neuroPurpleDark'>
               {maxCount}
