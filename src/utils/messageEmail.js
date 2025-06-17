@@ -8,11 +8,11 @@ let message
             break;
         case 'Obsoleted':     
                 title ='Your ID application has been obsoleted',
-                message ='Your Neuro ID application has been obsoleted. Follow this link to re-apply:'
+                message ='Your Neuro ID application has been obsoleted.'
                 break;
          case 'Compromised':
                 title ='Your ID application has been compromised',
-                message ='Your Neuro ID application has been compromised. Follow this link to re-apply:'
+                message ='Your Neuro ID application has been compromised.'
                 break;
          case 'Rejected':
                 title ='Your ID application has been denied',
