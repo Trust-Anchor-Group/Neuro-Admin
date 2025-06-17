@@ -5,9 +5,7 @@ export async function POST(request) {
     const clientCookie = request.headers.get('Cookie');
     const { host } = config.api.agent;
     const url = `https://${host}/Ping`;
-    console.log('EMAILJS_SERVICE_ID:', process.env.EMAILJS_SERVICE_ID)
-    console.log('EMAILJS_PUBLIC_KEY:', !!process.env.EMAILJS_PUBLIC_KEY)
-    console.log('EMAILJS_TEMPLATE_ID:', process.env.EMAILJS_TEMPLATE_ID)  
+
     try {
         const response = await fetch(url, {
             method: 'POST',
