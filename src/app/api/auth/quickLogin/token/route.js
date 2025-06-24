@@ -18,7 +18,7 @@ console.log('[QuickLogin] Session Cookie:', host);
     },
     body: JSON.stringify({ seconds: 3600 }),
   });
-
+  
   const contentType = response.headers.get('content-type');
   const result = contentType?.includes('application/json')
     ? await response.json()
