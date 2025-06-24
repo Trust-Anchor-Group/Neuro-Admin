@@ -6,7 +6,7 @@ import { cookies } from 'next/headers'
       try {
         const clientCookies = await cookies();
          
-          const url = `${config.protocol}://${config.origin}/api/legalIdentity`;
+          const url = `/api/legalIdentity`;
           const res = await fetch(url, {
               method: 'POST',
               headers: {
