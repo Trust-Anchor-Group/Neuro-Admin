@@ -56,7 +56,7 @@ export default function DetailPageContent() {
 
     async function getData() {
         try {
-            const url = `${config.protocol}://${config.origin}/api/legalIdentity`;
+            const url = `/api/legalIdentity`;
             const res = await fetch(url, {
                 method: 'POST',
                 headers: {
