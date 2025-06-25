@@ -52,18 +52,18 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
   }
 
   const renderButtons = (filterFn) => (
-    <div className="grid grid-cols-2 gap-2 max-sm:grid-cols-1">
-      {adminActions.filter(filterFn).map((btn, index) => (
-        <button
-          key={index}
-          onClick={() => onToggleHandler(btn.actionTitle, btn.name)}
-          className={`w-full ${btn.bgColor} ${btn.textColor} shadow-sm py-1 flex justify-center items-center font-semibold gap-2 rounded-lg cursor-pointer transition-opacity hover:opacity-70`}
-        >
-          <btn.icon aria-hidden="true" /> {btn.name}
-        </button>
-      ))}
-    </div>
-  )
+  <div className="flex justify-end">
+    {adminActions.filter(filterFn).map((btn, index) => (
+      <button
+        key={index}
+        onClick={() => onToggleHandler(btn.actionTitle, btn.name)}
+        className={`w-3/5 sm:w-2/5 aspect-[8/1] h-10 whitespace-nowrap text-base max-sm:text-sm ${btn.bgColor} ${btn.textColor} shadow-sm flex justify-center items-center font-semibold gap-2 rounded-lg cursor-pointer transition-opacity hover:opacity-70`}
+      >
+        {btn.icon && <btn.icon aria-hidden="true" />} {btn.name}
+      </button>
+    ))}
+  </div>
+)
 
   return (
     <div className="mt-5 max-sm:p-5">
@@ -77,9 +77,9 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
       )}
 
       {user?.state === 'Created' &&
-        renderButtons(btn =>
-          ['Approved', 'Rejected'].includes(btn.actionTitle)
-        )}
+  renderButtons(btn =>
+    btn.actionTitle === 'Review application'
+  )}
 
       {user?.state === 'Obsoleted' &&
         renderButtons(btn =>
