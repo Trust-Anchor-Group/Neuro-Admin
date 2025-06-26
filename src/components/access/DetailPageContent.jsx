@@ -24,7 +24,7 @@ export default function DetailPageContent() {
     console.log(backPath)
     async function getAccounts(){
         try {
-            const url = `${config.protocol}://${config.origin}/api/account`;
+            const url = `/api/account`;
             const res = await fetch(url, {
                 method: 'POST',
                 headers: {
