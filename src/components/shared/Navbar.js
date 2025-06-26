@@ -83,15 +83,10 @@ const Navbar = ({ neuroLogo }) => {
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout'); 
-      sessionStorage.removeItem("neuroUser");
-      setUser(null);
-      router.push('/');
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+  const handleLogout = () => {
+    sessionStorage.removeItem("neuroUser");
+    setUser(null);
+    window.location.href = '/api/auth/logout'; // hard redirect
   };
 
   return (
