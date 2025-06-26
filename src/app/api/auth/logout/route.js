@@ -4,7 +4,7 @@ import config from '@/config/config';
 export async function GET() {
 
     const { protocol, origin } = config;
-    const nextRes = NextResponse.redirect(new URL('/', `${protocol}://${origin}`));
+    const nextRes = NextResponse.redirect(new URL('/', ));
 
     nextRes.cookies.set('HttpSessionID', "", {
         httpOnly: true,
