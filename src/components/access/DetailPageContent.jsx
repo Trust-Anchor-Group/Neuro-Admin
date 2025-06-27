@@ -108,25 +108,15 @@ export default function DetailPageContent() {
     }, [])
 
     useEffect(() => {
- 
-  if (!urlTab) {
-    const newTab =
-  ref && (ref.includes('/account') || ref.includes('/id-application'))
-    ? 'details'
-    : 'identity';
-    console.log(newTab)
-    console.log(ref)
-    setTab(newTab);
-
- 
-    const newParams = new URLSearchParams(searchParams.toString());
-    newParams.set('tab', newTab);
-    router.replace(`${pathname}?${newParams.toString()}`);
-  } else {
-    setTab(urlTab);
-  }
-}, [urlTab, ref]);
-    
+        if (!urlTab) {
+            setTab('identity');
+            const newParams = new URLSearchParams(searchParams.toString());
+            newParams.set('tab', 'identity');
+            router.replace(`${pathname}?${newParams.toString()}`);
+        } else {
+            setTab(urlTab);
+        }
+    }, [urlTab, searchParams, pathname, router]);
 
   const fieldsToShowMetadata = [
     { label: "ID status", key: "state" },
