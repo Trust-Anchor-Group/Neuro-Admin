@@ -3,7 +3,6 @@ import { FaSpinner, FaTimes } from 'react-icons/fa'
 
 export const Modal = ({
   setToggle,
-  onHandleModal,
   loading
 }) => {
   // state för att visa/ha gömd confirm-popup:
@@ -35,7 +34,7 @@ export const Modal = ({
         </button>
 
         {/* Applicant photo */}
-        <div className="self-stretch text-[var(--Content-Primary,#181F25)] font-[Space Grotesk] text-[16px] font-bold leading-[120%] tracking-[0.016px] mb-2">Applicant photo</div>
+        <div className="text-[var(--Content-Primary,#181F25)] font-[Space Grotesk] text-[16px] font-bold leading-[120%] tracking-[0.016px] mb-2">Applicant photo</div>
         <div className="flex mb-6">
           <img
             src="https://via.placeholder.com/120x120.png?text=Photo"
@@ -45,7 +44,7 @@ export const Modal = ({
         </div>
 
         {/* Identification chosen */}
-        <div className="self-stretch text-[var(--Content-Primary,#181F25)] font-[Space Grotesk] text-[16px] font-bold leading-[120%] tracking-[0.016px]">Applicant identification</div>
+        <div className="text-[var(--Content-Primary,#181F25)] font-[Space Grotesk] text-[16px] font-bold leading-[120%] tracking-[0.016px]">Applicant identification</div>
           <div className="mt-2 bg-gray-50 p-4 rounded mb-6">
             <div className="text-[var(--Content-Secondary,rgba(24,31,37,0.62))] font-[Space Grotesk] font-bold text-[14px] leading-[120%] tracking-[0.1%] mb-3">Identification chosen</div>
             <div className="border-t border-gray-200 pt-[8px] text-[var(--Content-Secondary,rgba(24,31,37,0.62))] font-[Roboto] text-[16px] font-normal leading-[140%] tracking-[0.016px]">National ID card</div>
@@ -53,10 +52,10 @@ export const Modal = ({
 
         {/* ID-Front and Back */}
         <div className="flex flex-row gap-[16px] mb-[24px]">
-          <div className="w-[194px] h-[144px] box-border border-2 bg-gray-200 rounded-[8px] p-[8px] flex items-center justify-center">
+          <div className="w-[194px] h-[144px] border-2 bg-gray-200 rounded-[8px] p-[8px] flex items-center justify-center">
             [ photo of ID front ]
           </div>
-          <div className="w-[194px] h-[144px] box-border border-2 bg-gray-200 rounded-[8px] p-[8px] flex items-center justify-center">
+          <div className="w-[194px] h-[144px] border-2 bg-gray-200 rounded-[8px] p-[8px] flex items-center justify-center">
             [ photo of ID back ]
           </div>
         </div>
@@ -164,7 +163,7 @@ export const Modal = ({
           </div>
 
         {/* Legal representative identification */}
-        <div className="self-stretch text-[var(--Content-Primary,#181F25)] font-[Space Grotesk] text-[16px] font-bold leading-[120%] tracking-[0.016px]">Legal representative identification</div>
+        <div className="text-[var(--Content-Primary,#181F25)] font-[Space Grotesk] text-[16px] font-bold leading-[120%] tracking-[0.016px]">Legal representative identification</div>
           <div className="mt-2 bg-gray-50 p-4 rounded mb-6">
             <div className="text-[var(--Content-Secondary,rgba(24,31,37,0.62))] font-[Space Grotesk] font-bold text-[14px] leading-[120%] tracking-[0.1%] mb-3">Identification chosen</div>
             <div className="border-t border-gray-200 pt-[8px] text-[var(--Content-Secondary,rgba(24,31,37,0.62))] font-[Roboto] text-[16px] font-normal leading-[140%] tracking-[0.016px]">National ID card</div>
