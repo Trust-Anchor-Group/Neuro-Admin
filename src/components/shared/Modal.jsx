@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FaSpinner, FaTimes } from 'react-icons/fa'
 
 export const Modal = ({
@@ -6,6 +6,9 @@ export const Modal = ({
   onHandleModal,
   loading
 }) => {
+  // state för att visa/ha gömd confirm-popup:
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false)
+
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/30">
       <div className="relative bg-white rounded-lg border border-gray-200 w-full max-w-2xl p-6 overflow-y-auto max-h-screen sm:max-h-[90vh]">
@@ -14,6 +17,7 @@ export const Modal = ({
             <FaSpinner className="animate-spin text-4xl text-gray-500" />
           </div>
         )}
+
 
         {/* Header */}
         <header className="border-b pb-4 mb-6">
@@ -166,8 +170,49 @@ export const Modal = ({
             <div className="border-t border-gray-200 pt-[8px] text-[var(--Content-Secondary,rgba(24,31,37,0.62))] font-[Roboto] text-[16px] font-normal leading-[140%] tracking-[0.016px]">National ID card</div>
           </div>
 
-
+        {/* ACTION BUTTONS */}
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={() => setToggle(prev => !prev)}
+            className="px-16 py-2 rounded-lg font-semibold bg-red-500 text-white hover:opacity-80 transition"
+          >
+            Deny ID application
+          </button>
+          <button
+            onClick={() => setShowConfirmPopup(true)}
+            className="px-16 py-2 rounded-lg font-semibold bg-purple-600 text-white hover:opacity-80 transition"
+          >
+            Approve ID application
+          </button>
+        </div>
       </div>
+
+      {showConfirmPopup && (
+        <div className="absolute inset-0 flex justify-center items-center z-60">
+          <div className="relative bg-white rounded-lg border border-gray-200 w-80 p-20">
+            <button
+              onClick={() => setShowConfirmPopup(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              <FaTimes size={20} />
+            </button>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setShowConfirmPopup(false)}
+                className="px-4 py-2 bg-green-100 text-green-700 rounded font-semibold hover:opacity-80 transition"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setShowConfirmPopup(false)}
+                className="px-4 py-2 bg-red-100 text-red-700 rounded font-semibold hover:opacity-80 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
