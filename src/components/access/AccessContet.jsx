@@ -30,6 +30,9 @@ export const AccessContet = () => {
     const isFetchingRef = useRef(false)
 
     const [totalPages, setTotalPages] = useState(0)
+    const [modalOpen, setModalOpen] = useState(false)
+    const [selectedUser, setSelectedUser] = useState(null)
+    const [loading, setLoading] = useState(false)
   
     //fetch data depending if you are in ID application or accounts
     async function getData() {
@@ -93,9 +96,11 @@ export const AccessContet = () => {
      }
 }
 
-
-
-
+const handleReview = (userId) => {
+  const rawUser = userList?.find(u => u.id === userId)
+  setSelectedUser({ properties: rawUser, attachments: rawUser?.attachments })
+  setModalOpen(true)
+}
 
 function onToggleHandler(id,btnName,btnText){
     setToggle((prev => !prev))
@@ -137,7 +142,11 @@ const filteredColumns = filterAccount === 'noID'
                   limit={limit}
                   customCellRenderers={customCellPendingTable}
                   userColoumns={userColoumnsPending}
-                  renderRowActions={(props) => pendingActions({...props,onToggleHandler,pathnameWithFilter})}
+                  renderRowActions={(props) => pendingActions({
+                    ...props,
+                    onReviewHandler: handleReview,
+                    pathnameWithFilter
+                  })}
                   pending={true}
           />
         )}
@@ -151,6 +160,25 @@ const filteredColumns = filterAccount === 'noID'
           />
         )}
 
+        {/* Modal för review */}
+        {modalOpen && selectedUser && (
+        <Modal
+          setToggle={setModalOpen}
+          loading={loading}
+          user={selectedUser}
+          text={getModalText('Approved', 'Approve ID application')}
+          handleApprove={async () => {
+            await pendingAction(selectedUser.id, 'Approved')
+            setModalOpen(false)
+            getData()
+          }}
+          handleReject={async (reason) => {
+            await pendingAction(selectedUser.id, 'Rejected', reason)
+            setModalOpen(false)
+            getData()
+          }}
+        />
+      )}
 
       </div>
 
