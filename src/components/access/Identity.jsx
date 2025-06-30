@@ -18,9 +18,10 @@ export const Identity = ({
   const [infoToggleMetaData, setIntoToggleMetaData] = useState(false);
 
   const adminActions = [
-  { actionTitle: 'Review application', bgColor: 'bg-[#8F40D4]', textColor: 'text-white', name: 'Review application' },
-  { actionTitle: 'Compromised', bgColor: 'bg-neuroDarkOrange/20', icon: FaExclamationTriangle, textColor: 'text-neuroDarkOrange', name: 'Compromise Id' },
-  { actionTitle: 'Obsoleted', bgColor: 'bg-obsoletedRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: 'Obsolete Id' },
+    { actionTitle: 'Rejected', bgColor: 'bg-neuroRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: 'Deny ID application' },
+    { actionTitle: 'Approved', bgColor: 'bg-neuroPurpleLight', icon: FaExclamationTriangle, textColor: 'text-neuroPurpleDark', name: 'Approve ID application' },
+    { actionTitle: 'Compromised', bgColor: 'bg-neuroDarkOrange/20', icon: FaExclamationTriangle, textColor: 'text-neuroDarkOrange', name: 'Compromise Id' },
+    { actionTitle: 'Obsoleted', bgColor: 'bg-obsoletedRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: 'Obsolete Id' },
 ];
 
   if (!user) {
