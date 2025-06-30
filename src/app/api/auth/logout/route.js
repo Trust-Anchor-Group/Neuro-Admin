@@ -1,19 +1,17 @@
 import { NextResponse } from 'next/server';
-import config from '@/config/config';
 
 export async function GET() {
+    const response = NextResponse.json({ success: true });
 
-    const { protocol, origin } = config;
-    const nextRes = NextResponse.redirect(new URL('/', `${protocol}://${origin}`));
-
-    nextRes.cookies.set('HttpSessionID', "", {
+    response.cookies.set({
+        name: 'HttpSessionID',
+        value: '',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        maxAge: 0,
         expires: new Date(0),
     });
 
-    return nextRes;
+    return response;
 }
