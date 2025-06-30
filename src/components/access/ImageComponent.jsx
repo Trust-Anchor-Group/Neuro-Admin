@@ -8,13 +8,17 @@ export const ImageComponent = ({user}) => {
     {
             user?.attachments ?
         <div className='w-[128px] h-[128px] rounded-3xl overflow-hidden'>
-            <Image
-                className='w-full h-full object-cover'
-                src={`data:image/png;base64,${user?.attachments}`} 
-                width={1200}
-                height={1200}
-                alt='Profile'
-                />
+            {user?.attachments?.[2]?.data ? (
+              <img
+                src={`data:image/jpeg;base64,${user.attachments[2].data}`}
+                alt={user.attachments[2].fileName || 'Applicant Photo'}
+                className="w-32 h-32 rounded-lg object-cover border"
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-lg bg-gray-200 flex items-center justify-center text-sm text-gray-500 border">
+                No photo
+              </div>
+            )}
         </div> :
             user?.imageUrl ? 
                        <div className='w-[128px] h-[128px] rounded-3xl overflow-hidden'>
