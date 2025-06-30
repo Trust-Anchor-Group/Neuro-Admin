@@ -60,10 +60,10 @@ const Menu = ({ menuItems }) => {
               }`}
           >
             <Image
-              src="/NeuroLogo.svg"
+              src="/KikkinLogo.jpg"
               alt="Neuro Logo"
               fill
-              className="object-contain"
+              className="object-contain rounded-full shadow-sm"
               unoptimized
             />
           </div>
