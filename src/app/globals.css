@@ -1,6 +1,66 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+:root {
+    /* Standard - Mateo */
+    --brand-primary: #8F40D4;
+    --brand-secondary: #FFFFFF;
+    --brand-background: #FFFFFF;
+    --brand-third: #FFFFFF;
+    --brand-text-color: #2E2E2E;
+    --brand-accent: #FBB040;
+
+
+    
+}
+
+.kikkin {
+    --brand-primary: #005375;
+    --brand-secondary: #FFFFFF;
+    --brand-background: #005375;
+    --brand-third: #FFFFFF;
+    --brand-text-color: #161111;
+    --brand-accent: #FBB040;
+    --brand-icon: #005375;
+
+}
+/* Tailwind access via utility classes */
+.bg-brand {
+    background-color: var(--brand-background);
+}
+
+.text-brand {
+    color: var(--brand-primary);
+}
+.text-brand-on {
+    color: var(--brand-text-color, #181F25);
+ }
+
+.text-brand-secondary {
+    color: var(--brand-secondary);
+}
+
+.hover\:bg-brand-secondary:hover {
+    background-color: var(--brand-secondary); }
+/* Textfärg som passar ovanpå brand-background */
+.text-on-brand {
+    color: var(--brand-text-color, #181F25);
+    /* fallback svart */
+}
+
+.text-brand-accent {
+    color: var(--brand-accent);
+}
+
+.bg-brand-accent {
+    background-color: var(--brand-accent); }
+
+:root {
+    --brand-text-color: #2E2E2E;
+    /* mörk text för ljus bakgrund (Mateo) */ }
+        .hover-text-on-brand:hover {
+            color: var(--brand-accent) !important;
+        }
 .react-calendar {
     width: 100% !important;
     border: none !important;
