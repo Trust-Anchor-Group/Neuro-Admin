@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from 'react';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import { DetailpageStatus } from './DetailpageStatus';
@@ -8,6 +9,7 @@ import { MapOutInput } from '../shared/MapOutInput';
 import { PopUpButton } from './Buttons/PopUpButton';
 import { ImageComponent } from './ImageComponent';
 import { ProfileEditModal } from './ProfileEditModal';
+import { pendingActions } from './pendingTable';
 
 export const Identity = ({
   user, id, getData, fieldsToShow,
