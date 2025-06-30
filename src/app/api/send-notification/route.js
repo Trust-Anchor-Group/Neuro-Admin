@@ -1,5 +1,5 @@
 export async function POST(request) {
-  const { to_email, name, title, message } = await request.json()
+  const { to_email, name, title, message, link } = await request.json()
 
   try {
     const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
@@ -17,6 +17,7 @@ export async function POST(request) {
           name,
           title,
           message,
+          link
         },
       }),
     })
