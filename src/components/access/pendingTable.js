@@ -99,22 +99,32 @@ import { MdAssignment } from 'react-icons/md'
                           <p>See Application</p>
                     </div>
             </Link>
-                </div>
+          </div>
+          
         </MenuItem>,
-                arrayActions.map((item,index) =>(
-                  <MenuItem key={index + 2}>
-                    <button 
-                      onClick={() => {
-                        onToggleHandler(row.original.id, item.actionTitle, item.name);
-                        closeMenu(); // Kalla på closeMenu efteråt
-                      }}
-                      className="flex gap-2 rounded-full items-center"
-                    >
-                      <item.icon className={item.iconColor} />
-                      {item.name}
-                    </button>
-                  </MenuItem>
-                    )),   
+        <MenuItem key="review" onClick={() => {
+          onToggleHandler(row.original.id, "Review", "Review ID application");
+          closeMenu();
+        }}>
+          <div className="flex gap-2 items-center">
+            <FaUser />
+            <p>Review Application</p>
+          </div>
+        </MenuItem>,
+                // arrayActions.map((item,index) =>(
+                //   <MenuItem key={index + 2}>
+                //     <button 
+                //       onClick={() => {
+                //         onToggleHandler(row.original.id, item.actionTitle, item.name);
+                //         closeMenu(); // Kalla på closeMenu efteråt
+                //       }}
+                //       className="flex gap-2 rounded-full items-center"
+                //     >
+                //       <item.icon className={item.iconColor} />
+                //       {item.name}
+                //     </button>
+                //   </MenuItem>
+                //     )),   
     ];
 
 

@@ -1,23 +1,64 @@
+'use client'
 import React, { useState } from 'react'
 import { Modal } from '@/components/shared/Modal'
 import { pendingAction } from '../pendingFetch'
 import { getModalText } from '@/utils/getModalText'
 import { messageEmail } from '@/utils/messageEmail'
+import { FaExclamationTriangle, FaTimes } from 'react-icons/fa'
 
 export const ActionButtons = ({ user, adminActions, id, getData }) => {
   const [toggle, setToggle] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [actionButtonName, setActionButtonName] = useState('')
   const [buttonName, setButtonName] = useState('')
-  const [loading, setLoading] = useState(false)
 
-  async function onHandleModal() {
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false)
+  const [confirmText, setConfirmText] = useState({ textState: '', textVerifiedEmail: '' })
+  const [confirmActionType, setConfirmActionType] = useState('')
+
+  const handleReviewClick = () => {
+    setActionButtonName('Review')
+    setButtonName('Review ID application')
+    setToggle(true)
+  }
+
+  const handleQuickAction = (action, label) => {
+    setConfirmText(getModalText(action, label))
+    setConfirmActionType(action)
+    setShowConfirmPopup(true)
+  }
+
+  const handleConfirmQuickAction = async () => {
+    await onHandleModal(confirmActionType, confirmActionType === 'Compromised' ? 'Compromise Id' : 'Obsolete Id')
+    setShowConfirmPopup(false)
+  }
+
+  async function onHandleModal(action = '', label = '', reason = '') {
+    if (!action) return
+
     setLoading(true)
+    setActionButtonName(action)
+    setButtonName(label)
 
     try {
-      const changeState = await pendingAction(id, actionButtonName)
+      const changeState = await pendingAction(id, action)
 
       if (changeState.status === 200) {
-        const { title, message } = messageEmail(actionButtonName)
+        const { title, message } = messageEmail(action)
+        let dynamicLink = 'https://kyc.neuro-tech.io/' // fallback
+
+        if (action === 'Approved') {
+          dynamicLink = `https://kyc.neuro-tech.io/user/`
+        } else if (action === 'Rejected') {
+          dynamicLink = `https://kyc.neuro-tech.io/`
+        } else if (action === 'Obsoleted') {
+          dynamicLink = `https://kyc.neuro-tech.io/`
+        } else if (action === 'Compromised') {
+          dynamicLink = `https://kyc.neuro-tech.io/`
+        }
+        const fullMessage = action === 'Rejected' && reason?.trim()
+          ? `${message}\n\nReason:\n${reason}`
+          : message
 
         const res = await fetch('/api/send-notification', {
           method: 'POST',
@@ -26,7 +67,8 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
             to_email: user.properties.EMAIL,
             name: user.properties.FIRST,
             title,
-            message,
+            message: fullMessage,
+            link: dynamicLink,
           }),
         })
 
@@ -45,25 +87,8 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
     }
   }
 
-  function onToggleHandler(btnName, btnText) {
-    setToggle(true)
-    setActionButtonName(btnName)
-    setButtonName(btnText)
-  }
-
-  const renderButtons = (filterFn) => (
-  <div className="flex justify-end">
-    {adminActions.filter(filterFn).map((btn, index) => (
-      <button
-        key={index}
-        onClick={() => onToggleHandler(btn.actionTitle, btn.name)}
-        className={`w-3/5 sm:w-2/5 aspect-[8/1] h-10 whitespace-nowrap text-base max-sm:text-sm ${btn.bgColor} ${btn.textColor} shadow-sm flex justify-center items-center font-semibold gap-2 rounded-lg cursor-pointer transition-opacity hover:opacity-70`}
-      >
-        {btn.icon && <btn.icon aria-hidden="true" />} {btn.name}
-      </button>
-    ))}
-  </div>
-)
+  const handleApprove = () => onHandleModal('Approved', 'Approve ID application')
+  const handleReject = (reason) => onHandleModal('Rejected', 'Deny ID application', reason)
 
   return (
     <div className="mt-5 max-sm:p-5">
@@ -73,23 +98,81 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
           setToggle={setToggle}
           onHandleModal={onHandleModal}
           loading={loading}
+          user={user}
+          handleApprove={handleApprove}
+          handleReject={handleReject}
         />
       )}
 
-      {user?.state === 'Created' &&
-  renderButtons(btn =>
-    btn.actionTitle === 'Review application'
-  )}
+      {showConfirmPopup && (
+        <div className="fixed inset-0 flex justify-center items-center z-[9999] bg-black/40 px-4">
+          <div className="relative bg-white rounded-lg border border-gray-200 w-[90%] max-w-md p-6 text-center">
+            <button
+              onClick={() => setShowConfirmPopup(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              <FaTimes size={20} />
+            </button>
+            <p className="text-lg font-semibold text-gray-800 mb-2">
+              {confirmText.textState}
+            </p>
+            <p className="text-sm text-gray-500 mb-6">
+              {confirmText.textVerifiedEmail}
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleConfirmQuickAction}
+                className="px-4 py-2 bg-green-100 text-green-700 rounded font-semibold hover:opacity-80 transition"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setShowConfirmPopup(false)}
+                className="px-4 py-2 bg-red-100 text-red-700 rounded font-semibold hover:opacity-80 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {user?.state === 'Obsoleted' &&
-        renderButtons(btn =>
-          btn.actionTitle === 'Compromised'
-        )}
+      {user?.state === 'Created' && (
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={handleReviewClick}
+            className="bg-[#8F40D4] text-white shadow-sm px-4 py-2 font-semibold rounded-lg hover:opacity-80 transition"
+          >
+            Review application
+          </button>
+        </div>
+      )}
 
-      {user && !['Created', 'Obsoleted'].includes(user.state) &&
-        renderButtons(btn =>
-          ['Compromised', 'Obsoleted'].includes(btn.actionTitle)
-        )}
+      {user?.state === 'Obsoleted' && (
+        <button
+          onClick={() => handleQuickAction('Compromised', 'Compromise Id')}
+          className="w-full bg-neuroDarkOrange/20 text-neuroDarkOrange shadow-sm py-2 flex justify-center items-center font-semibold gap-2 rounded-lg cursor-pointer transition-opacity hover:opacity-70 mb-4"
+        >
+          <FaExclamationTriangle /> Compromise Id
+        </button>
+      )}
+
+      {user && !['Created', 'Obsoleted'].includes(user.state) && (
+        <>
+          <button
+            onClick={() => handleQuickAction('Compromised', 'Compromise Id')}
+            className="w-full bg-neuroDarkOrange/20 text-neuroDarkOrange shadow-sm py-2 flex justify-center items-center font-semibold gap-2 rounded-lg cursor-pointer transition-opacity hover:opacity-70 mb-4"
+          >
+            <FaExclamationTriangle /> Compromise Id
+          </button>
+          <button
+            onClick={() => handleQuickAction('Obsoleted', 'Obsolete Id')}
+            className="w-full bg-obsoletedRed/20 text-obsoletedRed shadow-sm py-2 flex justify-center items-center font-semibold gap-2 rounded-lg cursor-pointer transition-opacity hover:opacity-70"
+          >
+            <FaExclamationTriangle /> Obsolete Id
+          </button>
+        </>
+      )}
     </div>
   )
 }
