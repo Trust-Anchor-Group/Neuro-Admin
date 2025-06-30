@@ -5,6 +5,25 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
+const getBrandConfig = (host) => {
+  const lowerHost = host?.toLowerCase() || '';
+  if (lowerHost.includes('kikkin')) {
+    return {
+      logo: '/KikkinLogo.jpg',
+      name: 'Kikkin Admin',
+      subtitle: 'Access',
+      themeClass: 'kikkin',
+    };
+  }
+
+  return {
+    logo: '/NeuroLogo.svg',
+    name: 'Neuro Admin',
+    subtitle: 'Access',
+    themeClass: 'mateo',
+  };
+};
+
 const Menu = ({ menuItems }) => {
   const [open, setOpen] = useState(true);
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -14,54 +33,44 @@ const Menu = ({ menuItems }) => {
   const hideTimeoutRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutSide = (e) => {
+    document.addEventListener('mousedown', (e) => {
       if (filterRef.current && !filterRef.current.contains(e.target)) {
         setHoveredItem(null);
       }
-    };
-
-    document.addEventListener('mousedown', handleClickOutSide);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutSide);
-    };
+    });
+    return () => document.removeEventListener('mousedown', () => { });
   }, []);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    const storedHost = sessionStorage.getItem("AgentAPI.Host");
-    if (storedHost) {
-      setHost(storedHost);
-    }
+    const storedHost = sessionStorage.getItem('AgentAPI.Host');
+    if (storedHost) setHost(storedHost);
   }, []);
 
   if (!isClient) return null;
 
+  const { logo, name, subtitle, themeClass } = getBrandConfig(host);
+
   return (
     <aside
       ref={filterRef}
-      className={`h-screen shadow-md border-r border-gray-200 transition-all duration-300 flex flex-col justify-between ${open ? 'w-64 bg-[#FCFCFC]' : 'w-16'
-        }`}
+      className={`h-screen shadow-md border-r border-gray-200 transition-all duration-300 flex flex-col justify-between ${open ? 'w-64' : 'w-16'} ${themeClass}`}
     >
       <div>
-        <div className="flex flex-col items-center px-3 py-4 border-b relative bg-[#F5F6F7]">
+        {/* HEADER */}
+        <div className="flex flex-col items-center px-3 py-4 border-b relative bg-brand text-brand-on">
           {open && (
             <div className="text-center w-full mb-4">
-              <div className="bg-[#FCFCFC] py-2 px-4 rounded-lg text-sm text-[#181f259e]">
+              <div className="bg-[var(--brand-third)] py-2 px-4 rounded-lg text-sm font-medium text-brand-on">
                 {host}
               </div>
             </div>
           )}
 
-          <div
-            className={`relative transition-all ${open ? 'w-16 aspect-[1/1]' : 'w-10 aspect-[1/1] my-1'
-              }`}
-          >
+          <div className={`relative transition-all ${open ? 'w-16 aspect-[1/1]' : 'w-10 aspect-[1/1] my-1'}`}>
             <Image
-              src="/KikkinLogo.jpg"
-              alt="Neuro Logo"
+              src={logo}
+              alt="Brand Logo"
               fill
               className="object-contain rounded-full shadow-sm"
               unoptimized
@@ -69,10 +78,10 @@ const Menu = ({ menuItems }) => {
           </div>
 
           {open && (
-            <div className="w-full px-2 mb-4">
-              <div className="bg-[#FCFCFC] p-2 rounded-lg text-sm text-center">
-                <strong className="block">Neuro Admin</strong>
-                <span className="text-xs text-gray-400">Access</span>
+            <div className="w-full px-2 mt-4 mb-4">
+              <div className="bg-[var(--brand-third)] p-2 rounded-lg text-sm text-center text-brand-on">
+                <strong className="block">{name}</strong>
+                <span className="text-xs block opacity-80">{subtitle}</span>
               </div>
             </div>
           )}
@@ -81,20 +90,20 @@ const Menu = ({ menuItems }) => {
             <button
               onClick={() => setOpen(false)}
               aria-label="Collapse sidebar"
-              className="absolute bottom-[-7%] right-0 bg-neuroButtonGray text-purple-600 rounded-l p-2 shadow z-20 hover:bg-purple-600 hover:text-white"
+              className="absolute bottom-[-7%] right-0 bg-[var(--brand-third)] text-[var(--brand-primary)] rounded-l p-2 shadow z-20 hover:bg-brand-accent hover:text-[var(--brand-third)]"
             >
               <FaChevronLeft size={16} />
             </button>
           )}
         </div>
 
-        {/* Navigation */}
+        {/* NAVIGATION */}
         <nav className={`px-2.5 py-3 relative flex flex-col gap-4 ${open ? 'items-start' : 'items-center'}`}>
           {!open && (
             <button
               onClick={() => setOpen(true)}
               aria-label="Expand sidebar"
-              className="bg-neuroButtonGray absolute top-[-10%] right-[25%] text-purple-600 rounded p-2 shadow hover:bg-purple-600 hover:text-white"
+              className="bg-[var(--brand-third)] absolute top-[-10%] right-[25%] text-[var(--brand-primary)] rounded p-2 shadow hover:bg-[var(--brand-primary)] hover:text-[var(--brand-third)]"
             >
               <FaChevronRight size={16} />
             </button>
@@ -115,25 +124,24 @@ const Menu = ({ menuItems }) => {
                   }, 200);
                 }}
               >
-                <div className='border-t pt-3'>
-
-                <Link
-                  href={item.href || '#'}
-                  className="flex  text-center gap-3 text-[#181F25] text-base font-medium rounded hover:bg-purple-100 hover:text-purple-700 p-3 w-full"
+                <div className="border-t pt-3">
+                  <Link
+                    href={item.href || '#'}
+                    className="flex gap-3 items-center text-[var(--brand-text-color)] text-base font-medium rounded hover:bg-brand-accent hover-text-on-brand p-3 w-full transition-colors"
                   >
-                    <span className=''>{item.icon}</span>
-                  {open && <span>{item.title}</span>}
-                </Link>
-
+                    <span>{item.icon}</span>
+                    {open && <span>{item.title}</span>}
+                  </Link>
                 </div>
-                {/* Inline submenu (if menu is open) */}
+
+                {/* Subitems (open) */}
                 {item.subItems && open && (
                   <ul className="ml-6 mt-1 space-y-1 text-sm">
                     {item.subItems.map((subItem) => (
                       <li key={subItem.label}>
                         <Link
                           href={subItem.href}
-                          className="block px-2 py-1 rounded hover:bg-gray-200 text-gray-600 transition"
+                          className="block px-2 py-1 rounded hover:bg-gray-200 text-[var(--brand-text-color)] transition"
                         >
                           {subItem.label}
                         </Link>
@@ -142,35 +150,30 @@ const Menu = ({ menuItems }) => {
                   </ul>
                 )}
 
-                {/* Floating submenu (if menu is collapsed and hovered) */}
-                {item && !open && hoveredItem === idx && (
+                {/* Floating submenu (hover + collapsed) */}
+                {!open && hoveredItem === idx && (
                   <ul
                     className="absolute left-full top-3 ml-2 bg-white shadow-lg rounded-lg text-sm p-2 z-30"
-                    onMouseEnter={() => {
-                      clearTimeout(hideTimeoutRef.current);
-                      setHoveredItem(idx);
-                    }}
+                    onMouseEnter={() => clearTimeout(hideTimeoutRef.current)}
                     onMouseLeave={() => {
                       hideTimeoutRef.current = setTimeout(() => {
                         setHoveredItem(null);
                       }, 200);
                     }}
                   >
-                    <li className={`font-semibold text-purple-600  ${item.subItems ? 'border-b pb-1 mb-1' : ''}  `}>
-                      <Link href={item.href}>
-                      {item.title}
-                      </Link>
+                    <li className="font-semibold text-brand-accent border-b pb-1 mb-1">
+                      <Link href={item.href}>{item.title}</Link>
                     </li>
-                    {item.subItems && item.subItems.map((subItem) => (
+                    {item.subItems?.map((subItem) => (
                       <li key={subItem.label}>
                         <Link
                           href={subItem.href}
-                          className="block px-2 py-1 rounded hover:bg-gray-200 text-gray-600 transition whitespace-nowrap"
+                          className="block px-2 py-1 rounded hover:bg-gray-100 text-[var(--brand-text-color)] transition whitespace-nowrap"
                         >
                           {subItem.label}
                         </Link>
                       </li>
-                    )) }
+                    ))}
                   </ul>
                 )}
               </li>
@@ -179,11 +182,12 @@ const Menu = ({ menuItems }) => {
         </nav>
       </div>
 
+      {/* FOOTER */}
       <footer className="p-4">
         <Link href="/landingpage" className="flex justify-center">
           <Image
-            src="/NeuroLogo.svg"
-            alt="Neuro Logo"
+            src={logo}
+            alt="Brand Logo"
             width={open ? 80 : 32}
             height={open ? 80 : 32}
             unoptimized
