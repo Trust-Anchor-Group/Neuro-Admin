@@ -113,7 +113,7 @@ export default function LandingPage() {
                 <div className="flex items-center gap-4">
                   <div className="w-[64px] h-[64px] rounded-full flex items-center justify-center">
                     <img
-                      src="/NeuroLogoGrey.jpg"
+                      src="/KikkinLogo.jpg"
                       alt="Neuro Logo"
                       className="w-[48px] h-[48px] object-contain rounded-full shadow-sm"
                     />
