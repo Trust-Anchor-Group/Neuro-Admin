@@ -83,38 +83,47 @@ import { MdAssignment } from 'react-icons/md'
       }}
       }
 
-     const arrayActions = [
-          {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve application'},
-          {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Deny application'},
-        ]
+    //  const arrayActions = [
+    //       {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve application'},
+    //       {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Deny application'},
+    //     ]
   
     
 
-      export const pendingActions = ({ closeMenu, row,getData,onToggleHandler,pathnameWithFilter }) => [
+    export const pendingActions = ({ closeMenu, row, onReviewHandler, pathnameWithFilter }) => [
         <MenuItem key={1} onClick={closeMenu}>
                 <div className="">
-            <Link href={`/neuro-access/detailpage/${row.original.id}?ref=${encodeURIComponent(pathnameWithFilter)}`}>
-                  <div className="flex gap-2 items-center">
-                      <MdAssignment />
-                          <p>See Application</p>
-                    </div>
-            </Link>
+        <Link href={`/neuro-access/detailpage/${row.original.id}?ref=${encodeURIComponent(pathnameWithFilter)}`}>
+          <div className="flex gap-2 items-center">
+            <MdAssignment />
+            <p>See Application</p>
+          </div>
+        </Link>
                 </div>
-        </MenuItem>,
-                arrayActions.map((item,index) =>(
-                  <MenuItem key={index + 2}>
-                    <button 
-                      onClick={() => {
-                        onToggleHandler(row.original.id, item.actionTitle, item.name);
-                        closeMenu(); // Kalla på closeMenu efteråt
-                      }}
-                      className="flex gap-2 rounded-full items-center"
-                    >
-                      <item.icon className={item.iconColor} />
-                      {item.name}
-                    </button>
-                  </MenuItem>
-                    )),   
+      </MenuItem>,
+      <MenuItem key="review">
+        <button
+          className="flex gap-2 items-center w-full text-left"
+          onClick={() => { onReviewHandler(row.original.id); closeMenu(); }}
+        >
+          <MdAssignment />
+          <p>Review Application</p>
+        </button>
+      </MenuItem>,
+                // arrayActions.map((item,index) =>(
+                //   <MenuItem key={index + 2}>
+                //     <button 
+                //       onClick={() => {
+                //         onToggleHandler(row.original.id, item.actionTitle, item.name);
+                //         closeMenu(); // Kalla på closeMenu efteråt
+                //       }}
+                //       className="flex gap-2 rounded-full items-center"
+                //     >
+                //       <item.icon className={item.iconColor} />
+                //       {item.name}
+                //     </button>
+                //   </MenuItem>
+                //     )),   
     ];
 
 
