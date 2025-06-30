@@ -1,41 +1,36 @@
-"use client";
+'use client'
 
-import Image from "next/image";
-import dynamic from "next/dynamic";
-import { useState } from "react";
-import config from "@/config/config";
-import { FaQrcode } from "react-icons/fa";
-import { useRouter } from 'next/navigation';
+import Image from 'next/image'
+import dynamic from 'next/dynamic'
+import { useState } from 'react'
+import config from '@/config/config'
+import { FaQrcode } from 'react-icons/fa'
+import { useRouter } from 'next/navigation'
 
-const QuickLogin = dynamic(
-  () => import("@/components/quickLogin/QuickLogin"),
-  { ssr: false }
-);
+const QuickLogin = dynamic(() => import('@/components/quickLogin/QuickLogin'), {
+  ssr: false,
+})
 
 export default function LoginPage() {
-  const [showQR, setShowQR] = useState(false);
-  const router = useRouter();
+  const [showQR, setShowQR] = useState(false)
+  const router = useRouter()
   async function checkLogin() {
     const res = await fetch('/api/accounts', {
       method: 'POST',
       headers: { 'Content-type': 'application/json' },
       credentials: 'include',
-      body:"{}"
+      body: '{}',
     })
-
 
     if (res.status === 403) {
       router.push('/403')
-    }else{
+    } else {
       router.push('/landingpage')
     }
-
   }
 
   return (
-    <div
-      className="relative min-h-screen font-grotesk overflow-hidden"
-    >
+    <div className="relative min-h-screen font-grotesk overflow-hidden">
       <div className="absolute inset-0 z-0 bg-[url('/backgroundSvg.svg')] bg-no-repeat bg-cover bg-center opacity-100 filter contrast-[0.6] brightness-[1]" />
 
       {/* HEADER */}
@@ -53,11 +48,9 @@ export default function LoginPage() {
       <main className="relative z-10 flex justify-center items-center px-4 pt-20 pb-10">
         {/* LOGIN CARD */}
         <div className="bg-[#FCFCFC] rounded-[1.5rem] shadow-[0px_4px_10px_rgba(24,31,37,0.05)] w-full max-w-6xl flex flex-col md:flex-row px-12 py-10 gap-16">
-
           {/* LEFT COLUMN: phone + badges */}
           <div className="order-2 md:order-1 md:w-1/2 flex justify-end">
             <div className="flex flex-col md:flex-row items-center md:items-start bg-gray-100 p-10 rounded-2xl">
-
               {/* Phone mockup (hidden on mobile, visible from md up) */}
               <Image
                 src="/Neuro-Access-preview.png"
@@ -152,18 +145,19 @@ export default function LoginPage() {
                   />
                 </div>
 
-                <button
-                  onClick={() => setShowQR(true)}
-                  className="flex items-center gap-4 bg-[#8F40D4] hover:bg-[#722FAD] text-white px-20 py-3 rounded-lg text-sm font-semibold shadow"
-                >
-                  <FaQrcode className="text-xl" />
-                  Start Login
-                </button>
+                  <button
+                    onClick={() => setShowQR(true)}
+                    className="flex items-center gap-4 bg-[var(--brand-primary)] hover:bg-opacity-80 text-white px-20 py-3 rounded-lg text-sm font-semibold shadow"
+                  >
+                    <FaQrcode className="text-xl" />
+                    Start Login
+                  </button>
+
               </>
             )}
 
             <p className="text-sm text-gray-500 mt-4 text-center">
-              Don’t have the app?{" "}
+              Don’t have the app?{' '}
               <a
                 href="https://play.google.com/store/apps/details?id=com.tag.NeuroAccess"
                 target="_blank"
@@ -177,5 +171,5 @@ export default function LoginPage() {
         </div>
       </main>
     </div>
-  );
+  )
 }

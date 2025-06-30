@@ -83,33 +83,34 @@ import { MdAssignment } from 'react-icons/md'
       }}
       }
 
-    //  const arrayActions = [
-    //       {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve application'},
-    //       {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Deny application'},
-    //     ]
+     const arrayActions = [
+          {actionTitle:'Approved',icon:FaCheck,iconColor:'text-green-600',name:'Approve application'},
+          {actionTitle:'Rejected',icon:FaTimes,iconColor:'text-red-600',name:'Deny application'},
+        ]
   
     
 
-    export const pendingActions = ({ closeMenu, row, onReviewHandler, pathnameWithFilter }) => [
+      export const pendingActions = ({ closeMenu, row,getData,onToggleHandler,pathnameWithFilter }) => [
         <MenuItem key={1} onClick={closeMenu}>
                 <div className="">
-        <Link href={`/neuro-access/detailpage/${row.original.id}?ref=${encodeURIComponent(pathnameWithFilter)}`}>
-          <div className="flex gap-2 items-center">
-            <MdAssignment />
-            <p>See Application</p>
+            <Link href={`/neuro-access/detailpage/${row.original.id}?ref=${encodeURIComponent(pathnameWithFilter)}`}>
+                  <div className="flex gap-2 items-center">
+                      <MdAssignment />
+                          <p>See Application</p>
+                    </div>
+            </Link>
           </div>
-        </Link>
-                </div>
-      </MenuItem>,
-      <MenuItem key="review">
-        <button
-          className="flex gap-2 items-center w-full text-left"
-          onClick={() => { onReviewHandler(row.original.id); closeMenu(); }}
-        >
-          <MdAssignment />
-          <p>Review Application</p>
-        </button>
-      </MenuItem>,
+          
+        </MenuItem>,
+        <MenuItem key="review" onClick={() => {
+          onToggleHandler(row.original.id, "Review", "Review ID application");
+          closeMenu();
+        }}>
+          <div className="flex gap-2 items-center">
+            <FaUser />
+            <p>Review Application</p>
+          </div>
+        </MenuItem>,
                 // arrayActions.map((item,index) =>(
                 //   <MenuItem key={index + 2}>
                 //     <button 

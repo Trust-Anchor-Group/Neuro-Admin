@@ -12,7 +12,8 @@ import {
   MdLockOutline,
 } from 'react-icons/md'
 import Navbar from '@/components/shared/Navbar'
-
+import { getClientId } from '@/utils/getClientId'
+import { clientConfigs } from "@/config/clientConfig"
 const services = [
   {
     title: 'Neuro-Access',
@@ -80,6 +81,8 @@ export default function LandingPage() {
   const [host, setHost] = useState(null)
   const [neuroLogo, setNeuroLogo] = useState(false)
 
+  const clientId = getClientId()
+  const logoUrl = clientConfigs[clientId]?.brand?.logoUrl ?? "/NeuroLogo.svg"
   useEffect(() => {
     setNeuroLogo(true)
     const storedUser = sessionStorage.getItem('AgentAPI.Host')
@@ -109,12 +112,12 @@ export default function LandingPage() {
             {/* Left Section: EcoTech + Destination stacked vertically */}
             <div className="flex flex-col gap-[24px]">
               {/* EcoTech Card */}
-              <div className="rounded-[16px] bg-[#FCFCFC] shadow-[0px_4px_10px_rgba(24,31,37,0.05)] px-[24px] py-[20px] flex justify-between items-center">
+              <div className="rounded-[16px] bg-[var(--brand-secondary)] shadow-[0px_4px_10px_rgba(24,31,37,0.05)] px-[24px] py-[20px] flex justify-between items-center">
                 <div className="flex items-center gap-4">
-                  <div className="w-[64px] h-[64px] rounded-full flex items-center justify-center">
+                  <div className="w-[64px] h-[64px] rounded-full flex items-center justify-center bg-[var(--brand-background)]">
                     <img
-                      src="/KikkinLogo.jpg"
-                      alt="Neuro Logo"
+                      src={logoUrl}
+                      alt="Client Logo"
                       className="w-[48px] h-[48px] object-contain rounded-full shadow-sm"
                     />
                   </div>
@@ -122,12 +125,9 @@ export default function LandingPage() {
                     <h2 className="text-[20px] font-bold text-gray-900 leading-tight">
                       {host}
                     </h2>
-                    <p className="text-[14px] text-gray-500 mt-[4px]">
-                      Current Neuron
-                    </p>
+                    <p className="text-[14px] text-gray-500 mt-[4px]">Current Neuron</p>
                   </div>
                 </div>
-                {/* <div className="text-gray-500 pr-[4px]">▼</div> */}
               </div>
 
               {/* Destination Card */}

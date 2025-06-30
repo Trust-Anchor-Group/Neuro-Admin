@@ -28,11 +28,8 @@ export const AccessContet = () => {
     const [buttonName, setButtonName] = useState('')
     const [id, setId] = useState('')
     const isFetchingRef = useRef(false)
-
+  const [selectedUser, setSelectedUser] = useState(null)
     const [totalPages, setTotalPages] = useState(0)
-    const [modalOpen, setModalOpen] = useState(false)
-    const [selectedUser, setSelectedUser] = useState(null)
-    const [loading, setLoading] = useState(false)
   
     //fetch data depending if you are in ID application or accounts
     async function getData() {
@@ -96,18 +93,44 @@ export const AccessContet = () => {
      }
 }
 
-const handleReview = (userId) => {
-  const rawUser = userList?.find(u => u.id === userId)
-  setSelectedUser({ properties: rawUser, attachments: rawUser?.attachments })
-  setModalOpen(true)
-}
 
-function onToggleHandler(id,btnName,btnText){
-    setToggle((prev => !prev))
+  async function onToggleHandler(userId, btnName, btnText) {
+    setToggle(true)
     setActionButtonName(btnName)
     setButtonName(btnText)
-    setId(id)
-}
+    setId(userId)
+
+    try {
+      const res = await fetch('/api/legalIdentity', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ legalIdentity: userId }),
+      })
+
+      const result = await res.json()
+
+      if (res.ok && result?.data) {
+        setSelectedUser(result.data)
+      } else {
+        console.error('Failed to fetch user:', result?.message || 'Unknown error')
+        setSelectedUser(null)
+      }
+    } catch (err) {
+      console.error('Error in onToggleHandler:', err)
+      setSelectedUser(null)
+    }
+  }
+
+
+
+// function onToggleHandler(id,btnName,btnText){
+//     setToggle((prev => !prev))
+//     setActionButtonName(btnName)
+//     setButtonName(btnText)
+//     setId(id)
+// }
  
    {/* To hide Id name and State column in Accounts page if you filter for Unverifed ID */}  
 const filteredColumns = filterAccount === 'noID'
@@ -142,43 +165,27 @@ const filteredColumns = filterAccount === 'noID'
                   limit={limit}
                   customCellRenderers={customCellPendingTable}
                   userColoumns={userColoumnsPending}
-                  renderRowActions={(props) => pendingActions({
-                    ...props,
-                    onReviewHandler: handleReview,
-                    pathnameWithFilter
-                  })}
+                  renderRowActions={(props) => pendingActions({...props,onToggleHandler,pathnameWithFilter})}
                   pending={true}
           />
         )}
 
         {/* Modal */}
-        {toggle && (
-          <Modal 
+        {toggle && selectedUser && (
+          <Modal
             text={getModalText(actionButtonName, buttonName)}
             setToggle={setToggle}
             onHandleModal={onHandleModal}
+            user={selectedUser}
+            loading={false}
+            handleApprove={() => onHandleModal('approve')}
+            handleReject={(reason) => onHandleModal('deny', reason)}
           />
         )}
 
-        {/* Modal för review */}
-        {modalOpen && selectedUser && (
-        <Modal
-          setToggle={setModalOpen}
-          loading={loading}
-          user={selectedUser}
-          text={getModalText('Approved', 'Approve ID application')}
-          handleApprove={async () => {
-            await pendingAction(selectedUser.id, 'Approved')
-            setModalOpen(false)
-            getData()
-          }}
-          handleReject={async (reason) => {
-            await pendingAction(selectedUser.id, 'Rejected', reason)
-            setModalOpen(false)
-            getData()
-          }}
-        />
-      )}
+
+
+
 
       </div>
 
