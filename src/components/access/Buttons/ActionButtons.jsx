@@ -130,7 +130,7 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
         <div className="flex justify-end mb-4">
           <button
             onClick={handleReviewClick}
-            className="bg-[#8F40D4] text-white shadow-sm px-4 py-2 font-semibold rounded-lg hover:opacity-80 transition"
+            className="bg-[#8F40D4] text-white shadow-sm px-20 py-2 font-semibold rounded-lg hover:opacity-80 transition"
           >
             Review application
           </button>

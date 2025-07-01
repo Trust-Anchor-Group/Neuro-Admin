@@ -44,7 +44,13 @@ export default function DetailPageContent() {
             console.log('New Account',data)
             
             setIsAccount(true)
-            setUser(data.data)
+            setUser({
+                ...data.data,
+                properties: {
+                    ...data.data.properties,
+                    FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
+                }
+            })
   
         } catch (error) {
             console.error('Error fetching user:', error)
@@ -75,7 +81,13 @@ export default function DetailPageContent() {
             const data = await res.json()
             console.log('New ID',data)
         
-            setUser(data.data)
+            setUser({
+            ...data.data,
+            properties: {
+                ...data.data.properties,
+                FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
+            }
+        })
   
         } catch (error) {
             console.error('Error fetching user:', error)
@@ -132,7 +144,7 @@ export default function DetailPageContent() {
       ];
 
       const fieldsToShowIdentity = [
-        { label: "First Name", key: "properties.LAST" },
+        { label: "Full Name", key: "properties.FULLNAME" },
         { label: "Nationality", key: "properties.COUNTRY" },
         { label: "Address", key: "properties.ADDR" },
         { label: "Personal number", key: "properties.PNR" },
