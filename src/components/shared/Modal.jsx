@@ -233,26 +233,11 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
                 ✔️ Approve ID application
               </button>
             </>
-          ) : (
-            <>
-              <button
-                disabled
-                className="px-6 py-2 rounded-lg font-semibold bg-red-100 text-red-600 cursor-not-allowed"
-              >
-                ❌ Deny ID application
-              </button>
-              <button
-                disabled
-                className="px-6 py-2 rounded-lg font-semibold bg-gray-100 text-gray-400 cursor-not-allowed"
-              >
-                ✔️ Approve ID application
-              </button>
-            </>
-          )}
+          ) : null}
         </div>
 
         {denialMode && (
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 gap-8">
             <button
               onClick={() => {
                 if (denialReason.trim()) {
@@ -261,12 +246,21 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
                 }
               }}
               disabled={!denialReason.trim()}
-              className={`px-16 py-2 rounded-lg font-semibold text-white transition ${denialReason.trim()
+              className={`px-20 py-2 rounded-lg font-semibold text-white transition ${denialReason.trim()
                 ? 'bg-red-500 hover:opacity-80'
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
             >
-              ❌ Submit denial
+             Submit denial
+            </button>
+            <button
+              onClick={() => {
+                setDenialMode(false)
+                setDenialReason('')
+              }}
+              className="px-24 py-2 rounded-lg font-semibold bg-purple-600 text-white hover:opacity-80 transition"
+            >
+              Cancel denial
             </button>
           </div>
         )}
