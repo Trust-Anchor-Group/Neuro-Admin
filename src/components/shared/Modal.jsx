@@ -240,27 +240,27 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           <div className="flex justify-center mt-4 gap-8">
             <button
               onClick={() => {
+                setDenialMode(false)
+                setDenialReason('')
+              }}
+              className="px-[90] py-2 rounded-lg font-semibold bg-[#F2495C33] text-[#A81123] hover:opacity-80 transition"
+            >
+              Cancel denial
+            </button>
+            <button
+              onClick={() => {
                 if (denialReason.trim()) {
                   setConfirmAction('deny')
                   setShowFinalConfirmPopup(true)
                 }
               }}
               disabled={!denialReason.trim()}
-              className={`px-20 py-2 rounded-lg font-semibold text-white transition ${denialReason.trim()
+              className={`px-[90] py-2 rounded-lg font-semibold text-white transition ${denialReason.trim()
                 ? 'bg-red-500 hover:opacity-80'
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
             >
              Submit denial
-            </button>
-            <button
-              onClick={() => {
-                setDenialMode(false)
-                setDenialReason('')
-              }}
-              className="px-24 py-2 rounded-lg font-semibold bg-purple-600 text-white hover:opacity-80 transition"
-            >
-              Cancel denial
             </button>
           </div>
         )}
