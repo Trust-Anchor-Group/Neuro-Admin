@@ -15,8 +15,17 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
 
   const imageList = user.attachments?.filter(a => a?.data) || []
 
+  function handleOverlayClick(e) {
+    if (e.target === e.currentTarget) {
+      setToggle(false);
+    }
+  }
+
   return (
-    <div className="fixed inset-0 flex justify-center items-center z-50 bg-black/30">
+    <div 
+    className="fixed inset-0 flex justify-center items-center z-50 bg-black/30"
+    onClick={handleOverlayClick}
+    >
       <div className="relative bg-white rounded-lg border border-gray-200 w-full max-w-2xl p-6 overflow-y-auto max-h-screen sm:max-h-[90vh]">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50">
@@ -61,7 +70,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
         <div className="text-sm font-bold">Applicant identification</div>
         <div className="mt-2 bg-gray-50 p-4 rounded mb-6">
           <div className="text-sm font-bold text-gray-500 mb-3">Identification chosen</div>
-          <div className="border-t border-gray-200 pt-2 text-sm text-gray-700">National ID card</div>
+          <div className="border-t border-gray-200 pt-2 text-base text-gray-700">National ID card</div>
         </div>
 
         <div className="flex gap-4 mb-6">
@@ -91,7 +100,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
 
         <div className="bg-gray-50 p-4 rounded mb-6">
           <div className="text-sm font-bold text-gray-500 mb-3">Personal information</div>
-          <ul className="text-sm divide-y divide-gray-200">
+          <ul className="text-base divide-y divide-gray-200">
             <li className="border-t pt-2 py-2 flex justify-between">
               <span className="text-gray-600">Full name:</span>
               <span>{user.properties.FIRST + ' ' + user.properties.LAST}</span>
@@ -123,7 +132,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           <>
             <div className="bg-gray-50 p-4 rounded mb-6">
               <div className="text-sm font-bold text-gray-500 mb-3">Company information</div>
-              <ul className="text-sm divide-y divide-gray-200">
+              <ul className="text-base divide-y divide-gray-200">
                 <li className="border-t pt-2 py-2 flex justify-between">
                   <span className="text-gray-600">ID number:</span>
                   <span>{user.properties.ORGNR}</span>
@@ -205,12 +214,12 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           </>
         )}
 
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-8">
           {!denialMode ? (
             <>
               <button
                 onClick={() => setDenialMode(true)}
-                className="px-6 py-2 rounded-lg font-semibold bg-red-500 text-white hover:opacity-80 transition"
+                className="px-12 py-2 rounded-lg font-semibold bg-red-500 text-white hover:opacity-80 transition"
               >
                 ❌ Deny ID application
               </button>
@@ -219,31 +228,25 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
                   setConfirmAction('approve')
                   setShowFinalConfirmPopup(true)
                 }}
-                className="px-6 py-2 rounded-lg font-semibold bg-purple-600 text-white hover:opacity-80 transition"
+                className="px-12 py-2 rounded-lg font-semibold bg-purple-600 text-white hover:opacity-80 transition"
               >
                 ✔️ Approve ID application
               </button>
             </>
-          ) : (
-            <>
-              <button
-                disabled
-                className="px-6 py-2 rounded-lg font-semibold bg-red-100 text-red-600 cursor-not-allowed"
-              >
-                ❌ Deny ID application
-              </button>
-              <button
-                disabled
-                className="px-6 py-2 rounded-lg font-semibold bg-gray-100 text-gray-400 cursor-not-allowed"
-              >
-                ✔️ Approve ID application
-              </button>
-            </>
-          )}
+          ) : null}
         </div>
 
         {denialMode && (
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 gap-8">
+            <button
+              onClick={() => {
+                setDenialMode(false)
+                setDenialReason('')
+              }}
+              className="px-[90] py-2 rounded-lg font-semibold bg-[#F2495C33] text-[#A81123] hover:opacity-80 transition"
+            >
+              Cancel denial
+            </button>
             <button
               onClick={() => {
                 if (denialReason.trim()) {
@@ -252,12 +255,12 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
                 }
               }}
               disabled={!denialReason.trim()}
-              className={`px-16 py-2 rounded-lg font-semibold text-white transition ${denialReason.trim()
+              className={`px-[90] py-2 rounded-lg font-semibold text-white transition ${denialReason.trim()
                 ? 'bg-red-500 hover:opacity-80'
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
             >
-              ❌ Submit denial
+             Submit denial
             </button>
           </div>
         )}
