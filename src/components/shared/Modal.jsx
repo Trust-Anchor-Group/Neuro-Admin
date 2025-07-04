@@ -243,7 +243,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
                 setDenialMode(false)
                 setDenialReason('')
               }}
-              className="px-[90] py-2 rounded-lg font-semibold bg-[#F2495C33] text-[#A81123] hover:opacity-80 transition"
+              className="px-[15%] py-2 rounded-lg font-semibold bg-[#F2495C33] text-[#A81123] hover:opacity-80 transition"
             >
               Cancel denial
             </button>
@@ -255,7 +255,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
                 }
               }}
               disabled={!denialReason.trim()}
-              className={`px-[90] py-2 rounded-lg font-semibold text-white transition ${denialReason.trim()
+              className={`px-[15%] py-2 rounded-lg font-semibold text-white transition ${denialReason.trim()
                 ? 'bg-red-500 hover:opacity-80'
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
