@@ -4,7 +4,7 @@ import ResponseModel from "@/models/ResponseModel";
 export async function POST(request) {
 
     const requestData = await request.json();
-    const { to, subject, message, name } = requestData;
+    const { to, subject, message, name, link } = requestData;
     const clientCookie = request.headers.get('Cookie');
 
     const { host } = config.api.agent;
@@ -15,7 +15,7 @@ export async function POST(request) {
     <div style="font-family: system-ui, sans-serif, Arial; font-size: 12px;">
         <p><span style="font-family: verdana, geneva, sans-serif;"><strong>Hello ${name}</strong></span></p>
         <p><span style="font-family: verdana, geneva, sans-serif;">${message}</span></p>
-        <p><a href="https://kyc.neuro-tech.io/user">kikkin KYC/KYB Onboarding</a></p>
+        <p><a href=${link}>kikkin KYC/KYB Onboarding</a></p>
         <p><br> &nbsp;</p>
         <p>&nbsp;</p>
         <p>&nbsp;</p>
