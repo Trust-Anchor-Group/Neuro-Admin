@@ -60,13 +60,13 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
           ? `${message}\n\nReason:\n${reason}`
           : message
 
-        const res = await fetch('/api/send-notification', {
+        const res = await fetch('/api/sendMail', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            to_email: user.properties.EMAIL,
+            to: user.properties.EMAIL,
             name: user.properties.FIRST,
-            title,
+            subject: title,
             message: fullMessage,
             link: dynamicLink,
           }),
