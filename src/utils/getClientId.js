@@ -7,7 +7,7 @@ export function getClientId() {
   const envHost = process.env.NEXT_PUBLIC_AGENT_HOST || ''
 
   const domainMap = {
-    'neuron.kikkin.io': 'kikkin',
+    'kikkin.tagroot.io': 'kikkin',
     'mateo.lab.tagroot.io': 'Mateo',
   }
 

@@ -30,7 +30,7 @@ export default function SettingsPageClient() {
 
       <div className="flex border-b">
         {
-          hideKyc !== 'neuron.kikkin.io' &&
+          hideKyc !== 'kikkin.tagroot.io' &&
           <button
           className={`px-4 py-2 text-lg font-medium ${tab === "kyc" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"}`}
           onClick={() => router.push("/neuro-access/settings?tab=kyc")}
@@ -47,7 +47,7 @@ export default function SettingsPageClient() {
       </div>
 
       <div className="mt-6 bg-white shadow-md rounded-lg p-6">
-        {tab === "kyc" && hideKyc !== 'neuron.kikkin.io' ? <KYCSettings /> : <APIKeys />}
+        {tab === "kyc" && hideKyc !== 'kikkin.tagroot.io' ? <KYCSettings /> : <APIKeys />}
       </div>
     </div>
   );
