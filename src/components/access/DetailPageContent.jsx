@@ -37,6 +37,9 @@ export default function DetailPageContent() {
             if (!res.ok) {
                 const errorText = await res.text()
                 console.error('Fetch error details:', errorText)
+                if (res.status === 403) {
+                  router.push('/403')
+                }
                 throw new Error('Failed to fetch user')
             }
             
