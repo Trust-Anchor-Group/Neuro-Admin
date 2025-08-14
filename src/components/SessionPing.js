@@ -1,19 +1,26 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SessionPing() {
+  const router = useRouter();
+
   useEffect(() => {
     const pingSession = async () => {
       try {
-        const response = await fetch("/api/ping", {
+        const response = await fetch("/api/accounts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include", 
+          credentials: "include",
+          body: '{}',
         });
 
         if (!response.ok) {
           console.error("❌ Ping request failed:", response.status);
+          if (res.status === 403) {
+            router.push('/login')
+          }
           return;
         }
 
@@ -32,5 +39,5 @@ export default function SessionPing() {
     return () => clearInterval(interval);
   }, []);
 
-  return null; 
+  return null;
 }
