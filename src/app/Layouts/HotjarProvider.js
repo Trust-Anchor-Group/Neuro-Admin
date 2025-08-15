@@ -7,8 +7,8 @@ export default function HotjarProvider({ consent }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const enableDev = process.env.NEXT_PUBLIC_HOTJAR_ENABLE_DEV === "true";
-  const bypassConsent = process.env.NEXT_PUBLIC_HOTJAR_BYPASS_CONSENT === "true";
+  const enableDev =  "true";
+  const bypassConsent = "true";
   const hasConsent = consent || bypassConsent;
 
   useEffect(() => {
