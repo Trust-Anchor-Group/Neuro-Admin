@@ -25,7 +25,7 @@ jobs:
           NEXT_PUBLIC_ORIGIN: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_ORIGIN || secrets.NEXT_PUBLIC_ORIGIN_DEV }}
           NEXT_PUBLIC_AGENT_HOST: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_AGENT_HOST || secrets.NEXT_PUBLIC_AGENT_HOST }}
           NEXT_PUBLIC_HOTJAR_ID: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_HOTJAR_ID || secrets.NEXT_PUBLIC_HOTJAR_ID }}
-          NEXT_PUBLIC_HOTJAR_ENABLE_DEV: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_HOTJAR_ENABLE_DEV || secrets.NEXT_PUBLIC_HOTJAR_ENABLE_DEV }}
+          NEXT_PUBLIC_HOTJAR_ENABLE_DEV: ${{ github.ref == 'refs/heads/master' && 'false' || 'true' }}
           NEXT_PUBLIC_HOTJAR_BYPASS_CONSENT: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_HOTJAR_BYPASS_CONSENT || secrets.NEXT_PUBLIC_HOTJAR_BYPASS_CONSENT }}
         run: |
           npm install
