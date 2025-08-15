@@ -14,6 +14,17 @@ export default function HotjarProvider({ consent }) {
   useEffect(() => {
     const siteId = process.env.NEXT_PUBLIC_HOTJAR_ID;
     const isProd = process.env.NODE_ENV === "production";
+    const debug = process.env.NEXT_PUBLIC_HOTJAR_DEBUG === "true";
+    console.log("[Hotjar] Initializing with settings:", {
+      isProd,
+      enableDev,
+      hasConsent,
+      siteId,
+    });
+    if (debug) {
+      console.log("[Hotjar] isProd:", isProd, "enableDev:", enableDev, "hasConsent:", hasConsent, "siteId:", siteId);
+    }
+    
     if ((isProd || enableDev) && hasConsent && siteId) {
       initHotjar(Number(siteId));
     }
