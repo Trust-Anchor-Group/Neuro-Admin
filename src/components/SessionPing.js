@@ -18,7 +18,7 @@ export default function SessionPing() {
 
         if (!response.ok) {
           console.error("❌ Ping request failed:", response.status);
-          if (res.status === 403) {
+          if (response.status === 403) {
             router.push('/login')
           }
           return;
