@@ -1,36 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import { MapOutInput } from '../../shared/MapOutInput';
 
 export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
-  if (!userData) return <p>No data available</p>;
-  const router = useRouter()
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const router = useRouter();
 
   const handleDeleteAccount = async () => {
-    if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
-      try {
-        const objBody = { accountName: userData.data.userName };
-        const res = await fetch('/api/deleteAccount', {
-          method: 'POST',
-          headers: { 'Content-type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(objBody),
-        });
+    try {
+      const objBody = { accountName: userData.data.userName };
+      const res = await fetch('/api/deleteAccount', {
+        method: 'POST',
+        headers: { 'Content-type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(objBody),
+      });
 
-        if (res.ok) {
-          alert('Your account has been successfully deleted.');
-          router.push('/landingpage')
-
-        } else {
-          const errorText = await res.text();
-          alert(`Failed to delete account: ${errorText || res.statusText}`);
-        }
-      } catch (err) {
-        alert(`An error occurred: ${err.message}`);
+      if (res.ok) {
+        alert('Your account has been successfully deleted.');
+        router.push('/landingpage');
+      } else {
+        const errorText = await res.text();
+        alert(`Failed to delete account: ${errorText || res.statusText}`);
       }
+    } catch (err) {
+      alert(`An error occurred: ${err.message}`);
     }
+    setShowConfirmPopup(false);
   };
+
+  if (!userData) return <p>No data available</p>;
 
   return (
     <div className="flex flex-col h-full max-md:grid-cols-1">
@@ -68,15 +68,47 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
               {title}
             </h2>
             <MapOutInput fieldsToShow={fieldsToShow} user={userData} />
-            <button
-              onClick={handleDeleteAccount}
-              className="mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-xl text-xl shadow-lg transition-colors"
-            >
-              Delete Account
-            </button>
           </div>
+          <button
+            onClick={() => setShowConfirmPopup(true)}
+            className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-xl text-xl shadow-lg transition-colors"
+          >
+            Delete Account
+          </button>
         </div>
       </div>
+      {showConfirmPopup && (
+        <div className="fixed inset-0 flex justify-center items-center z-[9999] bg-black/40 px-4">
+          <div className="relative bg-white rounded-lg border border-gray-200 w-[90%] max-w-md p-6 text-center">
+            <button
+              onClick={() => setShowConfirmPopup(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              ×
+            </button>
+            <p className="text-lg font-semibold text-gray-800 mb-2">
+              Are you sure you want to delete your account?
+            </p>
+            <p className="text-sm text-gray-500 mb-6">
+              This action cannot be undone.
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={handleDeleteAccount}
+                className="px-4 py-2 bg-red-600 text-white rounded font-semibold hover:opacity-80 transition"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => setShowConfirmPopup(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded font-semibold hover:opacity-80 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
