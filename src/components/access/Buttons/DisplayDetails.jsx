@@ -9,7 +9,12 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
 
   const handleDeleteAccount = async () => {
     try {
-      const objBody = { accountName: userData.data.userName };
+      let objBody
+      if (userData.data === undefined) {
+        objBody = { accountName: userData.account };
+      } else {
+        objBody = { accountName: userData.data.userName };
+      }
       const res = await fetch('/api/deleteAccount', {
         method: 'POST',
         headers: { 'Content-type': 'application/json' },
