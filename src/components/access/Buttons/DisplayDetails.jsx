@@ -5,6 +5,7 @@ import { MapOutInput } from '../../shared/MapOutInput';
 
 export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [showDeletedMessage, setShowDeletedMessage] = useState(false);
   const router = useRouter();
 
   const handleDeleteAccount = async () => {
@@ -23,8 +24,10 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
       });
 
       if (res.ok) {
-        alert('Your account has been successfully deleted.');
-        router.push('/landingpage');
+        setShowConfirmPopup(false);
+        setShowDeletedMessage(true);
+        // Optionally, redirect after a delay:
+        setTimeout(() => router.push('/neuro-access/account'), 1300);
       } else {
         const errorText = await res.text();
         alert(`Failed to delete account: ${errorText || res.statusText}`);
@@ -32,7 +35,6 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
     } catch (err) {
       alert(`An error occurred: ${err.message}`);
     }
-    setShowConfirmPopup(false);
   };
 
   if (!userData) return <p>No data available</p>;
@@ -114,6 +116,17 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
           </div>
         </div>
       )}
+      {showDeletedMessage && (
+        <div className="fixed inset-0 flex justify-center items-center z-[9999] bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-lg p-8 shadow-lg text-center">
+            <p className="text-2xl font-semibold text-gray-800">
+              Your account has been successfully deleted.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+
