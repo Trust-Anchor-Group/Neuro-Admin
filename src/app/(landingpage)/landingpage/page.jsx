@@ -179,9 +179,16 @@ export default function LandingPage() {
                   // Open external (absolute) URLs in new tab
                   target={!item.locked && /^https?:\/\//i.test(item.href) ? '_blank' : undefined}
                   rel={!item.locked && /^https?:\/\//i.test(item.href) ? 'noopener noreferrer' : undefined}
-                  className={`group rounded-[16px] border border-gray-200 bg-white p-[24px] w-full h-[240px] flex flex-col justify-between transition duration-200 ${item.locked ? 'opacity-50 hover:opacity-100 ' : 'hover:shadow-md'
+                  className={`group relative rounded-[16px] border border-gray-200 bg-white p-[24px] w-full h-[240px] flex flex-col justify-between transition duration-200 ${item.locked ? 'opacity-50 hover:opacity-100 ' : 'hover:shadow-md'
                     }`}
                 >
+                  {item.title === 'Neuro-Monitor' && (
+                    <div className="absolute top-0 right-0 overflow-hidden w-[150px] h-[150px]">
+                      <div className="absolute -right-[40px] top-[20px] w-[150px] bg-[#8F40D4] text-white text-[12px] font-bold text-center transform rotate-45  shadow-md">
+                        BETA
+                      </div>
+                    </div>
+                  )}
                   <div className="flex justify-between items-start mb-2">
                     {item.locked ? (
                       <div className="flex items-center gap-[6px] px-[12px] py-[8px] rounded-full bg-[#DFE1E3]">
