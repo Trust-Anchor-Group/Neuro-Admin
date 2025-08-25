@@ -41,19 +41,21 @@ const services = [
     icon: MdOutlineTimeline,
     iconColor: 'text-[#8B5CF6]',
     iconBg: 'bg-[#F3E8FF]',
-    href: '/neuro-monitor',
+    href: 'https://neuro-exchange.com/pri/dashboard/',
     status: 'Learn more',
-    locked: true,
+    locked: false,
+    newTab: true,
   },
   {
     title: 'Neuro-Payments',
     description: 'Payment monitoring and management',
     icon: MdAccountBalance,
-    iconColor: 'text-gray-400',
-    iconBg: 'bg-gray-100',
-    href: '#',
+    iconColor: 'text-[#8B5CF6]',
+    iconBg: 'bg-[#F3E8FF]',
+    href: 'https://neuro-admin.com/site/loginqr',
     status: 'Learn more',
-    locked: true,
+    locked: false,
+    newTab: true,
   },
   {
     title: 'Neuro-Leasing',
@@ -174,6 +176,9 @@ export default function LandingPage() {
                 <Link
                   key={index}
                   href={item.locked ? '#' : item.href}
+                  // Open external (absolute) URLs in new tab
+                  target={!item.locked && /^https?:\/\//i.test(item.href) ? '_blank' : undefined}
+                  rel={!item.locked && /^https?:\/\//i.test(item.href) ? 'noopener noreferrer' : undefined}
                   className={`group rounded-[16px] border border-gray-200 bg-white p-[24px] w-full h-[240px] flex flex-col justify-between transition duration-200 ${item.locked ? 'opacity-50 hover:opacity-100 ' : 'hover:shadow-md'
                     }`}
                 >
