@@ -12,6 +12,7 @@ import {
   MdLockOutline,
 } from 'react-icons/md';
 import Navbar from '@/components/shared/Navbar';
+import SessionPing from "@/components/SessionPing"
 
 // SERVICES LIST
 const services = [
@@ -107,6 +108,8 @@ export default function LandingPage() {
   }, []);
 
   return (
+    <>
+      <SessionPing />
     <div className="relative min-h-screen w-full bg-[#F5F6F7] font-sans overflow-x-hidden">
       <Navbar neuroLogo={true} />
 
@@ -230,6 +233,7 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

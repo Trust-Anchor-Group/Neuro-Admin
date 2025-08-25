@@ -2,6 +2,7 @@
 import Menu from "@/components/shared/Menu";
 import Navbar from "@/components/shared/Navbar";
 import { MdOutlineDocumentScanner, MdOutlineSettings } from "react-icons/md";
+import SessionPing from "@/components/SessionPing"
 
 export default function DashboardLayout({ children }) {
 
@@ -24,6 +25,8 @@ export default function DashboardLayout({ children }) {
     ]
 
   return (
+    <>
+      <SessionPing />
     <div className="h-screen flex bg-gray-50">
       {/* Sidebar */}
       <div className="flex flex-col bg-white shadow-md border-r border-gray-200">
@@ -37,5 +40,6 @@ export default function DashboardLayout({ children }) {
 
       </div>
     </div>
+    </>
   );
 }
