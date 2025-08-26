@@ -22,7 +22,8 @@ export const AccessContet = () => {
     const query = searchParams.get('query') || ''
     const [toggle, setToggle] = useState(false)
     const [userList, setUserList] = useState(null)
-    const limit = searchParams.get('limit') || '50'
+  const rawLimit = searchParams.get('limit') || '50'
+  const limit = rawLimit === 'all' ? MAX_ITEMS : rawLimit
     const page = Number(searchParams.get('page') || 1)
     const [actionButtonName, setActionButtonName] = useState('')
     const [buttonName, setButtonName] = useState('')
@@ -30,6 +31,7 @@ export const AccessContet = () => {
     const isFetchingRef = useRef(false)
   const [selectedUser, setSelectedUser] = useState(null)
     const [totalPages, setTotalPages] = useState(0)
+    const [totalItems, setTotalItems] = useState(0)
   
     //fetch data depending if you are in ID application or accounts
     async function getData() {
@@ -38,7 +40,7 @@ export const AccessContet = () => {
       try {
           if (pathname.includes('id-application')) {
               const requestBody = {
-                  offset: (page - 1) * limit,
+                  offset: rawLimit === 'all' ? 0 : (page - 1) * limit,
                   maxCount: limit,
                   state: "Created",
                   
@@ -58,8 +60,9 @@ export const AccessContet = () => {
               setUserList(data.data || []);
               console.log('ID application',data)
               setTotalPages(data.totalPages || 1);
+              setTotalItems(getTotalItems(data));
           } else {
-              const url = `/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
+              const url = `/api/mockdata?page=${rawLimit === 'all' ? 1 : page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
               const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
 
               if (!res.ok) throw new Error("Could not fetch userList");
@@ -69,6 +72,12 @@ export const AccessContet = () => {
               setUserList(data.data || []);
 
               setTotalPages(data.totalPages || 38);
+              setTotalItems(
+                (typeof data.items === 'number' && data.items) ||
+                (typeof data.totalItems === 'number' && data.totalItems) ||
+                (typeof data.total === 'number' && data.total) ||
+                (Array.isArray(data.data) ? data.data.length : 0)
+              );
           }
       } catch (error) {
           console.error(error);
@@ -153,6 +162,7 @@ const filteredColumns = filterAccount === 'noID'
                 userColoumns={filteredColumns}
                 pending={false}
                 query={query}
+                totalItems={totalItems}
           />
         )}
 
@@ -167,6 +177,7 @@ const filteredColumns = filterAccount === 'noID'
                   userColoumns={userColoumnsPending}
                   renderRowActions={(props) => pendingActions({...props,onToggleHandler,pathnameWithFilter})}
                   pending={true}
+                  totalItems={totalItems}
           />
         )}
 
