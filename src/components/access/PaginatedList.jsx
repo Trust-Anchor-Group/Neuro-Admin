@@ -17,6 +17,7 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
     renderRowActions = false,
     pending,
     query,
+    totalItems,
     }) => {
 
 const searchParams = useSearchParams()
@@ -94,6 +95,7 @@ const buildUrlWithParams = (key, value) => {
                             { linkHref: buildUrlWithParams('limit', '10'), text: '10' },
                             { linkHref: buildUrlWithParams('limit', '25'), text: '25' },
                             { linkHref: buildUrlWithParams('limit', '50'), text: '50' },
+                            { linkHref: buildUrlWithParams('limit', String(totalItems || 1000000)), text: 'Show all' },
                         ]}
                         isFilterAccount={false}
                         absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
