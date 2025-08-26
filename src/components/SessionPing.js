@@ -92,10 +92,18 @@ export default function SessionPing() {
   };
 
   // Handle logout button or timer end
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const res = await fetch("/api/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
     clearInterval(countdownIntervalRef.current);
     setShowModal(false);
     setCountdown(60);
+
     router.push('/login');
   };
 
