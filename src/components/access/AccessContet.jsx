@@ -23,7 +23,7 @@ export const AccessContet = () => {
     const [toggle, setToggle] = useState(false)
     const [userList, setUserList] = useState(null)
   const rawLimit = searchParams.get('limit') || '50'
-  const limit = rawLimit === 'all' ? '1000000' : rawLimit
+  const limit = rawLimit === 'all' ? MAX_ITEMS : rawLimit
     const page = Number(searchParams.get('page') || 1)
     const [actionButtonName, setActionButtonName] = useState('')
     const [buttonName, setButtonName] = useState('')
