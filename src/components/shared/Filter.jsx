@@ -30,9 +30,6 @@ export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,select
       case 'noID':
         setFilterNames('No Id')
         break
-      case 'all':
-        setFilterNames('Show all')
-        break
       case '50':
         setFilterNames('50')
         break
