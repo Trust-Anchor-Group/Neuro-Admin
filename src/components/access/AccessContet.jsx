@@ -12,6 +12,9 @@ import { pendingAction } from './pendingFetch.js';
 import { getModalText } from '@/utils/getModalText.js';
 
 
+// Max items used when limit=all
+const MAX_ITEMS = 1000000;
+
 
 export const AccessContet = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
@@ -60,7 +63,12 @@ export const AccessContet = () => {
               setUserList(data.data || []);
               console.log('ID application',data)
               setTotalPages(data.totalPages || 1);
-              setTotalItems(getTotalItems(data));
+              setTotalItems(
+                (typeof data.items === 'number' && data.items) ||
+                (typeof data.totalItems === 'number' && data.totalItems) ||
+                (typeof data.total === 'number' && data.total) ||
+                (Array.isArray(data.data) ? data.data.length : 0)
+              );
           } else {
               const url = `/api/mockdata?page=${rawLimit === 'all' ? 1 : page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
               const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
