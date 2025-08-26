@@ -16,7 +16,7 @@ import { getModalText } from '@/utils/getModalText.js';
 const MAX_ITEMS = 1000000;
 
 
-export const AccessContet = () => {
+export const AccessContent = () => {
     const searchParams = useSearchParams()  //Check the page number in the url
     const pathname = usePathname()
     const params = new URLSearchParams(searchParams)
