@@ -1,5 +1,5 @@
 'use client'
-import { AccessContet } from '@/components/access/AccessContet'
+import { AccessContent } from '@/components/access/AccessContent'
 import { theme } from '@/components/access/accountTableList'
 import { ThemeProvider } from '@mui/material'
 import React, { Suspense} from 'react'
@@ -15,7 +15,7 @@ const PendingIDs = () => {
       <Suspense fallback={
         <div className="absolute inset-1 bg-white/50  flex items-center justify-center z-50">
         <FaSpinner className="animate-spin text-4xl text-gray-500" /></div>}>
-        <AccessContet/>
+        <AccessContent/>
       </Suspense>
       </ThemeProvider>
     </div>
