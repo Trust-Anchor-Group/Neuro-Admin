@@ -60,12 +60,7 @@ export const AccessContet = () => {
               setUserList(data.data || []);
               console.log('ID application',data)
               setTotalPages(data.totalPages || 1);
-              setTotalItems(
-                (typeof data.items === 'number' && data.items) ||
-                (typeof data.totalItems === 'number' && data.totalItems) ||
-                (typeof data.total === 'number' && data.total) ||
-                (Array.isArray(data.data) ? data.data.length : 0)
-              );
+              setTotalItems(getTotalItems(data));
           } else {
               const url = `/api/mockdata?page=${rawLimit === 'all' ? 1 : page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
               const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
