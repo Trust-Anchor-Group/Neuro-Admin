@@ -9,7 +9,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 
 const TableComponent = ({data = [], columns = [],enableSorting = false, enableRowActions, renderRowActionMenuItems,
-  customCellRenderers = {},}) => {
+  customCellRenderers = {}, page, limit, totalItems,}) => {
     
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -22,13 +22,20 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     ...col,
     Cell: customCellRenderers[col.accessorKey] || col.Cell, 
   }))
+
+  // derive controlled pagination state from props/URL
+  const total = Number.isFinite(Number(totalItems)) ? Number(totalItems) : data.length;
+  const pageIndex = Math.max(0, (Number(page) || 1) - 1);
+  const pageSize = Number.isFinite(Number(limit)) ? Number(limit) : (total || 50);
   
   const table = useMaterialReactTable({
     columns: modifiedColumns,
     data,
     enableSorting: true,
     enableColumnFilters: false,
-    enablePagination: false,
+    enablePagination: true,
+    manualPagination: true, // server-side pagination
+    rowCount: total, // total number of rows on the server
     enableGlobalFilter: false,
     enableColumnActions: true,
     enableRowActions: renderRowActionMenuItems == false ? false : true,
@@ -37,6 +44,18 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     enableHiding: true,
     positionActionsColumn: "last",
     renderRowActionMenuItems: renderRowActionMenuItems || undefined,
+    state: {
+      pagination: { pageIndex, pageSize },
+    },
+    onPaginationChange: (updater) => {
+      const next = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater;
+      const nextPage = (next?.pageIndex ?? 0) + 1;
+      const nextLimit = next?.pageSize ?? pageSize;
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.set('page', String(nextPage));
+      newParams.set('limit', String(nextLimit));
+      router.push(`${pathname}?${newParams.toString()}`, { scroll: false });
+    },
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
         if (!pathname.includes('id-application')) {
