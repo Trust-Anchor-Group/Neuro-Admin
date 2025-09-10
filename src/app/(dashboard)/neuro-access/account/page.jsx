@@ -1,5 +1,5 @@
 
-import { AccessContet } from '@/components/access/AccessContet'
+import { AccessContent } from '@/components/access/AccessContent'
 
 import React, { Suspense} from 'react'
 import { FaSpinner } from 'react-icons/fa'

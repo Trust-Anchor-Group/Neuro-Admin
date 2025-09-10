@@ -40,6 +40,18 @@ export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,select
         setFilterNames('10')
         break
       default:
+        // For limit filter: show a friendly label when selecting a custom value (e.g., "Show all")
+        if (!isFilterAccount) {
+          const n = Number(filtered)
+          if (!Number.isNaN(n)) {
+            // Treat any value greater than the largest preset as "Show all"
+            if (n > 50) {
+              setFilterNames('Show all')
+            } else {
+              setFilterNames(String(filtered))
+            }
+          }
+        }
         break
     }
   }

@@ -16,6 +16,7 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
     renderRowActions = false,
     pending,
     query,
+    totalItems,
     }) => {
 
 const searchParams = useSearchParams()
