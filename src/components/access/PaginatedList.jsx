@@ -1,7 +1,6 @@
 'use client'
 import React, { useState } from 'react'
 import TableComponent from './TableComponent';
-import { Pagination } from './Pagination';
 import SearchBar from '../SearchBar';
 import { Filter} from '../shared/Filter';
 import Link from 'next/link';
@@ -91,23 +90,18 @@ const buildUrlWithParams = (key, value) => {
                      <div className='hidden md:block'>
                     {/* FilterLimit */}
                     
-                        { /* Show all: use a semantic 'all' value so parent can handle it */ }
-                        {(
-                            <Filter linkArray={[
+                        {/* <Filter linkArray={[
                             { linkHref: buildUrlWithParams('limit', '10'), text: '10' },
                             { linkHref: buildUrlWithParams('limit', '25'), text: '25' },
                             { linkHref: buildUrlWithParams('limit', '50'), text: '50' },
-                            { linkHref: buildUrlWithParams('limit', 'all'), text: 'Show all' },
+                            { linkHref: buildUrlWithParams('limit', 'all'), text: 'All' },
                         ]}
                         isFilterAccount={false}
                         absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
-                            size={'w-[100px]'} />
-                        )}
+                        size={'w-[100px]'}/> */}
                     </div>
                     </div>
-                    <div className='hidden md:block'>
-                        <Pagination page={page} prevPage={prevPage} totalPages={totalPages} limit={limit} />                
-                    </div>
+                    {/* Remove separate Pagination; MRT handles pagination */}
                 </div>
             </div>
             <ThemeProvider theme={theme}>
@@ -120,12 +114,13 @@ const buildUrlWithParams = (key, value) => {
                 enableGlobalFilter={false}
                 customCellRenderers={customCellRenderers}
                 renderRowActionMenuItems={renderRowActions}
+                page={page}
+                limit={limit}
+                totalItems={totalPages}
                 />
             }
             </ThemeProvider>
-                <div className='block py-2 md:hidden'>
-                        <Pagination page={page} prevPage={prevPage} totalPages={totalPages} limit={limit} />                
-                </div>
+                {/* Mobile pagination removed; MRT provides built-in controls */}
             </div>
             
             
