@@ -109,6 +109,10 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
               <span className="text-gray-600">Country:</span>
               <span>{user.properties.COUNTRY}</span>
             </li>
+            {/* <li className="py-2 flex justify-between">
+              <span className="text-gray-600">Date of birth:</span>
+              <span>{user.properties.DOB}</span>
+            </li> */}
             <li className="py-2 flex justify-between">
               <span className="text-gray-600">Identity number:</span>
               <span>{user.properties.PNR}</span>

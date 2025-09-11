@@ -152,7 +152,8 @@ export default function DetailPageContent() {
         { label: "Address", key: "properties.ADDR" },
         { label: "Personal number", key: "properties.PNR" },
         { label: "Phone", key: "properties.PHONE" },
-        
+        { label: "Email", key: "properties.EMAIL" },
+        // { label: "Date of birth", key: "properties.DOB" },     
       ];
     
       const fieldsToShowWithNoID = [
