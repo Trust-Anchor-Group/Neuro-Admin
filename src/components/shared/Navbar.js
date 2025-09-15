@@ -83,6 +83,14 @@ const Navbar = ({ neuroLogo }) => {
 
   const handleLogout = async () => {
     try {
+      const res = await fetch("/api/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
       await fetch('/api/auth/logout', { method: 'GET' })
 
       sessionStorage.removeItem('neuroUser')

@@ -39,46 +39,42 @@ export const AccessContent = () => {
     const [totalPages, setTotalPages] = useState(0)
     const [totalItems, setTotalItems] = useState(0)
   
-    //fetch data depending if you are in ID application or accounts
+    
     async function getData() {
       if (isFetchingRef.current) return
       isFetchingRef.current = true
       try {
-          if (pathname.includes('id-application')) {
-              const requestBody = {
-                  offset: rawLimit === 'all' ? 0 : (page - 1) * limit,
-                  maxCount: limit,
-                  state: "Created",
-                  
-                  filter: {
-                    FIRST:query
-                  },
-              };
+        if (pathname.includes('id-application')) {
+          const requestBody = {
+            page,
+            limit,                 // supports 'all'
+            state: "Created",
+            filter: { FIRST: query },
+          };
 
-              const res = await fetch("/api/legal-identities", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(requestBody),
-              });
+          const res = await fetch("/api/legal-identities", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+          });
 
-              if (!res.ok) throw new Error("Failed to fetch pending applications");
-              const data = await res.json();
-              setUserList(data.data || []);
-              console.log('ID application',data)
-              setTotalPages(data.totalPages || 1);
-              setTotalItems(
-                (typeof data.items === 'number' && data.items) ||
-                (typeof data.totalItems === 'number' && data.totalItems) ||
-                (typeof data.total === 'number' && data.total) ||
-                (Array.isArray(data.data) ? data.data.length : 0)
-              );
-          } else {
-              const url = `/api/mockdata?page=${rawLimit === 'all' ? 1 : page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
+          if (!res.ok) throw new Error("Failed to fetch pending applications");
+          const data = await res.json();
+          console.log("data:", data);
+          const payload = data?.data;
+          const items = Array.isArray(payload?.items) ? payload.items : [];
+          const totalItems = Number(payload?.totalItems ?? 0);
+
+          setUserList(items);
+          setTotalPages(totalItems);   
+        } else {
+              const url = `/api/mockdata?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&filter=${filterAccount}`;
               const res = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' });
 
               if (!res.ok) throw new Error("Could not fetch userList");
               
               const data = await res.json();
+          console.log("data:", data);
 
               setUserList(data.data || []);
 

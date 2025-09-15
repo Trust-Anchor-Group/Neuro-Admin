@@ -1,7 +1,10 @@
 // app/_hotjar.js
 export function initHotjar(siteId) {
   if (typeof window === "undefined") return;
-  if (!siteId || window.__hotjarLoaded) return;
+  if (window.__hotjarLoaded) return;
+
+  const id = Number(siteId || process.env.NEXT_PUBLIC_HOTJAR_ID || 6508289);
+  if (!id) return;
 
   (function (h, o, t, j, a, r) {
     h.hj =
@@ -9,7 +12,7 @@ export function initHotjar(siteId) {
       function () {
         (h.hj.q = h.hj.q || []).push(arguments);
       };
-    h._hjSettings = { hjid: siteId, hjsv: 6 };
+    h._hjSettings = { hjid: id, hjsv: 6 };
     a = o.getElementsByTagName("head")[0];
     r = o.createElement("script");
     r.async = 1;
