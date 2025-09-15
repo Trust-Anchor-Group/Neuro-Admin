@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
-export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,selectArray}) => {
+export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,selectArray,onSelect}) => {
 
   const searchParams = useSearchParams()
   const filtered = isFilterAccount ? searchParams.get('filter') || 'all' : searchParams.get('limit') || '50'
@@ -75,16 +75,34 @@ export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,select
 function handleSelect(value){
   setSelectedValue(value)
   setToggle(false)
+  if (typeof onSelect === 'function') {
+    try { onSelect(value) } catch { /* noop */ }
+  }
 }
   
 
   return (
     <div>
-        <div className={`relative z-20 flex items-center py-1.5 justify-between bg-neuroGray/70 border rounded-md ${size}`}>
+        <div
+          className={`relative z-20 text-sm flex items-center py-1.5 justify-between ${size} cursor-pointer select-none`}
+          role="button"
+          aria-haspopup="listbox"
+          aria-expanded={toggle}
+          tabIndex={0}
+          onClick={() => setToggle(prev => !prev)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setToggle(prev => !prev);
+            } else if (e.key === 'Escape') {
+              setToggle(false);
+            }
+          }}
+        >
           <span className='ml-2 text-neuroTextBlack '>{filterNames}</span>
-          <button className='mr-2' onClick={() => setToggle(prev => !prev)}>
+          <span className='mr-2'>
             {toggle === false ? <FaChevronDown color='#6e6e6e' /> : <FaChevronUp color='#6e6e6e' />}
-            </button>  
+          </span>
           {
                      toggle && linkArray && (
                         <div className={absoluteClassName} ref={filterRef}>   
@@ -105,7 +123,7 @@ function handleSelect(value){
                           <button
                           onClick={() => handleSelect(value)}
                           key={index}
-                          className="block w-full text-left px-2 py-1 text-lg text-neuroTextBlack hover:bg-neuroGray">
+                          className="block w-full text-left px-2 py-1 text-sm text-neuroTextBlack hover:bg-neuroGray">
                             {label}
                           </button>
                         ))}

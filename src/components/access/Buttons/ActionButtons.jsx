@@ -3,10 +3,13 @@ import React, { useState } from 'react'
 import { Modal } from '@/components/shared/Modal'
 import { pendingAction } from '../pendingFetch'
 import { getModalText } from '@/utils/getModalText'
+import { useLanguage, content } from '../../../../context/LanguageContext'
 import { messageEmail } from '@/utils/messageEmail'
 import { FaExclamationTriangle, FaTimes } from 'react-icons/fa'
 
 export const ActionButtons = ({ user, adminActions, id, getData }) => {
+  const { language } = useLanguage()
+  const t = content[language]
   const [toggle, setToggle] = useState(false)
   const [loading, setLoading] = useState(false)
   const [actionButtonName, setActionButtonName] = useState('')
@@ -23,7 +26,7 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
   }
 
   const handleQuickAction = (action, label) => {
-    setConfirmText(getModalText(action, label))
+    setConfirmText(getModalText(action, label, t))
     setConfirmActionType(action)
     setShowConfirmPopup(true)
   }
@@ -94,7 +97,7 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
     <div className="mt-5 max-sm:p-5">
       {toggle && (
         <Modal
-          text={getModalText(actionButtonName, buttonName)}
+          text={getModalText(actionButtonName, buttonName, t)}
           setToggle={setToggle}
           onHandleModal={onHandleModal}
           loading={loading}
@@ -124,13 +127,13 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
                 onClick={handleConfirmQuickAction}
                 className="px-4 py-2 bg-green-100 text-green-700 rounded font-semibold hover:opacity-80 transition"
               >
-                Confirm
+                {t?.actionButtons?.confirm || 'Confirm'}
               </button>
               <button
                 onClick={() => setShowConfirmPopup(false)}
                 className="px-4 py-2 bg-red-100 text-red-700 rounded font-semibold hover:opacity-80 transition"
               >
-                Cancel
+                {t?.actionButtons?.cancel || 'Cancel'}
               </button>
             </div>
           </div>
@@ -143,7 +146,7 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
             onClick={handleReviewClick}
             className="bg-[#8F40D4] text-white shadow-sm px-20 py-2 font-semibold rounded-lg hover:opacity-80 transition"
           >
-            Review application
+            {t?.actionButtons?.reviewApplication || 'Review application'}
           </button>
         </div>
       )}
@@ -153,7 +156,7 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
           onClick={() => handleQuickAction('Compromised', 'Compromise Id')}
           className="w-full bg-neuroDarkOrange/20 text-neuroDarkOrange shadow-sm py-2 flex justify-center items-center font-semibold gap-2 rounded-lg cursor-pointer transition-opacity hover:opacity-70 mb-4"
         >
-          <FaExclamationTriangle /> Compromise Id
+          <FaExclamationTriangle /> {t?.actionButtons?.compromiseId || 'Compromise Id'}
         </button>
       )}
 
@@ -163,13 +166,13 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
             onClick={() => handleQuickAction('Compromised', 'Compromise Id')}
             className="w-full bg-neuroDarkOrange/20 text-neuroDarkOrange shadow-sm py-2 flex justify-center items-center font-semibold gap-2 rounded-lg cursor-pointer transition-opacity hover:opacity-70 mb-4"
           >
-            <FaExclamationTriangle /> Compromise Id
+            <FaExclamationTriangle /> {t?.actionButtons?.compromiseId || 'Compromise Id'}
           </button>
           <button
             onClick={() => handleQuickAction('Obsoleted', 'Obsolete Id')}
             className="w-full bg-obsoletedRed/20 text-obsoletedRed shadow-sm py-2 flex justify-center items-center font-semibold gap-2 rounded-lg cursor-pointer transition-opacity hover:opacity-70"
           >
-            <FaExclamationTriangle /> Obsolete Id
+            <FaExclamationTriangle /> {t?.actionButtons?.obsoleteId || 'Obsolete Id'}
           </button>
         </>
       )}

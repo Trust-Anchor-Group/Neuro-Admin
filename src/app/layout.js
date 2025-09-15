@@ -1,6 +1,7 @@
 import { Inter, Space_Grotesk } from "next/font/google"
 import "./globals.css"
 import BrandProvider from "@/components/BrandProvider"
+import LanguageProvider from "../../context/LanguageContext";
 import HotjarProvider from "./Layouts/HotjarProvider"
 import { cookies } from "next/headers";
 
@@ -19,9 +20,11 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en" >
       <body className={`${inter.className} ${grotesk.className}`}>
-        <BrandProvider /> 
-        <HotjarProvider consent={analyticsConsent} />
-        {children}
+        <LanguageProvider>
+          <BrandProvider /> 
+          <HotjarProvider consent={analyticsConsent} />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   )

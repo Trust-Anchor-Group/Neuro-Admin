@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import { FiUser, FiLogOut } from 'react-icons/fi'
 import { useRouter } from 'next/navigation'
 import { LinkToPage } from './LinkToPage'
+import { Filter } from './Filter'
 import { fetchUserImage } from '@/utils/fetchUserImage'
+import { useLanguage } from '../../../context/LanguageContext'
 
 const Navbar = ({ neuroLogo }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -14,6 +16,24 @@ const Navbar = ({ neuroLogo }) => {
   const router = useRouter()
   const isFetchingRef = useRef(false)
   const hideTimeoutRef = useRef(null)
+  const { language, setLanguage, content } = useLanguage()
+  const t = content?.[language] || {}
+
+  // Language selection data (recomputed when language changes so current is first)
+  const baseLangOptions = useMemo(() => ([
+    { value: 'en', label: 'English' },
+    { value: 'pt', label: 'Português' },
+    { value: 'fr', label: 'Français' }
+  ]), [])
+
+  const languageOptions = useMemo(() => ([
+    ...baseLangOptions.filter(o => o.value === language),
+    ...baseLangOptions.filter(o => o.value !== language)
+  ]), [language, baseLangOptions])
+
+  const handleLanguageChange = (val) => {
+    setLanguage(val)
+  }
 
   useEffect(() => {
     try {
@@ -129,16 +149,26 @@ const Navbar = ({ neuroLogo }) => {
                 <LinkToPage
                   hrefName={`/neuro-access/profile/${user?.legalId}`}
                   setToggle={setDropdownOpen}
-                  title="Profile"
+                  title={t?.navbar?.profile || 'Profile'}
                   icon={<FiUser size={18} className="text-gray-600" />}
                 />
 
                 <LinkToPage
                   handleLogout={handleLogout}
                   setToggle={setDropdownOpen}
-                  title="Logout"
+                  title={t?.navbar?.logout || 'Logout'}
                   icon={<FiLogOut size={18} className="text-red-500" />}
                 />
+                <li className="px-2 pb-2">
+                  <Filter
+                    noUrlParam
+                    selectArray={languageOptions}
+                    isFilterAccount={true}
+                    absoluteClassName={'absolute top-9 left-0 z-50 flex bg-white flex-col w-full cursor-pointer border rounded-md shadow'}
+                    size={'w-full'}
+                    onSelect={handleLanguageChange}
+                  />
+                </li>
               </ul>
             </div>
           )}

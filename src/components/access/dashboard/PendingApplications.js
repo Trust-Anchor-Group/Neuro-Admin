@@ -2,8 +2,12 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
+import { useLanguage, content } from "../../../../context/LanguageContext";
 
 export default function PendingApplications() {
+  const { language } = useLanguage();
+  const t = content[language];
+  const statusMap = t?.pendingApplicationsStatuses || {};
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const isFetchingRef = useRef(false);
@@ -72,12 +76,12 @@ function handleNavigate(id) {
 
   return (
     <div className="bg-white/80 backdrop-blur-lg shadow-xl rounded-xl p-6 border border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-700 mb-4">Pending Applications</h2>
+      <h2 className="text-2xl font-bold text-gray-700 mb-4">{t?.pendingApplications?.title}</h2>
 
       {loading ? (
-        <p className="text-gray-500 text-center">Loading...</p>
+        <p className="text-gray-500 text-center">{t?.pendingApplications?.loading}</p>
       ) : applications.length === 0 ? (
-        <p className="text-gray-500 text-center">No pending applications.</p>
+        <p className="text-gray-500 text-center">{t?.pendingApplications?.empty}</p>
       ) : (
         <ul className="divide-y divide-gray-300">
           {applications.map((app) => (
@@ -87,7 +91,7 @@ function handleNavigate(id) {
                 <p className="text-gray-500 text-sm">{app.submittedAt}</p>
               </div>
               <span className="bg-yellow-500 text-white px-4 py-1 rounded-full text-sm shadow-md">
-                {app.status}
+                {statusMap[app.status?.toLowerCase()] || app.status}
               </span>
             </li>
           ))}

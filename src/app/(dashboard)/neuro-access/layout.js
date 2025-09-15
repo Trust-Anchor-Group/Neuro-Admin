@@ -2,27 +2,29 @@
 import Menu from "@/components/shared/Menu";
 import Navbar from "@/components/shared/Navbar";
 import { MdOutlineDocumentScanner, MdOutlineSettings } from "react-icons/md";
-import SessionPing from "@/components/SessionPing"
+import SessionPing from "@/components/SessionPing";
+import { useLanguage, content } from '../../../../context/LanguageContext'
 
 export default function DashboardLayout({ children }) {
+  const { language } = useLanguage();
+  const t = content[language];
 
-    const menuItems = [
-    
-      {
-        title: 'Access',
-        icon: <MdOutlineDocumentScanner size={20} />,
-        href:'/neuro-access',
-        subItems: [
-          { label: 'ID applications', href: '/neuro-access/id-application' },
-          { label: 'Accounts', href: '/neuro-access/account' },
-        ],
-      },
-      {
-        title: 'Access\u00A0settings',
-        icon: <MdOutlineSettings size={20} />,
-        href: '/neuro-access/settings',
-      },
-    ]
+  const menuItems = [
+    {
+      title: t?.menu?.access || 'Access',
+      icon: <MdOutlineDocumentScanner size={20} />,
+      href: '/neuro-access',
+      subItems: [
+        { label: t?.menu?.idApplications || 'ID applications', href: '/neuro-access/id-application' },
+        { label: t?.menu?.accounts || 'Accounts', href: '/neuro-access/account' },
+      ],
+    },
+    {
+      title: t?.menu?.accessSettings || 'Access settings',
+      icon: <MdOutlineSettings size={20} />,
+      href: '/neuro-access/settings',
+    },
+  ];
 
   return (
     <>
