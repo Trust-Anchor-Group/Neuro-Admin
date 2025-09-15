@@ -103,11 +103,6 @@ const buildUrlWithParams = (key, value) => {
                             { linkHref: buildUrlWithParams('limit', '25'), text: t?.PaginatedList?.limit25 || '25' },
                             { linkHref: buildUrlWithParams('limit', '50'), text: t?.PaginatedList?.limit50 || '50' },
                             { linkHref: buildUrlWithParams('limit', 'all'), text: t?.PaginatedList?.limitAll || 'Show all' },
-                        {/* <Filter linkArray={[
-                            { linkHref: buildUrlWithParams('limit', '10'), text: '10' },
-                            { linkHref: buildUrlWithParams('limit', '25'), text: '25' },
-                            { linkHref: buildUrlWithParams('limit', '50'), text: '50' },
-                            { linkHref: buildUrlWithParams('limit', 'all'), text: 'All' },
                         ]}
                         isFilterAccount={false}
                         absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
