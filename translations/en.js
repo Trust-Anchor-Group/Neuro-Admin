@@ -1,4 +1,6 @@
-﻿const en = {
+﻿import KYCSettings from "@/components/settings/kyc/KYCSettings";
+
+const en = {
   home: {
     title: 'Welcome',
     subtitle: 'Your dashboard at a glance',
@@ -36,6 +38,90 @@
   title: 'Settings',
   kycTab: 'KYC Settings',
   apiTab: 'API Keys'
+  },
+  KYCSettings: {
+    title: 'KYC settings',
+    messages: {
+      loadError: 'Failed to load KYC settings.',
+      saveSuccess: 'Settings updated successfully!',
+      saveError: 'Failed to update settings.'
+    },
+    sections: {
+      peerReview: 'Peer review settings',
+      requiredFields: 'Required fields for ID creation'
+    },
+    fields: {
+      requirePeerReview: 'Require peer review',
+      minPeerReviewers: 'Min. number of peer reviewers required',
+      requirePhotos: 'Require photos',
+      minPhotos: 'Min. number of photos required'
+    },
+    labels: {
+      FIRST: 'First name',
+      MID: 'Middle name',
+      LAST: 'Last name',
+      PNR: 'Personal number',
+      DOB: 'Date of birth',
+      GENDER: 'Gender',
+      NATIONALITY: 'Nationality',
+      ADDR: 'Address',
+      ZIP: 'Postal code',
+      CITY: 'City',
+      COUNTRY: 'Country',
+      AREA: 'Area',
+      REGION: 'Region'
+    },
+    buttons: {
+      reset: 'Reset changes',
+      save: 'Save settings'
+    },
+    unauthorized: {
+      title: 'Unauthorized',
+      body: 'Administrator privileges are required to manage KYC settings.',
+      help: 'Please contact your administrator for further help.'
+    }
+  },
+  KYCSetting: {
+    title: 'KYC settings',
+    messages: {
+      loadError: 'Failed to load KYC settings.',
+      saveSuccess: 'Settings updated successfully!',
+      saveError: 'Failed to update settings.'
+    },
+    sections: {
+      peerReview: 'Peer review settings',
+      requiredFields: 'Required fields for ID creation'
+    },
+    fields: {
+      requirePeerReview: 'Require peer review',
+      minPeerReviewers: 'Min. number of peer reviewers required',
+      requirePhotos: 'Require photos',
+      minPhotos: 'Min. number of photos required'
+    },
+    labels: {
+      FIRST: 'First name',
+      MID: 'Middle name',
+      LAST: 'Last name',
+      PNR: 'Personal number',
+      DOB: 'Date of birth',
+      GENDER: 'Gender',
+      NATIONALITY: 'Nationality',
+      ADDR: 'Address',
+      ZIP: 'Postal code',
+      CITY: 'City',
+      COUNTRY: 'Country',
+      AREA: 'Area',
+      REGION: 'Region'
+    },
+    buttons: {
+      reset: 'Reset changes',
+      save: 'Save settings'
+    },
+    unauthorized: {
+      title: 'Unauthorized',
+      body: 'Administrator privileges are required to manage KYC settings.',
+      help: 'Please contact your administrator for further help.'
+    }
   },
   apiKeyDetails: {
     title: 'API key',
@@ -291,4 +377,3 @@
 };
 
 export default en;
-

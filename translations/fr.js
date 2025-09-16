@@ -39,6 +39,90 @@ const fr = {
     kycTab: 'Paramètres KYC',
     apiTab: 'Clés API'
   },
+  KYCSettings: {
+    title: 'Paramètres KYC',
+    messages: {
+      loadError: 'Échec du chargement des paramètres KYC.',
+      saveSuccess: 'Paramètres mis à jour avec succès !',
+      saveError: 'Échec de la mise à jour des paramètres.'
+    },
+    sections: {
+      peerReview: 'Paramètres de revue par les pairs',
+      requiredFields: "Champs requis pour la création d'ID"
+    },
+    fields: {
+      requirePeerReview: 'Exiger une revue par les pairs',
+      minPeerReviewers: 'Nombre min. de réviseurs requis',
+      requirePhotos: 'Exiger des photos',
+      minPhotos: 'Nombre min. de photos requis'
+    },
+    labels: {
+      FIRST: 'Prénom',
+      MID: 'Deuxième prénom',
+      LAST: 'Nom de famille',
+      PNR: 'Numéro personnel',
+      DOB: 'Date de naissance',
+      GENDER: 'Sexe',
+      NATIONALITY: 'Nationalité',
+      ADDR: 'Adresse',
+      ZIP: 'Code postal',
+      CITY: 'Ville',
+      COUNTRY: 'Pays',
+      AREA: 'Zone',
+      REGION: 'Région'
+    },
+    buttons: {
+      reset: 'Réinitialiser les modifications',
+      save: 'Enregistrer les paramètres'
+    },
+    unauthorized: {
+      title: 'Non autorisé',
+      body: "Les privilèges d'administrateur sont requis pour gérer les paramètres KYC.",
+      help: "Veuillez contacter votre administrateur pour obtenir de l'aide."
+    }
+  },
+  KYCSetting: {
+    title: 'Paramètres KYC',
+    messages: {
+      loadError: 'Échec du chargement des paramètres KYC.',
+      saveSuccess: 'Paramètres mis à jour avec succès !',
+      saveError: 'Échec de la mise à jour des paramètres.'
+    },
+    sections: {
+      peerReview: 'Paramètres de revue par les pairs',
+      requiredFields: "Champs requis pour la création d'ID"
+    },
+    fields: {
+      requirePeerReview: 'Exiger une revue par les pairs',
+      minPeerReviewers: 'Nombre min. de réviseurs requis',
+      requirePhotos: 'Exiger des photos',
+      minPhotos: 'Nombre min. de photos requis'
+    },
+    labels: {
+      FIRST: 'Prénom',
+      MID: 'Deuxième prénom',
+      LAST: 'Nom de famille',
+      PNR: 'Numéro personnel',
+      DOB: 'Date de naissance',
+      GENDER: 'Sexe',
+      NATIONALITY: 'Nationalité',
+      ADDR: 'Adresse',
+      ZIP: 'Code postal',
+      CITY: 'Ville',
+      COUNTRY: 'Pays',
+      AREA: 'Zone',
+      REGION: 'Région'
+    },
+    buttons: {
+      reset: 'Réinitialiser les modifications',
+      save: 'Enregistrer les paramètres'
+    },
+    unauthorized: {
+      title: 'Non autorisé',
+      body: "Les privilèges d'administrateur sont requis pour gérer les paramètres KYC.",
+      help: "Veuillez contacter votre administrateur pour obtenir de l'aide."
+    }
+  },
   apiKeyDetails: {
     title: 'Clé API',
     back: 'Retour aux clés API',

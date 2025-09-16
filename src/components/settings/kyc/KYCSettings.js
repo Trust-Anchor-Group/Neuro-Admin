@@ -1,8 +1,11 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { FaCheckCircle, FaExclamationCircle, FaExclamationTriangle } from "react-icons/fa";
+import { useLanguage, content } from '../../../../context/LanguageContext';
 
 export default function KYCSettings() {
+	const { language } = useLanguage();
+	const t = content?.[language]?.KYCSettings || content?.[language]?.KYCSetting || {};
 	const [settings, setSettings] = useState(null);
 	const [originalSettings, setOriginalSettings] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -58,7 +61,7 @@ useEffect(() => {
 			setOriginalSettings(JSON.stringify(formattedSettings));
 		} catch (error) {
 			console.error("Failed to fetch peer review settings", error);
-			setMessage({ type: "error", text: "Failed to load KYC settings." });
+			setMessage({ type: "error", text: t?.messages?.loadError || "Failed to load KYC settings." });
 		} finally {
 			setLoading(false);
 		}
@@ -101,10 +104,10 @@ useEffect(() => {
 				body: JSON.stringify(payload),
 			});
 
-			setMessage({ type: "success", text: "Settings updated successfully!" });
+			setMessage({ type: "success", text: t?.messages?.saveSuccess || "Settings updated successfully!" });
 			setOriginalSettings(JSON.stringify(settings));
 		} catch (error) {
-			setMessage({ type: "error", text: "Failed to update settings." });
+			setMessage({ type: "error", text: t?.messages?.saveError || "Failed to update settings." });
 		} finally {
 			setSaving(false);
 		}
@@ -112,7 +115,7 @@ useEffect(() => {
 
 	return (
 		<div className="bg-white rounded-2xl">
-			<h2 className="text-2xl font-bold text-gray-900 mb-6">KYC settings</h2>
+			<h2 className="text-2xl font-bold text-gray-900 mb-6">{t?.title || 'KYC settings'}</h2>
 			{message.text && (
 				<div
 					className={`p-3 mb-6 rounded-md text-sm text-center ${
@@ -128,14 +131,14 @@ useEffect(() => {
 								<>
 					{/* Peer review settings */}
 					<section className="bg-gray-50 rounded-xl border border-gray-200 p-6 mb-6">
-						<h3 className="text-sm font-semibold text-gray-600 mb-4">Peer review settings</h3>
+						<h3 className="text-sm font-semibold text-gray-600 mb-4">{t?.sections?.peerReview || 'Peer review settings'}</h3>
 
 						<div className="space-y-4 border-b border-gray-200 pb-4">
-							<Checkbox label="Require peer review" checked={settings.peerReview} onChange={() => toggleSetting("peerReview")} />
+							<Checkbox label={t?.fields?.requirePeerReview || "Require peer review"} checked={settings.peerReview} onChange={() => toggleSetting("peerReview")} />
 							{settings.peerReview && (
 								<div className="pl-6">
 									<Input
-										label="Min. number of peer reviewers required"
+										label={t?.fields?.minPeerReviewers || "Min. number of peer reviewers required"}
 										value={settings.nrReviewers}
 										onChange={(v) => setSettings({ ...settings, nrReviewers: Number(v) })}
 									/>
@@ -144,11 +147,11 @@ useEffect(() => {
 						</div>
 
             <div className="space-y-4 pt-4">
-                <Checkbox label="Require photos" checked={settings.requirePhotos} onChange={() => toggleSetting("requirePhotos")} />
+                <Checkbox label={t?.fields?.requirePhotos || "Require photos"} checked={settings.requirePhotos} onChange={() => toggleSetting("requirePhotos")} />
               {settings.requirePhotos && (
                 <div className="pl-6">
                   <Input
-                    label="Min. number of photos required"
+                    label={t?.fields?.minPhotos || "Min. number of photos required"}
                     value={settings.nrPhotos}
                     onChange={(v) => setSettings({ ...settings, nrPhotos: Number(v) })}
                   />
@@ -159,7 +162,7 @@ useEffect(() => {
 
 					{/* Required fields */}
 					<section className="bg-gray-50 rounded-xl border border-gray-200 p-6">
-						<h3 className="text-sm font-semibold text-gray-600 mb-4">Required fields for ID creation</h3>
+						<h3 className="text-sm font-semibold text-gray-600 mb-4">{t?.sections?.requiredFields || 'Required fields for ID creation'}</h3>
 
 						<div className="grid grid-cols-2 gap-0 border border-gray-200 rounded-lg divide-y divide-gray-200">
 							{settings.requiredFields.map((field, idx) => (
@@ -169,7 +172,7 @@ useEffect(() => {
 										idx % 2 === 0 ? "border-r border-gray-200" : ""
 									}`}
 								>
-									<Checkbox label={field.label} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
+									<Checkbox label={t?.labels?.[field.id] || field.label} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
 								</div>
 							))}
 						</div>
@@ -181,7 +184,7 @@ useEffect(() => {
 							onClick={() => setSettings(JSON.parse(originalSettings))}
 							className="px-4 py-2 text-sm font-medium border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100"
 						>
-							Reset changes
+							{t?.buttons?.reset || 'Reset changes'}
 						</button>
 						<button
 							onClick={saveSettings}
@@ -192,7 +195,7 @@ useEffect(() => {
 									: "bg-purple-600 hover:bg-purple-700 text-white"
 							}`}
 						>
-							Save settings
+							{t?.buttons?.save || 'Save settings'}
 						</button>
 					</div>
 				</> 
@@ -201,11 +204,11 @@ useEffect(() => {
 						  <div className="flex flex-col justify-center items-center h-[50vh] max-sm:p-5">
 							<FaExclamationTriangle className="size-20 max-sm:size-12" color="orange" />
 							<h1 className="text-xl font-semibold max-sm:text-sm">
-							  Unauthorized
+							  {t?.unauthorized?.title || 'Unauthorized'}
 							</h1>
 							<div className="text-gray-500 text-lg text-center max-sm:text-sm">
-							  <p>Administrator privileges are required to manage KYC settings. 
-								<br></br>Please contact your administrator for further help.</p>
+							  <p>{t?.unauthorized?.body || 'Administrator privileges are required to manage KYC settings.'} 
+								<br></br>{t?.unauthorized?.help || 'Please contact your administrator for further help.'}</p>
 							</div>
 						  </div>
 						  </div>

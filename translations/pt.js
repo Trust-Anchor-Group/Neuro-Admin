@@ -38,6 +38,90 @@ const pt = {
     kycTab: 'Configurações KYC',
     apiTab: 'Chaves de API'
   },
+  KYCSettings: {
+    title: 'Configurações de KYC',
+    messages: {
+      loadError: 'Falha ao carregar as configurações de KYC.',
+      saveSuccess: 'Configurações atualizadas com sucesso!',
+      saveError: 'Falha ao atualizar as configurações.'
+    },
+    sections: {
+      peerReview: 'Configurações de revisão por pares',
+      requiredFields: 'Campos obrigatórios para criação de ID'
+    },
+    fields: {
+      requirePeerReview: 'Exigir revisão por pares',
+      minPeerReviewers: 'Nº mín. de revisores exigidos',
+      requirePhotos: 'Exigir fotos',
+      minPhotos: 'Nº mín. de fotos exigidas'
+    },
+    labels: {
+      FIRST: 'Nome',
+      MID: 'Nome do meio',
+      LAST: 'Sobrenome',
+      PNR: 'Número pessoal',
+      DOB: 'Data de nascimento',
+      GENDER: 'Gênero',
+      NATIONALITY: 'Nacionalidade',
+      ADDR: 'Endereço',
+      ZIP: 'CEP',
+      CITY: 'Cidade',
+      COUNTRY: 'País',
+      AREA: 'Área',
+      REGION: 'Região'
+    },
+    buttons: {
+      reset: 'Redefinir alterações',
+      save: 'Salvar configurações'
+    },
+    unauthorized: {
+      title: 'Não autorizado',
+      body: 'Privilégios de administrador são necessários para gerenciar as configurações de KYC.',
+      help: 'Entre em contato com o administrador para obter ajuda.'
+    }
+  },
+  KYCSetting: {
+    title: 'Configurações de KYC',
+    messages: {
+      loadError: 'Falha ao carregar as configurações de KYC.',
+      saveSuccess: 'Configurações atualizadas com sucesso!',
+      saveError: 'Falha ao atualizar as configurações.'
+    },
+    sections: {
+      peerReview: 'Configurações de revisão por pares',
+      requiredFields: 'Campos obrigatórios para criação de ID'
+    },
+    fields: {
+      requirePeerReview: 'Exigir revisão por pares',
+      minPeerReviewers: 'Nº mín. de revisores exigidos',
+      requirePhotos: 'Exigir fotos',
+      minPhotos: 'Nº mín. de fotos exigidas'
+    },
+    labels: {
+      FIRST: 'Nome',
+      MID: 'Nome do meio',
+      LAST: 'Sobrenome',
+      PNR: 'Número pessoal',
+      DOB: 'Data de nascimento',
+      GENDER: 'Gênero',
+      NATIONALITY: 'Nacionalidade',
+      ADDR: 'Endereço',
+      ZIP: 'CEP',
+      CITY: 'Cidade',
+      COUNTRY: 'País',
+      AREA: 'Área',
+      REGION: 'Região'
+    },
+    buttons: {
+      reset: 'Redefinir alterações',
+      save: 'Salvar configurações'
+    },
+    unauthorized: {
+      title: 'Não autorizado',
+      body: 'Privilégios de administrador são necessários para gerenciar as configurações de KYC.',
+      help: 'Entre em contato com o administrador para obter ajuda.'
+    }
+  },
   apiKeyDetails: {
     title: 'Chave de API',
     back: 'Voltar para Chaves de API',
