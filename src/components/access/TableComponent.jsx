@@ -6,6 +6,12 @@ import {
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
+import { enUS as coreEnUS, ptBR as corePtBR, frFR as coreFrFR } from '@mui/material/locale';
+import { MRT_Localization_EN } from 'material-react-table/locales/en';
+import { MRT_Localization_PT_BR } from 'material-react-table/locales/pt-BR';
+import { MRT_Localization_FR } from 'material-react-table/locales/fr';
+import { useLanguage } from '../../../context/LanguageContext';
 
 
 const TableComponent = ({data = [], columns = [],enableSorting = false, enableRowActions, renderRowActionMenuItems,
@@ -16,6 +22,19 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     const params = new URLSearchParams(searchParams)
     const pathnameWithFilter = `${pathname}?${params}`
     const router = useRouter()
+  const { language } = useLanguage();
+  const baseTheme = useTheme();
+  const muiLocaleMap = {
+    en: coreEnUS,
+    pt: corePtBR,
+    fr: coreFrFR,
+  };
+  const mrtLocaleMap = {
+    en: MRT_Localization_EN,
+    pt: MRT_Localization_PT_BR,
+    fr: MRT_Localization_FR,
+  };
+  const mergedTheme = createTheme(baseTheme, muiLocaleMap[language] || coreEnUS);
 
 
   const modifiedColumns = columns.map((col) => ({
@@ -44,6 +63,7 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     enableHiding: true,
     positionActionsColumn: "last",
     renderRowActionMenuItems: renderRowActionMenuItems || undefined,
+    localization: mrtLocaleMap[language] || MRT_Localization_EN,
     state: {
       pagination: { pageIndex, pageSize },
     },
@@ -96,12 +116,13 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
   
   
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div className="">
-      <MaterialReactTable 
-      table={table} /> 
-      </div>
-    </LocalizationProvider>
+    <ThemeProvider theme={mergedTheme}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <div className="">
+          <MaterialReactTable table={table} />
+        </div>
+      </LocalizationProvider>
+    </ThemeProvider>
   );
 };
 

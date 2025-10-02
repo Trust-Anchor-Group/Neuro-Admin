@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
 import { useRouter } from 'next/navigation'
 import { MaterialReactTable } from 'material-react-table'
 import { FaEye, FaEyeSlash, FaCopy } from 'react-icons/fa'
 import { FiSearch } from 'react-icons/fi'
 
 export default function APIKeys() {
+  const { language } = useLanguage();
+  const t = i18nContent?.[language]?.apiKeysList || {};
   const [apiKeys, setApiKeys] = useState([])
   const [visibleKeys, setVisibleKeys] = useState({})
   const [loading, setLoading] = useState(true)
@@ -65,7 +68,7 @@ export default function APIKeys() {
     () => [
       {
         accessorKey: 'owner',
-        header: 'Owner',
+        header: t.columns?.owner || 'Owner',
         Cell: ({ row }) => (
           <span className="text-sm text-gray-900 font-medium">
             {row.original.owner}
@@ -74,7 +77,7 @@ export default function APIKeys() {
       },
       {
         accessorKey: 'key',
-        header: 'API key',
+        header: t.columns?.apiKey || 'API key',
         Cell: ({ row }) => (
           <div className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-lg font-mono text-sm w-full overflow-hidden">
             <span className="truncate w-full">
@@ -101,30 +104,29 @@ export default function APIKeys() {
           </div>
         ),
       },
-
       {
         accessorKey: 'email',
-        header: 'Owner email',
+        header: t.columns?.ownerEmail || 'Owner email',
         Cell: ({ row }) => (
           <span className="text-sm text-gray-800">{row.original.email}</span>
         ),
-        size: 250, 
+        size: 250,
       },
       {
         accessorKey: 'created',
-        header: 'Created',
+        header: t.columns?.created || 'Created',
         Cell: ({ row }) => (
           <span className="text-sm text-gray-800">{row.original.created}</span>
         ),
         size: 150,
       },
     ],
-    [visibleKeys]
+    [visibleKeys, t]
   )
 
   return (
     <div className="bg-white rounded-2xl  font-grotesk">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">API keys</h2>
+  <h2 className="text-2xl font-bold text-gray-900 mb-6">{t.title || 'API keys'}</h2>
 
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm">
         <MaterialReactTable

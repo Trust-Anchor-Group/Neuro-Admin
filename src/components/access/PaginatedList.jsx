@@ -8,6 +8,7 @@ import { ThemeProvider } from '@mui/material';
 import { theme } from './accountTableList';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { useLanguage, content } from '../../../context/LanguageContext';
 
 export const PaginatedList = ({ userList, page, prevPage, totalPages,
     limit,
@@ -20,6 +21,8 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
     }) => {
 
 const searchParams = useSearchParams()
+const { language } = useLanguage();
+const t = content?.[language] || {};
 const [showFallback, setShowFallback] = useState(false)
 
 const buildUrlWithParams = (key, value) => {
@@ -64,23 +67,26 @@ const buildUrlWithParams = (key, value) => {
             <div className="absolute top-0 left-0 w-full p-5">
                 <div className='flex justify-between'>
 
-                {
-                    pending ? (
-                        <p className='text-text20 font-semibold pb-4'>ID applications</p>
-                    ) : <p className='text-text20 font-semibold pb-4'>Accounts</p>
-                    
-                }
+                                {pending ? (
+                                    <p className='text-text20 font-semibold pb-4'>
+                                        {t?.PaginatedList?.titleIdApplications || 'ID applications'}
+                                    </p>
+                                ) : (
+                                    <p className='text-text20 font-semibold pb-4'>
+                                        {t?.PaginatedList?.titleAccounts || 'Accounts'}
+                                    </p>
+                                )}
                 </div>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-2'>
-                    <SearchBar placeholder={'Search...'} classNameText={'border-2 rounded-md py-2 pr-10 pl-12 text-sm max-sm:pr-0 max-sm:pl-2'} />
+                    <SearchBar placeholder={t?.PaginatedList?.searchPlaceholder || 'Search...'} classNameText={'border-2 rounded-md py-2 pr-10 pl-12 text-sm max-sm:pr-0 max-sm:pl-2'} />
                     {/* FilterAccount */}
                     { pending === false && 
                     <div className='hidden md:block'>
                         <Filter linkArray={[
-                            { linkHref: buildUrlWithParams('filter', 'all'), text: 'All' },
-                            { linkHref: buildUrlWithParams('filter', 'hasID'), text: 'Has Id' },
-                            { linkHref: buildUrlWithParams('filter', 'noID'), text: 'No Id' },
+                            { linkHref: buildUrlWithParams('filter', 'all'), text: t?.PaginatedList?.filterAll || 'All' },
+                            { linkHref: buildUrlWithParams('filter', 'hasID'), text: t?.PaginatedList?.filterHasId || 'Has Id' },
+                            { linkHref: buildUrlWithParams('filter', 'noID'), text: t?.PaginatedList?.filterNoId || 'No Id' },
                         ]}
                         isFilterAccount={true}
                         absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
@@ -90,15 +96,17 @@ const buildUrlWithParams = (key, value) => {
                      <div className='hidden md:block'>
                     {/* FilterLimit */}
                     
-                        {/* <Filter linkArray={[
-                            { linkHref: buildUrlWithParams('limit', '10'), text: '10' },
-                            { linkHref: buildUrlWithParams('limit', '25'), text: '25' },
-                            { linkHref: buildUrlWithParams('limit', '50'), text: '50' },
-                            { linkHref: buildUrlWithParams('limit', 'all'), text: 'All' },
+                        { /* Show all: use a semantic 'all' value so parent can handle it */ }
+                        {(
+                            <Filter linkArray={[
+                            { linkHref: buildUrlWithParams('limit', '10'), text: t?.PaginatedList?.limit10 || '10' },
+                            { linkHref: buildUrlWithParams('limit', '25'), text: t?.PaginatedList?.limit25 || '25' },
+                            { linkHref: buildUrlWithParams('limit', '50'), text: t?.PaginatedList?.limit50 || '50' },
+                            { linkHref: buildUrlWithParams('limit', 'all'), text: t?.PaginatedList?.limitAll || 'Show all' },
                         ]}
                         isFilterAccount={false}
                         absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
-                        size={'w-[100px]'}/> */}
+                        size={'w-[100px]'}/> )}
                     </div>
                     </div>
                     {/* Remove separate Pagination; MRT handles pagination */}

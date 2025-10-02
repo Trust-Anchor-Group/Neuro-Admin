@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage, content } from '../../../context/LanguageContext';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import { DetailpageStatus } from './DetailpageStatus';
 import { ActionButtons } from './Buttons/ActionButtons';
@@ -16,19 +17,21 @@ export const Identity = ({
 }) => {
   const [infoToggle, setIntoToggle] = useState(true);
   const [infoToggleMetaData, setIntoToggleMetaData] = useState(false);
+  const { language } = useLanguage();
+  const t = content[language];
 
   const adminActions = [
-    { actionTitle: 'Rejected', bgColor: 'bg-neuroRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: 'Deny ID application' },
-    { actionTitle: 'Approved', bgColor: 'bg-neuroPurpleLight', icon: FaExclamationTriangle, textColor: 'text-neuroPurpleDark', name: 'Approve ID application' },
-    { actionTitle: 'Compromised', bgColor: 'bg-neuroDarkOrange/20', icon: FaExclamationTriangle, textColor: 'text-neuroDarkOrange', name: 'Compromise Id' },
-    { actionTitle: 'Obsoleted', bgColor: 'bg-obsoletedRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: 'Obsolete Id' },
-];
+    { actionTitle: 'Rejected', bgColor: 'bg-neuroRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: t?.Identity?.actionTitles?.rejected || 'Deny ID application' },
+    { actionTitle: 'Approved', bgColor: 'bg-neuroPurpleLight', icon: FaExclamationTriangle, textColor: 'text-neuroPurpleDark', name: t?.Identity?.actionTitles?.approved || 'Approve ID application' },
+    { actionTitle: 'Compromised', bgColor: 'bg-neuroDarkOrange/20', icon: FaExclamationTriangle, textColor: 'text-neuroDarkOrange', name: t?.Identity?.actionTitles?.compromised || 'Compromise Id' },
+    { actionTitle: 'Obsoleted', bgColor: 'bg-obsoletedRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: t?.Identity?.actionTitles?.obsoleted || 'Obsolete Id' },
+  ];
 
   if (!user) {
     return (
       <section className="p-3 pb-12">
         <article className="bg-white border-2 rounded-xl p-6 py-12 text-center">
-          <p>No available data</p>
+          <p>{t?.Identity?.noData || 'No available data'}</p>
         </article>
       </section>
     );
@@ -54,7 +57,7 @@ export const Identity = ({
                     {user.account || ''}
                   </p>
                   <div className="border-t-2 pt-2 text-text16 text-neuroDarkGray/70 w-full">
-                    {user.state.includes('Created') ? 'Application made ' : 'Registered '}
+                    {user.state.includes('Created') ? `${t?.Identity?.applicationMade || 'Application made'} ` : `${t?.Identity?.registered || 'Registered'} `}
                     {dateConverter(user.created)}
                   </div>
                 </div>
@@ -65,11 +68,11 @@ export const Identity = ({
               className="bg-neuroGray/70 rounded-xl p-4 overflow-auto"
               aria-labelledby="identity-info-heading"
             >
-              <h2 id="identity-info-heading" className="sr-only">Identity Information</h2>
+              <h2 id="identity-info-heading" className="sr-only">{t?.Identity?.sections?.identityInformation || 'Identity Information'}</h2>
               <InfoToggleButton
                 infoToggle={infoToggle}
                 setIntoToggle={setIntoToggle}
-                title="Identity Information"
+                title={t?.Identity?.sections?.identityInformation || 'Identity Information'}
               />
               {infoToggle && <MapOutInput fieldsToShow={fieldsToShow} user={user} />}
             </section>
@@ -78,11 +81,11 @@ export const Identity = ({
               className="bg-neuroGray/70 rounded-xl p-4 mt-5 overflow-auto"
               aria-labelledby="identity-meta-heading"
             >
-              <h2 id="identity-meta-heading" className="sr-only">Identity Metadata</h2>
+              <h2 id="identity-meta-heading" className="sr-only">{t?.Identity?.sections?.identityMetadata || 'Identity Metadata'}</h2>
               <InfoToggleButton
                 infoToggle={infoToggleMetaData}
                 setIntoToggle={setIntoToggleMetaData}
-                title="Identity metadata"
+                title={t?.Identity?.sections?.identityMetadata || 'Identity Metadata'}
               />
               {infoToggleMetaData && 
                 <MapOutInput fieldsToShow={fieldsToShowMetaData} user={user} />
@@ -118,10 +121,10 @@ export const Identity = ({
           <div className="flex flex-col justify-center items-center h-[50vh] max-sm:p-5">
             <FaExclamationTriangle className="size-20 max-sm:size-12" color="orange" />
             <h1 className="text-xl font-semibold max-sm:text-sm">
-              Account does not have any ID
+              {t?.Identity?.noIdTitle || 'Account does not have any ID'}
             </h1>
             <div className="text-gray-500 text-lg text-center max-sm:text-sm">
-              <p>This account doesn't have an identity verification yet.</p>
+              <p>{t?.Identity?.noIdDescription || "This account doesn't have an identity verification yet."}</p>
             </div>
           </div>
           </div>

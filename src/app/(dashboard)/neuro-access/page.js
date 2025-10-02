@@ -1,9 +1,12 @@
-"use client";
+﻿"use client";
 import { Suspense } from "react";
+import { useLanguage, content } from "../../../../context/LanguageContext";
 import { useState } from "react";
 import PendingApplications from "../../../components/access/dashboard/PendingApplications";
 
 export default function DashboardPage() {
+  const { language } = useLanguage();
+  const t = content[language];
   // Mock statistics
   const [stats] = useState({
     totalIdentities: 3200,
@@ -15,8 +18,8 @@ export default function DashboardPage() {
 
   return (
     <div className="p-8 min-h-screen bg-gradient-to-br from-blue-50 to-gray-100">
-      <h1 className="text-4xl font-bold text-gray-800 mb-2">Neuro-Access Dashboard</h1>
-      <p className="text-gray-500 text-md mb-8">Real-time identity management insights</p>
+  <h1 className="text-4xl font-bold text-gray-800 mb-2">{t?.accessDashboard?.title || 'Neuro-Access Dashboard'}</h1>
+  <p className="text-gray-500 text-md mb-8">{t?.accessDashboard?.subtitle || 'Real-time identity management insights'}</p>
 
       {/* Stats Overview */}
       {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
@@ -50,3 +53,4 @@ function StatCard({ title, value, icon }) {
     </div>
   );
 }
+
