@@ -114,8 +114,8 @@ useEffect(() => {
 	}, [settings, originalSettings]);
 
 	return (
-		<div className="bg-white rounded-2xl">
-			<h2 className="text-2xl font-bold text-gray-900 mb-6">{t?.title || 'KYC settings'}</h2>
+		<div className="bg-[var(--brand-navbar)] rounded-2xl">
+			<h2 className="text-2xl font-bold text-[var(--brand-text)] mb-6">{t?.title || 'KYC settings'}</h2>
 			{message.text && (
 				<div
 					className={`p-3 mb-6 rounded-md text-sm text-center ${
@@ -130,10 +130,10 @@ useEffect(() => {
 			{settings ? (
 								<>
 					{/* Peer review settings */}
-					<section className="bg-gray-50 rounded-xl border border-gray-200 p-6 mb-6">
-						<h3 className="text-sm font-semibold text-gray-600 mb-4">{t?.sections?.peerReview || 'Peer review settings'}</h3>
+					<section className="bg-[var(--brand-background)] rounded-xl border border-[var(--brand-border)] p-6 mb-6">
+						<h3 className="text-sm font-semibold text-[var(--brand-text-secondary)] mb-4">{t?.sections?.peerReview || 'Peer review settings'}</h3>
 
-						<div className="space-y-4 border-b border-gray-200 pb-4">
+						<div className="space-y-4 border-b border-[var(--brand-border)] pb-4">
 							<Checkbox label={t?.fields?.requirePeerReview || "Require peer review"} checked={settings.peerReview} onChange={() => toggleSetting("peerReview")} />
 							{settings.peerReview && (
 								<div className="pl-6">
@@ -161,15 +161,15 @@ useEffect(() => {
           </section>
 
 					{/* Required fields */}
-					<section className="bg-gray-50 rounded-xl border border-gray-200 p-6">
-						<h3 className="text-sm font-semibold text-gray-600 mb-4">{t?.sections?.requiredFields || 'Required fields for ID creation'}</h3>
+					<section className="bg-[var(--brand-background)] rounded-xl border border-[var(--brand-border)] p-6">
+						<h3 className="text-sm font-semibold text-[var(--brand-text-secondary)] mb-4">{t?.sections?.requiredFields || 'Required fields for ID creation'}</h3>
 
-						<div className="grid grid-cols-2 gap-0 border border-gray-200 rounded-lg divide-y divide-gray-200">
+						<div className="grid grid-cols-2 gap-0 border border-[var(--brand-border)] rounded-lg divide-y divide-[var(--brand-border)]">
 							{settings.requiredFields.map((field, idx) => (
 								<div
 									key={field.id}
 									className={`flex items-center px-4 py-3 ${
-										idx % 2 === 0 ? "border-r border-gray-200" : ""
+										idx % 2 === 0 ? "border-r border-[var(--brand-border)]" : ""
 									}`}
 								>
 									<Checkbox label={t?.labels?.[field.id] || field.label} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
@@ -182,7 +182,7 @@ useEffect(() => {
 					<div className="flex justify-end mt-8 gap-3">
 						<button
 							onClick={() => setSettings(JSON.parse(originalSettings))}
-							className="px-4 py-2 text-sm font-medium border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100"
+							className="px-4 py-2 text-sm font-medium border border-[var(--brand-border)] rounded-md text-[var(--brand-text)] hover:bg-gray-100"
 						>
 							{t?.buttons?.reset || 'Reset changes'}
 						</button>
@@ -219,7 +219,7 @@ useEffect(() => {
 
 function Checkbox({ label, checked, onChange }) {
 	return (
-		<label className="flex items-center gap-2 cursor-pointer text-gray-800 text-sm">
+		<label className="flex items-center gap-2 cursor-pointer text-[var(--brand-text)] text-sm">
 			<input
 				type="checkbox"
 				checked={checked}
@@ -233,13 +233,14 @@ function Checkbox({ label, checked, onChange }) {
 
 function Input({ label, value, onChange }) {
 	return (
-		<label className="flex items-center justify-between text-sm text-gray-800 gap-4">
+		<label className="flex items-center justify-between text-sm text-[var(--brand-text)] gap-4">
 			{label}
 			<input
 				type="number"
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
-				className="w-20 border border-gray-300 rounded-md px-2 py-1 text-sm"
+				className="w-20 border rounded-md px-2 py-1 text-sm bg-[var(--brand-background)] text-[var(--brand-text-color)] border-[var(--brand-border)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] transition-colors"
+				style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
 			/>
 		</label>
 	);

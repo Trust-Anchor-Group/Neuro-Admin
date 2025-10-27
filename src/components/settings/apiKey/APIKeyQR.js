@@ -65,16 +65,16 @@ export default function APIKeyQR({ apiKey }) {
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-md p-6">
-      <h3 className="text-lg font-bold text-gray-900 mb-3">{t.title || 'API key QR-code'}</h3>
+    <div className="bg-[var(--brand-navbar)] border border-[var(--brand-border)] rounded-2xl shadow-md p-6">
+      <h3 className="text-lg font-bold text-[var(--brand-text-color)] mb-3">{t.title || 'API key QR-code'}</h3>
 
-      <label className="block text-sm text-gray-500 mb-2">
+      <label className="block text-sm text-[var(--brand-text-secondary)] mb-2">
         {t.expirationLabel || 'QR-code expiration date & time (YYYY-MM-DD, Time)'}
       </label>
 
       <div className="grid grid-cols-4 gap-2 mb-4">
         <input
-          className="bg-gray-100 text-center rounded-lg py-2 px-3 text-sm border"
+          className="bg-[var(--brand-background)] text-center rounded-lg py-2 px-3 text-sm border-[var(--brand-border)]"
           placeholder={t.placeholders?.year || 'YYYY'}
           maxLength={4}
           value={new Date(expires * 1000).getFullYear()}
@@ -85,7 +85,7 @@ export default function APIKeyQR({ apiKey }) {
           }}
         />
         <input
-          className="bg-gray-100 text-center rounded-lg py-2 px-3 text-sm border"
+          className="bg-[var(--brand-background)] text-center rounded-lg py-2 px-3 text-sm border-[var(--brand-border)]"
           placeholder={t.placeholders?.month || 'MM'}
           maxLength={2}
           value={(new Date(expires * 1000).getMonth() + 1).toString().padStart(2, "0")}
@@ -96,7 +96,7 @@ export default function APIKeyQR({ apiKey }) {
           }}
         />
         <input
-          className="bg-gray-100 text-center rounded-lg py-2 px-3 text-sm border"
+          className="bg-[var(--brand-background)] text-center rounded-lg py-2 px-3 text-sm border-[var(--brand-border)]"
           placeholder={t.placeholders?.day || 'DD'}
           maxLength={2}
           value={new Date(expires * 1000).getDate().toString().padStart(2, "0")}
@@ -107,7 +107,7 @@ export default function APIKeyQR({ apiKey }) {
           }}
         />
         <input
-          className="bg-gray-100 text-center rounded-lg py-2 px-3 text-sm border"
+          className="bg-[var(--brand-background)] text-center rounded-lg py-2 px-3 text-sm border-[var(--brand-border)]"
           placeholder={t.placeholders?.time || 'Time'}
           value={new Date(expires * 1000).toTimeString().slice(0, 5)}
           onChange={(e) => {
@@ -134,15 +134,15 @@ export default function APIKeyQR({ apiKey }) {
       {loading ? (
         <div className="text-center text-gray-500">{t.loading || 'Loading QR code...'}</div>
       ) : qrData ? (
-        <div className="bg-[#F9F9F9] p-6 rounded-xl flex flex-col items-center">
+        <div className="bg-[var(--brand-background)] p-6 rounded-xl flex flex-col items-center">
           <img
             src={qrData.url}
             alt="QR Code"
             width={qrData.width}
             height={qrData.height}
-            className="mb-4"
+            className="mb-4 rounded-xl"
           />
-          <p className="text-gray-500 text-sm mb-4">{t.scanHelp || 'Scan the QR code to access the Neuron'}</p>
+          <p className="text-[var(--brand-text-secondary)] text-sm mb-4">{t.scanHelp || 'Scan the QR code to access the Neuron'}</p>
           <div className="flex gap-4 w-full">
             <button
               onClick={downloadQR}

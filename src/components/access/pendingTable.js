@@ -5,6 +5,25 @@ import { MenuItem } from "@mui/material";
 import { MdAssignment } from 'react-icons/md'
 import { content as i18nContent } from '../../../context/LanguageContext'
 
+const headCellBaseSx = {
+  color: 'var(--brand-text-secondary)',
+  fontWeight: 500,
+  '& .MuiTableSortLabel-root': {
+    color: 'var(--brand-text-color) !important',
+    '&.Mui-active': {
+      color: 'var(--brand-text-color) !important',
+    },
+    '& .MuiTableSortLabel-icon': {
+      color: 'var(--brand-text-color) !important',
+      opacity: 1,
+    },
+  },
+  '& .MuiSvgIcon-root': {
+    color: 'var(--brand-text-color) !important',
+    opacity: 0.9,
+  },
+};
+
 // Decide what columns you should have in your table
 export const userColoumnsPending = (language) => {
   const t = i18nContent?.[language]?.pendingTable?.columns || {}
@@ -14,34 +33,34 @@ export const userColoumnsPending = (language) => {
       header: t.idName || 'ID name',
       size: 100,
       muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } },
-      muiTableHeadCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' }, color: 'rgba(24, 31, 37, 0.6)', fontWeight: 500 } },
+  muiTableHeadCellProps: { sx: { ...headCellBaseSx, display: { xs: 'none', sm: 'table-cell' } } },
     },
     {
       accessorKey: 'account',
       header: t.accountName || 'Account',
       size: 100,
-      muiTableHeadCellProps: { sx: { color: 'rgba(24, 31, 37, 0.6)', fontWeight: 500 } },
+  muiTableHeadCellProps: { sx: headCellBaseSx },
     },
     {
       accessorKey: 'other.EMAIL',
       header: t.email || 'Email',
       size: 100,
       muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } },
-      muiTableHeadCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' }, color: 'rgba(24, 31, 37, 0.6)', fontWeight: 500 } },
+  muiTableHeadCellProps: { sx: { ...headCellBaseSx, display: { xs: 'none', sm: 'table-cell' } } },
     },
     {
       accessorKey: 'city',
       header: t.location || 'Location',
       size: 100,
       muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } },
-      muiTableHeadCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' }, color: 'rgba(24, 31, 37, 0.6)', fontWeight: 500 } },
+  muiTableHeadCellProps: { sx: { ...headCellBaseSx, display: { xs: 'none', sm: 'table-cell' } } },
     },
     {
       accessorKey: 'createdDate',
       header: t.created || 'Created',
       size: 100,
       muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } },
-      muiTableHeadCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' }, color: 'rgba(24, 31, 37, 0.6)', fontWeight: 500 } },
+  muiTableHeadCellProps: { sx: { ...headCellBaseSx, display: { xs: 'none', sm: 'table-cell' } } },
     },
   ]
 }
@@ -133,4 +152,3 @@ export const pendingActions = ({ closeMenu, row, getData, onToggleHandler, pathn
     //     )),   
   ];
 }
-

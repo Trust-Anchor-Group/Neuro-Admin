@@ -1,0 +1,66 @@
+{
+  "kikkin": {
+    "modes": {
+      "light": {
+        "primaryColor": "#005375",
+        "secondaryColor": "#FFFFFF",
+        "backgroundColor": "#FAFAFA",
+        "thirdColor": "#FFFFFF",
+        "textColor": "#161111",
+        "textSecondaryColor": "#181F259E",
+        "accentColor": "#FBB040",
+        "borderColor": "#e2e8f0",
+        "sidebarBg": "#FFFFFF",
+        "navbarBg": "#FFFFFF",
+        "logoUrl": "/KikkinLogo.jpg",
+        "hover": "#f3f4f6"
+      },
+      "dark": {
+        "primaryColor": "#0A5D7D",
+        "secondaryColor": "#1E1E1E",
+        "backgroundColor": "#0B1F29",
+        "thirdColor": "#142F3C",
+        "textColor": "#F1F5F9",
+        "textSecondaryColor": "#F5F6F780",
+        "accentColor": "#FBB040",
+        "borderColor": "#1F3340",
+        "sidebarBg": "#0F2733",
+        "navbarBg": "#0F2733",
+        "logoUrl": "/KikkinLogo.jpg",
+        "hover": "#0A5D7D"
+      }
+    }
+  },
+  "mateo": {
+    "modes": {
+      "light": {
+        "primaryColor": "#8F40D4",
+        "secondaryColor": "#FFFFFF",
+        "backgroundColor": "#FFFFFF",
+        "thirdColor": "#FFFFFF",
+        "textColor": "#2E2E2E",
+        "textSecondaryColor": "#4b5563",
+        "accentColor": "#FBB040",
+        "borderColor": "#e2e8f0",
+        "sidebarBg": "#FFFFFF",
+        "navbarBg": "#FFFFFF",
+        "logoUrl": "/NeuroLogo.svg",
+        "hover": "#f3f4f6"
+      },
+      "dark": {
+        "primaryColor": "#A160E8",
+        "secondaryColor": "#1E1E1E",
+        "backgroundColor": "#161617",
+        "thirdColor": "#1F1F1F",
+        "textColor": "#E2E2E2",
+        "textSecondaryColor": "#94a3b8",
+        "accentColor": "#FBB040",
+        "borderColor": "#2A2A2A",
+        "sidebarBg": "#181818",
+        "navbarBg": "#252526",
+        "logoUrl": "/NeuroLogo.svg",
+        "hover": "#A160E8"
+      }
+    }
+  }
+}

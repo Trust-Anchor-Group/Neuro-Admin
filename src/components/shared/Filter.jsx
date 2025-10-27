@@ -5,7 +5,15 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
-export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,selectArray,onSelect}) => {
+export const Filter = ({
+  linkArray,
+  isFilterAccount,
+  absoluteClassName,
+  size = '',
+  selectArray,
+  onSelect,
+  displayLabel,
+}) => {
 
   const searchParams = useSearchParams()
   const filtered = isFilterAccount ? searchParams.get('filter') || 'all' : searchParams.get('limit') || '50'
@@ -16,10 +24,11 @@ export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,select
   const filterRef = useRef(null)
 
   useEffect(() => {
- if(selectArray?.length > 0){
-      setFilterNames(selectArray[0].label)
-    } 
-  else {
+    // If a displayLabel (external current selection) is provided, don't override it
+    if (displayLabel) return;
+    if (selectArray?.length > 0) {
+      setFilterNames(selectArray[0].label);
+    } else {
     switch (filtered) {
       case 'all':
         setFilterNames('All')
@@ -55,7 +64,7 @@ export const  Filter = ({linkArray,isFilterAccount,absoluteClassName,size,select
         break
     }
   }
-}, [filtered, selectArray, selectedValue])
+}, [filtered, selectArray, selectedValue, displayLabel]);
   useEffect(() => {
     
     const handleClickOutSide = (e) => {
@@ -84,7 +93,7 @@ function handleSelect(value){
   return (
     <div>
         <div
-          className={`relative z-20 text-sm flex items-center py-1.5 justify-between ${size} cursor-pointer select-none`}
+          className={`relative z-20 text-sm flex items-center justify-between px-3 py-1.5 rounded-md border border-[var(--brand-border)] bg-[var(--brand-third)] text-[var(--brand-text-color)] shadow-sm transition-colors cursor-pointer select-none ${size}`}
           role="button"
           aria-haspopup="listbox"
           aria-expanded={toggle}
@@ -99,16 +108,18 @@ function handleSelect(value){
             }
           }}
         >
-          <span className='ml-2 text-neuroTextBlack '>{filterNames}</span>
-          <span className='mr-2'>
-            {toggle === false ? <FaChevronDown color='#6e6e6e' /> : <FaChevronUp color='#6e6e6e' />}
+          <span className='ml-1 flex-1 text-[var(--brand-text-color)]'>
+            {displayLabel || filterNames}
+          </span>
+          <span className='ml-2 text-[var(--brand-text-secondary)]'>
+            {toggle === false ? <FaChevronDown /> : <FaChevronUp />}
           </span>
           {
                      toggle && linkArray && (
-                        <div className={absoluteClassName} ref={filterRef}>   
+                        <div className={`${absoluteClassName} rounded-md shadow-md`} ref={filterRef}>   
                             {
                               linkArray.map((item,index) => (
-                                <Link key={index} onClick={() => setToggle(false)} className='transition-all border pl-2 hover:bg-neuroGray'
+                                <Link key={index} onClick={() => setToggle(false)} className='transition-all border-b border-[var(--brand-border)] px-3 py-2 text-[var(--brand-text-color)] hover:bg-[var(--brand-accent)] hover:text-[var(--brand-third)]'
                                 href={item?.linkHref}>{item.text}</Link>  
                               )                          
                               )
@@ -118,12 +129,12 @@ function handleSelect(value){
                 }
                 {
                   toggle && selectArray && (
-                    <div className={absoluteClassName} ref={filterRef}>
+                    <div className={`${absoluteClassName} rounded-md shadow-md`} ref={filterRef}>
                         {selectArray.map(({value,label},index)=> (
                           <button
                           onClick={() => handleSelect(value)}
                           key={index}
-                          className="block w-full text-left px-2 py-1 text-sm text-neuroTextBlack hover:bg-neuroGray">
+                          className="block w-full text-left px-3 py-2 text-sm text-[var(--brand-text-color)] hover:bg-[var(--brand-accent)] hover:text-[var(--brand-third)]">
                             {label}
                           </button>
                         ))}

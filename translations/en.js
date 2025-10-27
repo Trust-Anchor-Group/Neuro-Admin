@@ -229,6 +229,13 @@ const en = {
     profile: 'Profile',
     logout: 'Logout'
   },
+  profilePage: {
+    systemTitle: 'System',
+    languageLabel: 'Language',
+    languageValueEnglish: 'English',
+    defaultThemeLabel: 'Default theme',
+    defaultThemeTimed: 'Timed'
+  },
   landing: {
     status: {
       active: 'Active',
@@ -303,6 +310,7 @@ const en = {
       phone: 'Phone',
       created: 'Created',
       fullName: 'Full Name',
+      firstname: 'First Name',
       nationality: 'Nationality',
       address: 'Address',
       personalNumber: 'Personal number',
@@ -315,7 +323,8 @@ const en = {
     sections: {
       identityInformation: 'Identity Information',
       identityMetadata: 'Identity Metadata'
-    }
+    },
+    viewMoreInformation: 'View more Information'
   },
   modal: {
     title: 'Review ID application',
@@ -373,6 +382,26 @@ const en = {
         email: 'The user will be notified.'
       }
     }
+  }
+  ,
+  profileEditModal: {
+    editPersonal: 'Edit personal information',
+    editClient: 'Edit client information',
+    profilePageLegend: 'Profile Page',
+    firstName: 'First name',
+    lastName: 'Last name',
+    nationality: 'Nationality',
+    personalNumber: 'Personal number',
+    email: 'Email',
+    phoneNumber: 'Phone number',
+    language: 'Language',
+    clientSettingsLegend: 'Client settings',
+    cancel: 'Cancel'
+  }
+  ,
+  themeToggle: {
+    light: 'Light Mode',
+    dark: 'Dark Mode'
   }
 };
 

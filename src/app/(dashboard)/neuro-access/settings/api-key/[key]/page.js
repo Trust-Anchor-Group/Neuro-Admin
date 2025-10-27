@@ -45,9 +45,9 @@ export default function APIKeyDetails() {
   if (!apiKeyDetails) return <p className="text-center text-red-500 mt-10">{t.notFound || 'API Key not found'}</p>;
 
   return (
-  <div className="min-h-screen bg-gray-100">
+  <div className="min-h-screen bg-[var(--brand-background)] text-[var(--brand-text)]">
      <Header title={t.title || 'API key'} />
-    <div className="min-h-screen px-6 py-12 bg-[#FAFAFA] font-grotesk">
+    <div className="min-h-screen px-6 py-12 bg-[var(--brand-background)] font-grotesk">
        
       <div className="max-w-6xl mx-auto">
           <button onClick={() => router.push("/neuro-access/settings?tab=api")}
@@ -57,7 +57,7 @@ export default function APIKeyDetails() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left column - info */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-5">
+          <div className="bg-[var(--brand-navbar)] border border-[var(--brand-border)] rounded-2xl p-6 space-y-5">
             <KeyInfo label={t.labels?.owner || 'Owner:'} value={apiKeyDetails.owner} isLink />
             <KeyInfo label={t.labels?.email || 'Email:'} value={apiKeyDetails.eMail} />
             <KeyInfo label={t.labels?.apiKey || 'API key:'} value={apiKeyDetails.key} secret visible={visibleKeys.apiKey} onToggle={() => setVisibleKeys(p => ({ ...p, apiKey: !p.apiKey }))} />
@@ -80,12 +80,12 @@ export default function APIKeyDetails() {
 
 function KeyInfo({ label, value, isLink = false, secret = false, visible, onToggle }) {
   return (
-    <div className="border-b border-gray-200 pb-3">
-      <p className="text-sm text-gray-500 font-medium mb-1">{label}</p>
+    <div className="border-b border-[var(--brand-border)] pb-3">
+      <p className="text-sm text-[var(--brand-text-secondary)] font-medium mb-1">{label}</p>
       <div className="flex items-center justify-between">
         {secret ? (
-          <div className="flex items-center gap-2 text-sm text-gray-900 font-mono overflow-hidden">
-            <span className="max-w-[400px] overflow-x-auto whitespace-nowrap font-mono text-sm text-gray-800 pr-1">{visible ? value : "**********************"}</span>
+          <div className="flex items-center gap-2 text-sm text-[var(--brand-text-color)] font-mono overflow-hidden">
+            <span className="max-w-[400px] overflow-x-auto whitespace-nowrap font-mono text-sm text-[var(--brand-text-color)] pr-1">{visible ? value : "**********************"}</span>
             <button onClick={onToggle} className="text-gray-500 hover:text-gray-700">
               {visible ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
             </button>
@@ -94,7 +94,7 @@ function KeyInfo({ label, value, isLink = false, secret = false, visible, onTogg
             </button>
           </div>
         ) : (
-          <div className="text-sm text-gray-900">
+          <div className="text-sm text-[var(--brand-text-color)]">
             {isLink ? <a href="#" className="text-neuroPurple hover:underline">{value}</a> : value}
           </div>
         )}

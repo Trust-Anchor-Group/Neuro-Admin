@@ -8,14 +8,33 @@ export const theme = createTheme({
   typography: { fontFamily: '"Space Grotesk", sans-serif' },
 });
 
+const headCellBaseSx = {
+  color: 'var(--brand-text-secondary)',
+  fontWeight: 500,
+  '& .MuiTableSortLabel-root': {
+    color: 'var(--brand-text-color) !important',
+    '&.Mui-active': {
+      color: 'var(--brand-text-color) !important',
+    },
+    '& .MuiTableSortLabel-icon': {
+      color: 'var(--brand-text-color) !important',
+      opacity: 1,
+    },
+  },
+  '& .MuiSvgIcon-root': {
+    color: 'var(--brand-text-color) !important',
+    opacity: 0.9,
+  },
+};
+
 export const userColoumnsAccount = (language) => {
   const t = i18nContent?.[language]?.accountTableList?.columns || {};
   return [
-    { accessorKey: 'firstName', header: t.idName || 'ID name', size: 100, muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } }, muiTableHeadCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' }, color: 'rgba(24, 31, 37, 0.6)', fontWeight: 500 } } },
-    { accessorKey: 'latestLegalIdState', header: t.identityStatus || 'Identity status', size: 100, muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } }, muiTableHeadCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' }, color: 'rgba(24, 31, 37, 0.6)', fontWeight: 500 } } },
-    { accessorKey: 'userName', header: t.accountName || 'Account Name', size: 100, muiTableHeadCellProps: { sx: { color: 'rgba(24, 31, 37, 0.6)', fontWeight: 500 } } },
-    { accessorKey: 'email', header: t.email || 'Email', size: 100, muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } }, muiTableHeadCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' }, color: 'rgba(24, 31, 37, 0.6)', fontWeight: 500 } } },
-    { accessorKey: 'created', header: t.created || 'Created', size: 100, muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } }, muiTableHeadCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' }, color: 'rgba(24, 31, 37, 0.6)', fontWeight: 500 } } },
+    { accessorKey: 'firstName', header: t.idName || 'ID name', size: 100, muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } }, muiTableHeadCellProps: { sx: { ...headCellBaseSx, display: { xs: 'none', sm: 'table-cell' } } } },
+    { accessorKey: 'latestLegalIdState', header: t.identityStatus || 'Identity status', size: 100, muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } }, muiTableHeadCellProps: { sx: { ...headCellBaseSx, display: { xs: 'none', sm: 'table-cell' } } } },
+    { accessorKey: 'userName', header: t.accountName || 'Account Name', size: 100, muiTableHeadCellProps: { sx: headCellBaseSx } },
+    { accessorKey: 'email', header: t.email || 'Email', size: 100, muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } }, muiTableHeadCellProps: { sx: { ...headCellBaseSx, display: { xs: 'none', sm: 'table-cell' } } } },
+    { accessorKey: 'created', header: t.created || 'Created', size: 100, muiTableBodyCellProps: { sx: { display: { xs: 'none', sm: 'table-cell' } } }, muiTableHeadCellProps: { sx: { ...headCellBaseSx, display: { xs: 'none', sm: 'table-cell' } } } },
   ];
 };
 
