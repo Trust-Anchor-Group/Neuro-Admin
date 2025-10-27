@@ -44,7 +44,7 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
 
   return (
     <div className="flex flex-col h-full max-md:grid-cols-1">
-      <div className="bg-white border rounded-xl shadow-sm p-6 max-md:col-span-1 max-sm:p-0 max-sm:pb-5 max-sm:overflow-auto">
+      <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-xl shadow-sm p-6 max-md:col-span-1 max-sm:p-0 max-sm:pb-5 max-sm:overflow-auto">
         <div className="grid grid-cols-1 gap-5 max-sm:grid-cols-1 max-sm:px-5">
           <div className="flex justify-between items-center gap-3 max-sm:flex-col max-sm:mt-5">
             <p className="text-text28 font-semibold max-sm:text-xl">
@@ -73,8 +73,8 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
               </div>
             )
           }
-          <div className="bg-neuroGray/70 rounded-xl p-5 overflow-auto">
-            <h2 className="font-semibold text-neuroDarkGray/70 border-b-2 pb-2">
+          <div className="bg-[var(--brand-background)] rounded-xl p-5 overflow-auto">
+            <h2 className="font-semibold text-[var(--brand-text-secondary)] border-b-2 border-[var(--brand-border)] pb-2">
               {title}
             </h2>
             <MapOutInput fieldsToShow={fieldsToShow} user={userData} />

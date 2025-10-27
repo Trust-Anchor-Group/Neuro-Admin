@@ -30,7 +30,7 @@ export const Identity = ({
   if (!user) {
     return (
       <section className="p-3 pb-12">
-        <article className="bg-white border-2 rounded-xl p-6 py-12 text-center">
+  <article className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-xl p-6 py-12 text-center text-[var(--brand-text-color)]">
           <p>{t?.Identity?.noData || 'No available data'}</p>
         </article>
       </section>
@@ -40,7 +40,7 @@ export const Identity = ({
   return (
     <section className="">
       <article
-        className="bg-white border-2 rounded-xl shadow-sm p-6 pt-8"
+        className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-xl shadow-sm p-6 pt-8 text-[var(--brand-text-color)]"
         aria-labelledby="identity-heading"
       >
         {user?.properties?.FIRST ? (
@@ -53,10 +53,10 @@ export const Identity = ({
                   <h1 id="identity-heading" className="text-3xl font-semibold">
                     {user.properties.FIRST + ' ' + user.properties.LAST || 'N/A'}
                   </h1>
-                  <p className="text-text16 text-neuroDarkGray/70">
+                  <p className="text-text16 text-[var(--brand-text-secondary)]">
                     {user.account || ''}
                   </p>
-                  <div className="border-t-2 pt-2 text-text16 text-neuroDarkGray/70 w-full">
+                  <div className="border-t-2 border-[var(--brand-border)] pt-2 text-text16 text-[var(--brand-text-secondary)] w-full">
                     {user.state.includes('Created') ? `${t?.Identity?.applicationMade || 'Application made'} ` : `${t?.Identity?.registered || 'Registered'} `}
                     {dateConverter(user.created)}
                   </div>
@@ -65,10 +65,10 @@ export const Identity = ({
             </header>
 
             <section
-              className="bg-neuroGray/70 rounded-xl p-4 overflow-auto"
+              className="bg-[var(--brand-navbar)]/70 rounded-xl p-4 overflow-auto"
               aria-labelledby="identity-info-heading"
             >
-              <h2 id="identity-info-heading" className="sr-only">{t?.Identity?.sections?.identityInformation || 'Identity Information'}</h2>
+              <h2 id="identity-info-heading" className="sr-only text-[var(--brand-text-secondary)]">{t?.Identity?.sections?.identityInformation || 'Identity Information'}</h2>
               <InfoToggleButton
                 infoToggle={infoToggle}
                 setIntoToggle={setIntoToggle}
@@ -78,7 +78,7 @@ export const Identity = ({
             </section>
 
             <section
-              className="bg-neuroGray/70 rounded-xl p-4 mt-5 overflow-auto"
+              className="bg-[var(--brand-navbar)]/70 rounded-xl p-4 mt-5 overflow-auto"
               aria-labelledby="identity-meta-heading"
             >
               <h2 id="identity-meta-heading" className="sr-only">{t?.Identity?.sections?.identityMetadata || 'Identity Metadata'}</h2>
@@ -102,7 +102,7 @@ export const Identity = ({
                 />
               ) : (
                 <PopUpButton
-                  title="View more Information"
+                  title={t?.Identity?.viewMoreInformation || 'View more Information'}
                   setToggle={setModalToggle}
                   />
               )}
@@ -118,12 +118,12 @@ export const Identity = ({
           </div>
         ) : (
           <div className=''>
-          <div className="flex flex-col justify-center items-center h-[50vh] max-sm:p-5">
+          <div className="flex flex-col justify-center items-center h-[50vh] max-sm:p-5 text-[var(--brand-text-color)]">
             <FaExclamationTriangle className="size-20 max-sm:size-12" color="orange" />
             <h1 className="text-xl font-semibold max-sm:text-sm">
               {t?.Identity?.noIdTitle || 'Account does not have any ID'}
             </h1>
-            <div className="text-gray-500 text-lg text-center max-sm:text-sm">
+            <div className="text-[var(--brand-text-secondary)] text-lg text-center max-sm:text-sm">
               <p>{t?.Identity?.noIdDescription || "This account doesn't have an identity verification yet."}</p>
             </div>
           </div>

@@ -9,6 +9,8 @@
     --brand-third: #FFFFFF;
     --brand-text-color: #2E2E2E;
     --brand-accent: #FBB040;
+    --brand-border: #e2e8f0;
+    --brand-sidebar-bg: #FFFFFF;
 
 
     
@@ -22,11 +24,49 @@
     --brand-text-color: #161111;
     --brand-accent: #FBB040;
     --brand-icon: #005375;
+    --brand-border: #1F3340;
+    --brand-sidebar-bg: #0F2733;
 
 }
 /* Tailwind access via utility classes */
 .bg-brand {
     background-color: var(--brand-background);
+}
+
+/* Menu reusable classes */
+.menu-item {
+    background: transparent;
+    color: var(--brand-text-color);
+    border-radius: 8px;
+    transition: background-color .2s ease, color .2s ease;
+}
+.menu-item:hover {
+    background: var(--brand-accent);
+    color: var(--brand-third);
+}
+.submenu-container {
+    background: var(--brand-background);
+    border: 1px solid var(--brand-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.submenu-item {
+    background: transparent;
+    color: var(--brand-text-color);
+    border-radius: 6px;
+    padding: 4px 8px;
+    display: block;
+    transition: background-color .2s ease, color .2s ease;
+    white-space: nowrap;
+}
+.submenu-item:hover {
+    background: var(--brand-accent);
+    color: var(--brand-third);
+}
+
+body {
+    background: var(--brand-background);
+    color: var(--brand-text-color);
 }
 
 .text-brand {

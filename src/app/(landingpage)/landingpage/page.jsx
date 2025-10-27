@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
+import { getInitialMode, applyBrandTheme } from '@/utils/brandTheme';
 import Link from 'next/link';
 import {
   MdEmojiTransportation,
@@ -98,23 +99,47 @@ const getBrandConfig = (host) => {
 
 export default function LandingPage() {
   const [host, setHost] = useState('');
+  const [mode, setMode] = useState('light');
   const { language } = useLanguage();
   const t = i18nContent[language];
   const services = LandingServices(t);
   const [brand, setBrand] = useState({ logo: '/NeuroLogo.svg', name: 'Neuro Admin' });
 
+  // Initial load: host + initial mode
   useEffect(() => {
     const storedHost = sessionStorage.getItem('AgentAPI.Host');
     if (storedHost) {
       setHost(storedHost);
       setBrand(getBrandConfig(storedHost));
     }
+    const initial = getInitialMode();
+    setMode(initial);
+  }, []);
+
+  // Apply brand theme when mode changes
+  useEffect(() => {
+    const h = sessionStorage.getItem('AgentAPI.Host') || '';
+    applyBrandTheme(h, mode);
+  }, [mode]);
+
+  // Listen for global mode change events (dispatched by toggle in Navbar)
+  useEffect(() => {
+    const handler = (e) => {
+      const next = e?.detail || localStorage.getItem('ui.mode');
+      if (next === 'light' || next === 'dark') setMode(next);
+    };
+    window.addEventListener('ui-mode-changed', handler);
+    window.addEventListener('storage', handler);
+    return () => {
+      window.removeEventListener('ui-mode-changed', handler);
+      window.removeEventListener('storage', handler);
+    };
   }, []);
 
   return (
     <>
       <SessionPing />
-    <div className="relative min-h-screen w-full bg-[#F5F6F7] font-sans overflow-x-hidden">
+    <div className="relative min-h-screen w-full bg-[var(--brand-background)] font-sans overflow-x-hidden">
       <Navbar neuroLogo={true} />
 
       {/* Background Pattern */}
@@ -123,10 +148,10 @@ export default function LandingPage() {
       <div className="relative z-10 max-w-[1240px] mx-auto px-6 pt-14 pb-24">
         {/* Header */}
         <div className="mb-12 text-center">
-          <h1 className="text-[24px] font-bold text-gray-900">
+          <h1 className="text-[24px] font-bold text-[var(--brand-text)]">
             {t?.landing?.header?.welcomeTo || 'Welcome to'} <span className="font-semibold">{brand.name}</span>
           </h1>
-          <p className="text-[14px] text-gray-500 mt-1">
+          <p className="text-[14px] text-[var(--brand-text-secondary)] mt-1">
             {t?.landing?.header?.subtitle || 'Please select where you would like to enter'}
           </p>
         </div>
@@ -135,31 +160,31 @@ export default function LandingPage() {
           {/* LEFT SECTION */}
           <div className="flex flex-col gap-[24px]">
             {/* EcoTech Card */}
-            <div className="rounded-[16px] bg-[var(--brand-secondary)] shadow-[0px_4px_10px_rgba(24,31,37,0.05)] px-[24px] py-[20px] flex justify-between items-center">
+            <div className="rounded-[16px] bg-[var(--brand-navbar)] shadow-[0px_4px_10px_rgba(24,31,37,0.05)] px-[24px] py-[20px] flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <div className="w-[64px] h-[64px] rounded-full flex items-center justify-center bg-[var(--brand-background)]">
                   <img
-                    src={brand.logo}
+                    src={mode === 'dark' ? '/NeuroLogoLight.svg' : '/NeuroLogo.svg'}
                     alt="Client Logo"
                     className="w-[48px] h-[48px] object-contain rounded-full shadow-sm"
                   />
                 </div>
                 <div>
-                  <h2 className="text-[20px] font-bold text-gray-900 leading-tight">
+                  <h2 className="text-[20px] font-bold text-[var(--brand-text)] leading-tight">
                     {host}
                   </h2>
-                  <p className="text-[14px] text-gray-500 mt-[4px]">{t?.landing?.labels?.currentNeuron || 'Current Neuron'}</p>
+                  <p className="text-[14px] text-[var(--brand-text-secondary)] mt-[4px]">{t?.landing?.labels?.currentNeuron || 'Current Neuron'}</p>
                 </div>
               </div>
             </div>
 
             {/* Destination Card */}
-            <div className="rounded-[16px] bg-[#DFE1E3] shadow-[inset_0_0_10px_rgba(24, 31, 37, 0.10)] px-[24px] py-[20px]">
-              <label className="text-[14px] text-gray-700 font-medium block mb-2">
+            <div className="rounded-[16px] bg-[var(--brand-navbar)] shadow-[inset_0_0_10px_rgba(24, 31, 37, 0.10)] px-[24px] py-[20px]">
+              <label className="text-[14px] text-[var(--brand-text-secondary)] font-medium block mb-2">
                 {t?.landing?.labels?.destination || 'Destination'}
               </label>
               <div className="relative">
-                <select className="w-full appearance-none rounded-[8px] cursor-pointer bg-white py-[12px] px-[16px] text-[16px] text-gray-900 font-medium focus:outline-none">
+                <select className="w-full appearance-none rounded-[8px] cursor-pointer bg-[var(--brand-navbar)] py-[12px] px-[16px] text-[16px] text-[var(--brand-text)] border-2 border-[var(--brand-border)] font-medium focus:outline-none">
                   <option>{(t?.landing?.labels?.main || 'Main')} - {host}</option>
                 </select>
                 <div className="absolute inset-y-0 right-4 flex items-center text-gray-600 text-sm pointer-events-none">
@@ -171,8 +196,8 @@ export default function LandingPage() {
 
           {/* RIGHT SECTION */}
           <div className="relative">
-            <div className="absolute top-[-60px] right-0 text-sm bg-white border border-gray-200 px-3 py-1.5 rounded-full shadow-sm text-gray-700 flex items-center gap-1">
-              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="absolute top-[-60px] right-0 text-sm bg-[var(--brand-navbar)] border border-[var(--brand-border)] px-3 py-1.5 rounded-full shadow-sm text-[var(--brand-text)] flex items-center gap-1">
+              <svg className="w-4 h-4 text-[var(--brand-text)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v.01M12 12v.01M12 18v.01" />
               </svg>
               {t?.landing?.labels?.manageServices || 'Manage services'}
@@ -186,7 +211,7 @@ export default function LandingPage() {
                   // Open external (absolute) URLs in new tab
                   target={!item.locked && /^https?:\/\//i.test(item.href) ? '_blank' : undefined}
                   rel={!item.locked && /^https?:\/\//i.test(item.href) ? 'noopener noreferrer' : undefined}
-                  className={`group relative rounded-[16px] border border-gray-200 bg-white p-[24px] w-full h-[240px] flex flex-col justify-between transition duration-200 ${item.locked ? 'opacity-50 hover:opacity-100 ' : 'hover:shadow-md'
+                  className={`group relative rounded-[16px] border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-[24px] w-full h-[240px] flex flex-col justify-between transition duration-200 ${item.locked ? 'opacity-50 hover:opacity-100 ' : 'hover:shadow-md'
                     }`}
                 >
                   {item.title === 'Neuro-Monitor' && (
@@ -211,14 +236,14 @@ export default function LandingPage() {
 
                   <div className="flex-1">
                     <h3
-                      className={`text-[16px] font-semibold ${item.locked ? 'text-gray-400' : 'text-gray-900'
+                      className={`text-[16px] font-semibold ${item.locked ? 'text-[var(--brand-text-secondary)]' : 'text-[var(--brand-text)]'
                         }`}
                     >
                       {item.title}
                     </h3>
-                    <div className="h-[1px] bg-gray-200 my-[6px] w-full" />
+                    <div className="h-[1px] bg-[var(--brand-border)] my-[6px] w-full" />
                     <p
-                      className={`text-[14px] leading-[1.4] ${item.locked ? 'text-gray-400' : 'text-gray-500'
+                      className={`text-[14px] leading-[1.4] ${item.locked ? 'text-[var(--brand-text-secondary)]' : 'text-[var(--brand-text)]'
                         }`}
                     >
                       {item.description}
@@ -226,7 +251,7 @@ export default function LandingPage() {
                   </div>
 
                   <p
-                    className={`text-[12px] mt-4 ${item.locked ? 'text-gray-400' : 'text-gray-500'
+                    className={`text-[12px] mt-4 ${item.locked ? 'text-[var(--brand-text-secondary)]' : 'text-[var(--brand-text)]'
                       }`}
                   >
                     {item.status}

@@ -228,6 +228,13 @@ const fr = {
     profile: 'Profil',
     logout: 'Déconnexion'
   },
+  profilePage: {
+    systemTitle: 'Système',
+    languageLabel: 'Langue',
+    languageValueEnglish: 'Anglais',
+    defaultThemeLabel: 'Thème par défaut',
+    defaultThemeTimed: 'Programmé'
+  },
   landing: {
     status: {
       active: 'Actif',
@@ -290,6 +297,7 @@ const fr = {
       phone: 'Téléphone',
       created: 'Créé',
       fullName: 'Nom complet',
+      firstname: 'Prénom',
       nationality: 'Nationalité',
       address: 'Adresse',
       personalNumber: 'Numéro personnel',
@@ -302,7 +310,8 @@ const fr = {
     sections: {
       identityInformation: 'Informations sur l\'identité',
       identityMetadata: 'Métadonnées de l\'identité'
-    }
+    },
+    viewMoreInformation: 'Voir plus d\'informations'
   },
   modal: {
     title: 'Examiner la demande d\'ID',
@@ -360,6 +369,26 @@ const fr = {
         email: 'L\'utilisateur sera averti.'
       }
     }
+  }
+  ,
+  profileEditModal: {
+    editPersonal: 'Modifier les informations personnelles',
+    editClient: 'Modifier les informations client',
+    profilePageLegend: 'Page de profil',
+    firstName: 'Prénom',
+    lastName: 'Nom de famille',
+    nationality: 'Nationalité',
+    personalNumber: 'Numéro personnel',
+    email: 'E-mail',
+    phoneNumber: 'Numéro de téléphone',
+    language: 'Langue',
+    clientSettingsLegend: 'Paramètres client',
+    cancel: 'Annuler'
+  }
+  ,
+  themeToggle: {
+    light: 'Mode clair',
+    dark: 'Mode sombre'
   }
 };
 

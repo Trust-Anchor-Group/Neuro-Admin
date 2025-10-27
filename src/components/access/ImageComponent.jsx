@@ -1,7 +1,10 @@
 import Image from 'next/image'
 import React from 'react'
+import { useLanguage, content } from '../../../context/LanguageContext';
 
 export const ImageComponent = ({user}) => {
+  const { language } = useLanguage()
+  const t = content[language]?.modal || {}
 
   return (
     <div>
@@ -16,7 +19,7 @@ export const ImageComponent = ({user}) => {
               />
             ) : (
               <div className="w-32 h-32 rounded-lg bg-gray-200 flex items-center justify-center text-sm text-gray-500 border">
-                No photo
+                {t.noPhoto || 'No photo'}
               </div>
             )}
         </div> :

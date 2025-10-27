@@ -26,7 +26,7 @@ export const TiptapEditor = ({ content, onChange }) => {
     editorProps: {
       attributes: {
         class:
-          'min-h-[140px] p-3 border border-gray-300 rounded-md text-sm focus:outline-none prose max-w-none',
+          'min-h-[140px] p-3 border border-[var(--brand-border)] rounded-md text-sm focus:outline-none prose max-w-none',
       },
     },
     onUpdate: ({ editor }) => {
@@ -43,24 +43,24 @@ export const TiptapEditor = ({ content, onChange }) => {
   return (
     <div className="w-full">
       {/* Toolbar */}
-      <div className="flex flex-wrap gap-2 border border-gray-300 rounded-t-md bg-gray-50 px-3 py-2">
+      <div className="flex flex-wrap gap-2 border border-[var(--brand-border)] rounded-t-md bg-[var(--brand-background)] px-3 py-2">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`font-bold px-2 py-1 rounded ${editor.isActive('bold') ? 'bg-purple-100 text-purple-800' : 'hover:bg-gray-200'
+          className={`font-bold px-2 py-1 rounded ${editor.isActive('bold') ? 'bg-purple-100 text-purple-800' : 'hover:bg-[var(--brand-navbar)]'
             }`}
         >
           B
         </button>
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`italic px-2 py-1 rounded ${editor.isActive('italic') ? 'bg-purple-100 text-purple-800' : 'hover:bg-gray-200'
+          className={`italic px-2 py-1 rounded ${editor.isActive('italic') ? 'bg-purple-100 text-purple-800' : 'hover:bg-[var(--brand-navbar)]'
             }`}
         >
           I
         </button>
         <button
           onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`underline px-2 py-1 rounded ${editor.isActive('underline') ? 'bg-purple-100 text-purple-800' : 'hover:bg-gray-200'
+          className={`underline px-2 py-1 rounded ${editor.isActive('underline') ? 'bg-purple-100 text-purple-800' : 'hover:bg-[var(--brand-navbar)]'
             }`}
         >
           U
@@ -72,20 +72,20 @@ export const TiptapEditor = ({ content, onChange }) => {
               editor.chain().focus().setLink({ href: url }).run()
             }
           }}
-          className="px-2 py-1 rounded hover:bg-gray-200"
+          className="px-2 py-1 rounded hover:bg-[var(--brand-navbar)]"
         >
           🔗 Link
         </button>
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={`px-2 py-1 rounded ${editor.isActive('heading', { level: 1 }) ? 'bg-purple-100 text-purple-800' : 'hover:bg-gray-200'
+          className={`px-2 py-1 rounded ${editor.isActive('heading', { level: 1 }) ? 'bg-purple-100 text-purple-800' : 'hover:bg-[var(--brand-navbar)]'
             }`}
         >
           H1
         </button>
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`px-2 py-1 rounded ${editor.isActive('heading', { level: 2 }) ? 'bg-purple-100 text-purple-800' : 'hover:bg-gray-200'
+          className={`px-2 py-1 rounded ${editor.isActive('heading', { level: 2 }) ? 'bg-purple-100 text-purple-800' : 'hover:bg-[var(--brand-navbar)]'
             }`}
         >
           H2
@@ -93,7 +93,7 @@ export const TiptapEditor = ({ content, onChange }) => {
       </div>
 
       {/* Editor */}
-      <EditorContent editor={editor} className="rounded-b-md border border-t-0 border-gray-300" />
+      <EditorContent editor={editor} className="rounded-b-md border border-t-0 border-[var(--brand-border)]" />
     </div>
   )
 }

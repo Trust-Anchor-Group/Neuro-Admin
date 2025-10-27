@@ -227,6 +227,7 @@ export default function QuickLogin({
             <img
               src={`${window.location.protocol}//${neuron}/QR/${tagSign}`}
               alt="QR Code"
+              className='rounded-2xl'
             />
             <Typography
               variant="body2"

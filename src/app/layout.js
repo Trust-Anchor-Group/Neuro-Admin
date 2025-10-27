@@ -4,6 +4,7 @@ import BrandProvider from "@/components/BrandProvider"
 import LanguageProvider from "../../context/LanguageContext";
 import HotjarProvider from "./Layouts/HotjarProvider"
 import { cookies } from "next/headers";
+import 'flag-icons/css/flag-icons.min.css';
 
 const inter = Inter({ subsets: ["latin"] })
 const grotesk = Space_Grotesk({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] })

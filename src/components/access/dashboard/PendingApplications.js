@@ -88,24 +88,24 @@ export default function PendingApplications() {
   }, []); // load once
 
   return (
-    <div className="bg-white/80 backdrop-blur-lg shadow-xl rounded-xl p-6 border border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-700 mb-4">{t?.pendingApplications?.title}</h2>
+    <div className="bg-[var(--brand-navbar)] backdrop-blur-lg shadow-xl rounded-xl p-6 border border-[var(--brand-border)]">
+      <h2 className="text-2xl font-bold text-[var(--brand-text)] mb-4">{t?.pendingApplications?.title}</h2>
 
       {loading ? (
-        <p className="text-gray-500 text-center">{t?.pendingApplications?.loading}</p>
+        <p className="text-[var(--brand-text-secondary)] text-center">{t?.pendingApplications?.loading}</p>
       ) : applications.length === 0 ? (
-        <p className="text-gray-500 text-center">{t?.pendingApplications?.empty}</p>
+        <p className="text-[var(--brand-text-secondary)] text-center">{t?.pendingApplications?.empty}</p>
       ) : (
-        <ul className="divide-y divide-gray-300">
+        <ul className="divide-y divide-[var(--brand-border)]">
           {applications.map((app) => (
             <li
               onClick={() => handleNavigate(app.id)}
               key={app.id}
-              className="py-4 flex cursor-pointer justify-between items-center hover:bg-gray-100 p-3 rounded-lg transition-all"
+              className="py-4 flex cursor-pointer justify-between items-center hover:bg-[var(--brand-hover)] p-3 rounded-lg transition-all"
             >
               <div>
-                <p className="text-gray-800 font-semibold">{app.name}</p>
-                <p className="text-gray-500 text-sm">{app.submittedAt}</p>
+                <p className="text-[var(--brand-text-secondary)] font-semibold">{app.name}</p>
+                <p className="text-[var(--brand-text-tertiary)] text-sm">{app.submittedAt}</p>
               </div>
               <span className="bg-yellow-500 text-white px-4 py-1 rounded-full text-sm shadow-md">
                 {statusMap[app.status?.toLowerCase()] || app.status}

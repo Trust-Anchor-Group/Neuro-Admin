@@ -30,7 +30,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
     className="fixed inset-0 flex justify-center items-center z-50 bg-black/30"
     onClick={handleOverlayClick}
     >
-      <div className="relative bg-white rounded-lg border border-gray-200 w-full max-w-2xl p-6 overflow-y-auto max-h-screen sm:max-h-[90vh]">
+      <div className="relative bg-[var(--brand-navbar)] rounded-lg border border-[var(--brand-border)] w-full max-w-2xl p-6 overflow-y-auto max-h-screen sm:max-h-[90vh]">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50">
             <FaSpinner className="animate-spin text-4xl text-gray-500" />
@@ -44,11 +44,11 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           <FaTimes size={20} />
         </button>
 
-        <header className="border-b pb-4 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900">{t.title || 'Review ID application'}</h2>
+        <header className="border-b border-[var(--brand-border)] pb-4 mb-6">
+          <h2 className="text-2xl font-semibold text-[var(--brand-text-color)]">{t.title || 'Review ID application'}</h2>
         </header>
 
-        <div className="text-sm font-bold mb-2">{t.applicantPhoto || 'Applicant photo'}</div>
+        <div className="text-sm text-[var(--brand-text-secondary)] font-bold mb-2">{t.applicantPhoto || 'Applicant photo'}</div>
         <div className="flex mb-6">
           {user?.attachments?.[2]?.data ? (
             <div
@@ -71,10 +71,10 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           )}
         </div>
 
-        <div className="text-sm font-bold">{t.applicantIdentification || 'Applicant identification'}</div>
-        <div className="mt-2 bg-gray-50 p-4 rounded mb-6">
-          <div className="text-sm font-bold text-gray-500 mb-3">{t.identificationChosen || 'Identification chosen'}</div>
-          <div className="border-t border-gray-200 pt-2 text-base text-gray-700">{t.nationalIdCard || 'National ID card'}</div>
+        <div className="text-sm text-[var(--brand-text-secondary)] font-bold">{t.applicantIdentification || 'Applicant identification'}</div>
+        <div className="mt-2 bg-[var(--brand-background)] p-4 rounded mb-6">
+          <div className="text-sm font-bold text-[var(--brand-text-secondary)] mb-3">{t.identificationChosen || 'Identification chosen'}</div>
+          <div className="border-t border-[var(--brand-border)] pt-2 text-base text-[var(--brand-text-secondary)]">{t.nationalIdCard || 'National ID card'}</div>
         </div>
 
         <div className="flex gap-4 mb-6">
@@ -102,15 +102,15 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           ))}
         </div>
 
-        <div className="bg-gray-50 p-4 rounded mb-6">
-          <div className="text-sm font-bold text-gray-500 mb-3">{t.personalInformation || 'Personal information'}</div>
-          <ul className="text-base divide-y divide-gray-200">
-            <li className="border-t pt-2 py-2 flex justify-between">
-              <span className="text-gray-600">{t.fullName || 'Full name'}:</span>
+        <div className="bg-[var(--brand-background)] p-4 rounded mb-6">
+          <div className="text-sm font-bold text-[var(--brand-text-color)] mb-3">{t.personalInformation || 'Personal information'}</div>
+          <ul className="text-base divide-y divide-[var(--brand-border)]">
+            <li className="border-t border-[var(--brand-border)] pt-2 py-2 flex justify-between">
+              <span className="text-[var(--brand-text-secondary)]">{t.fullName || 'Full name'}:</span>
               <span>{user.properties.FIRST + ' ' + user.properties.LAST}</span>
             </li>
             <li className="py-2 flex justify-between">
-              <span className="text-gray-600">{t.country || 'Country'}:</span>
+              <span className="text-[var(--brand-text-secondary)]">{t.country || 'Country'}:</span>
               <span>{user.properties.COUNTRY}</span>
             </li>
             {/* <li className="py-2 flex justify-between">
@@ -118,19 +118,19 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
               <span>{user.properties.DOB}</span>
             </li> */}
             <li className="py-2 flex justify-between">
-              <span className="text-gray-600">{t.identityNumber || 'Identity number'}:</span>
+              <span className="text-[var(--brand-text-secondary)]">{t.identityNumber || 'Identity number'}:</span>
               <span>{user.properties.PNR}</span>
             </li>
             <li className="py-2 flex justify-between">
-              <span className="text-gray-600">{t.address || 'Address'}:</span>
+              <span className="text-[var(--brand-text-secondary)]">{t.address || 'Address'}:</span>
               <span className="text-right">{user.properties.ADDR}</span>
             </li>
             <li className="py-2 flex justify-between">
-              <span className="text-gray-600">{t.email || 'Email'}:</span>
+              <span className="text-[var(--brand-text-secondary)]">{t.email || 'Email'}:</span>
               <span>{user.properties.EMAIL}</span>
             </li>
             <li className="py-2 flex justify-between">
-              <span className="text-gray-600">{t.phoneNumber || 'Phone number'}:</span>
+              <span className="text-[var(--brand-text-secondary)]">{t.phoneNumber || 'Phone number'}:</span>
               <span>{user.properties.PHONE}</span>
             </li>
           </ul>
@@ -140,36 +140,36 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           <>
             <div className="bg-gray-50 p-4 rounded mb-6">
               <div className="text-sm font-bold text-gray-500 mb-3">{t.companyInformation || 'Company information'}</div>
-              <ul className="text-base divide-y divide-gray-200">
-                <li className="border-t pt-2 py-2 flex justify-between">
-                  <span className="text-gray-600">{t.idNumber || 'ID number'}:</span>
+              <ul className="text-base divide-y divide-[var(--brand-border)]">
+                <li className="border-t border-[var(--brand-border)] pt-2 py-2 flex justify-between">
+                  <span className="text-[var(--brand-text-secondary)]">{t.idNumber || 'ID number'}:</span>
                   <span>{user.properties.ORGNR}</span>
                 </li>
                 <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">{t.legalName || 'Legal name'}:</span>
+                  <span className="text-[var(--brand-text-secondary)]">{t.legalName || 'Legal name'}:</span>
                   <span>{user.properties.ORGNAME}</span>
                 </li>
                 <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">{t.address || 'Address'}:</span>
+                  <span className="text-[var(--brand-text-secondary)]">{t.address || 'Address'}:</span>
                   <span className="text-right">
                     {user.properties.ORGADDR}
                     {user.properties.ORGADDR2 ? `, ${user.properties.ORGADDR2}` : ''}
                   </span>
                 </li>
                 <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">{t.city || 'City'}:</span>
+                  <span className="text-[var(--brand-text-secondary)]">{t.city || 'City'}:</span>
                   <span>{user.properties.ORGCITY}</span>
                 </li>
                 <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">{t.zip || 'ZIP'}:</span>
+                  <span className="text-[var(--brand-text-secondary)]">{t.zip || 'ZIP'}:</span>
                   <span>{user.properties.ORGZIP}</span>
                 </li>
                 <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">{t.region || 'Region'}:</span>
+                  <span className="text-[var(--brand-text-secondary)]">{t.region || 'Region'}:</span>
                   <span>{user.properties.ORGREGION}</span>
                 </li>
                 <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">{t.companyCountry || t.country || 'Country'}:</span>
+                  <span className="text-[var(--brand-text-secondary)]">{t.companyCountry || t.country || 'Country'}:</span>
                   <span>{user.properties.ORGCOUNTRY}</span>
                 </li>
               </ul>
@@ -208,8 +208,8 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           
         {denialMode && (
           <>
-            <div className="mb-2 text-sm font-medium text-gray-600">
-              {t.denialReasonLabel || 'Reason for denial of ID application'} <span className="text-gray-400 text-xs">{t.denialReasonHint || '(Will be sent to the applicant)'}</span>
+            <div className="mb-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+              {t.denialReasonLabel || 'Reason for denial of ID application'} <span className="text-[var(--brand-text-secondary)] text-xs">{t.denialReasonHint || '(Will be sent to the applicant)'}</span>
             </div>
             {/* <textarea
               className="w-full border border-gray-300 rounded-md p-3 text-sm mb-4"

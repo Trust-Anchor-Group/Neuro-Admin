@@ -28,8 +28,8 @@ export const ActivityDetailspage = ({tab}) => {
     <div className='h-full '>
     {tab === 'details' && (
         <>
-            <div className='relative flex justify-center items-center bg-white border-2 rounded-xl h-full p-5 max-sm:h-[300px]'>
-                <p className='absolute top-[3vh] left-[2vw] text-neuroTextBlack mb-5 text-text20 font-semibold max-sm:text-center max-sm:text-lg'>{t?.activity?.accountActivity || 'Account Activity'}</p>
+            <div className='relative flex justify-center items-center bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-xl h-full p-5 max-sm:h-[300px]'>
+                <p className='absolute top-[3vh] left-[2vw] text-[var(--brand-text)] mb-5 text-text20 font-semibold max-sm:text-center max-sm:text-lg'>{t?.activity?.accountActivity || 'Account Activity'}</p>
                 <h2 className=' text-gray-500 text-xl'>{t?.activity?.comingSoon || 'Coming soon'}</h2>
                 {/* {accountActivityArray.map((item, index) => (
                     <div className='bg-neuroGray/70 rounded-xl mt-2 p-3' key={index}>
@@ -51,8 +51,8 @@ export const ActivityDetailspage = ({tab}) => {
     )}
     {tab === 'identity' && (
         <>
-            <div className='relative flex items-center justify-center h-full bg-white border-2 rounded-xl p-5 max-sm:h-[300px]'>
-                <p className='absolute top-[3vh] left-[2vw] text-neuroTextBlack mb-5 text-text20 font-semibold max-sm:text-center max-sm:text-lg'>{t?.activity?.identityActivity || 'Identity Activity'}</p>
+            <div className='relative flex items-center justify-center h-full bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-xl p-5 max-sm:h-[300px]'>
+                <p className='absolute top-[3vh] left-[2vw] text-(var(--brand-text)) mb-5 text-text20 font-semibold max-sm:text-center max-sm:text-lg'>{t?.activity?.identityActivity || 'Identity Activity'}</p>
                 <h2 className='text-center text-gray-500 text-xl'>{t?.activity?.comingSoon || 'Coming soon'}</h2>
                 {/* {accountActivityArray.map((item, index) => (
                     <div className='bg-neuroGray/70 rounded-xl mt-2 p-3' key={index}>

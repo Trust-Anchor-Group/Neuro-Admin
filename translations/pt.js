@@ -227,6 +227,13 @@ const pt = {
     profile: 'Perfil',
     logout: 'Sair'
   },
+  profilePage: {
+    systemTitle: 'Sistema',
+    languageLabel: 'Idioma',
+    languageValueEnglish: 'Inglês',
+    defaultThemeLabel: 'Tema padrão',
+    defaultThemeTimed: 'Temporizado'
+  },
   landing: {
     status: {
       active: 'Ativo',
@@ -301,6 +308,7 @@ const pt = {
       phone: 'Telefone',
       created: 'Criado',
       fullName: 'Nome completo',
+      firstname: 'Nome',
       nationality: 'Nacionalidade',
       address: 'Endereço',
       personalNumber: 'Número pessoal',
@@ -313,7 +321,8 @@ const pt = {
     sections: {
       identityInformation: 'Informações da Identidade',
       identityMetadata: 'Metadados da Identidade'
-    }
+    },
+    viewMoreInformation: 'Ver mais informações'
   },
   modal: {
     title: 'Revisar aplicação de ID',
@@ -371,6 +380,26 @@ const pt = {
         email: 'O usuário será notificado.'
       }
     }
+  }
+  ,
+  profileEditModal: {
+    editPersonal: 'Editar informações pessoais',
+    editClient: 'Editar informações do cliente',
+    profilePageLegend: 'Página de perfil',
+    firstName: 'Nome',
+    lastName: 'Sobrenome',
+    nationality: 'Nacionalidade',
+    personalNumber: 'Número pessoal',
+    email: 'E-mail',
+    phoneNumber: 'Número de telefone',
+    language: 'Idioma',
+    clientSettingsLegend: 'Configurações do cliente',
+    cancel: 'Cancelar'
+  }
+  ,
+  themeToggle: {
+    light: 'Modo claro',
+    dark: 'Modo escuro'
   }
 };
 

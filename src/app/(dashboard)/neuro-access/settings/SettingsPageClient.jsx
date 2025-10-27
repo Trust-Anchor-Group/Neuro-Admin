@@ -28,10 +28,10 @@ export default function SettingsPageClient() {
   }, [searchParams]);
 
   return (
-    <div className="p-6 min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold text-gray-800 mb-4">{t.title || 'Settings'}</h1>
+    <div className="p-6 min-h-screen bg-[var(--brand-background)]">
+      <h1 className="text-3xl font-bold text-[var(--brand-text)] mb-4">{t.title || 'Settings'}</h1>
 
-      <div className="flex border-b">
+      <div className="flex border-b border-[var(--brand-border)]">
         {
           hideKyc !== 'kikkin.tagroot.io' &&
           <button
@@ -49,7 +49,7 @@ export default function SettingsPageClient() {
         </button>
       </div>
 
-      <div className="mt-6 bg-white shadow-md rounded-lg p-6">
+      <div className="mt-6 bg-[var(--brand-navbar)] shadow-md rounded-lg p-6">
         {tab === "kyc" && hideKyc !== 'kikkin.tagroot.io' ? <KYCSettings /> : <APIKeys />}
       </div>
     </div>

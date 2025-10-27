@@ -174,7 +174,7 @@ export default function DetailPageContent() {
         <div className='flex mb-5 gap-5 max-sm:flex-col'>
             <div className=''>
                 <button aria-label='Back to Access Page' className='flex 
-                items-center gap-5 border-2 p-2 rounded-lg' onClick={() => backPath ? router.push(backPath) : router.back()}>
+                items-center gap-5 border-2 border-[var(--brand-border)] p-2 rounded-lg' onClick={() => backPath ? router.push(backPath) : router.back()}>
                     <FaArrowLeft className='transition-opacity size-5 hover:opacity-50'/>
                     {t?.Identity?.labels?.back || 'Back'}
                 </button>

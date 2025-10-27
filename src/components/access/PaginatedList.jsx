@@ -64,22 +64,22 @@ const buildUrlWithParams = (key, value) => {
         <div className="mt-5 rounded-md overflow-hidden">
            
             <div className="relative">
-            <div className="absolute top-0 left-0 w-full p-5">
+            <div className="absolute top-0 left-0 w-full p-5 bg-[var(--brand-navbar)] text-[var(--brand-text-color)] border-b border-[var(--brand-border)]">
                 <div className='flex justify-between'>
 
                                 {pending ? (
-                                    <p className='text-text20 font-semibold pb-4'>
+                                    <p className='text-text20 font-semibold pb-4 text-[var(--brand-text-color)]'>
                                         {t?.PaginatedList?.titleIdApplications || 'ID applications'}
                                     </p>
                                 ) : (
-                                    <p className='text-text20 font-semibold pb-4'>
+                                    <p className='text-text20 font-semibold pb-4 text-[var(--brand-text-color)]'>
                                         {t?.PaginatedList?.titleAccounts || 'Accounts'}
                                     </p>
                                 )}
                 </div>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-2'>
-                    <SearchBar placeholder={t?.PaginatedList?.searchPlaceholder || 'Search...'} classNameText={'border-2 rounded-md py-2 pr-10 pl-12 text-sm max-sm:pr-0 max-sm:pl-2'} />
+                    <SearchBar placeholder={t?.PaginatedList?.searchPlaceholder || 'Search...'} classNameText={'border-2 border-[var(--brand-border)] bg-[var(--brand-third)] text-[var(--brand-text-color)] placeholder-[var(--brand-text-secondary)] rounded-md py-2 pr-10 pl-12 text-sm max-sm:pr-0 max-sm:pl-2'} />
                     {/* FilterAccount */}
                     { pending === false && 
                     <div className='hidden md:block'>
@@ -89,7 +89,7 @@ const buildUrlWithParams = (key, value) => {
                             { linkHref: buildUrlWithParams('filter', 'noID'), text: t?.PaginatedList?.filterNoId || 'No Id' },
                         ]}
                         isFilterAccount={true}
-                        absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
+                        absoluteClassName={'absolute top-9 left-0 z-10 flex bg-[var(--brand-third)] text-[var(--brand-text-color)] flex-col w-full cursor-pointer border border-[var(--brand-border)]'}
                         size={'w-[170px]'}/>
                     </div>
                     }
@@ -105,7 +105,7 @@ const buildUrlWithParams = (key, value) => {
                             { linkHref: buildUrlWithParams('limit', 'all'), text: t?.PaginatedList?.limitAll || 'Show all' },
                         ]}
                         isFilterAccount={false}
-                        absoluteClassName={'absolute top-9 left-0 z-10 flex bg-white flex-col w-full cursor-pointer'}
+                        absoluteClassName={'absolute top-9 left-0 z-10 flex bg-[var(--brand-third)] text-[var(--brand-text-color)] flex-col w-full cursor-pointer border border-[var(--brand-border)]'}
                         size={'w-[100px]'}/> )}
                     </div>
                     </div>
