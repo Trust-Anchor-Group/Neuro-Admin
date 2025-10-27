@@ -182,7 +182,7 @@ useEffect(() => {
 					<div className="flex justify-end mt-8 gap-3">
 						<button
 							onClick={() => setSettings(JSON.parse(originalSettings))}
-							className="px-4 py-2 text-sm font-medium border border-[var(--brand-border)] rounded-md text-[var(--brand-text)] hover:bg-gray-100"
+							className="px-4 py-2 text-sm font-medium border border-[var(--brand-border)] rounded-md text-[var(--brand-text)] hover:bg-[var(--brand-hover)]"
 						>
 							{t?.buttons?.reset || 'Reset changes'}
 						</button>
