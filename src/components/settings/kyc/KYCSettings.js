@@ -1,118 +1,141 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { FaCheckCircle, FaExclamationCircle, FaExclamationTriangle } from "react-icons/fa";
 import KYCSettingsPreview from './KYCSettingsPreview';
 import { useLanguage, content } from '../../../../context/LanguageContext';
 
 export default function KYCSettings() {
-	const { language } = useLanguage();
-	const t = content?.[language]?.KYCSettings || content?.[language]?.KYCSetting || {};
-	const [settings, setSettings] = useState(null);
-	const [originalSettings, setOriginalSettings] = useState(null);
-	const [loading, setLoading] = useState(true);
-	const [saving, setSaving] = useState(false);
-	const [message, setMessage] = useState({ type: "", text: "" });
+  const { language } = useLanguage();
+  const t = content?.[language]?.KYCSettings || content?.[language]?.KYCSetting || {};
+  const [settings, setSettings] = useState(null);
+  const [originalSettings, setOriginalSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
+  const dismissTimerRef = useRef(null);
 
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await fetch("/api/settings/getPeerReview", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Accept": "application/json" },
+        });
 
-useEffect(() => {
-	async function fetchSettings() {
-		try {
-			const res = await fetch("/api/settings/getPeerReview", {
-				method: "POST",
-				credentials: "include",
-				headers: {
-					"Accept": "application/json",
-				},
-			});
+        if (res.status === 403) {
+          setSettings(null);
+          return;
+        }
 
-			if(res.status === 403){
-				return setSettings(null)
-			}
+        if (!res.ok) throw new Error("Failed to fetch settings");
 
-			if (!res.ok) {
-				throw new Error("Failed to fetch settings");
-			}
+        const json = await res.json();
+        const data = json?.data || {};
 
-			const json = await res.json();
-			const data = json?.data || {};
+        const formattedSettings = {
+          peerReview: data.allowPeerReview ?? false,
+          nrReviewers: parseInt(data.nrReviewersToApprove) || 2,
+          nrPhotos: parseInt(data.nrPhotosRequired) || 1,
+          requirePhotos: (parseInt(data.nrPhotosRequired) || 0) > 0,
+          requiredFields: [
+            { id: "FIRST", label: "First name", required: data.requireFirstName },
+            { id: "MID", label: "Middle name", required: data.requireMiddleName },
+            { id: "LAST", label: "Last name", required: data.requireLastName },
+            { id: "PNR", label: "Personal number", required: data.requirePersonalNumber },
+            { id: "DOB", label: "Date of birth", required: data.requireBirthDate },
+            { id: "GENDER", label: "Gender", required: data.requireGender },
+            { id: "NATIONALITY", label: "Nationality", required: data.requireNationality },
+            { id: "ADDR", label: "Address", required: data.requireAddress },
+            { id: "ZIP", label: "Postal code", required: data.requirePostalCode },
+            { id: "CITY", label: "City", required: data.requireCity },
+            { id: "COUNTRY", label: "Country", required: data.requireCountry },
+            { id: "AREA", label: "Area", required: data.requireArea },
+            { id: "REGION", label: "Region", required: data.requireRegion },
+          ],
+        };
 
-			const formattedSettings = {
-				peerReview: data.allowPeerReview ?? false,
-				nrReviewers: parseInt(data.nrReviewersToApprove) || 2,
-				nrPhotos: parseInt(data.nrPhotosRequired) || 1,
-				requirePhotos: (parseInt(data.nrPhotosRequired) || 0) > 0,
-				requiredFields: [
-					{ id: "FIRST", label: "First name", required: data.requireFirstName },
-					{ id: "MID", label: "Middle name", required: data.requireMiddleName },
-					{ id: "LAST", label: "Last name", required: data.requireLastName },
-					{ id: "PNR", label: "Personal number", required: data.requirePersonalNumber },
-					{ id: "DOB", label: "Date of birth", required: data.requireBirthDate },
-					{ id: "GENDER", label: "Gender", required: data.requireGender },
-					{ id: "NATIONALITY", label: "Nationality", required: data.requireNationality },
-					{ id: "ADDR", label: "Address", required: data.requireAddress },
-					{ id: "ZIP", label: "Postal code", required: data.requirePostalCode },
-					{ id: "CITY", label: "City", required: data.requireCity },
-					{ id: "COUNTRY", label: "Country", required: data.requireCountry },
-					{ id: "AREA", label: "Area", required: data.requireArea },
-					{ id: "REGION", label: "Region", required: data.requireRegion },
-				],
-			};
+        setSettings(formattedSettings);
+        setOriginalSettings(JSON.stringify(formattedSettings));
+      } catch (error) {
+        console.error("Failed to fetch peer review settings", error);
+        setMessage({ type: "error", text: t?.messages?.loadError || "Failed to load KYC settings." });
+      } finally {
+        setLoading(false);
+      }
+    }
 
-			setSettings(formattedSettings);
-			setOriginalSettings(JSON.stringify(formattedSettings));
-		} catch (error) {
-			console.error("Failed to fetch peer review settings", error);
-			setMessage({ type: "error", text: t?.messages?.loadError || "Failed to load KYC settings." });
-		} finally {
-			setLoading(false);
-		}
-	}
+    fetchSettings();
+    // cleanup on unmount
+    return () => {
+      if (dismissTimerRef.current) {
+        clearTimeout(dismissTimerRef.current);
+        dismissTimerRef.current = null;
+      }
+    };
+  }, [t]);
 
-	fetchSettings();
-}, []);
+  // auto-dismiss message after 2s
+  useEffect(() => {
+    if (!message?.text) return;
+    if (dismissTimerRef.current) {
+      clearTimeout(dismissTimerRef.current);
+      dismissTimerRef.current = null;
+    }
+    dismissTimerRef.current = setTimeout(() => {
+      setMessage({ type: "", text: "" });
+      dismissTimerRef.current = null;
+    }, 5000);
+    return () => {
+      if (dismissTimerRef.current) {
+        clearTimeout(dismissTimerRef.current);
+        dismissTimerRef.current = null;
+      }
+    };
+  }, [message.text]);
 
+  const toggleSetting = (key) => {
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
-	const toggleSetting = (key) => {
-		setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
-	};
+  const toggleRequiredField = (id) => {
+    setSettings((prev) => ({
+      ...prev,
+      requiredFields: prev.requiredFields.map((f) =>
+        f.id === id ? { ...f, required: !f.required } : f
+      ),
+    }));
+  };
 
-	const toggleRequiredField = (id) => {
-		setSettings((prev) => ({
-			...prev,
-			requiredFields: prev.requiredFields.map((f) =>
-				f.id === id ? { ...f, required: !f.required } : f
-			),
-		}));
-	};
+  const saveSettings = useCallback(async () => {
+    if (!settings || JSON.stringify(settings) === originalSettings) return;
+    setSaving(true);
+    try {
+      const payload = {
+        allowPeerReview: settings.peerReview,
+        nrReviewersToApprove: settings.nrReviewers.toString(),
+        nrPhotosRequired: settings.nrPhotos.toString(),
+        requiredFields: settings.requiredFields.filter((f) => f.required).map((f) => f.id),
+      };
 
-	const saveSettings = useCallback(async () => {
-		if (!settings || JSON.stringify(settings) === originalSettings) return;
-		setSaving(true);
-		try {
-			const payload = {
-				allowPeerReview: settings.peerReview,
-				nrReviewersToApprove: settings.nrReviewers.toString(),
-				nrPhotosRequired: settings.nrPhotos.toString(),
-				requiredFields: settings.requiredFields
-					.filter((f) => f.required)
-					.map((f) => f.id),
-			};
+      const res = await fetch("/api/settings/peerReview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
 
-			await fetch("/api/settings/peerReview", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				credentials: "include",
-				body: JSON.stringify(payload),
-			});
+      if (!res.ok) throw new Error("Save failed");
 
-			setMessage({ type: "success", text: t?.messages?.saveSuccess || "Settings updated successfully!" });
-			setOriginalSettings(JSON.stringify(settings));
-		} catch (error) {
-			setMessage({ type: "error", text: t?.messages?.saveError || "Failed to update settings." });
-		} finally {
-			setSaving(false);
-		}
-	}, [settings, originalSettings]);
+      setMessage({ type: "success", text: t?.messages?.saveSuccess || "Settings updated successfully!" });
+      setOriginalSettings(JSON.stringify(settings));
+    } catch (error) {
+      console.error("Failed to save settings", error);
+      setMessage({ type: "error", text: t?.messages?.saveError || "Failed to update settings." });
+    } finally {
+      setSaving(false);
+    }
+  }, [settings, originalSettings, t]);
 
 	return (
 		<div className="flex flex-col lg:flex-row lg:items-stretch gap-8">
@@ -232,30 +255,30 @@ useEffect(() => {
 }
 
 function Checkbox({ label, checked, onChange }) {
-	return (
-		<label className="flex items-center gap-2 cursor-pointer text-[var(--brand-text)] text-sm">
-			<input
-				type="checkbox"
-				checked={checked}
-				onChange={onChange}
-				className="w-4 h-4 rounded border-gray-300 accent-figmaPurple text-figmaPurple"
-			/>
-			{label}
-		</label>
-	);
+  return (
+    <label className="flex items-center gap-2 cursor-pointer text-[var(--brand-text)] text-sm">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="w-4 h-4 rounded border-gray-300 accent-figmaPurple text-figmaPurple"
+      />
+      {label}
+    </label>
+  );
 }
 
 function Input({ label, value, onChange }) {
-	return (
-		<label className="flex items-center justify-between text-sm text-[var(--brand-text)] gap-4">
-			{label}
-			<input
-				type="number"
-				value={value}
-				onChange={(e) => onChange(e.target.value)}
-				className="w-20 border rounded-md px-2 py-1 text-sm bg-[var(--brand-background)] text-[var(--brand-text-color)] border-[var(--brand-border)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] transition-colors"
-				style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
-			/>
-		</label>
-	);
+  return (
+    <label className="flex items-center justify-between text-sm text-[var(--brand-text)] gap-4">
+      {label}
+      <input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-20 border rounded-md px-2 py-1 text-sm bg-[var(--brand-background)] text-[var(--brand-text-color)] border-[var(--brand-border)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] transition-colors"
+        style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }}
+      />
+    </label>
+  );
 }
