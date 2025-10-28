@@ -27,8 +27,8 @@ const en = {
   titleAccounts: 'Accounts',
   searchPlaceholder: 'Search...',
   filterAll: 'All',
-  filterHasId: 'Has Id',
-  filterNoId: 'No Id',
+  filterHasId: 'Has ID',
+  filterNoId: 'No ID',
   limit10: '10',
   limit25: '25',
   limit50: '50',
@@ -176,10 +176,10 @@ const en = {
     statuses: {
       approved: 'Approved',
       compromised: 'Compromised',
-      created: 'Id pending',
+      created: 'ID pending',
       obsoleted: 'Obsoleted',
       rejected: 'Rejected',
-      none: 'No Id'
+      none: 'No ID'
     }
   },
   pendingTable: {
@@ -198,8 +198,8 @@ const en = {
   },
   actionButtons: {
     reviewApplication: 'Review application',
-    compromiseId: 'Compromise Id',
-    obsoleteId: 'Obsolete Id',
+    compromiseId: 'Compromise ID',
+    obsoleteId: 'Obsolete ID',
     confirm: 'Confirm',
     cancel: 'Cancel'
   },
@@ -291,8 +291,8 @@ const en = {
     actionTitles: {
       approved: 'Approve ID application',
       rejected: 'Deny ID application',
-      compromised: 'Compromise Id',
-      obsoleted: 'Obsolete Id'
+      compromised: 'Compromise ID',
+      obsoleted: 'Obsolete ID'
     },
     statuses: {
       pending: 'Pending ID application',

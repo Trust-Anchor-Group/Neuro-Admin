@@ -84,7 +84,7 @@ export default function KYCSettings() {
     dismissTimerRef.current = setTimeout(() => {
       setMessage({ type: "", text: "" });
       dismissTimerRef.current = null;
-    }, 1500);
+    }, 5000);
     return () => {
       if (dismissTimerRef.current) {
         clearTimeout(dismissTimerRef.current);
