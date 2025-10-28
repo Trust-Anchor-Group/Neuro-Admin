@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { FaCheckCircle, FaExclamationCircle, FaExclamationTriangle } from "react-icons/fa";
+import KYCSettingsPreview from './KYCSettingsPreview';
 import { useLanguage, content } from '../../../../context/LanguageContext';
 
 export default function KYCSettings() {
@@ -136,108 +137,121 @@ export default function KYCSettings() {
     }
   }, [settings, originalSettings, t]);
 
-  if (loading) {
-    return (
-      <div className="bg-[var(--brand-navbar)] rounded-2xl p-6">
-        <p className="text-[var(--brand-text)]">Loading...</p>
-      </div>
-    );
-  }
+	return (
+		<div className="flex flex-col lg:flex-row lg:items-stretch gap-8">
+		    <div className="bg-[var(--brand-navbar)] w-full lg:w-[50%] rounded-2xl p-6">
+				{/* LEFT: Existing settings UI */}
+				<div className="flex-1 min-w-0">
+					<h2 className="text-2xl font-bold text-[var(--brand-text)] mb-6">{t?.title || 'KYC settings'}</h2>
+					{message.text && (
+						<div
+							className={`p-3 mb-6 rounded-md text-sm text-center ${
+								message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+							}`}
+						>
+							{message.type === "success" ? <FaCheckCircle className="inline mr-2" /> : <FaExclamationCircle className="inline mr-2" />}
+							{message.text}
+						</div>
+					)}
 
-  return (
-    <div className="bg-[var(--brand-navbar)] rounded-2xl p-6">
-      <h2 className="text-2xl font-bold text-[var(--brand-text)] mb-6">{t?.title || 'KYC settings'}</h2>
+					{settings ? (
+						<>
+							{/* Peer review settings */}
+							<section className="bg-[var(--brand-background)] rounded-xl border border-[var(--brand-border)] p-6 mb-6">
+								<h3 className="text-sm font-semibold text-[var(--brand-text-secondary)] mb-4">{t?.sections?.peerReview || 'Peer review settings'}</h3>
 
-      {message.text && (
-        <div
-          className={`p-3 mb-6 rounded-md text-sm text-center ${
-            message.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-          }`}
-        >
-          {message.type === "success" ? <FaCheckCircle className="inline mr-2" /> : <FaExclamationCircle className="inline mr-2" />}
-          {message.text}
-        </div>
-      )}
+								<div className="space-y-4 border-b border-[var(--brand-border)] pb-4">
+									<Checkbox label={t?.fields?.requirePeerReview || "Require peer review"} checked={settings.peerReview} onChange={() => toggleSetting("peerReview")} />
+									{settings.peerReview && (
+										<div className="pl-6">
+											<Input
+												label={t?.fields?.minPeerReviewers || "Min. number of peer reviewers required"}
+												value={settings.nrReviewers}
+												onChange={(v) => setSettings({ ...settings, nrReviewers: Number(v) })}
+											/>
+										</div>
+									)}
+								</div>
 
-      {settings ? (
-        <>
-          <section className="bg-[var(--brand-background)] rounded-xl border border-[var(--brand-border)] p-6 mb-6">
-            <h3 className="text-sm font-semibold text-[var(--brand-text-secondary)] mb-4">{t?.sections?.peerReview || 'Peer review settings'}</h3>
+								<div className="space-y-4 pt-4">
+									<Checkbox label={t?.fields?.requirePhotos || "Require photos"} checked={settings.requirePhotos} onChange={() => toggleSetting("requirePhotos")} />
+									{settings.requirePhotos && (
+										<div className="pl-6">
+											<Input
+												label={t?.fields?.minPhotos || "Min. number of photos required"}
+												value={settings.nrPhotos}
+												onChange={(v) => setSettings({ ...settings, nrPhotos: Number(v) })}
+											/>
+										</div>
+									)}
+								</div>
+							</section>
 
-            <div className="space-y-4 border-b border-[var(--brand-border)] pb-4">
-              <Checkbox label={t?.fields?.requirePeerReview || "Require peer review"} checked={settings.peerReview} onChange={() => toggleSetting("peerReview")} />
-              {settings.peerReview && (
-                <div className="pl-6">
-                  <Input
-                    label={t?.fields?.minPeerReviewers || "Min. number of peer reviewers required"}
-                    value={settings.nrReviewers}
-                    onChange={(v) => setSettings({ ...settings, nrReviewers: Number(v) })}
-                  />
-                </div>
-              )}
-            </div>
+							{/* Required fields */}
+							<section className="bg-[var(--brand-background)] rounded-xl border border-[var(--brand-border)] p-6">
+								<h3 className="text-sm font-semibold text-[var(--brand-text-secondary)] mb-4">{t?.sections?.requiredFields || 'Required fields for ID creation'}</h3>
 
-            <div className="space-y-4 pt-4">
-              <Checkbox label={t?.fields?.requirePhotos || "Require photos"} checked={settings.requirePhotos} onChange={() => toggleSetting("requirePhotos")} />
-              {settings.requirePhotos && (
-                <div className="pl-6">
-                  <Input
-                    label={t?.fields?.minPhotos || "Min. number of photos required"}
-                    value={settings.nrPhotos}
-                    onChange={(v) => setSettings({ ...settings, nrPhotos: Number(v) })}
-                  />
-                </div>
-              )}
-            </div>
-          </section>
+								<div className="grid grid-cols-2 gap-0 border border-[var(--brand-border)] rounded-lg divide-y divide-[var(--brand-border)]">
+									{settings.requiredFields.map((field, idx) => (
+										<div
+											key={field.id}
+											className={`flex items-center px-4 py-3 ${
+												idx % 2 === 0 ? "border-r border-[var(--brand-border)]" : ""
+											}`}
+										>
+											<Checkbox label={t?.labels?.[field.id] || field.label} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
+										</div>
+									))}
+								</div>
+							</section>
 
-          <section className="bg-[var(--brand-background)] rounded-xl border border-[var(--brand-border)] p-6 mb-6">
-            <h3 className="text-sm font-semibold text-[var(--brand-text-secondary)] mb-4">{t?.sections?.requiredFields || 'Required fields for ID creation'}</h3>
-
-            <div className="grid grid-cols-2 gap-0 border border-[var(--brand-border)] rounded-lg divide-y divide-[var(--brand-border)]">
-              {settings.requiredFields.map((field, idx) => (
-                <div
-                  key={field.id}
-                  className={`flex items-center px-4 py-3 ${idx % 2 === 0 ? "border-r border-[var(--brand-border)]" : ""}`}
-                >
-                  <Checkbox label={t?.labels?.[field.id] || field.label} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <div className="flex justify-end mt-8 gap-3">
-            <button
-              onClick={() => setSettings(JSON.parse(originalSettings))}
-              className="px-4 py-2 text-sm font-medium border border-[var(--brand-border)] rounded-md text-[var(--brand-text)] hover:bg-[var(--brand-hover)]"
-            >
-              {t?.buttons?.reset || 'Reset changes'}
-            </button>
-            <button
-              onClick={saveSettings}
-              disabled={JSON.stringify(settings) === originalSettings || saving}
-              className={`px-5 py-2 text-sm font-semibold rounded-md ${
-                JSON.stringify(settings) === originalSettings || saving
-                  ? "bg-purple-300 cursor-not-allowed"
-                  : "bg-purple-600 hover:bg-purple-700 text-white"
-              }`}
-            >
-              {t?.buttons?.save || 'Save settings'}
-            </button>
-          </div>
-        </>
-      ) : (
-        <div className="flex flex-col justify-center items-center h-[50vh]">
-          <FaExclamationTriangle className="text-4xl mb-4" color="orange" />
-          <h1 className="text-xl font-semibold">{t?.unauthorized?.title || 'Unauthorized'}</h1>
-          <div className="text-gray-500 text-center mt-2">
-            <p>{t?.unauthorized?.body || 'Administrator privileges are required to manage KYC settings.'}</p>
-            <p className="mt-2">{t?.unauthorized?.help || 'Please contact your administrator for further help.'}</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+							{/* Buttons */}
+							<div className="flex justify-end mt-8 gap-3">
+								<button
+									onClick={() => setSettings(JSON.parse(originalSettings))}
+									className="px-4 py-2 text-sm font-medium border border-[var(--brand-border)] rounded-md text-[var(--brand-text)] hover:bg-[var(--brand-hover)]"
+								>
+									{t?.buttons?.reset || 'Reset changes'}
+								</button>
+								<button
+									onClick={saveSettings}
+									disabled={JSON.stringify(settings) === originalSettings || saving}
+									className={`px-5 py-2 text-sm font-semibold rounded-md ${
+										JSON.stringify(settings) === originalSettings || saving
+											? "bg-purple-300 cursor-not-allowed"
+											: "bg-purple-600 hover:bg-purple-700 text-white"
+									}`}
+								>
+									{t?.buttons?.save || 'Save settings'}
+								</button>
+							</div>
+						</>
+					) : (
+						<div className=''>
+							<div className="flex flex-col justify-center items-center h-[50vh] max-sm:p-5">
+								<FaExclamationTriangle className="size-20 max-sm:size-12" color="orange" />
+								<h1 className="text-xl font-semibold max-sm:text-sm">
+									{t?.unauthorized?.title || 'Unauthorized'}
+								</h1>
+								<div className="text-gray-500 text-lg text-center max-sm:text-sm">
+									<p>{t?.unauthorized?.body || 'Administrator privileges are required to manage KYC settings.'}
+										<br />{t?.unauthorized?.help || 'Please contact your administrator for further help.'}</p>
+								</div>
+							</div>
+						</div>
+					)}
+				</div>
+			</div>
+			<div className="bg-[var(--brand-navbar)] w-full lg:w-[50%] rounded-2xl p-6">
+				{/* RIGHT: Preview component */}
+				<KYCSettingsPreview
+					requiredFields={settings?.requiredFields || []}
+					labels={t?.labels || {}}
+					loading={loading}
+				/>
+			</div>
+		</div>
+	);
 }
 
 function Checkbox({ label, checked, onChange }) {

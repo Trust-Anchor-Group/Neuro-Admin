@@ -49,7 +49,7 @@ export default function SettingsPageClient() {
         </button>
       </div>
 
-      <div className="mt-6 bg-[var(--brand-navbar)] shadow-md rounded-lg p-6">
+      <div className="mt-6 bg-[var(--brand-background)] shadow-md rounded-lg">
         {tab === "kyc" && hideKyc !== 'kikkin.tagroot.io' ? <KYCSettings /> : <APIKeys />}
       </div>
     </div>
