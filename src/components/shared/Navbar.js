@@ -204,7 +204,7 @@ const Navbar = ({ neuroLogo }) => {
                   title={t?.navbar?.logout || 'Logout'}
                   icon={<FiLogOut size={18} className="text-red-500" />}
                 />
-                <li className="px-2 pb-2">
+                <li className="px-1 pb-2">
                   <Filter
                     noUrlParam
                     selectArray={languageOptions}

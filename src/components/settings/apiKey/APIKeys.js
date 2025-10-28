@@ -131,7 +131,7 @@ export default function APIKeys() {
   )
 
   return (
-    <div className="bg-[var(--brand-navbar)] rounded-2xl font-grotesk text-[var(--brand-text-color)]">
+    <div className="bg-[var(--brand-navbar)] rounded-2xl font-grotesk text-[var(--brand-text-color)] p-6">
       <h2 className="text-2xl font-bold text-[var(--brand-text-color)] mb-6">{t.title || 'API keys'}</h2>
 
       <div className="border border-[var(--brand-border)] rounded-2xl shadow-sm bg-[var(--brand-navbar)] text-[var(--brand-text-color)]">
