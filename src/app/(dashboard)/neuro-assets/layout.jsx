@@ -36,7 +36,7 @@ export default function NeuroAssetsLayout({ children }) {
         <Navbar />
         <div className="flex-1 pb-6">{children}</div>
 
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </div>
   );
