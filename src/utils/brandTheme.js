@@ -94,12 +94,7 @@ export function toggleMode(current) {
   // Broadcast a custom event so other components (e.g., sidebar Menu) can sync
   try {
     if (typeof window !== 'undefined') {
-      const dispatch = () => window.dispatchEvent(new CustomEvent('ui-mode-changed', { detail: next }));
-      if (typeof window.requestAnimationFrame === 'function') {
-        window.requestAnimationFrame(dispatch);
-      } else {
-        window.setTimeout(dispatch, 0);
-      }
+      window.dispatchEvent(new CustomEvent('ui-mode-changed', { detail: next }));
     }
   } catch (e) {
     // noop
