@@ -325,6 +325,7 @@
     viewMoreInformation: 'View more Information'
   },
   AssetMenu:{
+    title: 'Assets',
     orders: 'Orders',
     clients: 'Clients'
   },

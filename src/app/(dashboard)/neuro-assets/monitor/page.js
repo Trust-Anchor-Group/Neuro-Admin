@@ -33,7 +33,7 @@ const MonitorPage = () => {
   ];
 
   return (
-    <div className="p-6 bg-gradient-to-b from-gray-100 via-gray-50 to-white min-h-screen">
+    <div className="p-6 bg-[var(--brand-background)] min-h-screen">
       {/* Header */}
       <Header title="Digital Assets Monitor" />
 

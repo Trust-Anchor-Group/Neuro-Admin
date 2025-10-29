@@ -312,6 +312,7 @@ const fr = {
     viewMoreInformation: 'Voir plus d\'informations'
   },
   AssetMenu: {
+    title: 'Assets',
     orders: 'Commandes',
     clients: 'Clients'
   },
