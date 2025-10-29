@@ -63,12 +63,12 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
                     alt='Logo' />
                   <div className=''>
                     <h1 className=' text-2xl font-semibold' >{header.title}</h1>
-                    <p className='text16 text-neuroTextBlack/65'>{header.created}</p>
+                    <p className='text16 text-[var(--brand-text)]'>{header.created}</p>
                   </div>
                 </div>
                 <div className=''>
                   <p className='text-2xl font-semibold '>{header.credit}</p>
-                  <p className='text16 text-neuroTextBlack/65'>{header.tons}</p>
+                  <p className='text16 text-[var(--brand-text)]'>{header.tons}</p>
                 </div>
               </div>
             )

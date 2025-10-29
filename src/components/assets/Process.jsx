@@ -77,6 +77,38 @@ const summaryHighlights = [
 ];
 
 const Process = () => {
+  // Button state logic
+  const status = statusSnapshot.state;
+  const isActive = status === 'In progress' || status === 'Paused' || status === 'Not started';
+  // Status color mapping (copied from StatusBox)
+  const statusStyles = {
+    'Paused': {
+      bar: 'bg-gradient-to-r from-orange-400 to-orange-500',
+      cardBg: '#FEF3C7', // orange-100
+      cardText: '#F59E42', // orange-500
+    },
+    'Aborted': {
+      bar: 'bg-gradient-to-r from-red-500 to-red-600',
+      cardBg: '#FEE2E2', // red-100
+      cardText: '#EF4444', // red-500
+    },
+    'Complete': {
+      bar: 'bg-gradient-to-r from-green-500 to-green-600',
+      cardBg: '#DCFCE7', // green-100
+      cardText: '#22C55E', // green-500
+    },
+    'In progress': {
+      bar: 'bg-gradient-to-r from-purple-500 to-purple-600',
+      cardBg: '#E9D5FF', // purple-200
+      cardText: '#9333EA', // purple-700
+    },
+    'Not started': {
+      bar: 'bg-gradient-to-r from-gray-400 to-gray-500',
+      cardBg: '#F3F4F6', // gray-100
+      cardText: '#6B7280', // gray-500
+    },
+  };
+  const currentStyle = statusStyles[statusSnapshot.state] || statusStyles['Not started'];
   const [progressView, setProgressView] = React.useState("total");
 
   const progressBarWidth = Math.min(Math.max(statusSnapshot.completion, 0), 100);
@@ -132,48 +164,48 @@ const Process = () => {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_50%]">
         <section className="space-y-6">
           <div className="rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-6 shadow-sm">
-            <header className="mb-6 flex items-start justify-between gap-4">
+            <header className="mb-6 border-b pb-3 flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-[var(--brand-text-secondary)]">
+                <h2 className="text-2xl font-bold text-[var(--brand-text)]">
                   {statusSnapshot.label}
-                </p>
-                <p className="mt-3 text-3xl font-semibold text-[var(--brand-text)]">
-                  {statusSnapshot.completion}% complete
-                </p>
-                <p className="text-sm text-[var(--brand-text-secondary)]">
-                  {statusSnapshot.lastUpdated}
-                </p>
+                </h2>
+                
+                
               </div>
-              <span className="inline-flex items-center rounded-md bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-600">
+              <span
+                className="inline-flex items-center rounded-md px-3 py-1 text-sm font-semibold"
+                style={{ background: currentStyle.cardBg, color: currentStyle.cardText }}
+              >
                 {statusSnapshot.state}
               </span>
             </header>
 
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex-1">
-                <div className="flex items-center justify-between text-sm font-medium text-[var(--brand-text-secondary)]">
-                  <span>Progress</span>
-                  <span>{statusSnapshot.completion}%</span>
+                <div className="flex items-center justify-between">
+                  <p className="mt-3 text-3xl font-semibold text-[var(--brand-text)]">
+                  {statusSnapshot.completion}% complete
+                </p>
+                  <div className="px-5 text-2xl font-semibold ">
+                {statusSnapshot.volume}
+              </div>
                 </div>
-                <div className="mt-2 h-2 rounded-full bg-[var(--brand-border)]">
+                
+                <div className="mt-2 h-4 rounded-full relative" style={{ background: currentStyle.cardBg }}>
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600"
-                    style={{ width: `${progressBarWidth}%` }}
+                    className={`h-2 rounded-full transition-all duration-300 mx-1 absolute left-0 right-0 ${currentStyle.bar}`}
+                    style={{ width: `calc(${progressBarWidth}% - 0.5rem)`, top: '50%', transform: 'translateY(-50%)' }}
                   />
                 </div>
               </div>
-              <div className="rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-center text-sm font-semibold text-purple-600">
-                {statusSnapshot.volume}
-              </div>
+              
             </div>
 
-            <div className="flex flex-col items-stretch justify-between gap-4 lg:flex-row lg:items-center">
-              <p className="text-sm text-[var(--brand-text-secondary)]">
-                {statusSnapshot.nextMilestone}
-              </p>
+            <div className="flex flex-col items-stretch justify-end gap-4 lg:flex-row lg:items-center">
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-rose-100 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-200"
+                className={`inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition ${isActive ? 'bg-rose-100 text-rose-600 hover:bg-rose-200 cursor-pointer' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                disabled={!isActive}
               >
                 <AlertCircle className="h-4 w-4" />
                 Terminate process
@@ -354,7 +386,7 @@ const Process = () => {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-4">
+          <div className="mt-6 flex flex-row gap-4">
             <label className="relative flex items-center">
               <Search className="absolute left-3 h-4 w-4 text-[var(--brand-text-secondary)]" />
               <input
