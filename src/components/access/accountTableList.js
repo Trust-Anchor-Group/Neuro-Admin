@@ -6,6 +6,30 @@ import { content as i18nContent } from '../../../context/LanguageContext';
 
 export const theme = createTheme({
   typography: { fontFamily: '"Space Grotesk", sans-serif' },
+  components: {
+    MuiFormLabel: {
+      styleOverrides: {
+        root: { color: "var(--brand-text) !important" }, // "Rows per page" label
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: { color: "var(--brand-text) !important" },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: { color: "var(--brand-text) !important" },
+        input: { color: "var(--brand-text) !important" }, // select value
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        select: { color: "var(--brand-text) !important" },
+        standard: { color: "var(--brand-text) !important" },
+      },
+    },
+  },
 });
 
 const headCellBaseSx = {
