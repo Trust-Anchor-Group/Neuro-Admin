@@ -38,13 +38,14 @@ export const clientConfigs = {
       light: {
         primaryColor: '#8F40D4',
         secondaryColor: '#FFFFFF',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#FAFAFA',
         thirdColor: '#FFFFFF',
         textColor: '#2E2E2E',
         textSecondaryColor: '#4b5563',
         accentColor: '#FBB040',
         logoUrl: '/NeuroLogo.svg',
         borderColor: '#e2e8f0',
+        navbarBg: '#FFFFFF',
         sidebarBg: '#3b3b3bff',
         hover: '#f3f4f6'
       },
