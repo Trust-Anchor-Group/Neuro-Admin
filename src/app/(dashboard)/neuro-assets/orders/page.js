@@ -5,7 +5,7 @@ import { Award, Activity, Users, Timer } from "lucide-react";
 
 
 export default async function OrdersPage() {
-  const ordersData = await fetchOrders(); 
+  const ordersData = await fetchOrders();
 
     const summaryCards = [
       {
@@ -29,8 +29,8 @@ export default async function OrdersPage() {
     ];
 
   return (
-    <div className="p-6 bg-gradient-to-r from-blue-50 via-white to-blue-50 min-h-screen">
-      <h1 className="p-3 text-3xl font-bold text-gray-800">Asset Orders</h1>
+    <div className="p-6 min-h-screen bg-[var(--brand-background)]">
+      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">Asset Orders</h1>
       <section className="mt-4 mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {summaryCards.map(({ label, value, Icon, accentClass }) => (
           <div
@@ -49,7 +49,7 @@ export default async function OrdersPage() {
           </div>
         ))}
       </section>
-      <Suspense fallback={<p>Loading orders...</p>}>
+      <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">Loading orders...</p>}>
         <AssetOrdersTable orders={ordersData.orders} isLoading={ordersData.loading} />
       </Suspense>
     </div>
