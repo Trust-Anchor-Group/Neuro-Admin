@@ -195,7 +195,7 @@ const DigitalAssetsTable = ({ assets = [] }) => {
       }}
       muiTableBodyRowProps={({ row }) => ({
         onClick: () => {
-          window.location.href = `/neuro-assets/detailpage/${row.original.id}`;
+          window.location.href = `/neuro-assets/detailpageclient`;
         },
         sx: {
           cursor: "pointer",
