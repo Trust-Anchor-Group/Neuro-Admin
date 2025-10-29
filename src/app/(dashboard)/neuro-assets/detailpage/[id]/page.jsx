@@ -93,23 +93,19 @@ const DetailPageAssets = () => {
       {
         tab === 'order' && 
         <>
-        <div className='grid grid-cols-4 grid-rows-4 gap-5'>
-          <div className='col-span-3 row-span-4'>
-          <DisplayDetails
-          fieldsToShow={fieldsToShow}
-          userData={userData}
-          title={'Order details'}
-          header={headTitle}/>
-         </div>
-      
-             <div className='col-start-4 col-end-5'>
+        <div className='grid grid-cols-4 gap-5'>
+          <div className='col-span-3'>
+            <DisplayDetails
+              fieldsToShow={fieldsToShow}
+              userData={userData}
+              title={'Order details'}
+              header={headTitle}
+            />
+          </div>
+          <div className='col-start-4 col-end-5 flex flex-col items-start gap-2'>
             <StatusBox statusCard={statusCard}/>
-            </div> 
-            <div className='col-start-4 col-end-5 row-start-2 row-end-4'>
-             <PartiesBox/>
-            </div>
-
-
+            <PartiesBox/>
+          </div>
         </div>
         </>
       }
