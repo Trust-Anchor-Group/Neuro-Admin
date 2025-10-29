@@ -1,5 +1,3 @@
-import { Identity } from "@/components/access/Identity";
-
 const fr = {
   home: {
     title: 'Bienvenue',
@@ -312,6 +310,33 @@ const fr = {
       identityMetadata: 'Métadonnées de l\'identité'
     },
     viewMoreInformation: 'Voir plus d\'informations'
+  },
+  AssetMenu: {
+    orders: 'Commandes',
+    clients: 'Clients'
+  },
+  Clients: {
+    title: 'Clients d\'actifs',
+    subtitle: 'Vue d\'ensemble de l\'activité client liée aux actifs',
+    loading: 'Chargement des clients...',
+    empty: 'Aucun client disponible',
+    summary: {
+      total: 'Total',
+      activeOrders: 'Commandes actives',
+      totalClients: 'Nombre total de clients',
+      pendingOrders: 'Commandes en attente'
+    },
+    table: {
+      columns: {
+        facilityId: 'ID installation',
+        name: 'Nom',
+        address: 'Adresse',
+        carbonProcessed: 'Carbone total traité',
+        status: 'Statut'
+      },
+      statusActive: 'Actif',
+      statusInactive: 'Inactif'
+    }
   },
   modal: {
     title: 'Examiner la demande d\'ID',

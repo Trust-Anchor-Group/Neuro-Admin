@@ -1,6 +1,4 @@
-﻿import KYCSettings from "@/components/settings/kyc/KYCSettings";
-
-const en = {
+﻿const en = {
   home: {
     title: 'Welcome',
     subtitle: 'Your dashboard at a glance',
@@ -325,6 +323,33 @@ const en = {
       identityMetadata: 'Identity Metadata'
     },
     viewMoreInformation: 'View more Information'
+  },
+  AssetMenu:{
+    orders: 'Orders',
+    clients: 'Clients'
+  },
+  Clients: {
+    title: 'Asset Clients',
+    subtitle: 'Overview of asset-related client activity',
+    loading: 'Loading clients...',
+    empty: 'No clients available',
+    summary: {
+      total: 'Total',
+      activeOrders: 'Active orders',
+      totalClients: 'Total clients',
+      pendingOrders: 'Pending orders'
+    },
+    table: {
+      columns: {
+        facilityId: 'Facility ID',
+        name: 'Name',
+        address: 'Address',
+        carbonProcessed: 'Total Processed Carbon',
+        status: 'Status'
+      },
+      statusActive: 'Active',
+      statusInactive: 'Inactive'
+    }
   },
   modal: {
     title: 'Review ID application',

@@ -1,6 +1,4 @@
-﻿import { Identity } from "@/components/access/Identity";
-
-const pt = {
+﻿const pt = {
   home: {
     title: 'Bem-vindo',
     subtitle: 'Seu painel em um relance',
@@ -323,6 +321,33 @@ const pt = {
       identityMetadata: 'Metadados da Identidade'
     },
     viewMoreInformation: 'Ver mais informações'
+  },
+  AssetMenu: {
+    orders: 'Pedidos',
+    clients: 'Clientes'
+  },
+  Clients: {
+    title: 'Clientes de Ativos',
+    subtitle: 'Visão geral da atividade de clientes relacionada a ativos',
+    loading: 'Carregando clientes...',
+    empty: 'Nenhum cliente disponível',
+    summary: {
+      total: 'Total',
+      activeOrders: 'Pedidos ativos',
+      totalClients: 'Total de clientes',
+      pendingOrders: 'Pedidos pendentes'
+    },
+    table: {
+      columns: {
+        facilityId: 'ID da Instalação',
+        name: 'Nome',
+        address: 'Endereço',
+        carbonProcessed: 'Carbono Processado Total',
+        status: 'Status'
+      },
+      statusActive: 'Ativo',
+      statusInactive: 'Inativo'
+    }
   },
   modal: {
     title: 'Revisar aplicação de ID',
