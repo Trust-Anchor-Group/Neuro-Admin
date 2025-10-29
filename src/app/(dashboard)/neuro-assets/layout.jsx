@@ -1,28 +1,31 @@
+"use client";
 import Menu from "@/components/shared/Menu";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import Image from "next/image";
-import Link from "next/link";
-import { FaCog, FaRegFileAlt, FaRegUser, } from "react-icons/fa";
+import { FaCog, FaRegFileAlt } from "react-icons/fa";
+import { useLanguage, content } from "../../../../context/LanguageContext";
 
 export default function NeuroAssetsLayout({ children }) {
+  const { language } = useLanguage();
+  const tMenu = content[language]?.menu;
+  const tAssetMenu = content[language]?.AssetMenu;
 
-      const menuItems = [
-        {
-          title: 'Assets',
-          icon: <FaRegFileAlt />,
-          href:'/neuro-assets',
-          subItems: [
-            { label: 'Orders', href: '/neuro-assets/orders' },
-            { label: 'Clients', href: '/neuro-assets/orders' },
-          ],
-        },
-        {
-          title: 'Access settings',
-          icon: <FaCog size={20} />,
-          href: '/neuro-access/settings',
-        },
-      ]
+  const menuItems = [
+    {
+      title: tMenu?.access || "Access",
+      icon: <FaRegFileAlt />,
+      href: "/neuro-assets",
+      subItems: [
+        { label: tAssetMenu?.orders || "Orders", href: "/neuro-assets/orders" },
+        { label: tAssetMenu?.clients || "Clients", href: "/neuro-assets/clients" },
+      ],
+    },
+    {
+      title: tMenu?.accessSettings || "Access settings",
+      icon: <FaCog size={20} />,
+      href: "/neuro-access/settings",
+    },
+  ];
 
   return (
     <div className="h-screen flex bg-gray-50">
@@ -36,7 +39,7 @@ export default function NeuroAssetsLayout({ children }) {
         <Navbar />
         <div className="flex-1 pb-6">{children}</div>
 
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </div>
   );
