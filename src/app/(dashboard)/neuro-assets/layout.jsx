@@ -12,7 +12,7 @@ export default function NeuroAssetsLayout({ children }) {
 
   const menuItems = [
     {
-      title: tMenu?.access || "Access",
+      title: tAssetMenu?.title || "Assets",
       icon: <FaRegFileAlt />,
       href: "/neuro-assets",
       subItems: [
@@ -30,7 +30,7 @@ export default function NeuroAssetsLayout({ children }) {
   return (
     <div className="h-screen flex bg-gray-50">
       {/* Sidebar */}
-      <div className="flex flex-col bg-white shadow-md border-r border-gray-200">
+      <div className="flex flex-col bg-white shadow-md border-r border-[var(--brand-border)]">
         <Menu menuItems={menuItems} />
       </div>
 

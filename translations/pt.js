@@ -323,6 +323,7 @@
     viewMoreInformation: 'Ver mais informações'
   },
   AssetMenu: {
+    title: 'Assets',
     orders: 'Pedidos',
     clients: 'Clientes'
   },

@@ -10,6 +10,7 @@ import { PartiesBox } from '@/components/assets/PartiesBox';
 import Image from 'next/image';
 import certificateImage from '../../../../../../public/certificate.jpg'
 import { PdfButton } from '@/components/assets/PdfButton';
+import Process from '@/components/assets/Process';
 
 
 
@@ -111,12 +112,12 @@ const DetailPageAssets = () => {
       }
             {
               tab === 'certificate' &&
-              <div className='mx-auto w-full h-[60%] border-2 bg-white p-5 rounded-lg '>
-              <h1 className='font-semibold text-xl mb-5'>Order certificate</h1>
+              <div className='mx-auto w-full h-[60%] border-2 bg-[var(--brand-navbar)] border-[var(--brand-border)] p-5 rounded-lg '>
+                <h1 className='font-semibold text-xl mb-5'>Order certificate</h1>
                 <Image
-                className='bg-gray-100 p-4 rounded-lg'
+                className='bg-gray-100 p-4 rounded-lg justify-center items-center mx-auto'
                 src={certificateImage}
-                width={1200}
+                width='full'
                 height={1200}
                 alt='certificate'/>
                 <PdfButton/>
@@ -124,11 +125,7 @@ const DetailPageAssets = () => {
             }
             {
               tab === 'process' &&
-              <DisplayDetails
-              fieldsToShow={fieldsToShow}
-              userData={userData}
-              title={'Order details'}
-              headTitle={headTitle}/>
+              <Process />
             }
           </div>
   
