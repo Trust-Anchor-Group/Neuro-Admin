@@ -60,7 +60,7 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
                     src={header.image}
                     width={1200}
                     height={1200}
-                    alt='Logo' />
+                    alt='neuroAdminLogo.svg' />
                   <div className=''>
                     <h1 className=' text-2xl font-semibold' >{header.title}</h1>
                     <p className='text16 text-[var(--brand-text)]'>{header.created}</p>
@@ -73,6 +73,14 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
               </div>
             )
           }
+          <div className='bg-[var(--brand-background)] rounded-xl p-5'>
+            <h1 className='text-lg font-semibold text-[var(--brand-text)]'>
+              {t?.displayDetails?.certificateTitle || 'Certificate Information'}
+            </h1>
+            <p className='text-sm text-[var(--brand-text-secondary)]'>
+              {t?.displayDetails?.certificateDescription || 'The token validates the process of a tokenized Carbon Emissions Offset. The owner purchases the Carbon Token from Creturner which offsets a specific amount of CO₂e.'}
+            </p>
+          </div>
           <div className="bg-[var(--brand-background)] rounded-xl p-5 overflow-auto">
             <h2 className="font-semibold text-[var(--brand-text-secondary)] border-b-2 border-[var(--brand-border)] pb-2">
               {title}
@@ -83,7 +91,7 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
             onClick={() => setShowConfirmPopup(true)}
             className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-xl text-xl shadow-lg transition-colors"
           >
-            {t?.displayDetails?.deleteAccount || 'Delete Account'}
+            {t?.displayDetails?.cancelOrder || 'Cancel Order'}
           </button>
         </div>
       </div>

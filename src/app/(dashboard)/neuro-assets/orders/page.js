@@ -1,36 +1,52 @@
+"use client";
 import AssetOrdersTable from "@/components/assets/orders/AssetOrdersTable";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { fetchOrders } from "@/lib/fetchOrders"; 
-import { Award, Activity, Users, Timer } from "lucide-react";
+import { Award, Activity, Timer } from "lucide-react";
+import { useLanguage, content as i18nContent } from '../../../../../context/LanguageContext';
 
+export default function OrdersPage() {
+  const { language } = useLanguage();
+  const t = i18nContent[language]?.assetOrders || {};
+  const [ordersData, setOrdersData] = useState({ loading: true, orders: [] });
 
-export default async function OrdersPage() {
-  const ordersData = await fetchOrders();
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await fetchOrders();
+        if (mounted) setOrdersData(data);
+      } catch (e) {
+        if (mounted) setOrdersData({ loading: false, orders: [] });
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
-    const summaryCards = [
-      {
-        label: "Total",
-        value: "450 ton",
-        Icon: Award,
-        accentClass: "text-emerald-500 bg-emerald-100",
-      },
-      {
-        label: "Active orders",
-        value: "6",
-        Icon: Activity,
-        accentClass: "text-blue-500 bg-blue-100",
-      },
-      {
-        label: "Pending orders",
-        value: "4",
-        Icon: Timer,
-        accentClass: "text-amber-500 bg-amber-100",
-      },
-    ];
+  const summaryCards = [
+    {
+      label: t.summary?.total || 'Total',
+      value: `450 ${t.units?.tons || 'ton'}`,
+      Icon: Award,
+      accentClass: 'text-emerald-500 bg-emerald-100',
+    },
+    {
+      label: t.summary?.active || 'Active orders',
+      value: '6',
+      Icon: Activity,
+      accentClass: 'text-blue-500 bg-blue-100',
+    },
+    {
+      label: t.summary?.pending || 'Pending orders',
+      value: '4',
+      Icon: Timer,
+      accentClass: 'text-amber-500 bg-amber-100',
+    },
+  ];
 
   return (
     <div className="p-6 min-h-screen bg-[var(--brand-background)]">
-      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">Asset Orders</h1>
+      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">Carbon Credit Overview</h1>
       <section className="mt-4 mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {summaryCards.map(({ label, value, Icon, accentClass }) => (
           <div
@@ -49,7 +65,8 @@ export default async function OrdersPage() {
           </div>
         ))}
       </section>
-      <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">Loading orders...</p>}>
+      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">{t.heading || 'Asset Orders'}</h1>
+      <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading || 'Loading orders...'}</p>}>
         <AssetOrdersTable orders={ordersData.orders} isLoading={ordersData.loading} />
       </Suspense>
     </div>

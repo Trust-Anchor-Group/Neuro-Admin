@@ -11,6 +11,7 @@ import {
   MdDocumentScanner,
   MdOutlineStorage,
   MdLockOutline,
+  MdDescription
 } from 'react-icons/md';
 import Navbar from '@/components/shared/Navbar';
 import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
@@ -48,6 +49,17 @@ const LandingServices = (t) => ([
     status: t?.landing?.status?.learnMore,
     locked: false,
     newTab: true,
+  },
+  {
+    title: 'Neuro-Assets',
+    description: t?.landing?.services?.neuroAssets?.description,
+    icon: MdDescription,
+    iconColor: 'text-[#8B5CF6]',
+    iconBg: 'bg-[#F3E8FF]',
+    href: '/neuro-assets',
+    status: t?.landing?.status?.active,
+    locked: false,
+    newTab: false,
   },
   {
     title: 'Neuro-Payments',
@@ -214,7 +226,7 @@ export default function LandingPage() {
                   className={`group relative rounded-[16px] border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-[24px] w-full h-[240px] flex flex-col justify-between transition duration-200 ${item.locked ? 'opacity-50 hover:opacity-100 ' : 'hover:shadow-md'
                     }`}
                 >
-                  {item.title === 'Neuro-Monitor' && (
+                  {(item.title === 'Neuro-Monitor' || item.title === 'Neuro-Assets') && (
                     <div className="absolute top-0 right-0 overflow-hidden w-[150px] h-[150px]">
                       <div className="absolute -right-[40px] top-[20px] w-[150px] bg-[#8F40D4] text-white text-[12px] font-bold text-center transform rotate-45  shadow-md">
                         BETA

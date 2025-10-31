@@ -207,12 +207,14 @@ const fr = {
   },
   displayDetails: {
     noData: 'Aucune donnée disponible',
-    deleteAccount: 'Supprimer le compte',
-    confirmTitle: 'Êtes-vous sûr de vouloir supprimer votre compte ?',
+    cancelOrder: 'Annuler la commande',
+    confirmTitle: 'Êtes-vous sûr de vouloir annuler votre commande ?',
     confirmSubtitle: 'Cette action est irréversible.',
-    confirmDelete: 'Supprimer',
+    confirmDelete: 'Annuler',
     cancel: 'Annuler',
-    deletedMessage: 'Votre compte a été supprimé avec succès.'
+    deletedMessage: 'Votre compte a été supprimé avec succès.',
+    certificateTitle: 'Informations sur le certificat',
+    certificateDescription: 'Le jeton valide le processus de compensation tokenisée des émissions de carbone. Le propriétaire achète le Carbon Token auprès de Creturner ce qui compense une quantité spécifique de CO₂e.'
   },
   buttons: {
     save: 'Enregistrer',
@@ -244,7 +246,8 @@ const fr = {
       neuroMonitor: { description: 'Surveillance des actifs et des processus' },
       neuroPayments: { description: 'Surveillance et gestion des paiements' },
       neuroLeasing: { description: 'Portail de gestion de leasing' },
-      neuronManagement: { description: 'Console de gestion des serveurs' }
+      neuronManagement: { description: 'Console de gestion des serveurs' },
+      neuroAssets: { description: 'Gestion des actifs numériques' }
     },
     header: {
       welcomeTo: 'Bienvenue sur',
@@ -317,7 +320,7 @@ const fr = {
     clients: 'Clients'
   },
   Clients: {
-    title: 'Clients d\'actifs',
+    title: 'Clients Assets',
     subtitle: 'Vue d\'ensemble de l\'activité client liée aux actifs',
     loading: 'Chargement des clients...',
     empty: 'Aucun client disponible',
@@ -415,6 +418,154 @@ const fr = {
   themeToggle: {
     light: 'Mode clair',
     dark: 'Mode sombre'
+  }
+  ,
+  Manage: {
+    pageTitle: 'Activité du client',
+    searchPlaceholder: 'Rechercher une activité',
+    filterAll: 'Tout',
+    comingSoon: 'Bientôt disponible',
+    sections: {
+      identityInformation: 'Informations sur l\'identité',
+      identityMetadata: 'Métadonnées de l\'identité'
+    },
+    labels: {
+      clientType: 'Type de client :',
+      clientName: 'Nom du client :',
+      identityNumber: 'Numéro d\'identité :',
+      countryOfOrigin: 'Pays d\'origine :',
+      address: 'Adresse :',
+      originDate: 'Date d\'origine :',
+      email: 'E-mail :',
+      phoneNumber: 'Numéro de téléphone :'
+    },
+    metadata: {
+      requestedFlags: 'Drapeaux demandés :',
+      educationSources: 'Sources de formation :',
+      documents: 'Documents :',
+      lastRenewal: 'Dernier renouvellement',
+      complianceLevel: 'Niveau de conformité',
+      delegatedAdmins: 'Administrateurs délégués',
+      suspensionReason: 'Raison de la suspension',
+      escalationContact: 'Contact d\'escalade',
+      requiredSteps: 'Étapes requises'
+    },
+    statuses: {
+      pending: 'Demande d\'ID en attente',
+      active: 'ID active',
+      obsoleted: 'ID obsolète'
+    },
+    actions: {
+      deny: 'Refuser la demande d\'ID',
+      approve: 'Approuver la demande d\'ID',
+      suspend: 'Suspendre l\'ID',
+      obsolete: 'Rendre l\'ID obsolète'
+    }
+  }
+  ,
+  assetClientDetail: {
+    tabs: {
+      overview: 'Aperçu',
+      orders: 'Commandes',
+      manage: 'Gérer'
+    },
+    summary: {
+      total: 'Total',
+      activeOrders: 'Commandes actives',
+      pendingOrders: 'Commandes en attente'
+    },
+    units: {
+      tons: 'tonnes'
+    },
+    headings: {
+      orders: 'Commandes'
+    },
+    loading: {
+      orders: 'Chargement des commandes...'
+    }
+  }
+  ,
+  assetOrders: {
+    heading: 'Commandes Assets',
+    summary: {
+      total: 'Total',
+      active: 'Commandes actives',
+      pending: 'Commandes en attente'
+    },
+    units: {
+      tons: 'tonnes'
+    },
+    loading: 'Chargement des commandes...'
+  }
+  ,
+  userCard: {
+    thisMonth: 'Ce mois-ci',
+    types: {
+      amountSold: 'Montant vendu',
+      totalVolumeCompensated: 'Volume total compensé'
+    }
+  },
+  assetDashboard: {
+    heading: 'Tableau de bord des Assets'
+  }
+  ,
+  certificateButtons: {
+    download: 'Télécharger le certificat',
+    share: 'Partager le certificat'
+  }
+  ,
+  assetOrderDetail: {
+    tabs: {
+      order: 'Détail de la commande',
+      certificate: 'Certificat',
+      process: 'Processus'
+    },
+    headings: {
+      orderDetails: 'Détails de la commande',
+      orderCertificate: 'Certificat de la commande',
+      certificateInformation: 'Informations sur le certificat'
+    },
+    fields: {
+      orderName: 'Nom de la commande',
+      comment: 'Commentaire',
+      orderType: 'Type de commande',
+      orderQuantity: 'Quantité de la commande',
+      orderDate: 'Date de la commande',
+      orderedBy: 'Commandée par',
+      created: 'Créée'
+    },
+    statusBox: {
+      status: 'Statut',
+      progress: 'Progression',
+      amount: 'Montant'
+    }
+  }
+  ,
+  processPage: {
+    progress: {
+      title: 'Progression de la compensation',
+      descriptionTotal: 'Suivi du volume compensé dans le temps',
+      descriptionRelative: 'Comparaison de chaque phase par rapport au total',
+      relative: 'Relatif',
+      total: 'Total',
+      noData: 'Aucune donnée disponible'
+    },
+    summary: {
+      totalValue: 'Valeur totale',
+      totalCompensation: 'Compensation totale'
+    },
+    activity: {
+      title: 'Activité du processus',
+      searchPlaceholder: 'Rechercher des mises à jour',
+      filterAll: 'Tout',
+      comingSoon: 'Bientôt disponible'
+    },
+    units: {
+      tons: 'tonnes'
+    },
+    misc: {
+      completeSuffix: '% terminé'
+    }
   }
 };
 

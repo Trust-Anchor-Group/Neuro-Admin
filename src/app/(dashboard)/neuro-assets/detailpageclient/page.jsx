@@ -6,6 +6,8 @@ import { FaChartLine, FaRegFileAlt, FaFirstOrderAlt } from 'react-icons/fa';
 import { Award, Activity, Timer } from 'lucide-react';
 import Manage from '@/components/assets/Manage';
 import Overview from '@/components/assets/Overview';
+// NOTE: context folder is at project root (not under src), so we need five parent traversals
+import { useLanguage, content as i18nContent } from '../../../../../context/LanguageContext';
 import { Suspense } from 'react';
 import AssetOrdersTable from '@/components/assets/orders/AssetOrdersTable';
 
@@ -17,6 +19,8 @@ const DetailPageClient = () => {
    const { id } = useParams()
    const tab = searchParams.get('tab') || 'overview'
 
+  const { language } = useLanguage();
+  const t = i18nContent[language]?.assetClientDetail || {};
   const [ordersData, setOrdersData] = React.useState({ loading: true, orders: [] });
 
   React.useEffect(() => {
@@ -78,19 +82,19 @@ const DetailPageClient = () => {
 
   const summaryCards = [
     {
-      label: 'Total',
-      value: '450 ton',
+      label: t.summary?.total || 'Total',
+      value: `450 ${t.units?.tons || 'ton'}`,
       Icon: Award,
       accentClass: 'text-emerald-500 bg-emerald-100',
     },
     {
-      label: 'Active orders',
+      label: t.summary?.activeOrders || 'Active orders',
       value: '6',
       Icon: Activity,
       accentClass: 'text-blue-500 bg-blue-100',
     },
     {
-      label: 'Pending orders',
+      label: t.summary?.pendingOrders || 'Pending orders',
       value: '4',
       Icon: Timer,
       accentClass: 'text-amber-500 bg-amber-100',
@@ -101,21 +105,21 @@ const DetailPageClient = () => {
     <div className='p-5'>
       <TabNavigation tab={tab} id={id} gridCols={'grid-cols-3'} tabArray={[
         {
-          title: 'Overview',
+          title: t.tabs?.overview || 'Overview',
           href: '/neuro-assets/detailpageclient',
           tabDesination: 'overview',
           icon: FaRegFileAlt,
           tabRef: 'overview',
         },
         {
-          title: 'Orders',
+          title: t.tabs?.orders || 'Orders',
           href: '/neuro-assets/detailpageclient',
           tabDesination: 'orders',
           icon: FaFirstOrderAlt,
           tabRef: 'orders',
         },
         {
-          title: 'Manage',
+          title: t.tabs?.manage || 'Manage',
           href: '/neuro-assets/detailpageclient',
           tabDesination: 'manage',
           icon: FaChartLine,
@@ -147,8 +151,8 @@ const DetailPageClient = () => {
         {tab === 'overview' && <Overview />}
         {tab === 'orders' && (
           <div className='rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-5'>
-            <h1 className='font-semibold text-xl mb-5 text-[var(--brand-text)]'>Orders</h1>
-            <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">Loading orders...</p>}>
+            <h1 className='font-semibold text-xl mb-5 text-[var(--brand-text)]'>{t.headings?.orders || 'Orders'}</h1>
+            <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading?.orders || 'Loading orders...'}</p>}>
               <AssetOrdersTable orders={ordersData.orders} isLoading={ordersData.loading} />
             </Suspense>
           </div>
