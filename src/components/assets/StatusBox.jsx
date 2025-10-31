@@ -5,27 +5,27 @@ export const StatusBox = ({statusCard}) => {
   const statusStyles = {
     'Paused': {
       bar: 'bg-gradient-to-r from-orange-400 to-orange-500',
-      cardBg: '#FEF3C7', // orange-100
+      cardBg: '#d6b94543', // orange-10
       cardText: '#F59E42', // orange-500
     },
     'Aborted': {
       bar: 'bg-gradient-to-r from-red-500 to-red-600',
-      cardBg: '#FEE2E2', // red-100
+      cardBg: '#dc434335', // red-100
       cardText: '#EF4444', // red-500
     },
     'Complete': {
       bar: 'bg-gradient-to-r from-green-500 to-green-600',
-      cardBg: '#DCFCE7', // green-100
+      cardBg: '#3eda7543', // green-100
       cardText: '#22C55E', // green-500
     },
     'In progress': {
       bar: 'bg-gradient-to-r from-purple-500 to-purple-600',
-      cardBg: '#E9D5FF', // purple-200
+      cardBg: 'rgba(143, 64, 212, 0.15)', // purple-200
       cardText: '#9333EA', // purple-700
     },
     'Not started': {
       bar: 'bg-gradient-to-r from-gray-400 to-gray-500',
-      cardBg: '#F3F4F6', // gray-100
+      cardBg: '#3a68c443', // gray-100
       cardText: '#6B7280', // gray-500
     },
   };

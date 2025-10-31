@@ -37,44 +37,44 @@ const compensationRelative = [
 ];
 
 const compensationSeries = {
-  total: {
+    total: {
     key: "total",
     label: "Total",
     description: "Tracking compensated volume over time",
-    maxValue: 100,
-    points: compensationTotal,
-    yTicks: [25, 50, 75],
-    rightAxis: [
+      maxValue: 100,
+      points: compensationTotal,
+      yTicks: [25, 50, 75],
+      rightAxis: [
       { value: 73, label: "73 tons" },
       { value: 58, label: "58 tons" },
       { value: 37, label: "37 tons" },
       { value: 19, label: "19 tons" },
       { value: 0, label: "0 tons" },
-    ],
+      ],
     bottomLabel: (point) => `${point.value} tons`,
-  },
-  relative: {
+    },
+    relative: {
     key: "relative",
     label: "Relative",
     description: "Comparing each phase share of the total order",
-    maxValue: 25,
-    points: compensationRelative,
-    yTicks: [5, 10, 15, 20],
-    rightAxis: [
+      maxValue: 25,
+      points: compensationRelative,
+      yTicks: [5, 10, 15, 20],
+      rightAxis: [
       { value: 19, label: "19 tons" },
       { value: 16, label: "16 tons" },
       { value: 12, label: "12 tons" },
       { value: 8, label: "8 tons" },
       { value: 0, label: "0 tons" },
-    ],
-    bottomLabel: (point) => point.bottomLabel,
-  },
-};
+      ],
+      bottomLabel: (point) => point.bottomLabel,
+    },
+  };
 
 const summaryHighlights = [
   { label: "Total value", value: "173 TEUR", Icon: BadgeEuro },
   { label: "Total compensation", value: "47 tons", Icon: Leaf },
-];
+  ];
 
 const Process = () => {
   // Button state logic
@@ -99,7 +99,7 @@ const Process = () => {
     },
     'In progress': {
       bar: 'bg-gradient-to-r from-purple-500 to-purple-600',
-      cardBg: '#E9D5FF', // purple-200
+      cardBg: 'rgba(143, 64, 212, 0.15)',
       cardText: '#9333EA', // purple-700
     },
     'Not started': {
@@ -204,7 +204,7 @@ const Process = () => {
             <div className="flex flex-col items-stretch justify-end gap-4 lg:flex-row lg:items-center">
               <button
                 type="button"
-                className={`inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition ${isActive ? 'bg-rose-100 text-rose-600 hover:bg-rose-200 cursor-pointer' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                className={`inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition ${isActive ? 'bg-aprovedPurple/15 text-neuroPurpleDark hover:bg-rose-200 cursor-pointer' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
                 disabled={!isActive}
               >
                 <AlertCircle className="h-4 w-4" />
@@ -339,7 +339,7 @@ const Process = () => {
                 </div>
               ) : null}
 
-              <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-[var(--brand-text-secondary)] sm:grid-cols-4">
+              <div className="mt-4 flex flex-row justify-center gap-9 text-xs text-[var(--brand-text-secondary)]">
                 {chartPoints.map((point) => (
                   <div key={point.label} className="flex flex-col">
                     <span className="text-sm font-semibold text-[var(--brand-text)]">
@@ -375,16 +375,9 @@ const Process = () => {
         </section>
 
         <aside className="rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-6 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
               <h2 className="text-xl font-semibold text-[var(--brand-text)]">
                 Process activity
               </h2>
-              <p className="text-sm text-[var(--brand-text-secondary)]">
-                Hard-coded preview until activity feed is connected
-              </p>
-            </div>
-          </div>
 
           <div className="mt-6 flex flex-row gap-4">
             <label className="relative flex items-center">
@@ -404,9 +397,9 @@ const Process = () => {
             </button>
           </div>
 
-          <div className="mt-10 flex h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--brand-border)] bg-[var(--brand-background)] text-center">
-            <p className="text-sm font-medium text-[var(--brand-text-secondary)]">
-              Activity feed coming soon
+          <div className="mt-10 flex h-64 flex-col items-center justify-center rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-background)] text-center">
+            <p className="text-xl font-medium text-[var(--brand-text-secondary)]">
+              Coming soon
             </p>
           </div>
         </aside>

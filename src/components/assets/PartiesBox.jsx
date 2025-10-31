@@ -1,3 +1,5 @@
+import { Phone, Mail, User, Building2, Circle } from 'lucide-react';
+import Image from "next/image";
 
 export const PartiesBox = () => {
   return (
@@ -17,11 +19,10 @@ export const PartiesBox = () => {
           className="flex items-center gap-2 rounded-xl p-2"
           style={{background: 'var(--brand-background-secondary)'}}
         >
-          <span className="text-blue-200 text-xl">🏢</span>
           <div className="flex flex-col flex-1">
             <span className="font-semibold" style={{color: 'var(--brand-text)'}}>EcoTech Solutions</span>
             <span className="flex items-center text-sm mt-1 gap-1" style={{color: 'var(--brand-text)'}}>
-              <span className="text-base mr-1" style={{color: 'var(--brand-text)'}}>🏬</span>
+              <Building2 className="text-[var(--brand-text)] h-4 w-4" />
               Client
             </span>
           </div>
@@ -32,23 +33,22 @@ export const PartiesBox = () => {
           style={{background: 'var(--brand-background-secondary)'}}
         >
           <div className="flex items-center gap-2 p-2">
-            <span className="text-blue-200 text-xl">👤</span>
             <div className="flex flex-col flex-1">
               <span className="font-semibold" style={{color: 'var(--brand-text)'}}>Anna Lindberg</span>
               <span className="flex items-center text-sm mt-1 gap-1" style={{color: 'var(--brand-text)'}}>
-                <span className="text-base mr-1" style={{color: 'var(--brand-text)'}}>👤</span>
+                <User className="text-[var(--brand-text)] h-4 w-4" />
                 Contact person
               </span>
             </div>
           </div>
           <div className="border-t mx-2 my-2" style={{borderColor: 'var(--brand-border)'}} />
           <div className="flex items-center gap-2 text-xs p-2" style={{color: 'var(--brand-text)'}}>
-            <span style={{color: 'var(--brand-text)'}}>✉️</span>
+            <Mail className="text-[var(--brand-text)] h-4 w-4" />
             alexander@trustanchorgroup.com
           </div>
           <div className="border-t mx-2 my-2" style={{borderColor: 'var(--brand-border)'}} />
           <div className="flex items-center gap-2 text-xs p-2" style={{color: 'var(--brand-text)'}}>
-            <span style={{color: 'var(--brand-text)'}}>📞</span>
+            <Phone className="text-[var(--brand-text)] h-4 w-4" />
             +46 70 123 4567
           </div>
         </div>
@@ -60,11 +60,10 @@ export const PartiesBox = () => {
             className="flex items-center gap-2 rounded-xl p-2"
             style={{background: 'var(--brand-background-secondary)'}}
           >
-            <span className="text-blue-200 text-xl">🏢</span>
             <div className="flex flex-col flex-1">
               <span className="font-semibold" style={{color: 'var(--brand-text)'}}>Creturner</span>
               <span className="flex items-center text-sm mt-1 gap-1" style={{color: 'var(--brand-text)'}}>
-                <span className="text-base mr-1" style={{color: 'var(--brand-text)'}}>📝</span>
+                <Building2 className="text-[var(--brand-text)] h-4 w-4" />
                 Process owner
               </span>
             </div>
@@ -73,11 +72,10 @@ export const PartiesBox = () => {
             className="flex items-center gap-2 rounded-xl p-2 mt-1"
             style={{background: 'var(--brand-background-secondary)'}}
           >
-            <span className="text-blue-200 text-xl">👤</span>
             <div className="flex flex-col flex-1">
               <span className="font-semibold" style={{color: 'var(--brand-text)'}}>Anders Davidson</span>
               <span className="flex items-center text-sm mt-1 gap-1" style={{color: 'var(--brand-text)'}}>
-                <span className="text-base mr-1" style={{color: 'var(--brand-text)'}}>📝</span>
+                <User className="text-[var(--brand-text)] h-4 w-4" />
                 Signee
               </span>
             </div>

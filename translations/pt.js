@@ -206,12 +206,14 @@
   },
   displayDetails: {
     noData: 'Nenhum dado disponível',
-    deleteAccount: 'Excluir conta',
-    confirmTitle: 'Tem certeza de que deseja excluir sua conta?',
+    cancelOrder: 'Cancelar pedido',
+    confirmTitle: 'Tem certeza de que deseja cancelar seu pedido?',
     confirmSubtitle: 'Esta ação não pode ser desfeita.',
-    confirmDelete: 'Excluir',
+    confirmDelete: 'Cancelar',
     cancel: 'Cancelar',
-    deletedMessage: 'Sua conta foi excluída com sucesso.'
+    deletedMessage: 'Sua conta foi excluída com sucesso.',
+    certificateTitle: 'Informações do Certificado',
+    certificateDescription: 'O token valida o processo de compensação tokenizada de emissões de carbono. O proprietário compra o Carbon Token da Creturner que compensa uma quantidade específica de CO₂e.'
   },
   buttons: {
     save: 'Salvar',
@@ -255,6 +257,9 @@
       },
       neuronManagement: {
         description: 'Console de gestão de servidores'
+      },
+      neuroAssets: {
+        description: 'Gestão de ativos digitais'
       }
     },
     header: {
@@ -328,7 +333,7 @@
     clients: 'Clientes'
   },
   Clients: {
-    title: 'Clientes de Ativos',
+    title: 'Clientes de Assets',
     subtitle: 'Visão geral da atividade de clientes relacionada a ativos',
     loading: 'Carregando clientes...',
     empty: 'Nenhum cliente disponível',
@@ -426,6 +431,154 @@
   themeToggle: {
     light: 'Modo claro',
     dark: 'Modo escuro'
+  }
+  ,
+  Manage: {
+    pageTitle: 'Atividade do cliente',
+    searchPlaceholder: 'Buscar atividade',
+    filterAll: 'Tudo',
+    comingSoon: 'Em breve',
+    sections: {
+      identityInformation: 'Informações da identidade',
+      identityMetadata: 'Metadados da identidade'
+    },
+    labels: {
+      clientType: 'Tipo de cliente:',
+      clientName: 'Nome do cliente:',
+      identityNumber: 'Número de identidade:',
+      countryOfOrigin: 'País de origem:',
+      address: 'Endereço:',
+      originDate: 'Data de origem:',
+      email: 'E-mail:',
+      phoneNumber: 'Número de telefone:'
+    },
+    metadata: {
+      requestedFlags: 'Flags solicitadas:',
+      educationSources: 'Fontes de educação:',
+      documents: 'Documentos:',
+      lastRenewal: 'Última renovação',
+      complianceLevel: 'Nível de conformidade',
+      delegatedAdmins: 'Administradores delegados',
+      suspensionReason: 'Motivo da suspensão',
+      escalationContact: 'Contato de escalonamento',
+      requiredSteps: 'Etapas necessárias'
+    },
+    statuses: {
+      pending: 'Aplicação de ID pendente',
+      active: 'ID ativa',
+      obsoleted: 'ID obsoleta'
+    },
+    actions: {
+      deny: 'Negar aplicação de ID',
+      approve: 'Aprovar aplicação de ID',
+      suspend: 'Suspender ID',
+      obsolete: 'Tornar ID obsoleta'
+    }
+  }
+  ,
+  assetClientDetail: {
+    tabs: {
+      overview: 'Visão geral',
+      orders: 'Pedidos',
+      manage: 'Gerenciar'
+    },
+    summary: {
+      total: 'Total',
+      activeOrders: 'Pedidos ativos',
+      pendingOrders: 'Pedidos pendentes'
+    },
+    units: {
+      tons: 'ton'
+    },
+    headings: {
+      orders: 'Pedidos'
+    },
+    loading: {
+      orders: 'Carregando pedidos...'
+    }
+  }
+  ,
+  assetOrders: {
+    heading: 'Pedidos de Assets',
+    summary: {
+      total: 'Total',
+      active: 'Pedidos ativos',
+      pending: 'Pedidos pendentes'
+    },
+    units: {
+      tons: 'ton'
+    },
+    loading: 'Carregando pedidos...'
+  }
+  ,
+  userCard: {
+    thisMonth: 'Este mês',
+    types: {
+      amountSold: 'Quantidade vendida',
+      totalVolumeCompensated: 'Volume total compensado'
+    }
+  },
+  assetDashboard: {
+    heading: 'Painel de Assets'
+  }
+  ,
+  certificateButtons: {
+    download: 'Baixar certificado',
+    share: 'Compartilhar certificado'
+  }
+  ,
+  assetOrderDetail: {
+    tabs: {
+      order: 'Detalhe do pedido',
+      certificate: 'Certificado',
+      process: 'Processo'
+    },
+    headings: {
+      orderDetails: 'Detalhes do pedido',
+      orderCertificate: 'Certificado do pedido',
+      certificateInformation: 'Informações do certificado'
+    },
+    fields: {
+      orderName: 'Nome do pedido',
+      comment: 'Comentário',
+      orderType: 'Tipo de pedido',
+      orderQuantity: 'Quantidade do pedido',
+      orderDate: 'Data do pedido',
+      orderedBy: 'Pedido por',
+      created: 'Criado'
+    },
+    statusBox: {
+      status: 'Status',
+      progress: 'Progresso',
+      amount: 'Quantidade'
+    }
+  }
+  ,
+  processPage: {
+    progress: {
+      title: 'Progresso da compensação',
+      descriptionTotal: 'Acompanhando o volume compensado ao longo do tempo',
+      descriptionRelative: 'Comparando cada fase em relação ao total do pedido',
+      relative: 'Relativo',
+      total: 'Total',
+      noData: 'Nenhum dado disponível'
+    },
+    summary: {
+      totalValue: 'Valor total',
+      totalCompensation: 'Compensação total'
+    },
+    activity: {
+      title: 'Atividade do processo',
+      searchPlaceholder: 'Buscar atualizações',
+      filterAll: 'Tudo',
+      comingSoon: 'Em breve'
+    },
+    units: {
+      tons: 'tons'
+    },
+    misc: {
+      completeSuffix: '% concluído'
+    }
   }
 };
 

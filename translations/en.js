@@ -208,12 +208,14 @@
   },
   displayDetails: {
     noData: 'No data available',
-    deleteAccount: 'Delete Account',
+    cancelOrder: 'Cancel Order',
     confirmTitle: 'Are you sure you want to delete your account?',
     confirmSubtitle: 'This action cannot be undone.',
     confirmDelete: 'Delete',
     cancel: 'Cancel',
-    deletedMessage: 'Your account has been successfully deleted.'
+    deletedMessage: 'Your account has been successfully deleted.',
+    certificateTitle: 'Certificate Information',
+    certificateDescription: 'The token validates the process of a tokenized Carbon Emissions Offset. The owner purchases the Carbon Token from Creturner which offsets a specific amount of CO₂e.'
   },
   buttons: {
     save: 'Save',
@@ -257,6 +259,9 @@
       },
       neuronManagement: {
         description: 'Server management console'
+      },
+      neuroAssets: {
+        description: 'Digital asset management'
       }
     },
     header: {
@@ -326,7 +331,7 @@
   },
   AssetMenu:{
     title: 'Assets',
-    orders: 'Orders',
+    carbonCredit: 'Carbon Credit',
     clients: 'Clients'
   },
   Clients: {
@@ -428,6 +433,154 @@
   themeToggle: {
     light: 'Light Mode',
     dark: 'Dark Mode'
+  }
+  ,
+  Manage: {
+    pageTitle: 'Client activity',
+    searchPlaceholder: 'Search activity',
+    filterAll: 'All',
+    comingSoon: 'Coming soon',
+    sections: {
+      identityInformation: 'Identity information',
+      identityMetadata: 'Identity metadata'
+    },
+    labels: {
+      clientType: 'Client type:',
+      clientName: 'Client name:',
+      identityNumber: 'Identity number:',
+      countryOfOrigin: 'Country of origin:',
+      address: 'Address:',
+      originDate: 'Origin date:',
+      email: 'Email:',
+      phoneNumber: 'Phone number:'
+    },
+    metadata: {
+      requestedFlags: 'Requested flags:',
+      educationSources: 'Education sources:',
+      documents: 'Documents:',
+      lastRenewal: 'Last renewal',
+      complianceLevel: 'Compliance level',
+      delegatedAdmins: 'Delegated admins',
+      suspensionReason: 'Suspension reason',
+      escalationContact: 'Escalation contact',
+      requiredSteps: 'Required steps'
+    },
+    statuses: {
+      pending: 'Pending ID application',
+      active: 'Active ID',
+      obsoleted: 'Obsoleted ID'
+    },
+    actions: {
+      deny: 'Deny ID application',
+      approve: 'Approve ID application',
+      suspend: 'Suspend ID',
+      obsolete: 'Obsolete ID'
+    }
+  }
+  ,
+  assetClientDetail: {
+    tabs: {
+      overview: 'Overview',
+      orders: 'Orders',
+      manage: 'Manage'
+    },
+    summary: {
+      total: 'Total',
+      activeOrders: 'Active orders',
+      pendingOrders: 'Pending orders'
+    },
+    units: {
+      tons: 'ton'
+    },
+    headings: {
+      orders: 'Orders'
+    },
+    loading: {
+      orders: 'Loading orders...'
+    }
+  }
+  ,
+  assetOrders: {
+    heading: 'Asset Orders',
+    summary: {
+      total: 'Total',
+      active: 'Active orders',
+      pending: 'Pending orders'
+    },
+    units: {
+      tons: 'ton'
+    },
+    loading: 'Loading orders...'
+  }
+  ,
+  userCard: {
+    thisMonth: 'This Month',
+    types: {
+      amountSold: 'Amount Sold',
+      totalVolumeCompensated: 'Total volume compensated'
+    }
+  },
+  assetDashboard: {
+    heading: 'Assets Dashboard'
+  }
+  ,
+  certificateButtons: {
+    download: 'Download certificate',
+    share: 'Share certificate'
+  }
+  ,
+  assetOrderDetail: {
+    tabs: {
+      order: 'Order detail',
+      certificate: 'Certificate',
+      process: 'Process'
+    },
+    headings: {
+      orderDetails: 'Order details',
+      orderCertificate: 'Order certificate',
+      certificateInformation: 'Certificate Information'
+    },
+    fields: {
+      orderName: 'Order Name',
+      comment: 'Comment',
+      orderType: 'Order type',
+      orderQuantity: 'Order Quantity',
+      orderDate: 'Order Date',
+      orderedBy: 'Ordered By',
+      created: 'Created'
+    },
+    statusBox: {
+      status: 'Status',
+      progress: 'Progress',
+      amount: 'Amount'
+    }
+  }
+  ,
+  processPage: {
+    progress: {
+      title: 'Compensation progress',
+      descriptionTotal: 'Tracking compensated volume over time',
+      descriptionRelative: 'Comparing each phase share of the total order',
+      relative: 'Relative',
+      total: 'Total',
+      noData: 'No data available'
+    },
+    summary: {
+      totalValue: 'Total value',
+      totalCompensation: 'Total compensation'
+    },
+    activity: {
+      title: 'Process activity',
+      searchPlaceholder: 'Search updates',
+      filterAll: 'All',
+      comingSoon: 'Coming soon'
+    },
+    units: {
+      tons: 'tons'
+    },
+    misc: {
+      completeSuffix: '% complete'
+    }
   }
 };
 
