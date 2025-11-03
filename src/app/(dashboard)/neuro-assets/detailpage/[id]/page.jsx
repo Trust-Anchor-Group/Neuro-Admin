@@ -121,17 +121,65 @@ const DetailPageAssets = () => {
                   {t?.assetOrderDetail?.headings?.orderCertificate || 'Order certificate'}
                 </h1>
                 <div className='flex flex-row'>
-                  <div className='flex justify-left items-left w-[50%]'>
+                  <div className='flex w-[50%] flex-col items-start gap-6 bg-[var(--brand-background)] p-5 rounded-lg mr-5'>
                     <h1 className='text-lg font-semibold'>
                       {t?.assetOrderDetail?.headings?.certificateInformation || 'Certificate Information'}
                     </h1>
+                    <div className='grid w-full gap-x-10 gap-y-6 text-sm text-[var(--brand-text)] sm:grid-cols-2'>
+                      <div className='space-y-5'>
+                        <div>
+                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>NAMN</p>
+                          <p className='mt-1 break-words text-[var(--brand-text)]'>Creturner Carbon Credit</p>
+                        </div>
+                        <div>
+                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>SKAPARE</p>
+                          <p className='mt-1 break-words text-[var(--brand-text)]'>2e915fd2-4695-e555-f802-87bbe2cbb750@legal.mateo.lab.tagroot.io</p>
+                        </div>
+                        <div>
+                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>KATEGORI</p>
+                          <p className='mt-1 break-words text-[var(--brand-text)]'>Carbon Offsets</p>
+                        </div>
+                        <div>
+                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>SYNLIGHET</p>
+                          <p className='mt-1 break-words text-[var(--brand-text)]'>Public</p>
+                        </div>
+                        <div>
+                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>UPPDATERAD</p>
+                          <p className='mt-1 break-words text-[var(--brand-text)]'>12/16/2024</p>
+                        </div>
+                      </div>
+                      <div className='space-y-5'>
+                        <div>
+                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>TOKEN ID</p>
+                          <p className='mt-1 break-words text-[var(--brand-text)]'>cc71e0cc-78de-4689-828c-aa9e404b1de5@edaler.mateo.lab.tagroot.io</p>
+                        </div>
+                        <div>
+                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>ÄGARE</p>
+                          <p className='mt-1 break-words text-[var(--brand-text)]'>2eeed87a-e8a8-9a4d-400b-c2f0538661b9@legal.mateo.lab.tagroot.io</p>
+                        </div>
+                        <div>
+                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>VALUTA</p>
+                          <p className='mt-1 break-words text-[var(--brand-text)]'>TST</p>
+                        </div>
+                        <div>
+                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>SKAPAD</p>
+                          <p className='mt-1 break-words text-[var(--brand-text)]'>12/16/2024 3:25:30 PM</p>
+                        </div>
+                        <div>
+                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>GILTIG TILL</p>
+                          <p className='mt-1 break-words text-[var(--brand-text)]'>12/16/2029</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <Image
-                  className='bg-gray-100 p-4 rounded-lg justify-right items-right'
-                  src={certificateImage}
-                  width={600}
-                  height={600}
-                  alt='certificate'/>
+                  <div className='bg-[var(--brand-background)] p-5 rounded-lg w-[50%] flex flex-col items-center'>
+                    <Image
+                    className='bg-gray-100 p-4 rounded-lg justify-right items-right'
+                    src={certificateImage}
+                    width={600}
+                    height={600}
+                    alt='certificate'/>
+                  </div>
                 </div>
                 <PdfButton/>
               </div>
