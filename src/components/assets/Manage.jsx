@@ -102,10 +102,10 @@ const Manage = () => {
                       <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-sky-100 to-slate-50 shadow-inner">
                         <Image 
                         src='/neuroAdminLogo.svg' 
-                        width={1200}
-                        height={1200}
+                        width={64}
+                        height={64}
+                        unoptimized
                         alt='neuroAdminLogo.svg' 
-                        
                         className="h-12 w-12 object-contain" />
                       </div>
                       <div>
