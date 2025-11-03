@@ -46,7 +46,7 @@ export async function POST(request) {
         const data = contentType?.includes('application/json')
             ? await response.json()
             : await response.text();
-
+        console.log(data)
         const nextRes = NextResponse.json(
             new ResponseModel(
                 response.ok ? 200 : response.status,

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import config from '@/config/config'
 import { FaQrcode } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
@@ -14,10 +14,18 @@ const QuickLogin = dynamic(() => import('@/components/quickLogin/QuickLogin'), {
 export default function LoginPage() {
   const [showQR, setShowQR] = useState(false)
   const router = useRouter()
-  async function checkLogin() {
+
+  const checkLogin = useCallback(async () => {
+    const dynamicHost =
+      typeof window !== 'undefined'
+        ? sessionStorage.getItem('AgentAPI.Host')
+        : null
     const res = await fetch('/api/accounts', {
       method: 'POST',
-      headers: { 'Content-type': 'application/json' },
+      headers: {
+        'Content-type': 'application/json',
+        ...(dynamicHost ? { 'x-agent-host': dynamicHost } : {}),
+      },
       credentials: 'include',
       body: '{}',
     })
@@ -27,7 +35,7 @@ export default function LoginPage() {
     } else {
       router.push('/landingpage')
     }
-  }
+  }, [router])
 
   return (
     <div className="relative min-h-screen font-grotesk overflow-hidden">
@@ -145,14 +153,13 @@ export default function LoginPage() {
                   />
                 </div>
 
-                  <button
-                    onClick={() => setShowQR(true)}
-                    className="flex items-center gap-4 bg-[var(--brand-primary)] hover:bg-opacity-80 text-white px-20 py-3 rounded-lg text-sm font-semibold shadow"
-                  >
-                    <FaQrcode className="text-xl" />
-                    Start Login
-                  </button>
-
+                <button
+                  onClick={() => setShowQR(true)}
+                  className="flex items-center gap-4 bg-[var(--brand-primary)] hover:bg-opacity-80 text-white px-20 py-3 rounded-lg text-sm font-semibold shadow"
+                >
+                  <FaQrcode className="text-xl" />
+                  Start Login
+                </button>
               </>
             )}
 

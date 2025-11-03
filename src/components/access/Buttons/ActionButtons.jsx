@@ -44,37 +44,19 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
       const changeState = await pendingAction(id, action)
 
       if (changeState.status === 200) {
-        const { title, message } = messageEmail(action)
-        let dynamicLink = 'https://kyc.neuro-tech.io/' // fallback
-
-        if (action === 'Approved') {
-          dynamicLink = `https://kyc.neuro-tech.io/user/`
-        } else if (action === 'Rejected') {
-          dynamicLink = `https://kyc.neuro-tech.io/`
-        } else if (action === 'Obsoleted') {
-          dynamicLink = `https://kyc.neuro-tech.io/`
-        } else if (action === 'Compromised') {
-          dynamicLink = `https://kyc.neuro-tech.io/`
-        }
-        const fullMessage = action === 'Rejected' && reason?.trim()
-          ? `${message}\n\nReason:\n${reason}`
-          : message
-
+        // Send only minimal info to backend; backend handles all email formatting
         const res = await fetch('/api/send-notification', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            to_email: user.properties.EMAIL,
-            name: user.properties.FIRST,
-            title,
-            message: fullMessage,
-            link: dynamicLink,
+            action,
+            user,
+            reason,
           }),
         })
-
         const result = await res.json()
         if (!result.success) {
-          console.error('❌ Failed to send email:', result.error)
+          console.error('❌ Failed to send email:', result.error, result.details)
         }
       }
 

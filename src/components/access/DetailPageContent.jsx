@@ -51,7 +51,7 @@ export default function DetailPageContent() {
                 ...data.data,
                 properties: {
                     ...data.data.properties,
-                    FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
+                    // FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
                 }
             })
   
@@ -88,7 +88,7 @@ export default function DetailPageContent() {
             ...data.data,
             properties: {
                 ...data.data.properties,
-                FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
+                // FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
             }
         })
   
@@ -146,14 +146,13 @@ export default function DetailPageContent() {
         { label: "Created", key: "created" }
       ];
 
-      const fieldsToShowIdentity = [
-        { label: "Full Name", key: "properties.FULLNAME" },
-        { label: "Nationality", key: "properties.COUNTRY" },
-        { label: "Address", key: "properties.ADDR" },
-        { label: "Personal number", key: "properties.PNR" },
-        { label: "Phone", key: "properties.PHONE" },
-        
-      ];
+      // Dynamic identity fields: show all user.properties keys
+      const fieldsToShowIdentity = user?.properties
+        ? Object.keys(user.properties).map(key => ({
+            label: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            key: `properties.${key}`,
+          }))
+        : [];
     
       const fieldsToShowWithNoID = [
         { label: "Account", key: "data.userName" },

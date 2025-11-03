@@ -11,11 +11,12 @@ import { ProfileEditModal } from './ProfileEditModal';
 
 export const Identity = ({
   user, id, getData, fieldsToShow,
- modalToggle, setModalToggle,
+  modalToggle, setModalToggle,
   fieldsToShowMetaData
 }) => {
   const [infoToggle, setIntoToggle] = useState(true);
   const [infoToggleMetaData, setIntoToggleMetaData] = useState(false);
+  const [previewAtt, setPreviewAtt] = useState(null);
 
   const adminActions = [
     { actionTitle: 'Rejected', bgColor: 'bg-neuroRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: 'Deny ID application' },
@@ -88,6 +89,55 @@ export const Identity = ({
                 <MapOutInput fieldsToShow={fieldsToShowMetaData} user={user} />
               }
             </section>
+
+            {user?.attachments?.length > 0 && (
+          <section className="bg-white border-2 rounded-xl shadow-sm p-4 mt-4">
+            <h2 className="text-lg font-semibold mb-2">Attachments</h2>
+            <div className="flex flex-wrap gap-4">
+              {user.attachments.map((att, idx) => (
+                <div key={idx} className="flex flex-col items-center">
+                  {att.data && att.data.startsWith('/9j/') ? (
+                    <button
+                      type="button"
+                      onClick={() => setPreviewAtt(att)}
+                      className="focus:outline-none"
+                    >
+                      <img
+                        src={`data:image/jpeg;base64,${att.data}`}
+                        alt={att.fileName || `Attachment ${idx+1}`}
+                        className="w-32 h-32 rounded-lg object-cover border hover:ring-2 hover:ring-neuroPurpleDark"
+                      />
+                    </button>
+                  ) : (
+                    <a
+                      href={`data:application/octet-stream;base64,${att.data}`}
+                      download={att.fileName || `Attachment_${idx+1}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline"
+                    >
+                      {att.fileName || `Attachment ${idx+1}`}
+                    </a>
+                  )}
+                  <div className="text-xs text-gray-500 mt-1">{att.fileName}</div>
+                </div>
+              ))}
+            </div>
+            {previewAtt && (
+              <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center" onClick={() => setPreviewAtt(null)}>
+                <div className="bg-white rounded-lg shadow-lg p-4 max-w-2xl max-h-[90vh] flex flex-col items-center" onClick={e => e.stopPropagation()}>
+                  <img
+                    src={`data:image/jpeg;base64,${previewAtt.data}`}
+                    alt={previewAtt.fileName}
+                    className="max-w-full max-h-[80vh] rounded"
+                  />
+                  <div className="mt-2 text-sm text-gray-700">{previewAtt.fileName}</div>
+                  <button className="mt-4 px-4 py-2 bg-neuroPurpleDark text-white rounded" onClick={() => setPreviewAtt(null)}>Close</button>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
 
             <footer className="">
               {id ? (
