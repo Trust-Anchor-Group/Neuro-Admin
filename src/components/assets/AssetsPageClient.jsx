@@ -1,13 +1,28 @@
 "use client";
-import React, { Suspense, useMemo } from "react";
+
+import React, { Suspense, useMemo, useEffect, useState } from "react";
 import { useLanguage, content } from "../../../context/LanguageContext";
 import DigitalAssetsTable from "@/components/assets/DigitalAssetsTable";
 import { Award, Activity, Users, Timer } from "lucide-react";
+import { fetchOrders } from "@/lib/fetchOrders";
 
-// Accepts the raw ordersData from server wrapper.
-export default function AssetsPageClient({ ordersData }) {
+export default function AssetsPageClient() {
   const { language } = useLanguage();
   const t = content[language]?.Clients;
+  const [ordersData, setOrdersData] = useState({ loading: true, orders: [] });
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await fetchOrders();
+        if (mounted) setOrdersData(data);
+      } catch (e) {
+        if (mounted) setOrdersData({ loading: false, orders: [] });
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const assets = useMemo(() => {
     return (ordersData?.orders || []).map((o) => ({
