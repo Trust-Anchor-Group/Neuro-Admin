@@ -5,7 +5,7 @@ export async function fetchOrders() {
     if (typeof window === 'undefined') {
       try {
         const mod = await import('next/headers');
-        const serverCookies = mod.cookies();
+        const serverCookies = await mod.cookies();
         cookieHeader = serverCookies.getAll().map(c => `${c.name}=${c.value}`).join('; ');
       } catch (e) {
         // ignore if not available
