@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Mail, Phone } from "lucide-react";
 
 const pricingAgreements = [
   { title: 'Carbon capture EU (Q2 2025)', date: 'Apr 15, 2025', price: '250,000 SEK', status: 'Active' },
@@ -44,7 +45,7 @@ const Overview = () => {
       }}
     >
       {/* Header Section */}
-      <div className="relative mb-6">
+      <div className="relative mb-12">
         <div className="flex items-center gap-7 pt-2">
           <span className="inline-flex items-center justify-center rounded-full bg-white  border border-[var(--brand-border)] w-24 h-24 p-2 shadow absolute left-0 top-2" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)', zIndex: 2 }}>
             C
@@ -240,10 +241,10 @@ const Overview = () => {
               {idx < 3 && (
                 <>
                   <div className="border-b mb-3 pb-3 border-[var(--brand-border)] flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
-                    <span role="img" aria-label="email">📧</span> {c.email}
+                    <Mail className="text-[var(--brand-text)]" /> {c.email}
                   </div>
                   <div className="flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
-                    <span role="img" aria-label="phone">📞</span> {c.phone}
+                    <Phone className="text-[var(--brand-text)]" /> {c.phone}
                   </div>
                 </>
               )}
