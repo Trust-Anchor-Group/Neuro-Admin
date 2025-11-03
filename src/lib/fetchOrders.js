@@ -14,7 +14,7 @@ export async function fetchOrders() {
       cookieHeader = document.cookie || '';
     }
 
-    const url = `${process.env.NEXT_PUBLIC_PROTOCOL}://${process.env.NEXT_PUBLIC_ORIGIN}/api/tokens`;
+  const url = "/api/tokens";
 
     const response = await fetch(url, {
       method: "POST",
