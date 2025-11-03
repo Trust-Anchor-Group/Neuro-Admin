@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useLanguage, content as i18nContent } from "../../../context/LanguageContext";
 import Image from "next/image";
-import logo from "@/app/(dashboard)/neuro-assets/neuroAdminLogo.svg";
 
 const baseDetails = {
   clientType: "Organization",
@@ -101,7 +100,13 @@ const Manage = () => {
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-4">
                       <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-sky-100 to-slate-50 shadow-inner">
-                        <Image src={logo} alt="Client logo" className="h-12 w-12 object-contain" />
+                        <Image 
+                        src='/neuroAdminLogo.svg' 
+                        width={1200}
+                        height={1200}
+                        alt='neuroAdminLogo.svg' 
+                        
+                        className="h-12 w-12 object-contain" />
                       </div>
                       <div>
                         <span
