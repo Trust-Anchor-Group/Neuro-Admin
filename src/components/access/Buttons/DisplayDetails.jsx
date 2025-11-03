@@ -57,17 +57,10 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
                 <div className='flex gap-10'>
                   <Image
                     className='w-[100px] h-[100px]'
-                    src={typeof header.image === 'string' ? (header.image.startsWith('/') ? header.image : `/${header.image}`) : '/neuroAdminLogo.svg'}
+                    src='/neuroAdminLogo.svg'
                     width={1200}
                     height={1200}
-                    alt='Neuro Admin Logo'
-                    onError={(e) => {
-                      // Fallback if image fails in production
-                      const target = e.currentTarget;
-                      if (target.src.endsWith('neuroAdminLogo.svg')) return; // already fallback
-                      target.src = '/neuroAdminLogo.svg';
-                    }}
-                  />
+                    alt='neuroAdminLogo.svg'/>
                   <div className=''>
                     <h1 className=' text-2xl font-semibold' >{header.title}</h1>
                     <p className='text16 text-[var(--brand-text)]'>{header.created}</p>
