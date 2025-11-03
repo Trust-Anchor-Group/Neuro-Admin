@@ -44,7 +44,7 @@ export default function Footer() {
         <hr className="my-3" />
 
         <div className="flex justify-center mt-2">
-          <Image src="/neuroAdminLogo.svg" alt="logo" width={32} height={32} />
+          <Image src="/neuroAdminLogo.svg" alt="logo" width={32} height={32} unoptimized />
         </div>
       </div>
     </footer>

@@ -58,8 +58,9 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
                   <Image
                     className='w-[100px] h-[100px]'
                     src='/neuroAdminLogo.svg'
-                    width={1200}
-                    height={1200}
+                    width={120}
+                    height={120}
+                    unoptimized
                     alt='neuroAdminLogo.svg'/>
                   <div className=''>
                     <h1 className=' text-2xl font-semibold' >{header.title}</h1>
