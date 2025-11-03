@@ -20,11 +20,11 @@ export default function NeuroAssetsLayout({ children }) {
         { label: tAssetMenu?.clients || "Clients", href: "/neuro-assets/clients" },
       ],
     },
-    {
-      title: tMenu?.accessSettings || "Access settings",
-      icon: <FaCog size={20} />,
-      href: "/neuro-access/settings",
-    },
+    // {
+    //   title: tMenu?.accessSettings || "Access settings",
+    //   icon: <FaCog size={20} />,
+    //   href: "/neuro-access/settings",
+    // },
   ];
 
   return (
