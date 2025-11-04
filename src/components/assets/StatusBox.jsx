@@ -1,6 +1,7 @@
 import React from 'react'
+import { useLanguage, content } from '../../../context/LanguageContext'
 
-export const StatusBox = ({statusCard}) => {
+export const StatusBox = ({ statusCard }) => {
   // Status color mapping
   const statusStyles = {
     'Paused': {
@@ -29,7 +30,11 @@ export const StatusBox = ({statusCard}) => {
       cardText: '#6B7280', // gray-500
     },
   };
+  const { language } = useLanguage();
+  const t = content[language];
   const currentStyle = statusStyles[statusCard.status] || statusStyles['Not started'];
+  const statusLabel = t?.assetOrderDetail?.statusBox?.status || 'Status';
+  const completeLabel = t?.assetOrderDetail?.statusBox?.complete || 'complete';
   return (
     <div
       className="shadow-sm rounded-xl border p-4 w-full max-w-sm"
@@ -44,7 +49,7 @@ export const StatusBox = ({statusCard}) => {
         className="flex items-center justify-between pb-3 border-b mb-2"
         style={{ borderColor: 'var(--brand-border)' }}
       >
-        <h2 className="text-xl font-bold" style={{ color: 'var(--brand-text)' }}>Status</h2>
+  <h2 className="text-xl font-bold" style={{ color: 'var(--brand-text)' }}>{statusLabel}</h2>
         <span
           className="text-xs font-bold px-2 py-1 rounded-md"
           style={{
@@ -58,7 +63,7 @@ export const StatusBox = ({statusCard}) => {
       <div className="flex items-center justify-between mb-2">
         <span className="text-2xl font-bold" style={{ color: 'var(--brand-text)' }}>
           {statusCard.progress}%
-          <span className="text-sm font-bold ml-2" style={{ color: 'var(--brand-text-secondary)' }}>complete</span>
+          <span className="text-sm font-bold ml-2" style={{ color: 'var(--brand-text-secondary)' }}>{completeLabel}</span>
         </span>
         <span className="font-semibold text-sm" style={{ color: 'var(--brand-text-secondary)' }}>
           {statusCard.amount}

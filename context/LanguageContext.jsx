@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { content } from '../translations';
 export { content };
 
@@ -17,7 +17,23 @@ function getDefaultLanguage() {
 export const LanguageContext = createContext(null);
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(getDefaultLanguage);
+  // Initialize from localStorage if available to preserve selection across full reloads
+  const [language, setLanguage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = window.localStorage.getItem('language');
+      if (stored) return stored;
+    }
+    return getDefaultLanguage();
+  });
+
+  // Persist changes
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('language', language);
+      }
+    } catch {/* ignore persistence errors */}
+  }, [language]);
 
   const toggleLanguage = () =>
     setLanguage((prev) => {

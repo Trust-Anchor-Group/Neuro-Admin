@@ -73,7 +73,7 @@ export default function KYCSettings() {
         dismissTimerRef.current = null;
       }
     };
-  }, [t]);
+  }, []);
 
   // auto-dismiss message after 2s
   useEffect(() => {
@@ -199,7 +199,7 @@ export default function KYCSettings() {
 												idx % 2 === 0 ? "border-r border-[var(--brand-border)]" : ""
 											}`}
 										>
-											<Checkbox label={t?.labels?.[field.id] || field.label} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
+											<Checkbox label={t?.labels?.[field.id] || field.id} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
 										</div>
 									))}
 								</div>

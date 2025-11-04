@@ -1,4 +1,5 @@
 import React from "react";
+import { useLanguage, content } from '../../../context/LanguageContext';
 import {
   AlertCircle,
   BadgeEuro,
@@ -7,13 +8,13 @@ import {
   Search,
 } from "lucide-react";
 
+// Status snapshot uses translation keys (state key maps to t.processPage.status.states)
 const statusSnapshot = {
-  label: "Status",
-  state: "In progress",
+  state: 'inProgress',
   completion: 75,
-  volume: "47 tons",
-  nextMilestone: "Next milestone: Site verification on Aug 22",
-  lastUpdated: "Updated 12 hours ago",
+  volume: 47,
+  nextMilestoneNote: 'Site verification on Aug 22',
+  lastUpdatedHours: 12,
 };
 
 const compensationTotal = [
@@ -37,10 +38,10 @@ const compensationRelative = [
 ];
 
 const compensationSeries = {
-    total: {
-    key: "total",
-    label: "Total",
-    description: "Tracking compensated volume over time",
+  total: {
+    key: 'total',
+    label: 'total',
+    descriptionKey: 'descriptionTotal',
       maxValue: 100,
       points: compensationTotal,
       yTicks: [25, 50, 75],
@@ -51,12 +52,12 @@ const compensationSeries = {
       { value: 19, label: "19 tons" },
       { value: 0, label: "0 tons" },
       ],
-    bottomLabel: (point) => `${point.value} tons`,
-    },
-    relative: {
-    key: "relative",
-    label: "Relative",
-    description: "Comparing each phase share of the total order",
+    bottomLabel: (point, tonsLabel) => `${point.value} ${tonsLabel}`,
+  },
+  relative: {
+    key: 'relative',
+    label: 'relative',
+    descriptionKey: 'descriptionRelative',
       maxValue: 25,
       points: compensationRelative,
       yTicks: [5, 10, 15, 20],
@@ -67,48 +68,51 @@ const compensationSeries = {
       { value: 8, label: "8 tons" },
       { value: 0, label: "0 tons" },
       ],
-      bottomLabel: (point) => point.bottomLabel,
-    },
-  };
+    bottomLabel: (point) => point.bottomLabel,
+  },
+};
 
 const summaryHighlights = [
-  { label: "Total value", value: "173 TEUR", Icon: BadgeEuro },
-  { label: "Total compensation", value: "47 tons", Icon: Leaf },
-  ];
+  { labelKey: 'totalValue', value: '173 TEUR', Icon: BadgeEuro },
+  { labelKey: 'totalCompensation', value: '47 tons', Icon: Leaf },
+];
 
 const Process = () => {
-  // Button state logic
-  const status = statusSnapshot.state;
-  const isActive = status === 'In progress' || status === 'Paused' || status === 'Not started';
+  const { language } = useLanguage();
+  const t = content[language];
+  const tonsLabel = t?.processPage?.units?.tons || 'tons';
+  const statusLabel = t?.processPage?.status?.label || 'Status';
+  const statusTranslated = t?.processPage?.status?.states?.[statusSnapshot.state] || statusSnapshot.state;
+  const isActive = ['inProgress', 'paused', 'notStarted'].includes(statusSnapshot.state);
   // Status color mapping (copied from StatusBox)
   const statusStyles = {
-    'Paused': {
+    paused: {
       bar: 'bg-gradient-to-r from-orange-400 to-orange-500',
       cardBg: '#FEF3C7', // orange-100
       cardText: '#F59E42', // orange-500
     },
-    'Aborted': {
+    aborted: {
       bar: 'bg-gradient-to-r from-red-500 to-red-600',
       cardBg: '#FEE2E2', // red-100
       cardText: '#EF4444', // red-500
     },
-    'Complete': {
+    complete: {
       bar: 'bg-gradient-to-r from-green-500 to-green-600',
       cardBg: '#DCFCE7', // green-100
       cardText: '#22C55E', // green-500
     },
-    'In progress': {
+    inProgress: {
       bar: 'bg-gradient-to-r from-purple-500 to-purple-600',
       cardBg: 'rgba(143, 64, 212, 0.15)',
       cardText: '#9333EA', // purple-700
     },
-    'Not started': {
+    notStarted: {
       bar: 'bg-gradient-to-r from-gray-400 to-gray-500',
       cardBg: '#F3F4F6', // gray-100
       cardText: '#6B7280', // gray-500
     },
   };
-  const currentStyle = statusStyles[statusSnapshot.state] || statusStyles['Not started'];
+  const currentStyle = statusStyles[statusSnapshot.state] || statusStyles.notStarted;
   const [progressView, setProgressView] = React.useState("total");
 
   const progressBarWidth = Math.min(Math.max(statusSnapshot.completion, 0), 100);
@@ -167,7 +171,7 @@ const Process = () => {
             <header className="mb-6 border-b pb-3 flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-[var(--brand-text)]">
-                  {statusSnapshot.label}
+                  {statusLabel}
                 </h2>
                 
                 
@@ -176,7 +180,7 @@ const Process = () => {
                 className="inline-flex items-center rounded-md px-3 py-1 text-sm font-semibold"
                 style={{ background: currentStyle.cardBg, color: currentStyle.cardText }}
               >
-                {statusSnapshot.state}
+                {statusTranslated}
               </span>
             </header>
 
@@ -184,10 +188,10 @@ const Process = () => {
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <p className="mt-3 text-3xl font-semibold text-[var(--brand-text)]">
-                  {statusSnapshot.completion}% complete
+                  {statusSnapshot.completion}{t?.processPage?.misc?.completeSuffix ? ` ${t.processPage.misc.completeSuffix}` : '% complete'}
                 </p>
                   <div className="px-5 text-2xl font-semibold ">
-                {statusSnapshot.volume}
+                {`${statusSnapshot.volume} ${tonsLabel}`}
               </div>
                 </div>
                 
@@ -208,7 +212,7 @@ const Process = () => {
                 disabled={!isActive}
               >
                 <AlertCircle className="h-4 w-4" />
-                Terminate process
+                {t?.processPage?.status?.terminate || t?.processPage?.actions?.terminate || 'Terminate process'}
               </button>
             </div>
           </div>
@@ -217,10 +221,10 @@ const Process = () => {
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold text-[var(--brand-text)]">
-                  Compensation progress
+                  {t?.processPage?.progress?.title || 'Compensation progress'}
                 </h2>
                 <p className="text-sm text-[var(--brand-text-secondary)]">
-                  {selectedSeries.description}
+                  {t?.processPage?.progress?.[selectedSeries.descriptionKey] || selectedSeries.descriptionKey}
                 </p>
               </div>
               <div className="inline-flex rounded-full bg-[var(--brand-background)] p-1 text-xs font-medium">
@@ -233,7 +237,7 @@ const Process = () => {
                       : "text-[var(--brand-text-secondary)] hover:text-[var(--brand-text)]"
                   }`}
                 >
-                  Relative
+                  {t?.processPage?.progress?.relative || 'Relative'}
                 </button>
                 <button
                   type="button"
@@ -244,7 +248,7 @@ const Process = () => {
                       : "text-[var(--brand-text-secondary)] hover:text-[var(--brand-text)]"
                   }`}
                 >
-                  Total
+                  {t?.processPage?.progress?.total || 'Total'}
                 </button>
               </div>
             </div>
@@ -271,7 +275,7 @@ const Process = () => {
                     fill="var(--brand-text-secondary)"
                     fontSize="12"
                   >
-                    No data available
+                    {t?.processPage?.progress?.noData || 'No data available'}
                   </text>
                 )}
 
@@ -343,7 +347,7 @@ const Process = () => {
                 {chartPoints.map((point) => (
                   <div key={point.label} className="flex flex-col">
                     <span className="text-sm font-semibold text-[var(--brand-text)]">
-                      {selectedSeries.bottomLabel(point)}
+                      {selectedSeries.key === 'total' ? compensationSeries.total.bottomLabel(point, tonsLabel) : selectedSeries.bottomLabel(point)}
                     </span>
                     <span>{point.label}</span>
                   </div>
@@ -360,7 +364,7 @@ const Process = () => {
               >
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-[var(--brand-text-secondary)]">
-                    {item.label}
+                    {t?.processPage?.summary?.[item.labelKey] || item.labelKey}
                   </p>
                   <p className="mt-2 text-2xl font-semibold text-[var(--brand-text)]">
                     {item.value}
@@ -376,7 +380,7 @@ const Process = () => {
 
         <aside className="rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-[var(--brand-text)]">
-                Process activity
+                {t?.processPage?.activity?.title || 'Process activity'}
               </h2>
 
           <div className="mt-6 flex flex-row gap-4">
@@ -384,7 +388,7 @@ const Process = () => {
               <Search className="absolute left-3 h-4 w-4 text-[var(--brand-text-secondary)]" />
               <input
                 type="search"
-                placeholder="Search updates"
+                placeholder={t?.processPage?.activity?.searchPlaceholder || 'Search updates'}
                 className="w-full rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-background)] py-2 pl-9 pr-3 text-sm text-[var(--brand-text)] outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-300"
               />
             </label>
@@ -392,14 +396,14 @@ const Process = () => {
               type="button"
               className="inline-flex items-center justify-between gap-2 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)]"
             >
-              <span>All</span>
+              <span>{t?.processPage?.activity?.filterAll || 'All'}</span>
               <ChevronDown className="h-4 w-4 text-[var(--brand-text-secondary)]" />
             </button>
           </div>
 
           <div className="mt-10 flex h-64 flex-col items-center justify-center rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-background)] text-center">
             <p className="text-xl font-medium text-[var(--brand-text-secondary)]">
-              Coming soon
+              {t?.processPage?.activity?.comingSoon || 'Coming soon'}
             </p>
           </div>
         </aside>

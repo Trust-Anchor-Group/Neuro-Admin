@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { applyBrandTheme, getInitialMode, toggleMode } from '../../utils/brandTheme';
@@ -80,6 +81,10 @@ const Menu = ({ menuItems }) => {
   if (!isClient) return null;
 
   const { logo, name, subtitle, themeClass } = getBrandConfig(host);
+  const pathname = usePathname();
+  const dynamicSubtitle = (pathname && pathname.toLowerCase().includes('asset'))
+    ? (t?.AssetMenu?.title || 'Assets')
+    : (t?.menu?.access || subtitle || 'Access');
 
   return (
     <aside
@@ -116,7 +121,7 @@ const Menu = ({ menuItems }) => {
             <div className="w-full px-2 mt-4 mb-4">
               <div className="bg-[var(--brand-third)] p-2 rounded-lg text-sm text-center text-brand-on">
                 <strong className="block">{name}</strong>
-                <span className="text-xs block opacity-80">{subtitle}</span>
+                <span className="text-xs block opacity-80">{dynamicSubtitle}</span>
               </div>
               {/* Theme toggle moved to Navbar */}
             </div>

@@ -131,25 +131,29 @@ const Overview = () => {
       {/* Action Buttons */}
       <div className="flex gap-4 justify-end">
         <button
-          className="bg-purple-100 text-purple-700 px-5 py-2 rounded-xl font-semibold hover:bg-purple-200 shadow-sm"
+          className="bg-aprovedPurple/15 text-neuroPurpleDark hover:bg-aprovedPurple/30 w-[30%] px-5 py-2 rounded-xl font-semibold shadow-sm"
           onClick={() => setShowModal(true)}
         >
           {t?.clientOverview?.editInformation || 'Edit Information'}
         </button>
-        <button className="bg-purple-100 text-purple-700 px-5 py-2 rounded-xl font-semibold hover:bg-purple-200 shadow-sm">
+        <button className="bg-aprovedPurple/15 text-neuroPurpleDark hover:bg-aprovedPurple/30 w-[30%] px-5 py-2 rounded-xl font-semibold shadow-sm">
           {t?.clientOverview?.manageClientId || 'Manage Client ID'}
         </button>
       </div>
     </div>
         {/* Pricing Agreements Section */}     
         <div className="bg-[var(--brand-navbar)] rounded-lg shadow-md p-5 border border-[var(--brand-border)]">
-          <div className="font-semibold text-xl mb-3 text-[var(--brand-text)]">Pricing agreements</div>  
+          <div className="font-semibold text-xl mb-3 text-[var(--brand-text)]">{t?.pricingAgreementsSection?.title || 'Pricing agreements'}</div>
             <div className="flex justify-between items-center mb-4">
-              <input type="text" placeholder="Search agreements..." className="border border-[var(--brand-border)] rounded-xl px-3 py-2 text-sm w-1/2 bg-[var(--brand-navbar)] text-[var(--brand-text)]" />
+              <input
+                type="text"
+                placeholder={t?.pricingAgreementsSection?.searchPlaceholder || 'Search agreements...'}
+                className="border border-[var(--brand-border)] rounded-xl px-3 py-2 text-sm w-1/2 bg-[var(--brand-navbar)] text-[var(--brand-text)]"
+              />
               <select className="border border-[var(--brand-border)] rounded-xl px-3 py-2 text-sm bg-[var(--brand-navbar)] text-[var(--brand-text)]">
-                <option>All</option>
-                <option>Active</option>
-                <option>Expired</option>
+                <option value="all">{t?.pricingAgreementsSection?.filterAll || 'All'}</option>
+                <option value="active">{t?.pricingAgreementsSection?.filterActive || 'Active'}</option>
+                <option value="expired">{t?.pricingAgreementsSection?.filterExpired || 'Expired'}</option>
               </select>
             </div>
             <div className="space-y-2">
@@ -165,16 +169,16 @@ const Overview = () => {
                       <div className="font-semibold text-[var(--brand-text)]">{agreement.title}</div>
                       <div className="text-xs text-[var(--brand-text-secondary)]">{agreement.date} • {agreement.price}</div>
                     </div>
-                    <span className="bg-green-100 text-green-700 rounded-full px-3 py-1 text-sm font-medium border border-[var(--brand-border)]">{agreement.status}</span>
+                    <span className="bg-green-100 text-green-700 rounded-full px-3 py-1 text-sm font-medium border border-[var(--brand-border)]">{t?.pricingAgreementsSection?.['status' + agreement.status] || agreement.status}</span>
                   </div>
                 ))}
             </div>
             <div className="flex justify-end mt-8 border-t pt-4 border-[var(--brand-border)]">
               <button
-                className="bg-purple-100 text-purple-700 px-5 py-2 rounded-xl font-medium"
+                className="bg-aprovedPurple/15 text-neuroPurpleDark hover:bg-aprovedPurple/30 w-[40%] px-5 py-2 rounded-xl font-medium"
                 onClick={() => setCreateAgreementModal(true)}
               >
-                Create New Agreement
+                {t?.pricingAgreementsSection?.createNewButton || 'Create New Agreement'}
               </button>
             </div>
         {/* Modal Popup for Create Agreement */}
@@ -206,17 +210,17 @@ const Overview = () => {
       <div className="col-start-4 col-end-5 flex flex-col gap-5">
         {/* Purchases Card */}
         <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-lg p-5 mb-2 w-full">
-          <div className="font-bold text-l mb-2 text-[var(--brand-text-secondary)]">Total purchases</div>
+          <div className="text-l mb-2 text-[var(--brand-text-secondary)]">{t?.clientOverview?.totalPurchases || 'Total purchases'}</div>
           <div className="text-3xl font-bold text-[var(--brand-text)]">0.8 MSEK</div>
         </div>
         {/* Compensation Card */}
         <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-lg p-5 mb-2 w-full">
-          <div className="font-bold text-l mb-2 text-[var(--brand-text-secondary)]">Total compensation</div>
+          <div className="text-l mb-2 text-[var(--brand-text-secondary)]">{t?.clientOverview?.totalCompensation || 'Total compensation'}</div>
           <div className="text-3xl font-bold text-[var(--brand-text)]">125 tons</div>
         </div>
         {/* Contacts Card */}
         <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-lg p-5 w-full">
-          <div className="font-bold text-xl mb-3 text-[var(--brand-text)]">Contacts</div>
+          <div className="font-bold text-xl mb-3 text-[var(--brand-text)]">{t?.clientOverview?.contacts || 'Contacts'}</div>
           {contacts.map((c, idx) => (
             <div
               key={idx}
@@ -256,9 +260,9 @@ const Overview = () => {
             onClick={e => e.stopPropagation()}
           >
             <header className="flex justify-between items-center bg-[var(--brand-navbar)] border-b border-[var(--brand-border)] pb-3 mb-4 rounded-t-lg">
-              <h2 className="text-xl font-semibold text-[var(--brand-text-color)]">Edit Client Information</h2>
+              <h2 className="text-xl font-semibold text-[var(--brand-text-color)]">{t?.clientEditModal?.title || 'Edit Client Information'}</h2>
             </header>
-            <span className="text-[var(--brand-text-color)] font-semibold text-md">Client icon</span>
+            <span className="text-[var(--brand-text-color)] font-semibold text-md">{t?.clientEditModal?.clientIcon || 'Client icon'}</span>
             {/* Icons row */}
             <div className="flex flex-row gap-6 mb-4 items-center justify-center">
               
@@ -275,22 +279,22 @@ const Overview = () => {
                 </div>
             <div className="flex flex-col gap-2 mt-1 mb-1"> 
                 <div className="rounded-lg p-2 mb-1 bg-[var(--brand-background)]">
-                  <span className="block text-xs border-b border-[var(--brand-border)] text-[var(--brand-text-secondary)] mb-1">Light mode</span>
+                  <span className="block text-xs border-b border-[var(--brand-border)] text-[var(--brand-text-secondary)] mb-1">{t?.clientEditModal?.lightMode || 'Light mode'}</span>
                   <div className="flex flex-row justify-between items-center w-full">
-                    <div className="w-36 h-6 text-[var(--brand-text-secondary)] text-sm flex items-center justify-start">PNG Light</div>
+                    <div className="w-36 h-6 text-[var(--brand-text-secondary)] text-sm flex items-center justify-start">{t?.clientEditModal?.pngLight || 'PNG Light'}</div>
                     <div className="flex flex-row items-center">
-                      <button className="text-sm text-red-500 underline" onClick={() => setClientIcon('')}>Remove</button>
-                      <button className="text-sm text-blue-500 ml-3 underline" onClick={() => setClientIcon(prompt('Enter new icon (emoji):', clientIcon) || clientIcon)}>Change</button>
+                      <button className="text-sm text-red-500 underline" onClick={() => setClientIcon('')}>{t?.clientEditModal?.remove || 'Remove'}</button>
+                      <button className="text-sm text-blue-500 ml-3 underline" onClick={() => setClientIcon(prompt('Enter new icon (emoji):', clientIcon) || clientIcon)}>{t?.clientEditModal?.change || 'Change'}</button>
                     </div>
                   </div>
                 </div>
                 <div className="rounded-lg p-2  bg-[var(--brand-background)]">
-                  <span className="block border-b border-[var(--brand-border)] text-xs text-[var(--brand-text-secondary)] mb-1">Dark mode</span>
+                  <span className="block border-b border-[var(--brand-border)] text-xs text-[var(--brand-text-secondary)] mb-1">{t?.clientEditModal?.darkMode || 'Dark mode'}</span>
                   <div className="flex flex-row justify-between items-center w-full">
-                    <div className="w-36 h-6 text-[var(--brand-text-secondary)] text-sm flex items-center justify-start">PNG Dark</div>
+                    <div className="w-36 h-6 text-[var(--brand-text-secondary)] text-sm flex items-center justify-start">{t?.clientEditModal?.pngDark || 'PNG Dark'}</div>
                     <div className="flex flex-row items-center">
-                      <button className="text-sm text-red-500 underline" onClick={() => setClientIconDark('')}>Remove</button>
-                      <button className="text-sm text-blue-500 ml-3 underline" onClick={() => setClientIconDark(prompt('Enter new dark mode icon (emoji):', clientIconDark) || clientIconDark)}>Change</button>
+                      <button className="text-sm text-red-500 underline" onClick={() => setClientIconDark('')}>{t?.clientEditModal?.remove || 'Remove'}</button>
+                      <button className="text-sm text-blue-500 ml-3 underline" onClick={() => setClientIconDark(prompt('Enter new dark mode icon (emoji):', clientIconDark) || clientIconDark)}>{t?.clientEditModal?.change || 'Change'}</button>
                     </div>
                   </div>
                 </div>
@@ -298,34 +302,34 @@ const Overview = () => {
             </div>
             <div className="border-b border-[var(--brand-border)]">
               <div className="mb-3">
-                <label className="block text-sm font-small mb-1 text-[var(--brand-text-secondary)]">Client Name</label>
+                <label className="block text-sm font-small mb-1 text-[var(--brand-text-secondary)]">{t?.clientEditModal?.clientName || 'Client Name'}</label>
                 <input type="text" className="w-full border border-[var(--brand-border)] rounded-lg px-3 py-2 bg-[var(--brand-background)] text-[var(--brand-text)]" value={clientName} onChange={e => setClientName(e.target.value)} />
               </div>
               <div className="mb-3">
-                <label className="block text-sm font-small mb-1 text-[var(--brand-text-secondary)]">Industry</label>
+                <label className="block text-sm font-small mb-1 text-[var(--brand-text-secondary)]">{t?.clientEditModal?.industry || 'Industry'}</label>
                 <input type="text" className="w-full border border-[var(--brand-border)] rounded-lg px-3 py-2 bg-[var(--brand-background)] text-[var(--brand-text)]" value={industry} onChange={e => setIndustry(e.target.value)} />
               </div>
               <div className="mb-3">
-                <label className="block text-sm font-small mb-1 text-[var(--brand-text-secondary)]">Reg. Number</label>
+                <label className="block text-sm font-small mb-1 text-[var(--brand-text-secondary)]">{t?.clientEditModal?.regNumber || 'Reg. Number'}</label>
                 <input type="text" className="w-full border border-[var(--brand-border)] rounded-lg px-3 py-2 bg-[var(--brand-background)] text-[var(--brand-text)]" value={regNumber} onChange={e => setRegNumber(e.target.value)} />
               </div>
               <div className="mb-3">
-                <label className="block text-sm font-small mb-1 text-[var(--brand-text-secondary)]">Address</label>
+                <label className="block text-sm font-small mb-1 text-[var(--brand-text-secondary)]">{t?.clientEditModal?.address || 'Address'}</label>
                 <input type="text" className="w-full border border-[var(--brand-border)] rounded-lg px-3 py-2 bg-[var(--brand-background)] text-[var(--brand-text)]" value={address} onChange={e => setAddress(e.target.value)} />
               </div>
             </div>
             <div className="flex gap-4 mt-6 justify-end">
               <button
-                className="bg-red-100 text-red-700 w-[50%] px-4 py-2 rounded-xl font-medium hover:bg-red-200"
+                className="bg-obsoletedRed/20 text-obsoletedRed hover:bg-obsoletedRed/50 w-[50%] px-4 py-2 rounded-xl font-medium"
                 onClick={() => setShowModal(false)}
               >
-                Cancel
+                {t?.clientEditModal?.cancel || 'Cancel'}
               </button>
               <button
-                className="bg-purple-100 text-purple-700 w-[50%] px-4 py-2 rounded-xl font-medium hover:bg-purple-200"
+                className="bg-aprovedPurple/15 text-neuroPurpleDark hover:bg-aprovedPurple/30 w-[50%] px-4 py-2 rounded-xl font-medium"
                 onClick={() => setShowModal(false)}
               >
-                Save Changes
+                {t?.clientEditModal?.saveChanges || 'Save Changes'}
               </button>
             </div>
             {/* ...existing modal content... */}
@@ -351,50 +355,50 @@ const Overview = () => {
                 <h2 className="text-xl font-semibold text-[var(--brand-text-color)]">{agreementModal.agreement?.title}</h2>
               </header> 
               <div className="mb-5">
-                <span className="font-medium text-[var(--brand-text-secondary)]">Price agreement proposal</span>
+                <span className="font-medium text-[var(--brand-text-secondary)]">{t?.agreementDetailModal?.priceAgreementProposal || 'Price agreement proposal'}</span>
               </div>
               <div className="mb-4 pl-4 pr-4">
                 <div className="mb-3 border-b border-[var(--brand-border)]">
-                  <span className="font-small text-sm text-[var(--brand-text)]">Pricing agreement terms</span>
+                  <span className="font-small text-sm text-[var(--brand-text)]">{t?.agreementDetailModal?.pricingAgreementTerms || 'Pricing agreement terms'}</span>
                 </div>
                 <div className="flex justify-between border-b border-[var(--brand-border)] mb-3">
-                  <span className="font-medium text-[var(--brand-text-secondary)] mb-3">Buyer:</span>
+                  <span className="font-medium text-[var(--brand-text-secondary)] mb-3">{t?.agreementDetailModal?.buyerLabel || 'Buyer:'}</span>
                     <span className="text-[var(--brand-text)]">EcoTech Solutions</span>
                 </div>
                 <div className="flex justify-between border-b border-[var(--brand-border)] mb-3">
-                  <span className="font-medium text-[var(--brand-text-secondary)] mb-3">Seller:</span>
+                  <span className="font-medium text-[var(--brand-text-secondary)] mb-3">{t?.agreementDetailModal?.sellerLabel || 'Seller:'}</span>
                     <span className="text-[var(--brand-text)]">Trust Anchor Group</span>
                 </div>
                 <div className="flex justify-between border-b border-[var(--brand-border)] mb-3">
-                  <span className="font-medium text-[var(--brand-text-secondary)] mb-3">Price (per ton):</span>
+                  <span className="font-medium text-[var(--brand-text-secondary)] mb-3">{t?.agreementDetailModal?.pricePerTonLabel || 'Price (per ton):'}</span>
                     <span className="text-[var(--brand-text)]">{agreementModal.agreement?.price || '-'}</span>
                 </div>
                 <div className="flex justify-between mb-3">
-                  <span className="font-medium text-[var(--brand-text-secondary)] mb-3">Expiry date:</span>
+                  <span className="font-medium text-[var(--brand-text-secondary)] mb-3">{t?.agreementDetailModal?.expiryDateLabel || 'Expiry date:'}</span>
                     <span className="text-[var(--brand-text)]">{agreementModal.agreement?.date || '-'}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-4 mt-6 justify-end">
                 <button
-                  className="bg-purple-100  text-purple-700 px-4 py-2 rounded-xl font-medium hover:bg-purple-200"
+                  className="bg-aprovedPurple/15 text-neuroPurpleDark hover:bg-aprovedPurple/30 px-4 py-2 rounded-xl font-medium"
                   onClick={() => {
                     setEditProposalModal({ open: true, agreement: agreementModal.agreement });
                   }}
                 >
-                  Edit Proposal
+                  {t?.agreementDetailModal?.editProposalButton || 'Edit Proposal'}
                 </button>
                 <div className="flex flex-row gap-2">
                 <button
                   className="bg-red-700 text-white w-1/2 px-4 py-2 rounded-xl font-medium hover:bg-red-800"
                   onClick={() => setAgreementModal({ open: false, agreement: null })}
                 >
-                  Deny
+                  {t?.agreementDetailModal?.denyButton || 'Deny'}
                 </button>
                 <button
                   className="bg-purple-900 text-white w-1/2 px-4 py-2 rounded-xl font-medium hover:bg-purple-800"
                   onClick={() => setAgreementModal({ open: false, agreement: null })}
                 >
-                  Approve
+                  {t?.agreementDetailModal?.approveButton || 'Approve'}
                 </button>
                 </div>
               </div>
@@ -429,6 +433,8 @@ const Overview = () => {
 
 // Edit Proposal Modal Component
 function EditProposalModal({ agreement, onClose, onSave }) {
+  const { language } = useLanguage();
+  const t = content[language];
   const [name, setName] = useState(agreement?.title || '');
   const [price, setPrice] = useState(agreement?.price || '');
   // Split expiry into year, month, day, time
@@ -441,41 +447,41 @@ function EditProposalModal({ agreement, onClose, onSave }) {
   return (
     <section className="bg-[var(--brand-navbar)] p-6 rounded-lg shadow-lg w-[512px] max-h-[90vh] overflow-y-auto border-2 border-[var(--brand-border)] relative">
         <header className="flex justify-between items-center bg-[var(--brand-navbar)] border-b border-[var(--brand-border)] pb-3 mb-4 rounded-t-lg">
-          <h2 className="text-xl font-semibold text-[var(--brand-text-color)]">{agreement ? 'Edit pricing agreement proposal' : 'New pricing agreement'}</h2>
+          <h2 className="text-xl font-semibold text-[var(--brand-text-color)]">{agreement ? (t?.agreementEditModal?.editProposalTitle || 'Edit pricing agreement proposal') : (t?.agreementEditModal?.newProposalTitle || 'New pricing agreement')}</h2>
         </header>
         <div className="border-b border-[var(--brand-border)] mb-4">
           <div className="flex flex-col justify-between mb-6">
-            <span className="font-medium mb-3 text-[var(--brand-text)]">Buyer</span>
+            <span className="font-medium mb-3 text-[var(--brand-text)]">{t?.agreementEditModal?.buyer || 'Buyer'}</span>
             <div className="flex flex-row">
               <span className="inline-flex items-center justify-center rounded-full bg-green-100 text-green-600 w-14 h-14 border border-[var(--brand-border)]">
                 C
               </span>
             <div className=" ml-4 flex flex-col">
             <span className="text-[var(--brand-text)]">EcoTech Solutions</span>
-            <span className="text-[var(--brand-text-secondary)]">Client</span>
+            <span className="text-[var(--brand-text-secondary)]">{t?.agreementEditModal?.clientRole || 'Client'}</span>
             </div>
             </div>
           </div>
           <div className="flex flex-col justify-between mb-6">
-            <span className="font-medium mb-3 text-[var(--brand-text)]">Seller</span>
+            <span className="font-medium mb-3 text-[var(--brand-text)]">{t?.agreementEditModal?.seller || 'Seller'}</span>
             <div className="flex flex-row">
               <span className="inline-flex items-center justify-center rounded-full bg-green-100 text-green-600 w-14 h-14 border border-[var(--brand-border)]">
                 C
               </span>
             <div className=" ml-4 flex flex-col">
             <span className="text-[var(--brand-text)]">Trust Anchor Group</span>
-            <span className="text-[var(--brand-text-secondary)]">Process Owner</span>
+            <span className="text-[var(--brand-text-secondary)]">{t?.agreementEditModal?.processOwnerRole || 'Process Owner'}</span>
             </div>
             </div>
           </div>
         </div>
         <div className="border-b border-[var(--brand-border)] mb-4">
         <div className="mb-3">
-          <label className="block text-sm font-medium mb-1 text-[var(--brand-text-secondary)]">Agreement Name</label>
+          <label className="block text-sm font-medium mb-1 text-[var(--brand-text-secondary)]">{t?.agreementEditModal?.agreementNameLabel || 'Agreement Name'}</label>
           <input type="text" className="w-full border border-[var(--brand-border)] bg-[var(--brand-background)] rounded-lg px-3 py-2 text-[var(--brand-text)]" value={name} onChange={e => setName(e.target.value)} />
         </div>
         <div className="mb-3">
-          <label className="block text-sm font-medium mb-1 text-[var(--brand-text-secondary)]">Price (per ton)</label>
+          <label className="block text-sm font-medium mb-1 text-[var(--brand-text-secondary)]">{t?.agreementEditModal?.pricePerTonLabel || 'Price (per ton)'}</label>
           <input type="text" className="w-full border border-[var(--brand-border)] bg-[var(--brand-background)] rounded-lg px-3 py-2 text-[var(--brand-text)]" value={price} onChange={e => setPrice(e.target.value)} />
         </div>
         </div>
@@ -489,16 +495,16 @@ function EditProposalModal({ agreement, onClose, onSave }) {
             onChange={e => setExpiryEnabled(e.target.checked)}
           />
           <div className="flex items-center">
-            <label className="text-sm font-medium -mt-0.5 text-[var(--brand-text)]">Set expiry date</label>
+            <label className="text-sm font-medium -mt-0.5 text-[var(--brand-text)]">{t?.agreementEditModal?.setExpiryDateLabel || 'Set expiry date'}</label>
           </div>
           </div>
-          <label className="block text-sm font-medium mb-2 text-[var(--brand-text-secondary)]">Expiry Date</label>
+          <label className="block text-sm font-medium mb-2 text-[var(--brand-text-secondary)]">{t?.agreementEditModal?.expiryDateLabel || 'Expiry Date'}</label>
           <div className="grid grid-cols-4 gap-2">
             <input
               type="number"
               min="2023"
               max="2100"
-              placeholder="Year"
+              placeholder={t?.agreementEditModal?.placeholders?.year || 'Year'}
               className="border border-[var(--brand-border)] rounded-lg px-3 py-2 bg-[var(--brand-background)] text-[var(--brand-text)]"
               value={expiryYear}
               onChange={e => setExpiryYear(e.target.value)}
@@ -508,7 +514,7 @@ function EditProposalModal({ agreement, onClose, onSave }) {
               type="number"
               min="1"
               max="12"
-              placeholder="Month"
+              placeholder={t?.agreementEditModal?.placeholders?.month || 'Month'}
               className="border border-[var(--brand-border)] rounded-lg px-3 py-2 bg-[var(--brand-background)] text-[var(--brand-text)]"
               value={expiryMonth}
               onChange={e => setExpiryMonth(e.target.value)}
@@ -518,7 +524,7 @@ function EditProposalModal({ agreement, onClose, onSave }) {
               type="number"
               min="1"
               max="31"
-              placeholder="Day"
+              placeholder={t?.agreementEditModal?.placeholders?.day || 'Day'}
               className="border border-[var(--brand-border)] rounded-lg px-3 py-2 bg-[var(--brand-background)] text-[var(--brand-text)]"
               value={expiryDay}
               onChange={e => setExpiryDay(e.target.value)}
@@ -526,7 +532,7 @@ function EditProposalModal({ agreement, onClose, onSave }) {
             />
             <input
               type="time"
-              placeholder="Time"
+              placeholder={t?.agreementEditModal?.placeholders?.time || 'Time'}
               className="border border-[var(--border)] rounded-lg px-3 py-2 bg-[var(--brand-background)] text-[var(--brand-text)]"
               value={expiryTime}
               onChange={e => setExpiryTime(e.target.value)}
@@ -536,13 +542,13 @@ function EditProposalModal({ agreement, onClose, onSave }) {
         </div>
         <div className="flex gap-4 mt-6 justify-end">
           <button
-            className="bg-red-100 text-red-700 px-4 py-2 rounded-xl font-medium hover:bg-red-200"
+            className="bg-obsoletedRed/20 text-obsoletedRed hover:bg-obsoletedRed/50 w-[50%] px-4 py-2 rounded-xl font-medium"
             onClick={onClose}
           >
-            Cancel
+            {t?.agreementEditModal?.cancel || 'Cancel'}
           </button>
           <button
-            className="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl font-medium hover:bg-purple-200"
+            className="bg-aprovedPurple/15 text-neuroPurpleDark w-[50%] px-4 py-2 rounded-xl font-medium hover:bg-aprovedPurple/30"
             onClick={() => {
               let expiry = '';
               if (expiryEnabled) {
@@ -556,7 +562,7 @@ function EditProposalModal({ agreement, onClose, onSave }) {
             }}
             disabled={expiryEnabled && (!expiryYear || !expiryMonth || !expiryDay || !expiryTime)}
           >
-            {agreement ? 'Make Changes' : 'Create Agreement'}
+            {agreement ? (t?.agreementEditModal?.makeChanges || 'Make Changes') : (t?.agreementEditModal?.createAgreement || 'Create Agreement')}
           </button>
         </div>
       </section>
