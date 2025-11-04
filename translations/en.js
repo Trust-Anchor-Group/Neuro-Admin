@@ -581,7 +581,24 @@
     misc: {
       completeSuffix: '% complete'
     }
-  }
+  },
+  clientOverview: {
+  companyInformation: 'Company Information',
+  regNumber: 'Reg. Number',
+  industry: 'Industry',
+  location: 'Location',
+  billingInfo: 'Billing Info',
+  billingEmail: 'Billing Email',
+  paymentTerms: 'Payment Terms',
+  vatNumber: 'VAT Number',
+  invoiceDelivery: 'Invoice Delivery',
+  clientId: 'Client ID',
+  statusActive: 'Active',
+  editInformation: 'Edit Information',
+  manageClientId: 'Manage Client ID',
+  ariaShowBilling: 'Show billing info',
+  ariaHideBilling: 'Hide billing info'
+},
 };
 
 export default en;
