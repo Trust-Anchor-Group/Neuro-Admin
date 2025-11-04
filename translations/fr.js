@@ -566,7 +566,26 @@ const fr = {
     misc: {
       completeSuffix: '% terminé'
     }
-  }
+  },
+  clientOverview: {
+  companyInformation: 'Informations sur l\'entreprise',
+  regNumber: 'N° d\'enregistrement',
+  industry: 'Secteur',
+  location: 'Localisation',
+  billingInfo: 'Informations de facturation',
+  billingEmail: 'E-mail de facturation',
+  paymentTerms: 'Conditions de paiement',
+  vatNumber: 'N° TVA',
+  invoiceDelivery: 'Mode de livraison de facture',
+  clientId: 'ID Client',
+  statusActive: 'Actif',
+  editInformation: 'Modifier les informations',
+  manageClientId: 'Gérer l\'ID Client',
+  ariaShowBilling: 'Afficher les informations de facturation',
+  ariaHideBilling: 'Masquer les informations de facturation'
+}
 };
+
+
 
 export default fr;

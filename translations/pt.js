@@ -579,7 +579,26 @@
     misc: {
       completeSuffix: '% concluído'
     }
-  }
+  },
+  clientOverview: {
+  companyInformation: 'Informações da Empresa',
+  regNumber: 'Nº de Registro',
+  industry: 'Setor',
+  location: 'Localização',
+  billingInfo: 'Informações de Faturamento',
+  billingEmail: 'E-mail de faturamento',
+  paymentTerms: 'Termos de pagamento',
+  vatNumber: 'Nº IVA',
+  invoiceDelivery: 'Entrega da fatura',
+  clientId: 'ID do Cliente',
+  statusActive: 'Ativo',
+  editInformation: 'Editar informações',
+  manageClientId: 'Gerenciar ID do Cliente',
+  ariaShowBilling: 'Mostrar informações de faturamento',
+  ariaHideBilling: 'Ocultar informações de faturamento'
+}
 };
+
+
 
 export default pt;

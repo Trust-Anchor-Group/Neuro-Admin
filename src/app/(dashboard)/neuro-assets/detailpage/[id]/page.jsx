@@ -1,5 +1,5 @@
 'use client'
-import { DisplayDetails } from '@/components/access/Buttons/DisplayDetails'
+import { DisplayDetailsAsset } from '@/components/assets/DisplayDetailsAsset'
 import { TabNavigation } from '@/components/shared/TabNavigation';
 import { useParams, useSearchParams } from 'next/navigation';
 // Using public logo asset; Next/Image can take a string path referencing /public
@@ -100,7 +100,7 @@ const DetailPageAssets = () => {
         <>
         <div className='grid grid-cols-4 gap-5'>
           <div className='col-span-3'>
-            <DisplayDetails
+            <DisplayDetailsAsset
               fieldsToShow={fieldsToShow}
               userData={userData}
               title={'Order details'}

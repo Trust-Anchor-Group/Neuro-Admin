@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLanguage, content } from '../../../context/LanguageContext';
 import { Mail, Phone } from "lucide-react";
 
 const pricingAgreements = [
@@ -28,6 +29,8 @@ const Overview = () => {
   const [regNumber, setRegNumber] = useState('556677-8899');
   const [address, setAddress] = useState('456 Oak Ave, CA 94102, San Francisco, USA');
   const [showBilling, setShowBilling] = useState(true);
+  const { language } = useLanguage();
+  const t = content[language];
 
   return (
     <>
@@ -59,35 +62,32 @@ const Overview = () => {
       </div>
       {/* Company Information Section */}
       <div className="bg-[var(--brand-background)] rounded-xl p-5 mb-4">
-        <div className="font-medium text-gray-600 text-[var(--brand-text-secondary)] mb-4">Company Information</div>
+        <div className="font-medium text-gray-600 text-[var(--brand-text-secondary)] mb-4">{t?.clientOverview?.companyInformation || 'Company Information'}</div>
         <div className="space-y-3">
           <div className="grid grid-cols-3 items-center border-b border-[var(--brand-border)] bg-[var(--brand-background)] animate-fade-in">
-            <span className="text-sm text-[var(--brand-text-secondary)] my-2">Reg. Number</span>
-            <span className="text-base font-semibold text-[var(--brand-text-primary)] text-center my-2">556677-8899</span>
-            <span></span>
+            <span className="text-sm text-[var(--brand-text-secondary)] my-2">{t?.clientOverview?.regNumber || 'Reg. Number'}</span>
+            <span className="text-base text-[var(--brand-text-primary)] text-start my-2">556677-8899</span>
           </div>
           <div className="grid grid-cols-3 items-center border-b border-[var(--brand-border)] bg-[var(--brand-background)] animate-fade-in">
-            <span className="text-sm text-[var(--brand-text-secondary)]  my-2">Industry</span>
-            <span className="text-base font-semibold text-[var(--brand-text-primary)]  text-center my-2">Technology</span>
-            <span></span>
+            <span className="text-sm text-[var(--brand-text-secondary)]  my-2">{t?.clientOverview?.industry || 'Industry'}</span>
+            <span className="text-base font-semibold text-[var(--brand-text-primary)] text-start my-2">Technology</span>
           </div>
           <div className="grid grid-cols-3 items-center  bg-[var(--brand-background)] animate-fade-in">
-            <span className="text-sm text-[var(--brand-text-secondary)]  my-2">Location</span>
-            <span className="flex flex-col items-center justify-center my-2">
-              <span className="text-base font-semibold text-[var(--brand-text-primary)] text-center">San Francisco, USA</span>
-              <span className="text-xs text-[var(--brand-text-secondary)]  text-center">456 Oak Ave, CA 94102</span>
+            <span className="text-sm text-[var(--brand-text-secondary)]  my-2">{t?.clientOverview?.location || 'Location'}</span>
+            <span className="flex flex-col items-start justify-start my-2">
+              <span className="text-base font-semibold text-[var(--brand-text-primary)]">San Francisco, USA</span>
+              <span className="text-xs text-[var(--brand-text-secondary)]">456 Oak Ave, CA 94102</span>
             </span>
-            <span></span>
           </div>
         </div>
       </div>
       {/* Billing Info Section (with toggle) */}
       <div className="bg-[var(--brand-background)] rounded-xl p-4 mb-4">
-        <div className="flex justify-between items-center mb-3">
-          <div className="font-medium text-gray-600 text-[var(--brand-text-secondary)]">Billing Info</div>
+        <div className="flex justify-between items-center">
+          <div className="font-medium text-gray-600 text-[var(--brand-text-secondary)]">{t?.clientOverview?.billingInfo || 'Billing Info'}</div>
           <button
             className="p-0 m-0 text-[var(--brand-text-primary)] text-xs rounded flex items-center justify-center"
-            aria-label={showBilling ? 'Hide billing info' : 'Show billing info'}
+            aria-label={showBilling ? (t?.clientOverview?.ariaHideBilling || 'Hide billing info') : (t?.clientOverview?.ariaShowBilling || 'Show billing info')}
             onClick={() => setShowBilling((prev) => !prev)}
           >
             <span className="font-sm text-xs">{showBilling ? '▲' : '▼'}</span>
@@ -96,23 +96,23 @@ const Overview = () => {
         {showBilling && (
           <div className="space-y-2">
             <div className="grid grid-cols-3 items-center border-b border-[var(--brand-border)] bg-[var(--brand-background)]">
-              <span className="text-sm text-[var(--brand-text-secondary)] my-2">Billing Email</span>
-              <span className="text-base font-semibold text-[var(--brand-text-primary)] text-center my-2">billing@ecotech.com</span>
+              <span className="text-sm text-[var(--brand-text-secondary)] my-2">{t?.clientOverview?.billingEmail || 'Billing Email'}</span>
+              <span className="text-base  text-[var(--brand-text-primary)] text-start my-2">billing@ecotech.com</span>
               <span></span>
             </div>
             <div className="grid grid-cols-3 items-center border-b border-[var(--brand-border)] bg-[var(--brand-background)]">
-              <span className="text-sm text-[var(--brand-text-secondary)] my-2">Payment Terms</span>
-              <span className="text-base font-semibold text-[var(--brand-text-primary)] text-center my-2">30 days</span>
+              <span className="text-sm text-[var(--brand-text-secondary)] my-2">{t?.clientOverview?.paymentTerms || 'Payment Terms'}</span>
+              <span className="text-base text-[var(--brand-text-primary)] text-start my-2">30 days</span>
               <span></span>
             </div>
             <div className="grid grid-cols-3 items-center border-b border-[var(--brand-border)] bg-[var(--brand-background)]">
-              <span className="text-sm text-[var(--brand-text-secondary)] my-2">VAT Number</span>
-              <span className="text-base font-semibold text-[var(--brand-text-primary)] text-center my-2">SE556677889901</span>
+              <span className="text-sm text-[var(--brand-text-secondary)] my-2">{t?.clientOverview?.vatNumber || 'VAT Number'}</span>
+              <span className="text-base text-[var(--brand-text-primary)] text-start my-2">SE556677889901</span>
               <span></span>
             </div>
             <div className="grid grid-cols-3 items-center bg-[var(--brand-background)]">
-              <span className="text-sm text-[var(--brand-text-secondary)] my-2">Invoice Delivery</span>
-              <span className="text-base font-semibold text-[var(--brand-text-primary)] text-center my-2">Email</span>
+              <span className="text-sm text-[var(--brand-text-secondary)] my-2">{t?.clientOverview?.invoiceDelivery || 'Invoice Delivery'}</span>
+              <span className="text-base text-[var(--brand-text-primary)] text-start my-2">Email</span>
               <span></span>
             </div>
           </div>
@@ -120,12 +120,12 @@ const Overview = () => {
       </div>
       {/* Client ID Section */}
       <div className="bg-[var(--brand-background)] rounded-xl p-4 mb-6 flex items-center">
-        <span className="w-1/3 font-medium text-[var(--brand-text-secondary)] text-left flex items-center">Client ID</span>
-        <span className="w-1/3 flex justify-center items-center">
-          <span className="font-semibold text-[var(--brand-text-primary)] text-center">EcoTech_Solutions</span>
+        <span className="w-1/3 font-medium text-[var(--brand-text-secondary)] text-left flex items-center">{t?.clientOverview?.clientId || 'Client ID'}</span>
+        <span className="w-1/3 flex justify-start items-start">
+          <span className="text-[var(--brand-text-primary)]">EcoTech_Solutions</span>
         </span>
         <span className="w-1/3 flex justify-end items-center">
-          <span className="px-3 py-1 rounded-full bg-green-100  text-green-700  text-xs font-semibold">Active</span>
+          <span className="px-3 py-1 rounded-full bg-green-100  text-green-700  text-xs font-semibold">{t?.clientOverview?.statusActive || 'Active'}</span>
         </span>
       </div>
       {/* Action Buttons */}
@@ -134,17 +134,16 @@ const Overview = () => {
           className="bg-purple-100 text-purple-700 px-5 py-2 rounded-xl font-semibold hover:bg-purple-200 shadow-sm"
           onClick={() => setShowModal(true)}
         >
-          Edit Information
+          {t?.clientOverview?.editInformation || 'Edit Information'}
         </button>
         <button className="bg-purple-100 text-purple-700 px-5 py-2 rounded-xl font-semibold hover:bg-purple-200 shadow-sm">
-          Manage Client ID
+          {t?.clientOverview?.manageClientId || 'Manage Client ID'}
         </button>
       </div>
     </div>
-        {/* Pricing Agreements Section */}
-        <div>
-          <div className="font-semibold text-xl mb-3 text-[var(--brand-text)]">Pricing agreements</div>
-          <div className="bg-[var(--brand-navbar)] rounded-lg shadow-md p-5 border border-[var(--brand-border)]">
+        {/* Pricing Agreements Section */}     
+        <div className="bg-[var(--brand-navbar)] rounded-lg shadow-md p-5 border border-[var(--brand-border)]">
+          <div className="font-semibold text-xl mb-3 text-[var(--brand-text)]">Pricing agreements</div>  
             <div className="flex justify-between items-center mb-4">
               <input type="text" placeholder="Search agreements..." className="border border-[var(--brand-border)] rounded-xl px-3 py-2 text-sm w-1/2 bg-[var(--brand-navbar)] text-[var(--brand-text)]" />
               <select className="border border-[var(--brand-border)] rounded-xl px-3 py-2 text-sm bg-[var(--brand-navbar)] text-[var(--brand-text)]">
@@ -153,13 +152,13 @@ const Overview = () => {
                 <option>Expired</option>
               </select>
             </div>
-            <div className=" space-y-4">
+            <div className="space-y-2">
               {pricingAgreements
                 .slice((agreementPage - 1) * agreementsPerPage, agreementPage * agreementsPerPage)
                 .map((agreement, idx) => (
                   <div
                     key={idx + (agreementPage - 1) * agreementsPerPage}
-                    className="bg-[var(--brand-background)] rounded-xl shadow-sm p-4 flex hover:bg-[var(--brand-background-hover)] hover:border hover:border-purple-500 justify-between items-center cursor-pointer"
+                    className="bg-[var(--brand-background)] rounded-xl shadow-sm p-4 flex hover:border hover:border-[var(--brand-primary)] justify-between items-center cursor-pointer"
                     onClick={() => setAgreementModal({ open: true, agreement })}
                   >
                     <div>
@@ -170,20 +169,9 @@ const Overview = () => {
                   </div>
                 ))}
             </div>
-            <div className="flex gap-2 mt-6 justify-end">
-              {[...Array(Math.ceil(pricingAgreements.length / agreementsPerPage)).keys()].map(i => (
-                <button
-                  key={i}
-                  className={`rounded-full px-3 py-1 bg-[var(--brand-navbar)] text-purple-900 font-medium border border-[var(--brand-border)] ${agreementPage === i + 1 ? 'bg-purple-200' : ''}`}
-                  onClick={() => setAgreementPage(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-8 border-t pt-4 border-[var(--brand-border)]">
               <button
-                className="bg-purple-100 text-purple-700 px-5 py-2 rounded-xl font-medium hover:bg-purple-200"
+                className="bg-purple-100 text-purple-700 px-5 py-2 rounded-xl font-medium"
                 onClick={() => setCreateAgreementModal(true)}
               >
                 Create New Agreement
@@ -212,7 +200,6 @@ const Overview = () => {
             </div>
           </div>
         )}
-          </div>
         </div>
       </div>
       {/* Right column: sidebar (1/4) */}
@@ -329,13 +316,13 @@ const Overview = () => {
             </div>
             <div className="flex gap-4 mt-6 justify-end">
               <button
-                className="bg-red-100 text-red-700 px-4 py-2 rounded-xl font-medium hover:bg-red-200"
+                className="bg-red-100 text-red-700 w-[50%] px-4 py-2 rounded-xl font-medium hover:bg-red-200"
                 onClick={() => setShowModal(false)}
               >
                 Cancel
               </button>
               <button
-                className="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl font-medium hover:bg-purple-200"
+                className="bg-purple-100 text-purple-700 w-[50%] px-4 py-2 rounded-xl font-medium hover:bg-purple-200"
                 onClick={() => setShowModal(false)}
               >
                 Save Changes
