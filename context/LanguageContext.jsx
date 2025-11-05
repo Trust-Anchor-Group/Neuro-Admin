@@ -1,14 +1,36 @@
-"use client";
+﻿"use client";
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { content } from '../translations';
 export { content };
 
+const SUPPORTED_LANGUAGES = new Set(['en', 'pt', 'fr']);
+
+function detectBrowserLanguage() {
+  if (typeof navigator === 'undefined') return null;
+
+  const candidates = [];
+
+  if (Array.isArray(navigator.languages) && navigator.languages.length) {
+    candidates.push(...navigator.languages);
+  }
+
+  if (navigator.language) {
+    candidates.push(navigator.language);
+  }
+
+  for (const candidate of candidates) {
+    const normalized = candidate?.toLowerCase?.();
+    if (!normalized) continue;
+    const base = normalized.split('-')[0];
+    if (SUPPORTED_LANGUAGES.has(base)) return base;
+  }
+
+  return null;
+}
+
 function getDefaultLanguage() {
   try {
-    const lang = typeof navigator !== 'undefined' ? navigator.language.toLowerCase() : '';
-    if (lang.startsWith('pt')) return 'pt';
-    if (lang.startsWith('fr')) return 'fr';
-    return 'en';
+    return detectBrowserLanguage() ?? 'en';
   } catch {
     return 'en';
   }
@@ -17,16 +39,14 @@ function getDefaultLanguage() {
 export const LanguageContext = createContext(null);
 
 export function LanguageProvider({ children }) {
-  // Initialize from localStorage if available to preserve selection across full reloads
   const [language, setLanguage] = useState(() => {
     if (typeof window !== 'undefined') {
       const stored = window.localStorage.getItem('language');
-      if (stored) return stored;
+      if (SUPPORTED_LANGUAGES.has(stored)) return stored;
     }
     return getDefaultLanguage();
   });
 
-  // Persist changes
   useEffect(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -60,4 +80,3 @@ export function useLanguage() {
 }
 
 export default LanguageProvider;
-
