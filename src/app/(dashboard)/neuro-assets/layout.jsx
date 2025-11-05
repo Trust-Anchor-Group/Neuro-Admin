@@ -16,7 +16,7 @@ export default function NeuroAssetsLayout({ children }) {
       icon: <FaRegFileAlt />,
       href: "/neuro-assets",
       subItems: [
-        { label: tAssetMenu?.carbonCredit || "Carbon Credit", href: "/neuro-assets/orders" },
+        { label: tAssetMenu?.coffee || "Carbon Credit", href: "/neuro-assets/orders" },
         { label: tAssetMenu?.clients || "Clients", href: "/neuro-assets/clients" },
       ],
     },

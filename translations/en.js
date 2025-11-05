@@ -332,7 +332,8 @@
   AssetMenu:{
     title: 'Assets',
     carbonCredit: 'Carbon Credit',
-    clients: 'Clients'
+    clients: 'Clients',
+    coffee: 'Coffee'
   },
   Clients: {
     title: 'Asset Clients',
