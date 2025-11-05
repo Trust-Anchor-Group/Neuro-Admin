@@ -534,10 +534,23 @@ const fr = {
       orderedBy: 'Commandée par',
       created: 'Créée'
     },
+    certificateFields: {
+      name: 'Nom',
+      creator: 'Créateur',
+      category: 'Catégorie',
+      visibility: 'Visibilité',
+      updated: 'Mis à jour',
+      tokenId: 'ID du jeton',
+      owner: 'Propriétaire',
+      currency: 'Devise',
+      created: 'Créé',
+      validUntil: 'Valide jusqu\'au'
+    },
     statusBox: {
       status: 'Statut',
       progress: 'Progression',
-      amount: 'Montant'
+      amount: 'Montant',
+      complete: 'terminé'
     }
   }
   ,
@@ -565,6 +578,20 @@ const fr = {
     },
     misc: {
       completeSuffix: '% terminé'
+    },
+    status: {
+      label: 'Statut',
+      states: {
+        inProgress: 'En cours',
+        paused: 'En pause',
+        aborted: 'Annulé',
+        complete: 'Terminé',
+        notStarted: 'Non démarré'
+      },
+      terminate: 'Terminer le processus'
+    },
+    actions: {
+      terminate: 'Terminer le processus'
     }
   },
   clientOverview: {
@@ -582,8 +609,99 @@ const fr = {
   editInformation: 'Modifier les informations',
   manageClientId: 'Gérer l\'ID Client',
   ariaShowBilling: 'Afficher les informations de facturation',
-  ariaHideBilling: 'Masquer les informations de facturation'
-}
+  ariaHideBilling: 'Masquer les informations de facturation',
+  totalPurchases: 'Total des achats',
+  totalCompensation: 'Compensation totale',
+  contacts: 'Contacts'
+  },
+  clientEditModal: {
+    title: 'Modifier les informations du client',
+    clientIcon: 'Icône du client',
+    lightMode: 'Mode clair',
+    pngLight: 'PNG clair',
+    remove: 'Supprimer',
+    change: 'Changer',
+    darkMode: 'Mode sombre',
+    pngDark: 'PNG sombre',
+    clientName: 'Nom du client',
+    industry: 'Secteur',
+    regNumber: 'N° d\'enregistrement',
+    address: 'Adresse',
+    cancel: 'Annuler',
+    saveChanges: 'Enregistrer les modifications'
+  },
+  agreementDetailModal: {
+    priceAgreementProposal: "Proposition d'accord de prix",
+    pricingAgreementTerms: "Conditions de l'accord tarifaire",
+    buyerLabel: 'Acheteur :',
+    sellerLabel: 'Vendeur :',
+    pricePerTonLabel: 'Prix (par tonne) :',
+    expiryDateLabel: "Date d'expiration :",
+    editProposalButton: 'Modifier la proposition',
+    denyButton: 'Refuser',
+    approveButton: 'Approuver'
+  },
+  agreementEditModal: {
+    editProposalTitle: "Modifier la proposition d'accord de prix",
+    newProposalTitle: "Nouvelle proposition d'accord de prix",
+    buyer: 'Acheteur',
+    clientRole: 'Client',
+    seller: 'Vendeur',
+    processOwnerRole: 'Responsable du processus',
+    agreementNameLabel: "Nom de l'accord",
+    pricePerTonLabel: 'Prix (par tonne)',
+    setExpiryDateLabel: "Définir la date d'expiration",
+    expiryDateLabel: "Date d'expiration",
+    placeholders: {
+      year: 'Année',
+      month: 'Mois',
+      day: 'Jour',
+      time: 'Heure'
+    },
+    cancel: 'Annuler',
+    makeChanges: 'Apporter des modifications',
+    createAgreement: 'Créer un accord'
+  },
+  pricingAgreementsSection: {
+    title: 'Accords tarifaires',
+    searchPlaceholder: 'Rechercher des accords...',
+    filterAll: 'Tous',
+    filterActive: 'Actif',
+    filterExpired: 'Expiré',
+    createNewButton: 'Créer un nouvel accord',
+    statusActive: 'Actif',
+    statusExpired: 'Expiré'
+  },
+  localizationSettings: {
+    timezone: 'Fuseau horaire'
+  },
+  
+  kycPreview: {
+    previewTitle: 'Aperçu',
+    intro: 'Ce mini-flux reflète l\'intégration utilisateur finale. Activez les champs requis pour voir la checklist s\'adapter en temps réel.',
+    empty: 'Aucun champ requis sélectionné. Activez au moins un champ pour afficher l\'aperçu d\'intégration.',
+    progressLabel: 'Progression',
+    stepsSuffix: 'étapes',
+    stepLabel: 'Étape',
+    placeholderPrefix: 'Saisir',
+    stepDescriptions: {
+      FIRST: 'Vérifier les instructions d\'identité',
+      MID: 'Ajouter un deuxième prénom (optionnel)',
+      LAST: 'Ajouter le nom de famille',
+      PNR: 'Saisir le numéro d\'identité / personnel',
+      DOB: 'Confirmer la date de naissance',
+      GENDER: 'Sélectionner le sexe',
+      NATIONALITY: 'Sélectionner la nationalité',
+      ADDR: 'Fournir l\'adresse résidentielle',
+      ZIP: 'Saisir le code postal',
+      CITY: 'Ajouter la ville de résidence',
+      COUNTRY: 'Sélectionner le pays',
+      AREA: 'Définir la zone / quartier',
+      REGION: 'Choisir la région / état'
+    },
+    nextField: 'Champ suivant',
+    selectStep: 'Sélectionnez une étape dans la checklist pour voir les détails.'
+  }
 };
 
 

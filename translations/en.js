@@ -21,16 +21,16 @@
     compromised: 'Compromised'
   },
   PaginatedList: {
-  titleIdApplications: 'ID applications',
-  titleAccounts: 'Accounts',
-  searchPlaceholder: 'Search...',
-  filterAll: 'All',
-  filterHasId: 'Has ID',
-  filterNoId: 'No ID',
-  limit10: '10',
-  limit25: '25',
-  limit50: '50',
-  limitAll: 'Show all'
+    titleIdApplications: 'ID applications',
+    titleAccounts: 'Accounts',
+    searchPlaceholder: 'Search...',
+    filterAll: 'All',
+    filterHasId: 'Has ID',
+    filterNoId: 'No ID',
+    limit10: '10',
+    limit25: '25',
+    limit50: '50',
+    limitAll: 'Show all'
   },
   SettingsPageClient: {
   title: 'Settings',
@@ -549,10 +549,23 @@
       orderedBy: 'Ordered By',
       created: 'Created'
     },
+    certificateFields: {
+      name: 'Name',
+      creator: 'Creator',
+      category: 'Category',
+      visibility: 'Visibility',
+      updated: 'Updated',
+      tokenId: 'Token ID',
+      owner: 'Owner',
+      currency: 'Currency',
+      created: 'Created',
+      validUntil: 'Valid Until'
+    },
     statusBox: {
       status: 'Status',
       progress: 'Progress',
-      amount: 'Amount'
+      amount: 'Amount',
+      complete: 'complete'
     }
   }
   ,
@@ -580,6 +593,20 @@
     },
     misc: {
       completeSuffix: '% complete'
+    },
+    status: {
+      label: 'Status',
+      states: {
+        inProgress: 'In progress',
+        paused: 'Paused',
+        aborted: 'Aborted',
+        complete: 'Complete',
+        notStarted: 'Not started'
+      },
+      terminate: 'Terminate process'
+    },
+    actions: {
+      terminate: 'Terminate process'
     }
   },
   clientOverview: {
@@ -597,8 +624,98 @@
   editInformation: 'Edit Information',
   manageClientId: 'Manage Client ID',
   ariaShowBilling: 'Show billing info',
-  ariaHideBilling: 'Hide billing info'
+  ariaHideBilling: 'Hide billing info',
+  totalPurchases: 'Total purchases',
+  totalCompensation: 'Total compensation',
+  contacts: 'Contacts'
 },
+  localizationSettings: {
+    timezone: 'Time Zone'
+  },
+  clientEditModal: {
+    title: 'Edit Client Information',
+    clientIcon: 'Client icon',
+    lightMode: 'Light mode',
+    pngLight: 'PNG Light',
+    remove: 'Remove',
+    change: 'Change',
+    darkMode: 'Dark mode',
+    pngDark: 'PNG Dark',
+    clientName: 'Client Name',
+    industry: 'Industry',
+    regNumber: 'Reg. Number',
+    address: 'Address',
+    cancel: 'Cancel',
+    saveChanges: 'Save Changes'
+  },
+  agreementDetailModal: {
+    priceAgreementProposal: 'Price agreement proposal',
+    pricingAgreementTerms: 'Pricing agreement terms',
+    buyerLabel: 'Buyer:',
+    sellerLabel: 'Seller:',
+    pricePerTonLabel: 'Price (per ton):',
+    expiryDateLabel: 'Expiry date:',
+    editProposalButton: 'Edit Proposal',
+    denyButton: 'Deny',
+    approveButton: 'Approve'
+  },
+  agreementEditModal: {
+    editProposalTitle: 'Edit pricing agreement proposal',
+    newProposalTitle: 'New pricing agreement',
+    buyer: 'Buyer',
+    clientRole: 'Client',
+    seller: 'Seller',
+    processOwnerRole: 'Process Owner',
+    agreementNameLabel: 'Agreement Name',
+    pricePerTonLabel: 'Price (per ton)',
+    setExpiryDateLabel: 'Set expiry date',
+    expiryDateLabel: 'Expiry Date',
+    placeholders: {
+      year: 'Year',
+      month: 'Month',
+      day: 'Day',
+      time: 'Time'
+    },
+    cancel: 'Cancel',
+    makeChanges: 'Make Changes',
+    createAgreement: 'Create Agreement'
+  },
+  pricingAgreementsSection: {
+    title: 'Pricing agreements',
+    searchPlaceholder: 'Search agreements...',
+    filterAll: 'All',
+    filterActive: 'Active',
+    filterExpired: 'Expired',
+    createNewButton: 'Create New Agreement',
+    statusActive: 'Active',
+    statusExpired: 'Expired'
+  },
+  kycPreview: {
+    previewTitle: 'Preview',
+    intro: 'This miniature flow mirrors the end-user onboarding. Toggle required fields to see how the checklist adapts in real time.',
+    empty: 'No required fields selected. Enable at least one field to view the onboarding preview.',
+    progressLabel: 'Progress',
+    stepsSuffix: 'steps',
+    stepLabel: 'Step',
+    placeholderPrefix: 'Enter',
+    stepDescriptions: {
+      FIRST: 'Review ID instructions',
+      MID: 'Add middle name (optional in most flows)',
+      LAST: 'Add last name',
+      PNR: 'Enter national ID / personal number',
+      DOB: 'Confirm date of birth',
+      GENDER: 'Select gender',
+      NATIONALITY: 'Select nationality',
+      ADDR: 'Provide residential address',
+      ZIP: 'Enter postal / ZIP code',
+      CITY: 'Add city of residence',
+      COUNTRY: 'Select country',
+      AREA: 'Set area / neighborhood',
+      REGION: 'Choose state / region'
+    },
+    nextField: 'Next field',
+    selectStep: 'Select a step from the checklist to inspect the preview.'
+  }
 };
 
 export default en;

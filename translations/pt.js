@@ -547,10 +547,23 @@
       orderedBy: 'Pedido por',
       created: 'Criado'
     },
+    certificateFields: {
+      name: 'Nome',
+      creator: 'Criador',
+      category: 'Categoria',
+      visibility: 'Visibilidade',
+      updated: 'Atualizado',
+      tokenId: 'ID do Token',
+      owner: 'Proprietário',
+      currency: 'Moeda',
+      created: 'Criado',
+      validUntil: 'Válido até'
+    },
     statusBox: {
       status: 'Status',
       progress: 'Progresso',
-      amount: 'Quantidade'
+      amount: 'Quantidade',
+      complete: 'concluído'
     }
   }
   ,
@@ -578,6 +591,20 @@
     },
     misc: {
       completeSuffix: '% concluído'
+    },
+    status: {
+      label: 'Status',
+      states: {
+        inProgress: 'Em progresso',
+        paused: 'Pausado',
+        aborted: 'Abortado',
+        complete: 'Concluído',
+        notStarted: 'Não iniciado'
+      },
+      terminate: 'Encerrar processo'
+    },
+    actions: {
+      terminate: 'Encerrar processo'
     }
   },
   clientOverview: {
@@ -595,8 +622,99 @@
   editInformation: 'Editar informações',
   manageClientId: 'Gerenciar ID do Cliente',
   ariaShowBilling: 'Mostrar informações de faturamento',
-  ariaHideBilling: 'Ocultar informações de faturamento'
+  ariaHideBilling: 'Ocultar informações de faturamento',
+  totalPurchases: 'Total de compras',
+  totalCompensation: 'Compensação total',
+  contacts: 'Contatos'
 }
+,
+  clientEditModal: {
+    title: 'Editar informações do cliente',
+    clientIcon: 'Ícone do cliente',
+    lightMode: 'Modo claro',
+    pngLight: 'PNG claro',
+    remove: 'Remover',
+    change: 'Alterar',
+    darkMode: 'Modo escuro',
+    pngDark: 'PNG escuro',
+    clientName: 'Nome do cliente',
+    industry: 'Setor',
+    regNumber: 'Nº de registro',
+    address: 'Endereço',
+    cancel: 'Cancelar',
+    saveChanges: 'Salvar alterações'
+  },
+  agreementDetailModal: {
+    priceAgreementProposal: 'Proposta de acordo de preço',
+    pricingAgreementTerms: 'Termos do acordo de preço',
+    buyerLabel: 'Comprador:',
+    sellerLabel: 'Vendedor:',
+    pricePerTonLabel: 'Preço (por tonelada):',
+    expiryDateLabel: 'Data de expiração:',
+    editProposalButton: 'Editar Proposta',
+    denyButton: 'Negar',
+    approveButton: 'Aprovar'
+  },
+  agreementEditModal: {
+    editProposalTitle: 'Editar proposta de acordo de preço',
+    newProposalTitle: 'Nova proposta de acordo de preço',
+    buyer: 'Comprador',
+    clientRole: 'Cliente',
+    seller: 'Vendedor',
+    processOwnerRole: 'Responsável pelo processo',
+    agreementNameLabel: 'Nome do acordo',
+    pricePerTonLabel: 'Preço (por tonelada)',
+    setExpiryDateLabel: 'Definir data de expiração',
+    expiryDateLabel: 'Data de expiração',
+    placeholders: {
+      year: 'Ano',
+      month: 'Mês',
+      day: 'Dia',
+      time: 'Hora'
+    },
+    cancel: 'Cancelar',
+    makeChanges: 'Fazer alterações',
+    createAgreement: 'Criar acordo'
+  },
+  pricingAgreementsSection: {
+    title: 'Acordos de preços',
+    searchPlaceholder: 'Pesquisar acordos...',
+    filterAll: 'Todos',
+    filterActive: 'Ativo',
+    filterExpired: 'Expirado',
+    createNewButton: 'Criar novo acordo',
+    statusActive: 'Ativo',
+    statusExpired: 'Expirado'
+  },
+  localizationSettings: {
+    timezone: 'Fuso horário'
+  },
+  kycPreview: {
+    previewTitle: 'Pré-visualização',
+    intro: 'Este fluxo reduzido espelha a experiência de onboarding do usuário final. Ative campos obrigatórios para ver a lista se adaptar em tempo real.',
+    empty: 'Nenhum campo obrigatório selecionado. Ative pelo menos um para ver a pré-visualização.',
+    progressLabel: 'Progresso',
+    stepsSuffix: 'etapas',
+    stepLabel: 'Etapa',
+    placeholderPrefix: 'Inserir',
+    stepDescriptions: {
+      FIRST: 'Revisar instruções de identificação',
+      MID: 'Adicionar nome do meio (opcional)',
+      LAST: 'Adicionar sobrenome',
+      PNR: 'Inserir número de identificação nacional / pessoal',
+      DOB: 'Confirmar data de nascimento',
+      GENDER: 'Selecionar gênero',
+      NATIONALITY: 'Selecionar nacionalidade',
+      ADDR: 'Fornecer endereço residencial',
+      ZIP: 'Inserir CEP',
+      CITY: 'Adicionar cidade de residência',
+      COUNTRY: 'Selecionar país',
+      AREA: 'Definir área / bairro',
+      REGION: 'Escolher estado / região'
+    },
+    nextField: 'Próximo campo',
+    selectStep: 'Selecione uma etapa na lista para ver os detalhes.'
+  }
 };
 
 

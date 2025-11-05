@@ -1,11 +1,13 @@
 "use client";
 import { useMemo } from "react";
+import { useRouter } from 'next/navigation';
 import { MaterialReactTable } from "material-react-table";
 import { Box } from "@mui/material";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { useLanguage, content } from "../../../context/LanguageContext";
   
 const DigitalAssetsTable = ({ assets = [] }) => {
+  const router = useRouter();
   const { language } = useLanguage();
   const t = content[language]?.Clients;
 
@@ -195,7 +197,7 @@ const DigitalAssetsTable = ({ assets = [] }) => {
       }}
       muiTableBodyRowProps={({ row }) => ({
         onClick: () => {
-          window.location.href = `/neuro-assets/detailpageclient`;
+          router.push('/neuro-assets/detailpageclient');
         },
         sx: {
           cursor: "pointer",

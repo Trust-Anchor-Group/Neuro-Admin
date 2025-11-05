@@ -53,7 +53,10 @@ export const Identity = ({
                   <h1 id="identity-heading" className="text-3xl font-semibold">
                     {user.properties.FIRST + ' ' + user.properties.LAST || 'N/A'}
                   </h1>
-                  <p className="text-text16 text-[var(--brand-text-secondary)]">
+                  <p
+                    className="text-text16 text-[var(--brand-text-secondary)] break-words whitespace-normal w-full"
+                    style={{ wordBreak: 'break-word' }}
+                  >
                     {user.account || ''}
                   </p>
                   <div className="border-t-2 border-[var(--brand-border)] pt-2 text-text16 text-[var(--brand-text-secondary)] w-full">

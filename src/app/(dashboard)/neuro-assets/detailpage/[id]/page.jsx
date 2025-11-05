@@ -128,45 +128,45 @@ const DetailPageAssets = () => {
                     <div className='grid w-full gap-x-10 gap-y-6 text-sm text-[var(--brand-text)] sm:grid-cols-2'>
                       <div className='space-y-5'>
                         <div>
-                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>NAME</p>
+                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.name || 'NAME'}</h2>
                           <p className='mt-1 break-words text-[var(--brand-text)]'>Creturner Carbon Credit</p>
                         </div>
                         <div>
-                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>CREATOR</p>
+                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.creator || 'CREATOR'}</h2>
                           <p className='mt-1 break-words text-[var(--brand-text)]'>2e915fd2-4695-e555-f802-87bbe2cbb750@legal.mateo.lab.tagroot.io</p>
                         </div>
                         <div>
-                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>CATEGORY</p>
+                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.category || 'CATEGORY'}</h2>
                           <p className='mt-1 break-words text-[var(--brand-text)]'>Carbon Offsets</p>
                         </div>
                         <div>
-                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>VISIBILITY</p>
+                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.visibility || 'VISIBILITY'}</h2>
                           <p className='mt-1 break-words text-[var(--brand-text)]'>Public</p>
                         </div>
                         <div>
-                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>UPDATED</p>
+                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.updated || 'UPDATED'}</h2>
                           <p className='mt-1 break-words text-[var(--brand-text)]'>12/16/2024</p>
                         </div>
                       </div>
                       <div className='space-y-5'>
                         <div>
-                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>TOKEN ID</p>
+                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.tokenId || 'TOKEN ID'}</h2>
                           <p className='mt-1 break-words text-[var(--brand-text)]'>cc71e0cc-78de-4689-828c-aa9e404b1de5@edaler.mateo.lab.tagroot.io</p>
                         </div>
                         <div>
-                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>Owner</p>
+                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.owner || 'Owner'}</h2>
                           <p className='mt-1 break-words text-[var(--brand-text)]'>2eeed87a-e8a8-9a4d-400b-c2f0538661b9@legal.mateo.lab.tagroot.io</p>
                         </div>
                         <div>
-                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>CURRENCY</p>
+                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.currency || 'CURRENCY'}</h2>
                           <p className='mt-1 break-words text-[var(--brand-text)]'>TST</p>
                         </div>
                         <div>
-                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>Created</p>
+                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.created || 'Created'}</h2>
                           <p className='mt-1 break-words text-[var(--brand-text)]'>12/16/2024 3:25:30 PM</p>
                         </div>
                         <div>
-                          <p className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>VALID UNTIL</p>
+                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.validUntil || 'VALID UNTIL'}</h2>
                           <p className='mt-1 break-words text-[var(--brand-text)]'>12/16/2029</p>
                         </div>
                       </div>
