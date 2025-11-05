@@ -317,7 +317,8 @@ const fr = {
   AssetMenu: {
     title: 'Assets',
     orders: 'Commandes',
-    clients: 'Clients'
+    clients: 'Clients',
+    coffee: 'Café'
   },
   Clients: {
     title: 'Clients Assets',

@@ -330,7 +330,8 @@
   AssetMenu: {
     title: 'Assets',
     orders: 'Pedidos',
-    clients: 'Clientes'
+    clients: 'Clientes',
+    coffee: 'Café'
   },
   Clients: {
     title: 'Clientes de Assets',
