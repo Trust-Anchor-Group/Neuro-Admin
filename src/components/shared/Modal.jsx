@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { FaSpinner, FaTimes } from 'react-icons/fa'
 import { ImageViewerModal } from './ImageViewerModal'
 import { TiptapEditor } from './TiptapEditor'
+import { useLanguage, content } from '../../../context/LanguageContext'
 
 export const Modal = ({ setToggle, loading, user, text, handleApprove, handleReject }) => {
   const [showFinalConfirmPopup, setShowFinalConfirmPopup] = useState(false)
@@ -82,7 +83,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
     className="fixed inset-0 flex justify-center items-center z-50 bg-black/30"
     onClick={handleOverlayClick}
     >
-      <div className="relative bg-white rounded-lg border border-gray-200 w-full max-w-2xl p-6 overflow-y-auto max-h-screen sm:max-h-[90vh]">
+      <div className="relative bg-[var(--brand-navbar)] rounded-lg border border-[var(--brand-border)] w-full max-w-2xl p-6 overflow-y-auto max-h-screen sm:max-h-[90vh]">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50">
             <FaSpinner className="animate-spin text-4xl text-gray-500" />
@@ -96,8 +97,8 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           <FaTimes size={20} />
         </button>
 
-        <header className="border-b pb-4 mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900">Review ID application</h2>
+        <header className="border-b border-[var(--brand-border)] pb-4 mb-6">
+          <h2 className="text-2xl font-semibold text-[var(--brand-text-color)]">{t.title || 'Review ID application'}</h2>
         </header>
 
         {/* Serpro Validation Results */}
@@ -160,7 +161,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
             </div>
           ) : (
             <div className="w-32 h-32 rounded-lg bg-gray-200 flex items-center justify-center text-sm text-gray-500 border">
-              No photo
+              {t.noPhoto || 'No photo'}
             </div>
           )}
         </div>
@@ -239,8 +240,8 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           
         {denialMode && (
           <>
-            <div className="mb-2 text-sm font-medium text-gray-600">
-              Reason for denial of ID application <span className="text-gray-400 text-xs">(Will be sent to the applicant)</span>
+            <div className="mb-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+              {t.denialReasonLabel || 'Reason for denial of ID application'} <span className="text-[var(--brand-text-secondary)] text-xs">{t.denialReasonHint || '(Will be sent to the applicant)'}</span>
             </div>
             {/* <textarea
               className="w-full border border-gray-300 rounded-md p-3 text-sm mb-4"
@@ -260,7 +261,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
                 onClick={() => setDenialMode(true)}
                 className="px-12 py-2 rounded-lg font-semibold bg-red-500 text-white hover:opacity-80 transition"
               >
-                ❌ Deny ID application
+                ❌ {t.denyButton || 'Deny ID application'}
               </button>
               <button
                 onClick={() => {
@@ -269,7 +270,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
                 }}
                 className="px-12 py-2 rounded-lg font-semibold bg-purple-600 text-white hover:opacity-80 transition"
               >
-                ✔️ Approve ID application
+                ✔️ {t.approveButton || 'Approve ID application'}
               </button>
             </>
           ) : null}
@@ -284,7 +285,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
               }}
               className="px-[15%] py-2 rounded-lg font-semibold bg-[#F2495C33] text-[#A81123] hover:opacity-80 transition"
             >
-              Cancel denial
+              {t.cancelDenial || 'Cancel denial'}
             </button>
             <button
               onClick={() => {
@@ -299,7 +300,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 }`}
             >
-             Submit denial
+             {t.submitDenial || 'Submit denial'}
             </button>
           </div>
         )}

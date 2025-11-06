@@ -1,19 +1,60 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import { FiUser, FiLogOut } from 'react-icons/fi'
 import { useRouter } from 'next/navigation'
 import { LinkToPage } from './LinkToPage'
+import { Filter } from './Filter'
 import { fetchUserImage } from '@/utils/fetchUserImage'
+import { useLanguage } from '../../../context/LanguageContext'
+import { applyBrandTheme, getInitialMode, toggleMode } from '../../utils/brandTheme';
+import { Sun, Moon } from 'lucide-react'
+
 
 const Navbar = ({ neuroLogo }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [user, setUser] = useState(null)
   const [avatarUrl, setAvatarUrl] = useState('')
+  const [mode, setMode] = useState('light')
   const router = useRouter()
   const isFetchingRef = useRef(false)
   const hideTimeoutRef = useRef(null)
+  const { language, setLanguage, content } = useLanguage()
+  const t = content?.[language] || {}
+
+  // Language selection data (recomputed when language changes so current is first)
+  const renderFlagLabel = useMemo(
+    () => (countryCode, text) => (
+      <span className="flex items-center gap-2">
+        <span className={`fi fi-${countryCode}`} aria-hidden="true" />
+        <span>{text}</span>
+      </span>
+    ),
+    [],
+  )
+
+  const usLabelText = 'English (US)'
+  const ptLabelText = `Portugu${String.fromCharCode(234)}s (BR)`
+  const frLabelText = `Fran${String.fromCharCode(231)}ais`
+
+  const baseLangOptions = useMemo(
+    () => [
+      { value: 'en', label: renderFlagLabel('us', usLabelText) },
+      { value: 'pt', label: renderFlagLabel('br', ptLabelText) },
+      { value: 'fr', label: renderFlagLabel('fr', frLabelText) },
+    ],
+    [renderFlagLabel, ptLabelText, frLabelText],
+  )
+
+  const currentLanguage = useMemo(() => baseLangOptions.find(o => o.value === language), [language, baseLangOptions])
+  const languageOptions = useMemo(() => ([
+    ...baseLangOptions.filter(o => o.value !== language)
+  ]), [language, baseLangOptions])
+
+  const handleLanguageChange = (val) => {
+    setLanguage(val)
+  }
 
   useEffect(() => {
     try {
@@ -41,7 +82,15 @@ const Navbar = ({ neuroLogo }) => {
     } finally {
       isFetchingRef.current = false
     }
+    const initialMode = getInitialMode()
+    setMode(initialMode)
   }, [])
+
+  useEffect(() => {
+    // Apply theme when mode changes
+    const host = sessionStorage.getItem('AgentAPI.Host') || ''
+    applyBrandTheme(host, mode)
+  }, [mode])
 
   const filterRef = useRef(null)
 
@@ -82,12 +131,12 @@ const Navbar = ({ neuroLogo }) => {
     }
   }
   return (
-    <div className="relative z-20 flex items-center justify-between bg-white shadow-md border-b border-gray-200">
+    <div className="relative z-20 flex items-center justify-between shadow-md border-b bg-[var(--brand-navbar)] border-[var(--brand-border)]">
       {/* Left Section: Welcome Message */}
       <div className="flex items-center gap-4 ml-6 py-4">
       {neuroLogo && (
         <Image
-          src="/NeuroLogo.svg"
+          src={mode === 'dark' ? '/NeuroLogoLight.svg' : '/NeuroLogo.svg'}
           alt="Neuro"
           width={80}
           height={80}
@@ -95,6 +144,13 @@ const Navbar = ({ neuroLogo }) => {
         />
       )}
     </div>
+    <div className="flex items-center gap-4 mr-6 py-4">
+      <button
+        onClick={() => setMode(prev => toggleMode(prev))}
+        className="p-2 rounded-full border border-[var(--brand-border)] transition"
+      >
+        {mode === 'dark' ? <Moon className="w-5 h-5 text-blue-400" /> : <Sun className="w-5 h-5 text-yellow-400" />}
+      </button>
       {/* Icons and User Dropdown */}
       <div
         ref={filterRef}
@@ -107,7 +163,7 @@ const Navbar = ({ neuroLogo }) => {
             setDropdownOpen(false)
           }, 200)
         }}
-        className="relative flex items-center cursor-pointer mr-6 py-4 px-6 hover:bg-neuroButtonGray gap-6"
+        className="relative flex items-center cursor-pointer py-4 px-6 hover:bg-[var(--brand-hover)] gap-6"
       >
         {/* Hover bridge to prevent accidental close */}
         {dropdownOpen && (
@@ -126,34 +182,48 @@ const Navbar = ({ neuroLogo }) => {
                 className="rounded-full shadow-sm"
               />
             )}
-            <span className="text-gray-700 font-medium hidden md:block">
+            <span className="text-[var(--brand-text-color)] font-medium hidden md:block">
               {user?.name?.split(' ')[0] || 'User'}
             </span>
           </div>
 
           {dropdownOpen && (
-            <div className="absolute top-[170%] right-[-20%] w-[140%] rounded-md bg-white shadow-lg animate-fade-in z-50">
+            <div className="absolute top-[170%] right-[-20%] w-[140%]  rounded-md bg-[var(--brand-third)] border border-[var(--brand-border)] shadow-lg animate-fade-in z-50">
               <ul>
                 <LinkToPage
                   hrefName={`/neuro-access/profile/${user?.legalId}`}
                   setToggle={setDropdownOpen}
-                  title="Profile"
-                  icon={<FiUser size={18} className="text-gray-600" />}
+                  title={t?.navbar?.profile || 'Profile'}
+                  linkClassName="text-[var(--brand-text-color)]"
+                  icon={<FiUser size={18} className="text-[var(--brand-text-color)]" />}
                 />
 
                 <LinkToPage
                   handleLogout={handleLogout}
                   setToggle={setDropdownOpen}
-                  title="Logout"
+                  title={t?.navbar?.logout || 'Logout'}
                   icon={<FiLogOut size={18} className="text-red-500" />}
                 />
+                <li className="px-1 pb-2">
+                  <Filter
+                    noUrlParam
+                    selectArray={languageOptions}
+                    displayLabel={currentLanguage?.label}
+                    isFilterAccount={true}
+                    absoluteClassName={'absolute top-9 left-0 z-50 flex bg-[var(--brand-third)] border border-[var(--brand-border)] flex-col w-full cursor-pointer rounded-md shadow'}
+                    size={'w-full'}
+                    onSelect={handleLanguageChange}
+                  />
+                </li>
               </ul>
             </div>
           )}
         </div>
       </div>
     </div>
+    </div>
   )
 }
 
 export default Navbar
+

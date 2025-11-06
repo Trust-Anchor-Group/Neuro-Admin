@@ -1,9 +1,11 @@
 import { Inter, Space_Grotesk } from "next/font/google"
 import "./globals.css"
 import BrandProvider from "@/components/BrandProvider"
+import LanguageProvider from "../../context/LanguageContext";
 import HotjarProvider from "./Layouts/HotjarProvider"
 import Script from 'next/script'
 import { cookies } from "next/headers";
+import 'flag-icons/css/flag-icons.min.css';
 
 const inter = Inter({ subsets: ["latin"] })
 const grotesk = Space_Grotesk({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] })
@@ -27,9 +29,11 @@ export default async function RootLayout({ children }) {
         <Script src={eventsScript} strategy="beforeInteractive" />
       </head>
       <body className={`${inter.className} ${grotesk.className}`}>
-        <BrandProvider /> 
-        <HotjarProvider consent={analyticsConsent} />
-        {children}
+        <LanguageProvider>
+          <BrandProvider /> 
+          <HotjarProvider consent={analyticsConsent} />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   )

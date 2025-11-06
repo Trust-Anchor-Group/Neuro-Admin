@@ -1,8 +1,8 @@
+"use client";
 import React from 'react'
-import { useState } from 'react'
 import { FaPen } from 'react-icons/fa'
 
-export const PopUpButton = ({title,setToggle}) => {
+export const PopUpButton = ({ title, setToggle }) => {
 
   return (
     <div className='grid mt-5 grid-cols-2'>

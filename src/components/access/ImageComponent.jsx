@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import React from 'react'
+import { useLanguage, content } from '../../../context/LanguageContext';
 
 export const ImageComponent = ({user}) => {
   let profilePhoto = null;

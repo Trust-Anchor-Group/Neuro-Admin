@@ -4,6 +4,8 @@ import React, { useRef } from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
+import { useLanguage, content } from '../../../context/LanguageContext';
+
 
 export const LimitFilter = () => {
 
@@ -11,6 +13,8 @@ export const LimitFilter = () => {
   const limitFilter = searchParams.get('limit') || '50'
   const [toggle, setToggle] = useState(false)
   const [filterNames, setFilterNames] = useState('')
+  const { language } = useLanguage();
+  const t = content[language];
 
   const filterRef = useRef(null)
 
@@ -20,10 +24,10 @@ export const LimitFilter = () => {
         setFilterNames('All')
         break;
       case 'hasID':
-        setFilterNames('Active Id')
+        setFilterNames(t?.active || 'Active Id')
         break
         case 'noID':
-          setFilterNames('No Id')
+          setFilterNames(t?.noID || 'No Id')
       default:
         break;
     }
