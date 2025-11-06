@@ -46,13 +46,13 @@ const ProfileContent = () => {
     }
   }, [])
 
-  const fieldsToShowIdentity = [
-    { label: "First Name", key: "properties.FIRST" },
-    { label: "Nationality", key: "properties.COUNTRY" },
-    { label: "Address", key: "properties.ADDR" },
-    { label: "Date of birth", key: "properties.PNR" },
-    { label: "Phone", key: "properties.PHONE" },
-  ]
+  // Dynamically generate fields to show for identity from user.properties
+  const fieldsToShowIdentity = user?.properties
+    ? Object.keys(user.properties).map(key => ({
+        label: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        key: `properties.${key}`,
+      }))
+    : [];
 
   const fieldsToShowMetadata = [
     { label: "ID status", key: "state" },

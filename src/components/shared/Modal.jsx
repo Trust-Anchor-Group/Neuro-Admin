@@ -13,7 +13,63 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
   const [viewerOpen, setViewerOpen] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
-  const imageList = user.attachments?.filter(a => a?.data) || []
+  // Exclude ApplicationReview.xml from image list
+  const imageList = user.attachments?.filter(a => a?.data && a.fileName !== 'ApplicationReview.xml') || [];
+
+  // Find ApplicationReview.xml attachment (if any)
+  const applicationReviewXml = user.attachments?.find(a => a.fileName === 'ApplicationReview.xml');
+
+
+  // Parse XML string to extract error, validatedClaim, unvalidatedClaim, unvalidatedPhoto
+  function parseSerproXml(xmlString) {
+    if (!xmlString) return null;
+    try {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+      // Error
+      const errorNode = xmlDoc.getElementsByTagName('error')[0];
+      const error = errorNode ? {
+        message: errorNode.getAttribute('message'),
+        type: errorNode.getAttribute('type'),
+        service: errorNode.getAttribute('service')
+      } : null;
+      // Validated claims
+      const validatedClaims = Array.from(xmlDoc.getElementsByTagName('validatedClaim')).map(c => ({
+        claim: c.getAttribute('claim'),
+        service: c.getAttribute('service')
+      }));
+      // Unvalidated claims
+      const unvalidatedClaims = Array.from(xmlDoc.getElementsByTagName('unvalidatedClaim')).map(c => c.getAttribute('claim'));
+      // Unvalidated photos
+      const unvalidatedPhotos = Array.from(xmlDoc.getElementsByTagName('unvalidatedPhoto')).map(p => p.getAttribute('fileName'));
+      return { error, validatedClaims, unvalidatedClaims, unvalidatedPhotos };
+    } catch {
+      return null;
+    }
+  }
+
+  // If present, decode and parse the XML
+  let serproResults = null;
+  if (applicationReviewXml?.data) {
+    try {
+      const xmlString = atob(applicationReviewXml.data); // base64 decode
+      serproResults = parseSerproXml(xmlString);
+    } catch {}
+  }
+
+
+  // Helper to get attachment by exact filename (case-insensitive)
+  function getAttachmentByExactName(fileName) {
+    return user.attachments?.find(a => a.fileName && a.fileName.toLowerCase() === fileName.toLowerCase());
+  }
+
+  // KyC filenames
+  const applicantPhoto = getAttachmentByExactName('ProfilePhoto.jpg');
+  const idFront = getAttachmentByExactName('IdCardFront.jpg');
+  const idBack = getAttachmentByExactName('IdCardBack.jpg');
+  const passport = getAttachmentByExactName('Passport.jpg');
+  const driverFront = getAttachmentByExactName('DriverLicenseFront.jpg');
+  const driverBack = getAttachmentByExactName('DriverLicenseBack.jpg');
 
   function handleOverlayClick(e) {
     if (e.target === e.currentTarget) {
@@ -44,19 +100,61 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           <h2 className="text-2xl font-semibold text-gray-900">Review ID application</h2>
         </header>
 
+        {/* Serpro Validation Results */}
+        {/* {serproResults && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded p-4">
+            <div className="text-base font-bold text-blue-700 mb-2">Serpro Validation Results</div>
+            <ul className="text-sm text-blue-900 space-y-1">
+              {serproResults.error && (
+                <li className="text-red-700 font-semibold">Error: {serproResults.error.message} (Type: {serproResults.error.type}, Service: {serproResults.error.service})</li>
+              )}
+              {serproResults.validatedClaims && serproResults.validatedClaims.length > 0 && (
+                <li>
+                  <span className="font-medium">Validated Claims:</span>
+                  <ul className="ml-4 list-disc">
+                    {serproResults.validatedClaims.map((c, i) => (
+                      <li key={c.claim + c.service + i}>{c.claim} <span className="text-xs text-gray-500">({c.service})</span></li>
+                    ))}
+                  </ul>
+                </li>
+              )}
+              {serproResults.unvalidatedClaims && serproResults.unvalidatedClaims.length > 0 && (
+                <li>
+                  <span className="font-medium">Unvalidated Claims:</span>
+                  <ul className="ml-4 list-disc">
+                    {serproResults.unvalidatedClaims.map((c, i) => (
+                      <li key={c + i}>{c}</li>
+                    ))}
+                  </ul>
+                </li>
+              )}
+              {serproResults.unvalidatedPhotos && serproResults.unvalidatedPhotos.length > 0 && (
+                <li>
+                  <span className="font-medium">Unvalidated Photos:</span>
+                  <ul className="ml-4 list-disc">
+                    {serproResults.unvalidatedPhotos.map((f, i) => (
+                      <li key={f + i}>{f}</li>
+                    ))}
+                  </ul>
+                </li>
+              )}
+            </ul>
+          </div>
+        )} */}
+
         <div className="text-sm font-bold mb-2">Applicant photo</div>
         <div className="flex mb-6">
-          {user?.attachments?.[2]?.data ? (
+          {applicantPhoto?.data ? (
             <div
               className="w-32 h-32 rounded-lg overflow-hidden border cursor-pointer"
               onClick={() => {
-                setCurrentImageIndex(2)
+                setCurrentImageIndex(imageList.indexOf(applicantPhoto))
                 setViewerOpen(true)
               }}
             >
               <img
-                src={`data:image/jpeg;base64,${user.attachments[2].data}`}
-                alt={user.attachments[2].fileName || 'Applicant Photo'}
+                src={`data:image/jpeg;base64,${applicantPhoto.data}`}
+                alt={applicantPhoto.fileName || 'Applicant Photo'}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -70,133 +168,74 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
         <div className="text-sm font-bold">Applicant identification</div>
         <div className="mt-2 bg-gray-50 p-4 rounded mb-6">
           <div className="text-sm font-bold text-gray-500 mb-3">Identification chosen</div>
-          <div className="border-t border-gray-200 pt-2 text-base text-gray-700">National ID card</div>
+          <div className="border-t border-gray-200 pt-2 text-base text-gray-700">
+            {idFront ? 'National ID card'
+              : passport ? 'Passport'
+              : driverFront ? 'Driver License'
+              : 'Unknown'}
+          </div>
         </div>
 
         <div className="flex gap-4 mb-6">
-          {[0, 1].map(index => (
-            <div
-              key={index}
-              className="w-[194px] h-[144px] border-2 bg-gray-200 rounded-[8px] p-[8px] flex items-center justify-center overflow-hidden cursor-pointer"
-              onClick={() => {
-                setCurrentImageIndex(index)
-                setViewerOpen(true)
-              }}
-            >
-              {user?.attachments?.[index]?.data ? (
-                <img
-                  src={`data:image/jpeg;base64,${user.attachments[index].data}`}
-                  alt={user.attachments[index].fileName || `ID ${index === 1 ? 'Front' : 'Back'}`}
-                  className="w-full h-full object-cover rounded"
-                />
-              ) : (
-                <span className="text-gray-500 text-sm">
-                  No {index === 1 ? 'front' : 'back'} image
-                </span>
-              )}
-            </div>
-          ))}
+          {[{att: idFront, label: 'ID Card Front'}, {att: idBack, label: 'ID Card Back'}, {att: passport, label: 'Passport'}, {att: driverFront, label: 'Driver License Front'}, {att: driverBack, label: 'Driver License Back'}]
+            .filter(({att}) => att)
+            .map(({att, label}, idx) => (
+              <div
+                key={att.fileName || label}
+                className="w-[194px] h-[144px] border-2 bg-gray-200 rounded-[8px] p-[8px] flex items-center justify-center overflow-hidden cursor-pointer"
+                onClick={() => {
+                  setCurrentImageIndex(imageList.indexOf(att))
+                  setViewerOpen(true)
+                }}
+              >
+                {att.data ? (
+                  <img
+                    src={`data:image/jpeg;base64,${att.data}`}
+                    alt={att.fileName || label}
+                    className="w-full h-full object-cover rounded"
+                  />
+                ) : (
+                  <span className="text-gray-500 text-sm">
+                    No {label}
+                  </span>
+                )}
+              </div>
+            ))}
         </div>
 
         <div className="bg-gray-50 p-4 rounded mb-6">
           <div className="text-sm font-bold text-gray-500 mb-3">Personal information</div>
           <ul className="text-base divide-y divide-gray-200">
-            <li className="border-t pt-2 py-2 flex justify-between">
-              <span className="text-gray-600">Full name:</span>
-              <span>{user.properties.FIRST + ' ' + user.properties.LAST}</span>
-            </li>
-            <li className="py-2 flex justify-between">
-              <span className="text-gray-600">Country:</span>
-              <span>{user.properties.COUNTRY}</span>
-            </li>
-            <li className="py-2 flex justify-between">
-              <span className="text-gray-600">Identity number:</span>
-              <span>{user.properties.PNR}</span>
-            </li>
-            <li className="py-2 flex justify-between">
-              <span className="text-gray-600">Address:</span>
-              <span className="text-right">{user.properties.ADDR}</span>
-            </li>
-            <li className="py-2 flex justify-between">
-              <span className="text-gray-600">Email:</span>
-              <span>{user.properties.EMAIL}</span>
-            </li>
-            <li className="py-2 flex justify-between">
-              <span className="text-gray-600">Phone number:</span>
-              <span>{user.properties.PHONE}</span>
-            </li>
+            {user?.properties && Object.keys(user.properties).map((key, idx) => (
+              <li key={key} className={`pt-2 py-2 flex justify-between${idx === 0 ? ' border-t' : ''}`}>
+                <span className="text-gray-600">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                <span className="text-right">{user.properties[key]}</span>
+              </li>
+            ))}
           </ul>
         </div>
 
-        {user?.properties?.ORGNAME && user?.properties?.ORGNR && (
+        {/* Skipping company docs as requested */}
+        {/* {companyDoc?.data ? (
           <>
-            <div className="bg-gray-50 p-4 rounded mb-6">
-              <div className="text-sm font-bold text-gray-500 mb-3">Company information</div>
-              <ul className="text-base divide-y divide-gray-200">
-                <li className="border-t pt-2 py-2 flex justify-between">
-                  <span className="text-gray-600">ID number:</span>
-                  <span>{user.properties.ORGNR}</span>
-                </li>
-                <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">Legal name:</span>
-                  <span>{user.properties.ORGNAME}</span>
-                </li>
-                <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">Address:</span>
-                  <span className="text-right">
-                    {user.properties.ORGADDR}
-                    {user.properties.ORGADDR2 ? `, ${user.properties.ORGADDR2}` : ''}
-                  </span>
-                </li>
-                <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">City:</span>
-                  <span>{user.properties.ORGCITY}</span>
-                </li>
-                <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">ZIP:</span>
-                  <span>{user.properties.ORGZIP}</span>
-                </li>
-                <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">Region:</span>
-                  <span>{user.properties.ORGREGION}</span>
-                </li>
-                <li className="py-2 flex justify-between">
-                  <span className="text-gray-600">Country:</span>
-                  <span>{user.properties.ORGCOUNTRY}</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-gray-50 p-4 rounded mb-6">
-              <div className="text-sm font-bold text-gray-500 mb-3">Legal representation</div>
-              <div className="border-t border-gray-200 pt-2 text-sm text-gray-700">
-                {user.properties.ORGROLE === 'owner' || user.properties.ORGROLE === 'Legal Representative' ? 'Yes' : 'No'}
+            <div className="text-sm font-bold">Company legal document</div>
+            <div className="mt-2 bg-gray-50 p-4 rounded mb-6">
+              <div
+                className="w-[194px] h-[144px] border-2 bg-gray-200 rounded-[8px] p-[8px] flex items-center justify-center overflow-hidden cursor-pointer"
+                onClick={() => {
+                  setCurrentImageIndex(imageList.indexOf(companyDoc))
+                  setViewerOpen(true)
+                }}
+              >
+                <img
+                  src={`data:image/jpeg;base64,${companyDoc.data}`}
+                  alt={companyDoc.fileName || 'article_of_association'}
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </>
-        )}
-        {user?.attachments?.[3]?.data ? (
-          <>
-        <div className="text-sm font-bold">Company legal document</div>
-        <div className="mt-2 bg-gray-50 p-4 rounded mb-6">
-          <div
-                className="w-[194px] h-[144px] border-2 bg-gray-200 rounded-[8px] p-[8px] flex items-center justify-center overflow-hidden cursor-pointer"
-
-            onClick={() => {
-              setCurrentImageIndex(3)
-              setViewerOpen(true)
-            }}
-          >
-            <img
-              src={`data:image/jpeg;base64,${user.attachments[3].data}`}
-                  alt={user.attachments[2].fileName || 'article_of_association'}
-              className="w-full h-full object-cover"
-            />
-          </div>
-       
-            </div>
-          </>
-        ) : null}
+        ) : null} */}
           
         {denialMode && (
           <>
