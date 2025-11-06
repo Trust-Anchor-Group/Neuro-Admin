@@ -365,7 +365,7 @@ export default function LandingPage() {
           </div>
 
           {/* Simple Remote Quick Login Panel */}
-          {/* <div className="mb-8 bg-white border border-gray-200 rounded-lg p-4">
+          <div className="mb-8 bg-white border border-gray-200 rounded-lg p-4">
             <button
               onClick={() => setRemoteOpen((o) => !o)}
               className="text-xs mb-3 px-3 py-1 border rounded bg-gray-50 hover:bg-gray-100"
@@ -408,7 +408,7 @@ export default function LandingPage() {
                 {statusMsg && <p className="text-[11px] text-gray-600">{statusMsg}</p>}
               </div>
             )}
-          </div> */}
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[460px_1fr] gap-[48px] items-start">
             {/* LEFT SECTION */}
