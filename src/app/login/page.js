@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import config from '@/config/config'
 import { FaQrcode } from 'react-icons/fa'
 import { applyBrandTheme, getInitialMode, toggleMode } from '@/utils/brandTheme'
