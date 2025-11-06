@@ -13,7 +13,8 @@ export async function POST(request) {
       });
     }
 
-    const url = `https://${config.api.agent.host}/ApiKey.ws`;
+    const dynamicHost = config.api.agent.runtime?.(request.headers) || config.api.agent.host;
+    const url = `https://${dynamicHost}/ApiKey.ws`;
 
     const response = await fetch(url, {
       method: "POST",

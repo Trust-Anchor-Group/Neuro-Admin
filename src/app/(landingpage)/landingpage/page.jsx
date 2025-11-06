@@ -116,6 +116,17 @@ export default function LandingPage() {
   const t = i18nContent[language];
   const services = LandingServices(t);
   const [brand, setBrand] = useState({ logo: '/NeuroLogo.svg', name: 'Neuro Admin' });
+  const [remoteOpen, setRemoteOpen] = useState(false);
+  const [references, setReferences] = useState([]); // {domain, legalId}
+  const [selectedDomain, setSelectedDomain] = useState('');
+  const [localLegalId, setLocalLegalId] = useState('');
+  const [statusMsg, setStatusMsg] = useState('');
+  const [lastRemoteDomain, setLastRemoteDomain] = useState('');
+  const purpose = 'Admin Quick-Login via web';
+
+  // --- Remote WS refs & lifecycle ---
+  const remoteWsRef = useRef(null);
+  const remotePingRef = useRef(null);
 
   // Initial load: host + initial mode
   useEffect(() => {
@@ -147,6 +158,183 @@ export default function LandingPage() {
       window.removeEventListener('storage', handler);
     };
   }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      try {
+        if (remotePingRef.current) clearInterval(remotePingRef.current);
+        remoteWsRef.current?.send?.(JSON.stringify({ cmd: 'Unregister' }));
+        remoteWsRef.current?.close?.();
+      } catch { }
+    };
+  }, []);
+
+  // --- Remote WS connection ---
+  const connectRemoteEvents = (remoteDomain) => {
+    // close old
+    try {
+      if (remotePingRef.current) clearInterval(remotePingRef.current);
+      if (remoteWsRef.current) {
+        remoteWsRef.current.send?.(JSON.stringify({ cmd: 'Unregister' }));
+        remoteWsRef.current.close?.();
+      }
+    } catch { }
+
+    const wsUrl = `wss://${remoteDomain}/ClientEventsWS`;
+    const socket = new WebSocket(wsUrl, ['ls']);
+    remoteWsRef.current = socket;
+
+    socket.onopen = () => {
+      setStatusMsg(`Connected to remote events on ${remoteDomain}`);
+      socket.send(
+        JSON.stringify({
+          cmd: 'Register',
+          tabId: TabID,
+          location: window.location.href,
+        })
+      );
+
+      remotePingRef.current = setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({ cmd: 'Ping' }));
+        }
+      }, 10_000);
+    };
+
+    const remoteSignatureReceived = (signatureData, remoteDomain) => {
+      if (!signatureData) return;
+      try {
+        // Mirror QuickLogin storage logic
+        if (signatureData?.Properties && signatureData?.Attachments) {
+          const userData = {
+            name: `${signatureData.Properties.FIRST || ''} ${signatureData.Properties.LAST || ''}`.trim(),
+            legalId: signatureData.Id,
+            pictureId: signatureData.Attachments[0]?.Id,
+          };
+          sessionStorage.setItem('neuroUser', JSON.stringify(userData));
+          sessionStorage.setItem('profile', JSON.stringify(signatureData));
+        }
+        sessionStorage.setItem('signatureReceived', JSON.stringify(signatureData));
+        // Ensure host switch after data stored
+        switchToRemote(remoteDomain);
+        setStatusMsg('Remote quick login approved and profile stored.');
+      } catch (e) {
+        console.warn('Failed to persist remote signature data', e);
+      }
+    };
+
+    socket.onmessage = (ev) => {
+      if (!ev.data) return;
+      let msg;
+      try {
+        msg = JSON.parse(ev.data);
+      } catch {
+        return;
+      }
+      if (!msg?.type) return;
+
+      console.log('[Remote WS] Event:', msg);
+      const t = msg.type;
+      if (t === 'SignatureReceived' || t === 'SignatureReceivedBE') {
+        setStatusMsg('Remote signature received. Finalizing...');
+        try { socket.send(JSON.stringify({ cmd: 'Unregister' })); } catch {}
+        socket.close();
+        remoteSignatureReceived(msg.data, remoteDomain);
+      } else if (t === 'QuickLoginApproved' || t === 'QuickLoginGranted') {
+        setStatusMsg('Remote login approved. Switching host…');
+        try { socket.send(JSON.stringify({ cmd: 'Unregister' })); } catch {}
+        socket.close();
+        switchToRemote(remoteDomain);
+      } else if (t === 'QuickLoginDenied' || t === 'QuickLoginRejected') {
+        setStatusMsg('Remote login denied in app.');
+      }
+    };
+
+    socket.onerror = () => {
+      setStatusMsg(`[Remote WS] Error on ${remoteDomain}`);
+    };
+
+    socket.onclose = () => {
+      if (remotePingRef.current) clearInterval(remotePingRef.current);
+    };
+  };
+
+  const loadReferences = async () => {
+    setStatusMsg('Loading remote references...');
+    try {
+      const r = await AgentAPI.Account.RemoteReferences();
+      setReferences(r?.References || []);
+      setStatusMsg(`Loaded ${(r?.References || []).length} references`);
+    } catch (e) {
+      setStatusMsg('Failed to load references');
+    }
+  };
+
+  // Return the id so triggerRemote can use it immediately
+  const prepareRemote = async () => {
+    setStatusMsg('Preparing local quick login...');
+    try {
+      const r = await AgentAPI.Account.PrepareRemoteQuickLogin();
+      const id = r?.legalId || r?.LegalId || r?.Id || '';
+      setLocalLegalId(id);
+      setStatusMsg(id ? 'Local legalId ready' : 'No legalId returned');
+      return id;
+    } catch (e) {
+      setStatusMsg('Prepare failed');
+      return '';
+    }
+  };
+
+  const switchToRemote = (domain) => {
+    if (!domain) return;
+    try {
+      AgentAPI.IO?.SetHost?.(domain, true);
+    } catch { }
+    sessionStorage.setItem('AgentAPI.Host', domain);
+    setHost(domain);
+    setBrand(getBrandConfig(domain));
+    setLastRemoteDomain(domain);
+    setStatusMsg(`Switched to remote neuron: ${domain}`);
+    // After switching, you can optionally close the remote WS
+    // try {
+    //   if (remotePingRef.current) clearInterval(remotePingRef.current);
+    //   remoteWsRef.current?.send?.(JSON.stringify({ cmd: 'Unregister' }));
+    //   remoteWsRef.current?.close?.();
+    // } catch { }
+  };
+
+  const triggerRemote = async () => {
+    const domain = selectedDomain || 'lab.tagroot.io';
+    setLastRemoteDomain(domain);
+
+    // Ensure we are listening for the remote event BEFORE triggering
+    connectRemoteEvents(domain);
+
+    // Ensure we have a legalId right now (don't rely on async state)
+    let id = localLegalId;
+    if (!id) {
+      id = await prepareRemote();
+      if (!id) return; // abort if still missing
+    }
+
+    setStatusMsg('Triggering remote quick login...');
+    try {
+      const r = await AgentAPI.Account.RemoteQuickLogin(domain, id, purpose);
+      if (r?.loggedIn) {
+        setStatusMsg('Already logged in on remote. Switching host…');
+        switchToRemote(domain);
+      } else if (r?.petitionSent) {
+        switchToRemote(domain);
+        setStatusMsg('Petition sent. Await approval in app…');
+        // WS will catch the approval event and switch host
+      } else {
+        setStatusMsg('Remote cannot quick-login (no identity or broker lacks Legal Identity)');
+      }
+    } catch (e) {
+      setStatusMsg('Trigger failed');
+    }
+  };
 
   return (
     <>
@@ -187,8 +375,15 @@ export default function LandingPage() {
                   </h2>
                   <p className="text-[14px] text-[var(--brand-text-secondary)] mt-[4px]">{t?.landing?.labels?.currentNeuron || 'Current Neuron'}</p>
                 </div>
+                {localLegalId && (
+                  <p className="text-[11px] text-gray-500">
+                    Local legalId: <span className="font-mono">{localLegalId}</span>
+                  </p>
+                )}
+                {statusMsg && <p className="text-[11px] text-gray-600">{statusMsg}</p>}
               </div>
-            </div>
+            )}
+          </div> */}
 
             {/* Destination Card */}
             <div className="rounded-[16px] bg-[var(--brand-navbar)] shadow-[inset_0_0_10px_rgba(24, 31, 37, 0.10)] px-[24px] py-[20px]">
@@ -203,8 +398,6 @@ export default function LandingPage() {
                   ▼
                 </div>
               </div>
-            </div>
-          </div>
 
           {/* RIGHT SECTION */}
           <div className="relative">
@@ -244,7 +437,18 @@ export default function LandingPage() {
                         <item.icon size={20} className={item.iconColor} />
                       </div>
                     )}
-                  </div>
+                    <div className="flex justify-between items-start mb-2">
+                      {item.locked ? (
+                        <div className="flex items-center gap-[6px] px-[12px] py-[8px] rounded-full bg-[#DFE1E3]">
+                          <item.icon size={18} className="text-gray-700" />
+                          <MdLockOutline size={16} className="text-gray-400" />
+                        </div>
+                      ) : (
+                        <div className={`p-[10px] rounded-full ${item.iconBg}`}>
+                          <item.icon size={20} className={item.iconColor} />
+                        </div>
+                      )}
+                    </div>
 
                   <div className="flex-1">
                     <h3
@@ -273,7 +477,6 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </div>
       </div>
     </>
   );

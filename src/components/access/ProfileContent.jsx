@@ -49,16 +49,13 @@ const ProfileContent = () => {
     }
   }, [])
 
-  // Pull labels from Identity namespace translations
-  const ti = content?.[language]?.Identity?.labels || {}
-
-  const fieldsToShowIdentity = [
-    { label: ti.firstname || 'First Name', key: 'properties.FIRST' },
-    { label: ti.nationality || 'Nationality', key: 'properties.COUNTRY' },
-    { label: ti.address || 'Address', key: 'properties.ADDR' },
-    { label: ti.dateOfBirth || 'Date of birth', key: 'properties.PNR' },
-    { label: ti.phone || 'Phone', key: 'properties.PHONE' },
-  ]
+  // Dynamically generate fields to show for identity from user.properties
+  const fieldsToShowIdentity = user?.properties
+    ? Object.keys(user.properties).map(key => ({
+        label: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        key: `properties.${key}`,
+      }))
+    : [];
 
   const fieldsToShowMetadata = [
     { label: ti.idStatus || 'ID status', key: 'state' },
