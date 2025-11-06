@@ -431,18 +431,7 @@ export default function LandingPage() {
                         <item.icon size={20} className={item.iconColor} />
                       </div>
                     )}
-                    <div className="flex justify-between items-start mb-2">
-                      {item.locked ? (
-                        <div className="flex items-center gap-[6px] px-[12px] py-[8px] rounded-full bg-[#DFE1E3]">
-                          <item.icon size={18} className="text-gray-700" />
-                          <MdLockOutline size={16} className="text-gray-400" />
-                        </div>
-                      ) : (
-                        <div className={`p-[10px] rounded-full ${item.iconBg}`}>
-                          <item.icon size={20} className={item.iconColor} />
-                        </div>
-                      )}
-                    </div>
+                  </div>
 
                   <div className="flex-1">
                     <h3
