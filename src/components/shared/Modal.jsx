@@ -7,6 +7,8 @@ import { TiptapEditor } from './TiptapEditor'
 import { useLanguage, content } from '../../../context/LanguageContext'
 
 export const Modal = ({ setToggle, loading, user, text, handleApprove, handleReject }) => {
+  const { language } = useLanguage();
+  const t = content?.[language] || {};
   const [showFinalConfirmPopup, setShowFinalConfirmPopup] = useState(false)
   const [denialMode, setDenialMode] = useState(false)
   const [denialReason, setDenialReason] = useState('')
