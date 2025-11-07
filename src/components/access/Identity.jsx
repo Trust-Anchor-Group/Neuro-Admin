@@ -10,11 +10,14 @@ import { PopUpButton } from './Buttons/PopUpButton';
 import { ImageComponent } from './ImageComponent';
 import { ProfileEditModal } from './ProfileEditModal';
 
+
 export const Identity = ({
   user, id, getData, fieldsToShow,
   modalToggle, setModalToggle,
   fieldsToShowMetaData
 }) => {
+  const { language, content: i18nContent } = useLanguage();
+  const t = i18nContent?.[language] || {};
   const [infoToggle, setIntoToggle] = useState(true);
   const [infoToggleMetaData, setIntoToggleMetaData] = useState(false);
   const [previewAtt, setPreviewAtt] = useState(null);
