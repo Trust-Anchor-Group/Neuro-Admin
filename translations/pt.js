@@ -520,7 +520,50 @@
     }
   },
   assetDashboard: {
-    heading: 'Painel de Assets'
+    heading: 'Painel de Assets',
+    clients: {
+      title: 'Empresas subjacentes',
+      subtitle: 'Status mais recente dos emissores conectados',
+      cta: 'Gerenciar clientes',
+      columns: {
+        client: 'Cliente',
+        sector: 'Setor',
+        tokens: 'Tokens',
+        lastOrder: 'Último pedido',
+        status: 'Status'
+      },
+      statuses: {
+        active: 'Ativo',
+        onboarding: 'Em integração',
+        paused: 'Pausado',
+        review: 'Em revisão'
+      }
+    },
+    transactions: {
+      title: 'Últimas transações',
+      subtitle: 'Cinco eventos de mint/burn mais recentes',
+      tokensLabel: 'tokens',
+      statuses: {
+        settled: 'Liquidada',
+        pending: 'Pendente',
+        failed: 'Falhou'
+      }
+    },
+    monthlySummary: {
+      title: 'Resumo mensal',
+      subtitle: 'Tokens e pedidos criados',
+      tokens: 'Tokens',
+      orders: 'Pedidos'
+    },
+    certificates: {
+      title: 'Certificados nos tokens',
+      subtitle: 'Como os certificados lastreiam o supply ativo',
+      total: 'Certificados emitidos',
+      tokenized: 'Vinculados a tokens',
+      pending: 'Aguardando verificação',
+      expiring: 'Expirando em breve',
+      breakdownTitle: 'Distribuição por tipo'
+    }
   }
   ,
   certificateButtons: {
@@ -565,47 +608,6 @@
       progress: 'Progresso',
       amount: 'Quantidade',
       complete: 'concluído'
-    }
-  }
-  ,
-  processPage: {
-    progress: {
-      title: 'Progresso da compensação',
-      descriptionTotal: 'Acompanhando o volume compensado ao longo do tempo',
-      descriptionRelative: 'Comparando cada fase em relação ao total do pedido',
-      relative: 'Relativo',
-      total: 'Total',
-      noData: 'Nenhum dado disponível'
-    },
-    summary: {
-      totalValue: 'Valor total',
-      totalCompensation: 'Compensação total'
-    },
-    activity: {
-      title: 'Atividade do processo',
-      searchPlaceholder: 'Buscar atualizações',
-      filterAll: 'Tudo',
-      comingSoon: 'Em breve'
-    },
-    units: {
-      tons: 'tons'
-    },
-    misc: {
-      completeSuffix: '% concluído'
-    },
-    status: {
-      label: 'Status',
-      states: {
-        inProgress: 'Em progresso',
-        paused: 'Pausado',
-        aborted: 'Abortado',
-        complete: 'Concluído',
-        notStarted: 'Não iniciado'
-      },
-      terminate: 'Encerrar processo'
-    },
-    actions: {
-      terminate: 'Encerrar processo'
     }
   },
   clientOverview: {
@@ -715,6 +717,16 @@
     },
     nextField: 'Próximo campo',
     selectStep: 'Selecione uma etapa na lista para ver os detalhes.'
+  }
+  ,
+  editBox: {
+    editOrder: 'Editar pedido',
+    issueRefund: 'Emitir reembolso'
+  }
+  ,
+  partiesBox: {
+    buyer: 'Comprador',
+    issuer: 'Emissor'
   }
 };
 

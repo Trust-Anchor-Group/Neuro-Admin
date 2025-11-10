@@ -7,11 +7,12 @@ import React, { useContext, useMemo } from 'react'
 import { FaCertificate, FaChartLine, FaRegFileAlt } from 'react-icons/fa';
 import { StatusBox } from '@/components/assets/StatusBox';
 import { PartiesBox } from '@/components/assets/PartiesBox';
+import { EditBox } from '@/components/assets/EditBox';
 import Image from 'next/image';
 import certificateImage from '../../../../../../public/certificate.jpg'
 import { useLanguage } from '../../../../../../context/LanguageContext'
 import { PdfButton } from '@/components/assets/PdfButton';
-import Process from '@/components/assets/Process';
+
 
 
 
@@ -57,9 +58,15 @@ const DetailPageAssets = () => {
 
   const statusCard = {
     progress:'75',
-    amount:'47 tons',
+    amount:'47 of 73 tons',
     status:'In progress'
   }  
+
+  // Payment status card (duplicate of StatusBox for payment tracking)
+  const paymentStatusCard = {
+    progress: '100',
+    status: 'Complete',
+  }
 
   const parties = {
     
@@ -68,7 +75,7 @@ const DetailPageAssets = () => {
 
   return (
     <div className='p-5'>
-    <TabNavigation tab={tab} id={id} gridCols={'grid-cols-3'} tabArray={[
+    <TabNavigation tab={tab} id={id} gridCols={'grid-cols-2'} tabArray={[
       {
         title: t?.assetOrderDetail?.tabs?.order || 'Order detail',
         href:'/neuro-assets/detailpage',
@@ -84,14 +91,6 @@ const DetailPageAssets = () => {
         tabRef:'certificate'
 
       },
-          {   
-        title: t?.assetOrderDetail?.tabs?.process || 'Process',
-        href:'/neuro-assets/detailpage',
-        tabDesination:'process',
-        icon:FaChartLine,
-        tabRef:'process'
-
-      }
     ]}/> 
       <div className='mt-5'>
 
@@ -108,8 +107,10 @@ const DetailPageAssets = () => {
             />
           </div>
           <div className='col-start-4 col-end-5 flex flex-col items-start gap-2'>
-            <StatusBox statusCard={statusCard}/>
+            <StatusBox statusCard={statusCard} title={'Asset status'} />
+            <StatusBox statusCard={paymentStatusCard} title={'Payment status'} />
             <PartiesBox/>
+            <EditBox/>
           </div>
         </div>
         </>
@@ -184,16 +185,8 @@ const DetailPageAssets = () => {
                 <PdfButton/>
               </div>
             }
-            {
-              tab === 'process' &&
-              <Process />
-            }
           </div>
-  
     </div>
-                
-                
-
   )
 }
 

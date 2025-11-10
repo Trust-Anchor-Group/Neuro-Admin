@@ -522,7 +522,50 @@
     }
   },
   assetDashboard: {
-    heading: 'Assets Dashboard'
+    heading: 'Assets Dashboard',
+    clients: {
+      title: 'Underlying clients',
+      subtitle: 'Latest status across connected issuers',
+      cta: 'Manage clients',
+      columns: {
+        client: 'Client',
+        sector: 'Sector',
+        tokens: 'Tokens',
+        lastOrder: 'Last order',
+        status: 'Status'
+      },
+      statuses: {
+        active: 'Active',
+        onboarding: 'Onboarding',
+        paused: 'Paused',
+        review: 'Under review'
+      }
+    },
+    transactions: {
+      title: 'Latest transactions',
+      subtitle: 'Five most recent token mints and burns',
+      tokensLabel: 'tokens',
+      statuses: {
+        settled: 'Settled',
+        pending: 'Pending',
+        failed: 'Failed'
+      }
+    },
+    monthlySummary: {
+      title: 'Monthly summary',
+      subtitle: 'Created tokens and orders',
+      tokens: 'Tokens',
+      orders: 'Orders'
+    },
+    certificates: {
+      title: 'Certificates in tokens',
+      subtitle: 'How certificates back the active supply',
+      total: 'Certificates issued',
+      tokenized: 'Linked to tokens',
+      pending: 'Awaiting verification',
+      expiring: 'Expiring soon',
+      breakdownTitle: 'Breakdown by type'
+    }
   }
   ,
   certificateButtons: {
@@ -567,47 +610,6 @@
       progress: 'Progress',
       amount: 'Amount',
       complete: 'complete'
-    }
-  }
-  ,
-  processPage: {
-    progress: {
-      title: 'Compensation progress',
-      descriptionTotal: 'Tracking compensated volume over time',
-      descriptionRelative: 'Comparing each phase share of the total order',
-      relative: 'Relative',
-      total: 'Total',
-      noData: 'No data available'
-    },
-    summary: {
-      totalValue: 'Total value',
-      totalCompensation: 'Total compensation'
-    },
-    activity: {
-      title: 'Process activity',
-      searchPlaceholder: 'Search updates',
-      filterAll: 'All',
-      comingSoon: 'Coming soon'
-    },
-    units: {
-      tons: 'tons'
-    },
-    misc: {
-      completeSuffix: '% complete'
-    },
-    status: {
-      label: 'Status',
-      states: {
-        inProgress: 'In progress',
-        paused: 'Paused',
-        aborted: 'Aborted',
-        complete: 'Complete',
-        notStarted: 'Not started'
-      },
-      terminate: 'Terminate process'
-    },
-    actions: {
-      terminate: 'Terminate process'
     }
   },
   clientOverview: {
@@ -716,6 +718,16 @@
     },
     nextField: 'Next field',
     selectStep: 'Select a step from the checklist to inspect the preview.'
+  }
+  ,
+  editBox: {
+    editOrder: 'Edit order',
+    issueRefund: 'Issue refund'
+  }
+  ,
+  partiesBox: {
+    buyer: 'Buyer',
+    issuer: 'Issuer'
   }
 };
 

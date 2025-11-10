@@ -177,13 +177,14 @@ export default function LoginPage() {
                   />
                 </div>
 
-                <button
-                  onClick={() => setShowQR(true)}
-                  className="flex items-center gap-4 bg-[var(--brand-primary)] hover:bg-opacity-80 text-white px-20 py-3 rounded-lg text-sm font-semibold shadow"
-                >
-                  <FaQrcode className="text-xl" />
-                  Start Login
-                </button>
+                  <button
+                    onClick={() => setShowQR(true)}
+                    className="flex items-center gap-4 bg-[var(--brand-button)] hover:bg-opacity-80 text-white px-20 py-3 rounded-lg text-sm font-semibold shadow"
+                  >
+                    <FaQrcode className="text-xl" />
+                    Start Login
+                  </button>
+
               </>
             )}
 
