@@ -1,12 +1,14 @@
 "use client";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { FaCheckCircle, FaExclamationCircle, FaExclamationTriangle } from "react-icons/fa";
 import KYCSettingsPreview from './KYCSettingsPreview';
 import { useLanguage, content } from '../../../../context/LanguageContext';
 
 export default function KYCSettings() {
   const { language } = useLanguage();
-  const t = content?.[language]?.KYCSettings || content?.[language]?.KYCSetting || {};
+  const t = useMemo(() => {
+    return content?.[language]?.KYCSettings || content?.[language]?.KYCSetting || {};
+  }, [language]);
   const [settings, setSettings] = useState(null);
   const [originalSettings, setOriginalSettings] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,6 +16,7 @@ export default function KYCSettings() {
   const [message, setMessage] = useState({ type: "", text: "" });
   const dismissTimerRef = useRef(null);
 
+  const loadErrorMsg = t?.messages?.loadError || "Failed to load KYC settings.";
   useEffect(() => {
     async function fetchSettings() {
       try {
@@ -59,7 +62,7 @@ export default function KYCSettings() {
         setOriginalSettings(JSON.stringify(formattedSettings));
       } catch (error) {
         console.error("Failed to fetch peer review settings", error);
-        setMessage({ type: "error", text: t?.messages?.loadError || "Failed to load KYC settings." });
+  setMessage({ type: "error", text: loadErrorMsg });
       } finally {
         setLoading(false);
       }
@@ -73,7 +76,7 @@ export default function KYCSettings() {
         dismissTimerRef.current = null;
       }
     };
-  }, []);
+  }, [loadErrorMsg]);
 
   // auto-dismiss message after 2s
   useEffect(() => {
@@ -111,11 +114,36 @@ export default function KYCSettings() {
     if (!settings || JSON.stringify(settings) === originalSettings) return;
     setSaving(true);
     try {
+      // Map requiredFields array to individual boolean flags expected by backend
+      const requiredMap = settings.requiredFields.reduce((acc, f) => {
+        acc[f.id] = !!f.required;
+        return acc;
+      }, {});
+
+      // Ensure minimums & consistency
+      const nrReviewers = Math.max(1, Number(settings.nrReviewers) || 1);
+      const nrPhotos = settings.requirePhotos ? Math.max(1, Number(settings.nrPhotos) || 1) : 0;
+
       const payload = {
-        allowPeerReview: settings.peerReview,
-        nrReviewersToApprove: settings.nrReviewers.toString(),
-        nrPhotosRequired: settings.nrPhotos.toString(),
-        requiredFields: settings.requiredFields.filter((f) => f.required).map((f) => f.id),
+        allowPeerReview: !!settings.peerReview,
+        nrReviewersToApprove: nrReviewers.toString(),
+        nrPhotosRequired: nrPhotos.toString(),
+        // Individual field requirements
+        requireFirstName: requiredMap.FIRST || false,
+        requireMiddleName: requiredMap.MID || false,
+        requireLastName: requiredMap.LAST || false,
+        requirePersonalNumber: requiredMap.PNR || false,
+        requireBirthDate: requiredMap.DOB || false,
+        requireGender: requiredMap.GENDER || false,
+        requireNationality: requiredMap.NATIONALITY || false,
+        requireAddress: requiredMap.ADDR || false,
+        requirePostalCode: requiredMap.ZIP || false,
+        requireCity: requiredMap.CITY || false,
+        requireCountry: requiredMap.COUNTRY || false,
+        requireArea: requiredMap.AREA || false,
+        requireRegion: requiredMap.REGION || false,
+        // Optional untouched flag for completeness (kept false unless added to UI later)
+        requireIso3166Compliance: false,
       };
 
       const res = await fetch("/api/settings/peerReview", {
@@ -125,13 +153,15 @@ export default function KYCSettings() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Save failed");
-
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || "Save failed");
+      }
       setMessage({ type: "success", text: t?.messages?.saveSuccess || "Settings updated successfully!" });
       setOriginalSettings(JSON.stringify(settings));
     } catch (error) {
       console.error("Failed to save settings", error);
-      setMessage({ type: "error", text: t?.messages?.saveError || "Failed to update settings." });
+      setMessage({ type: "error", text: (t?.messages?.saveError || "Failed to update settings.") + (error.message ? ` (${error.message})` : "") });
     } finally {
       setSaving(false);
     }

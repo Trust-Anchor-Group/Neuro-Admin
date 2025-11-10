@@ -678,7 +678,7 @@ const fr = {
   },
   
   kycPreview: {
-    previewTitle: 'Aperçu',
+    previewTitle: 'Aperçu Beta',
     intro: 'Ce mini-flux reflète l\'intégration utilisateur finale. Activez les champs requis pour voir la checklist s\'adapter en temps réel.',
     empty: 'Aucun champ requis sélectionné. Activez au moins un champ pour afficher l\'aperçu d\'intégration.',
     progressLabel: 'Progression',
