@@ -691,7 +691,7 @@
     timezone: 'Fuso horário'
   },
   kycPreview: {
-    previewTitle: 'Pré-visualização',
+    previewTitle: 'Pré-visualização Beta',
     intro: 'Este fluxo reduzido espelha a experiência de onboarding do usuário final. Ative campos obrigatórios para ver a lista se adaptar em tempo real.',
     empty: 'Nenhum campo obrigatório selecionado. Ative pelo menos um para ver a pré-visualização.',
     progressLabel: 'Progresso',
