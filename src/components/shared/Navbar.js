@@ -9,7 +9,7 @@ import { Filter } from './Filter'
 import { fetchUserImage } from '@/utils/fetchUserImage'
 import { useLanguage } from '../../../context/LanguageContext'
 import { applyBrandTheme, getInitialMode, toggleMode } from '../../utils/brandTheme';
-import { Sun, Moon } from 'lucide-react'
+import { Sun, Moon, CircleUserRound, } from 'lucide-react'
 
 
 const Navbar = ({ neuroLogo }) => {
@@ -173,7 +173,7 @@ const Navbar = ({ neuroLogo }) => {
         {/* User Dropdown */}
         <div className="relative pr-5">
           <div className="flex items-center gap-2 cursor-pointer">
-            {avatarUrl && (
+            {avatarUrl ? (
               <Image
                 src={avatarUrl}
                 alt="User Avatar"
@@ -181,9 +181,16 @@ const Navbar = ({ neuroLogo }) => {
                 height={32}
                 className="rounded-full shadow-sm"
               />
+            ) : (
+              <CircleUserRound className="w-8 h-8 text-[var(--brand-text-color)]" aria-label="User" />
             )}
             <span className="text-[var(--brand-text-color)] font-medium hidden md:block">
-              {user?.name?.split(' ')[0] || 'User'}
+              {(() => {
+                const raw = user?.name;
+                if (!raw || typeof raw !== 'string') return (t?.navbar?.profile || 'Profile');
+                const first = raw.trim().split(/\s+/)[0];
+                return first || (t?.navbar?.profile || 'Profile');
+              })()}
             </span>
           </div>
 
