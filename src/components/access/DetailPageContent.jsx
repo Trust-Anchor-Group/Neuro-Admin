@@ -54,7 +54,7 @@ export default function DetailPageContent() {
                 ...data.data,
                 properties: {
                     ...data.data.properties,
-                    FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
+                    // FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
                 }
             })
   
@@ -91,7 +91,7 @@ export default function DetailPageContent() {
             ...data.data,
             properties: {
                 ...data.data.properties,
-                FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
+                // FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
             }
         })
   
@@ -149,15 +149,13 @@ export default function DetailPageContent() {
         { label: t?.Identity?.labels?.created || "Created", key: "created" }
             ];
 
-            const fieldsToShowIdentity = [
-                { label: t?.Identity?.labels?.fullName || "Full Name", key: "properties.FULLNAME" },
-                { label: t?.Identity?.labels?.nationality || "Nationality", key: "properties.COUNTRY" },
-                { label: t?.Identity?.labels?.address || "Address", key: "properties.ADDR" },
-                { label: t?.Identity?.labels?.personalNumber || "Personal number", key: "properties.PNR" },
-                { label: t?.Identity?.labels?.phone || "Phone", key: "properties.PHONE" },
-                { label: t?.Identity?.labels?.email || "Email", key: "properties.EMAIL" },
-                // { label: t?.Identity?.labels?.dateOfBirth || "Date of birth", key: "properties.DOB" },     
-            ];
+      // Dynamic identity fields: show all user.properties keys
+      const fieldsToShowIdentity = user?.properties
+        ? Object.keys(user.properties).map(key => ({
+            label: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            key: `properties.${key}`,
+          }))
+        : [];
     
             const fieldsToShowWithNoID = [
                 { label: t?.Identity?.labels?.account || "Account", key: "data.userName" },

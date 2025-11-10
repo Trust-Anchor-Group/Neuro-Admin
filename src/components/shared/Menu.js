@@ -27,7 +27,10 @@ const getBrandConfig = (host) => {
   };
 };
 
+
 const Menu = ({ menuItems }) => {
+  // All hooks must be called unconditionally and in the same order
+  const pathname = usePathname();
   const [open, setOpen] = useState(true);
   const [hoveredItem, setHoveredItem] = useState(null);
   const [mode, setMode] = useState('light');
@@ -78,10 +81,10 @@ const Menu = ({ menuItems }) => {
     };
   }, [isClient]);
 
+
   if (!isClient) return null;
 
   const { logo, name, subtitle, themeClass } = getBrandConfig(host);
-  const pathname = usePathname();
   const dynamicSubtitle = (pathname && pathname.toLowerCase().includes('asset'))
     ? (t?.AssetMenu?.title || 'Assets')
     : (t?.menu?.access || subtitle || 'Access');

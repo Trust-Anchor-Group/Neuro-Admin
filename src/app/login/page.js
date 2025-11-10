@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import config from '@/config/config'
 import { FaQrcode } from 'react-icons/fa'
 import { applyBrandTheme, getInitialMode, toggleMode } from '@/utils/brandTheme'
@@ -20,10 +20,18 @@ export default function LoginPage() {
   const { language, content } = useLanguage()
   const t = content?.[language] || {}
   const router = useRouter()
-  async function checkLogin() {
+
+  const checkLogin = useCallback(async () => {
+    const dynamicHost =
+      typeof window !== 'undefined'
+        ? sessionStorage.getItem('AgentAPI.Host')
+        : null
     const res = await fetch('/api/accounts', {
       method: 'POST',
-      headers: { 'Content-type': 'application/json' },
+      headers: {
+        'Content-type': 'application/json',
+        ...(dynamicHost ? { 'x-agent-host': dynamicHost } : {}),
+      },
       credentials: 'include',
       body: '{}',
     })
@@ -33,7 +41,7 @@ export default function LoginPage() {
     } else {
       router.push('/landingpage')
     }
-  }
+  }, [router])
 
   useEffect(() => {
     const initial = getInitialMode()

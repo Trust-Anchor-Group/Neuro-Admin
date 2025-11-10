@@ -694,7 +694,7 @@
     statusExpired: 'Expired'
   },
   kycPreview: {
-    previewTitle: 'Preview',
+    previewTitle: 'Preview Beta',
     intro: 'This miniature flow mirrors the end-user onboarding. Toggle required fields to see how the checklist adapts in real time.',
     empty: 'No required fields selected. Enable at least one field to view the onboarding preview.',
     progressLabel: 'Progress',

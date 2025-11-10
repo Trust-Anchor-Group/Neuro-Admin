@@ -17,8 +17,8 @@ export async function POST(request) {
 
         const clientCookie = request.headers.get("Cookie");
 
-        const { host } = config.api.agent;
-        const url = `https://${host}/LegalIdentities.ws`;
+        const dynamicHost = config.api.agent.runtime?.(request.headers) || config.api.agent.host;
+        const url = `https://${dynamicHost}/LegalIdentities.ws`;
 
         // ---------- 1) TOTAL request: NO maxCount ----------
         // Only include filters/search-like fields; omit maxCount/offset entirely.
@@ -28,7 +28,7 @@ export async function POST(request) {
         };
         if (state) totalBody.state = state;
         if (createdFrom) totalBody.createdFrom = createdFrom;
-
+       clientCookie
         const totalRes = await fetch(url, {
             method: "POST",
             headers: {
@@ -40,7 +40,7 @@ export async function POST(request) {
             mode: "cors",
             body: JSON.stringify(totalBody),
         });
-
+        console.log("TOTAL response:", totalRes);
         const totalContentType = totalRes.headers.get("content-type") || "";
         const totalRaw = totalContentType.includes("application/json")
             ? await totalRes.json()
