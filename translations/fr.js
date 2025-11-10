@@ -507,7 +507,50 @@ const fr = {
     }
   },
   assetDashboard: {
-    heading: 'Tableau de bord des Assets'
+    heading: 'Tableau de bord des actifs',
+    clients: {
+      title: 'Sociétés sous-jacentes',
+      subtitle: 'Statut le plus récent des émetteurs connectés',
+      cta: 'Gérer les clients',
+      columns: {
+        client: 'Client',
+        sector: 'Secteur',
+        tokens: 'Tokens',
+        lastOrder: 'Dernière commande',
+        status: 'Statut'
+      },
+      statuses: {
+        active: 'Actif',
+        onboarding: 'En intégration',
+        paused: 'Suspendu',
+        review: 'En revue'
+      }
+    },
+    transactions: {
+      title: 'Dernières transactions',
+      subtitle: 'Cinq opérations de mint/burn les plus récentes',
+      tokensLabel: 'tokens',
+      statuses: {
+        settled: 'Validée',
+        pending: 'En attente',
+        failed: 'Échec'
+      }
+    },
+    monthlySummary: {
+      title: 'Résumé mensuel',
+      subtitle: 'Tokens et ordres créés',
+      tokens: 'Tokens',
+      orders: 'Ordres'
+    },
+    certificates: {
+      title: 'Certificats dans les tokens',
+      subtitle: 'Comment les certificats couvrent l’offre active',
+      total: 'Certificats émis',
+      tokenized: 'Liés à des tokens',
+      pending: 'En attente de vérification',
+      expiring: 'Expire bientôt',
+      breakdownTitle: 'Répartition par type'
+    }
   }
   ,
   certificateButtons: {
@@ -552,47 +595,6 @@ const fr = {
       progress: 'Progression',
       amount: 'Montant',
       complete: 'terminé'
-    }
-  }
-  ,
-  processPage: {
-    progress: {
-      title: 'Progression de la compensation',
-      descriptionTotal: 'Suivi du volume compensé dans le temps',
-      descriptionRelative: 'Comparaison de chaque phase par rapport au total',
-      relative: 'Relatif',
-      total: 'Total',
-      noData: 'Aucune donnée disponible'
-    },
-    summary: {
-      totalValue: 'Valeur totale',
-      totalCompensation: 'Compensation totale'
-    },
-    activity: {
-      title: 'Activité du processus',
-      searchPlaceholder: 'Rechercher des mises à jour',
-      filterAll: 'Tout',
-      comingSoon: 'Bientôt disponible'
-    },
-    units: {
-      tons: 'tonnes'
-    },
-    misc: {
-      completeSuffix: '% terminé'
-    },
-    status: {
-      label: 'Statut',
-      states: {
-        inProgress: 'En cours',
-        paused: 'En pause',
-        aborted: 'Annulé',
-        complete: 'Terminé',
-        notStarted: 'Non démarré'
-      },
-      terminate: 'Terminer le processus'
-    },
-    actions: {
-      terminate: 'Terminer le processus'
     }
   },
   clientOverview: {
@@ -702,6 +704,16 @@ const fr = {
     },
     nextField: 'Champ suivant',
     selectStep: 'Sélectionnez une étape dans la checklist pour voir les détails.'
+  }
+  ,
+  editBox: {
+    editOrder: 'Modifier la commande',
+    issueRefund: 'Effectuer un remboursement'
+  }
+  ,
+  partiesBox: {
+    buyer: 'Acheteur',
+    issuer: 'Émetteur'
   }
 };
 

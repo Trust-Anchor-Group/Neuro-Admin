@@ -41,6 +41,7 @@ export async function applyBrandTheme(host, mode = 'light') {
     ['--brand-sidebar-bg', config.sidebarBg || config.backgroundColor],
     ['--brand-navbar', (config.navbarBg || config.backgroundColor)],
     ['--brand-hover', config.hover || '#f3f4f6'],
+    ['--brand-button', config.button || '#A160E8'],
   ];
 
   const root = document.documentElement;
@@ -74,6 +75,7 @@ export async function getBrandPalette(host, mode = 'light') {
     sidebarBg = backgroundColor,
     navbarBg = backgroundColor,
     hover = '#f3f4f6',
+    button = '#A160E8',
     logoUrl = ''
   } = config;
   return { primaryColor, secondaryColor, backgroundColor, thirdColor, textColor, textSecondaryColor, accentColor, borderColor, sidebarBg, navbarBg, logoUrl, brandKey, mode };

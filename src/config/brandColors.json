@@ -34,7 +34,7 @@
   "mateo": {
     "modes": {
       "light": {
-        "primaryColor": "#8F40D4",
+        "primaryColor": "#FAFAFA",
         "secondaryColor": "#FFFFFF",
         "backgroundColor": "#FAFAFA",
         "thirdColor": "#FFFFFF",
@@ -45,10 +45,11 @@
         "sidebarBg": "#FFFFFF",
         "navbarBg": "#FFFFFF",
         "logoUrl": "/NeuroLogo.svg",
-        "hover": "#f3f4f6"
+        "hover": "#f3f4f6",
+        "button": "#A160E8"
       },
       "dark": {
-        "primaryColor": "#A160E8",
+        "primaryColor": "#161617",
         "secondaryColor": "#1E1E1E",
         "backgroundColor": "#161617",
         "thirdColor": "#1F1F1F",
@@ -59,7 +60,8 @@
         "sidebarBg": "#181818",
         "navbarBg": "#252526",
         "logoUrl": "/NeuroLogo.svg",
-        "hover": "#A160E8"
+        "hover": "#161617",
+        "button": "#A160E8"
       }
     }
   }

@@ -46,7 +46,7 @@ export default function OrdersPage() {
 
   return (
     <div className="p-6 min-h-screen bg-[var(--brand-background)]">
-      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">Carbon Credit Overview</h1>
+      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">Asset Overview</h1>
       <section className="mt-4 mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {summaryCards.map(({ label, value, Icon, accentClass }) => (
           <div

@@ -163,7 +163,7 @@ const Navbar = ({ neuroLogo }) => {
             setDropdownOpen(false)
           }, 200)
         }}
-        className="relative flex items-center cursor-pointer py-4 px-6 hover:bg-[var(--brand-hover)] gap-6"
+        className="relative flex items-center bg-[var(--brand-background)] rounded-xl cursor-pointer py-4 px-6 hover:bg-[var(--brand-hover)] gap-6"
       >
         {/* Hover bridge to prevent accidental close */}
         {dropdownOpen && (

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useLanguage, content } from '../../../context/LanguageContext'
 
-export const StatusBox = ({ statusCard }) => {
+export const StatusBox = ({ statusCard, title }) => {
   // Status color mapping
   const statusStyles = {
     'Paused': {
@@ -33,14 +33,14 @@ export const StatusBox = ({ statusCard }) => {
   const { language } = useLanguage();
   const t = content[language];
   const currentStyle = statusStyles[statusCard.status] || statusStyles['Not started'];
-  const statusLabel = t?.assetOrderDetail?.statusBox?.status || 'Status';
+  const statusLabel = title || t?.assetOrderDetail?.statusBox?.status || 'Status';
   const completeLabel = t?.assetOrderDetail?.statusBox?.complete || 'complete';
   return (
     <div
       className="shadow-sm rounded-xl border p-4 w-full max-w-sm"
       style={{
 
-        background: 'var(--brand-background)',
+        background: 'var(--brand-navbar)',
         color: 'var(--brand-text)',
         borderColor: 'var(--brand-border)',
       }}
