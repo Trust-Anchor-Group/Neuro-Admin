@@ -729,6 +729,13 @@
     buyer: 'Buyer',
     issuer: 'Issuer'
   }
+  ,
+  sidebox: {
+    privateNotesTitle: 'Client notes',
+    addNotePlaceholder: 'Enter note...',
+    addNoteButton: 'Add note',
+    noNotes: 'No notes added yet.'
+  }
 };
 
 export default en;

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLanguage, content } from '../../../context/LanguageContext';
 import { Mail, Phone } from "lucide-react";
+import Sidebox from './Sidebox.jsx';
 
 const pricingAgreements = [
   { title: 'Carbon capture EU (Q2 2025)', date: 'Apr 15, 2025', price: '250,000 SEK', status: 'Active' },
@@ -206,43 +207,8 @@ const Overview = () => {
         )}
         </div>
       </div>
-      {/* Right column: sidebar (1/4) */}
-      <div className="col-start-4 col-end-5 flex flex-col gap-5">
-        {/* Purchases Card */}
-        <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-lg p-5 mb-2 w-full">
-          <div className="text-l mb-2 text-[var(--brand-text-secondary)]">{t?.clientOverview?.totalPurchases || 'Total purchases'}</div>
-          <div className="text-3xl font-bold text-[var(--brand-text)]">0.8 MSEK</div>
-        </div>
-        {/* Compensation Card */}
-        <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-lg p-5 mb-2 w-full">
-          <div className="text-l mb-2 text-[var(--brand-text-secondary)]">{t?.clientOverview?.totalCompensation || 'Total compensation'}</div>
-          <div className="text-3xl font-bold text-[var(--brand-text)]">125 tons</div>
-        </div>
-        {/* Contacts Card */}
-        <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-lg p-5 w-full">
-          <div className="font-bold text-xl mb-3 text-[var(--brand-text)]">{t?.clientOverview?.contacts || 'Contacts'}</div>
-          {contacts.map((c, idx) => (
-            <div
-              key={idx}
-              className={`bg-[var(--brand-background)] mb-4 pb-5 pt-5 pl-5 rounded-md cursor-pointer hover:border hover:border-purple-500 ${idx < contacts.length - 1 ? '' : ''}`}
-              onClick={() => alert(`Navigating to ${c.name}'s profile...`)}
-            >
-              <div className=" text-base font-bold text-[var(--brand-text)]">{c.name}</div>
-              <div className="border-b mb-3 pb-3 border-[var(--brand-border)] text-sm text-[var(--brand-text-secondary)] mb-1">{c.role}</div>
-              {idx < 3 && (
-                <>
-                  <div className="border-b mb-3 pb-3 border-[var(--brand-border)] flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
-                    <Mail className="text-[var(--brand-text)]" /> {c.email}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
-                    <Phone className="text-[var(--brand-text)]" /> {c.phone}
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Right column extracted to Sidebox */}
+      <Sidebox t={t} contacts={contacts} purchasesValue="0.8 MSEK" compensationValue="125 tons" maxContactDetails={3} />
       </div>
       {/* Modal Popup for Editing Client Info */}
       {showModal && (
