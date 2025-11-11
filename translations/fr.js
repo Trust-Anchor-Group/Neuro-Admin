@@ -715,6 +715,13 @@ const fr = {
     buyer: 'Acheteur',
     issuer: 'Émetteur'
   }
+  ,
+  sidebox: {
+    privateNotesTitle: 'Notes client',
+    addNotePlaceholder: 'Ajouter une note...',
+    addNoteButton: 'Ajouter',
+    noNotes: 'Aucune note pour l\'instant.'
+  }
 };
 
 

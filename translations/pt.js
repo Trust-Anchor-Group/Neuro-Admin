@@ -728,6 +728,13 @@
     buyer: 'Comprador',
     issuer: 'Emissor'
   }
+  ,
+  sidebox: {
+    privateNotesTitle: 'Notas cliente',
+    addNotePlaceholder: 'Digite uma nota...',
+    addNoteButton: 'Adicionar nota',
+    noNotes: 'Nenhuma nota adicionada ainda.'
+  }
 };
 
 
