@@ -1,24 +1,70 @@
 // src/config/clientConfig.js
 export const clientConfigs = {
   kikkin: {
-    brand: {
-      primaryColor: '#2f8aff',
-      secondaryColor: '#FFB900',
-      backgroundColor: '#005375',
-      accentColor: '#FBB040',
-      logoUrl: '/kikkinLogo.jpg',
+    modes: {
+      light: {
+        primaryColor: '#005375',
+        secondaryColor: '#FFFFFF',
+        backgroundColor: '#F5F6F7',
+        thirdColor: '#FFFFFF',
+        textColor: '#161111',
+        textSecondaryColor: '#181F259E',
+        accentColor: '#FBB040',
+        logoUrl: '/KikkinLogo.jpg',
+        borderColor: '#e2e8f0',
+        sidebarBg: '#FFFFFF',
+        navbarBg: '#0a2a49ff',
+        hover: '#f3f4f6',
+      },
+      dark: {
+        primaryColor: '#0A5D7D',
+        secondaryColor: '#DFE1E3',
+        backgroundColor: '#0B1F29',
+        thirdColor: '#142F3C',
+        textColor: '#F1F5F9',
+        textSecondaryColor: '#F5F6F780',
+        
+        accentColor: '#FBB040',
+        logoUrl: '/KikkinLogo.jpg',
+        borderColor: '#1F3340',
+        sidebarBg: '#4d1e87ff',
+        navbarBg: '#0F2733',
+        hover: '#0A5D7D',
+      },
     },
- 
-  
   },
-  Mateo: {
-    brand: {
-      primaryColor: '#7C4DFF',
-      secondaryColor: '#FFC107',
-      backgroundColor: '#FFFFFF',
-      accentColor: '#7C4DFF',
-      logoUrl: '/NeuroLogo.svg',
+  mateo: {
+    modes: {
+      light: {
+        primaryColor: '#FAFAFA',
+        secondaryColor: '#FFFFFF',
+        backgroundColor: '#FAFAFA',
+        thirdColor: '#FFFFFF',
+        textColor: '#2E2E2E',
+        textSecondaryColor: '#4b5563',
+        accentColor: '#FBB040',
+        logoUrl: '/NeuroLogo.svg',
+        borderColor: '#e2e8f0',
+        navbarBg: '#FFFFFF',
+        sidebarBg: '#3b3b3bff',
+        hover: '#f3f4f6',
+        button: '#A160E8'
+      },
+      dark: {
+        primaryColor: '#161617',
+        secondaryColor: '#1E1E1E',
+        backgroundColor: '#161617',
+        thirdColor: '#1F1F1F',
+        textColor: '#E2E2E2',
+        textSecondaryColor: '#94a3b8',
+        accentColor: '#FBB040',
+        logoUrl: '/NeuroLogo.svg',
+        borderColor: '#2A2A2A',
+        sidebarBg: '#a53a3aff',
+        navbarBg: '#252526',
+        hover: '#161617',
+        button: '#A160E8',
+      },
     },
-    
   },
-}
+};

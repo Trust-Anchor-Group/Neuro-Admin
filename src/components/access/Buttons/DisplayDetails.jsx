@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { MapOutInput } from '../../shared/MapOutInput';
+import { useLanguage, content } from '../../../../context/LanguageContext';
 
 export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
+  const { language } = useLanguage();
+  const t = content[language];
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [showDeletedMessage, setShowDeletedMessage] = useState(false);
   const router = useRouter();
@@ -37,14 +40,17 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
     }
   };
 
-  if (!userData) return <p>No data available</p>;
+  if (!userData) return <p>{t?.displayDetails?.noData || 'No data available'}</p>;
 
   return (
     <div className="flex flex-col h-full max-md:grid-cols-1">
-      <div className="bg-white border rounded-xl shadow-sm p-6 max-md:col-span-1 max-sm:p-0 max-sm:pb-5 max-sm:overflow-auto">
+      <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-xl shadow-sm p-6 max-md:col-span-1 max-sm:p-0 max-sm:pb-5 max-sm:overflow-auto">
         <div className="grid grid-cols-1 gap-5 max-sm:grid-cols-1 max-sm:px-5">
           <div className="flex justify-between items-center gap-3 max-sm:flex-col max-sm:mt-5">
-            <p className="text-text28 font-semibold max-sm:text-xl">
+            <p
+              className="text-text28 font-semibold max-sm:text-xl break-words whitespace-normal w-full"
+              style={{wordBreak: 'break-word'}}
+            >
               {userData?.account || userData?.data?.userName}
             </p>
           </div>
@@ -60,18 +66,18 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
                     alt='Logo' />
                   <div className=''>
                     <h1 className=' text-2xl font-semibold' >{header.title}</h1>
-                    <p className='text16 text-neuroTextBlack/65'>{header.created}</p>
+                    <p className='text16 text-[var(--brand-text)]'>{header.created}</p>
                   </div>
                 </div>
                 <div className=''>
                   <p className='text-2xl font-semibold '>{header.credit}</p>
-                  <p className='text16 text-neuroTextBlack/65'>{header.tons}</p>
+                  <p className='text16 text-[var(--brand-text)]'>{header.tons}</p>
                 </div>
               </div>
             )
           }
-          <div className="bg-neuroGray/70 rounded-xl p-5 overflow-auto">
-            <h2 className="font-semibold text-neuroDarkGray/70 border-b-2 pb-2">
+          <div className="bg-[var(--brand-background)] rounded-xl p-5 overflow-auto">
+            <h2 className="font-semibold text-[var(--brand-text-secondary)] border-b-2 border-[var(--brand-border)] pb-2">
               {title}
             </h2>
             <MapOutInput fieldsToShow={fieldsToShow} user={userData} />
@@ -80,7 +86,7 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
             onClick={() => setShowConfirmPopup(true)}
             className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-xl text-xl shadow-lg transition-colors"
           >
-            Delete Account
+            {t?.displayDetails?.deleteAccount || 'Delete Account'}
           </button>
         </div>
       </div>
@@ -94,23 +100,23 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
               ×
             </button>
             <p className="text-lg font-semibold text-gray-800 mb-2">
-              Are you sure you want to delete your account?
+              {t?.displayDetails?.confirmTitle || 'Are you sure you want to delete your account?'}
             </p>
             <p className="text-sm text-gray-500 mb-6">
-              This action cannot be undone.
+              {t?.displayDetails?.confirmSubtitle || 'This action cannot be undone.'}
             </p>
             <div className="flex justify-center gap-4">
               <button
                 onClick={handleDeleteAccount}
                 className="px-4 py-2 bg-red-600 text-white rounded font-semibold hover:opacity-80 transition"
               >
-                Delete
+                {t?.displayDetails?.confirmDelete || 'Delete'}
               </button>
               <button
                 onClick={() => setShowConfirmPopup(false)}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded font-semibold hover:opacity-80 transition"
               >
-                Cancel
+                {t?.displayDetails?.cancel || 'Cancel'}
               </button>
             </div>
           </div>
@@ -120,7 +126,7 @@ export const DisplayDetails = ({ userData, fieldsToShow, title, header }) => {
         <div className="fixed inset-0 flex justify-center items-center z-[9999] bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-lg p-8 shadow-lg text-center">
             <p className="text-2xl font-semibold text-gray-800">
-              Your account has been successfully deleted.
+              {t?.displayDetails?.deletedMessage || 'Your account has been successfully deleted.'}
             </p>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { Identity } from '@/components/access/Identity'
 import { LocalizationSettings } from '@/components/access/LocalizationSettings'
 import { InputField } from '@/components/access/InputField'
 import { ProfileEditModal } from '@/components/access/ProfileEditModal'
+import { useLanguage } from '../../../context/LanguageContext'
 import { fetchUserImage } from '@/utils/fetchUserImage'
 
 const ProfileContent = () => {
@@ -12,6 +13,8 @@ const ProfileContent = () => {
   const [loading, setLoading] = useState(false)
   const [modalToggle, setModalToggle] = useState(false)
   const [modalToggleClient, setModalToggleClient] = useState(false)
+  const { language, content } = useLanguage()
+  const t = content?.[language]?.profilePage || {}
 
   useEffect(() => {
     const storedProfile = sessionStorage.getItem('profile')
@@ -46,17 +49,17 @@ const ProfileContent = () => {
     }
   }, [])
 
-  const fieldsToShowIdentity = [
-    { label: "First Name", key: "properties.FIRST" },
-    { label: "Nationality", key: "properties.COUNTRY" },
-    { label: "Address", key: "properties.ADDR" },
-    { label: "Date of birth", key: "properties.PNR" },
-    { label: "Phone", key: "properties.PHONE" },
-  ]
+  // Dynamically generate fields to show for identity from user.properties
+  const fieldsToShowIdentity = user?.properties
+    ? Object.keys(user.properties).map(key => ({
+        label: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        key: `properties.${key}`,
+      }))
+    : [];
 
   const fieldsToShowMetadata = [
-    { label: "ID status", key: "state" },
-    { label: "ID created", key: "created" },
+    { label: ti.idStatus || 'ID status', key: 'state' },
+    { label: ti.idCreated || 'ID created', key: 'created' },
   ]
 
   return (
@@ -80,15 +83,15 @@ const ProfileContent = () => {
         </div>
       )}
 
-      <aside aria-label="System Settings" className='flex flex-col bg-white border-2 rounded-xl p-5 gap-3 max-sm:mt-5'>
+      <aside aria-label="System Settings" className='flex flex-col bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-xl p-5 gap-3 max-sm:mt-5'>
         <header>
-          <h2 className='text-text26 font-semibold'>System</h2>
+          <h2 className='text-text26 font-semibold'>{t.systemTitle || 'System'}</h2>
         </header>
 
-        <section className='bg-neuroGray/70 rounded-xl p-5 overflow-auto'>
-          <InputField labelText={'Language'} name={'English'} />
+        <section className='bg-[var(--brand-background)] rounded-xl p-5 overflow-auto'>
+          <InputField labelText={t.languageLabel || 'Language'} name={t.languageValueEnglish || 'English'} />
           <LocalizationSettings />
-          <InputField labelText={'Default theme'} name={'Timed'} />
+          <InputField labelText={t.defaultThemeLabel || 'Default theme'} name={t.defaultThemeTimed || 'Timed'} />
 
           {modalToggleClient && user && (
             <ProfileEditModal

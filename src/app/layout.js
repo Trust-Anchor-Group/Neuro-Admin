@@ -1,8 +1,11 @@
 import { Inter, Space_Grotesk } from "next/font/google"
 import "./globals.css"
 import BrandProvider from "@/components/BrandProvider"
+import LanguageProvider from "../../context/LanguageContext";
 import HotjarProvider from "./Layouts/HotjarProvider"
+import Script from 'next/script'
 import { cookies } from "next/headers";
+import 'flag-icons/css/flag-icons.min.css';
 
 const inter = Inter({ subsets: ["latin"] })
 const grotesk = Space_Grotesk({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] })
@@ -13,15 +16,24 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }) {
+  const baseUrl = (process.env.NEXT_PUBLIC_AGENT_API_URL || 'https://kikkin.lab.tagroot.io')
+  const baseURI = (process.env.NEXT_PUBLIC_AGENT_HOST || 'kikkin.lab.tagroot.io')
   const cookieStore = await cookies();
   const analyticsConsent = cookieStore.get("analytics_consent")?.value === "granted";
+  const eventsScript = `${baseUrl}/Events.js`
 
   return (
     <html lang="en" >
+      <head>
+        <meta name="NEURON" content={baseURI} />
+        <Script src={eventsScript} strategy="beforeInteractive" />
+      </head>
       <body className={`${inter.className} ${grotesk.className}`}>
-        <BrandProvider /> 
-        <HotjarProvider consent={analyticsConsent} />
-        {children}
+        <LanguageProvider>
+          <BrandProvider /> 
+          <HotjarProvider consent={analyticsConsent} />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   )

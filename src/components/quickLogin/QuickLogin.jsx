@@ -134,7 +134,6 @@ export default function QuickLogin({
   const evaluateEvent = async (event) => {
     if (!event?.type) return;
 
-
     if (
       event.type === 'SignatureReceived' ||
       event.type === 'SignatureReceivedBE'
@@ -142,35 +141,27 @@ export default function QuickLogin({
       signatureReceived(event.data);
       sessionStorage.setItem("signatureReceived", JSON.stringify(event.data));
 
-      // Set host regardless
       AgentAPI.IO.SetHost(neuron, true);
-      console.log(
-        '[AgentAPI] Host set to', event.data.Domain)
-      console.log('[AgentAPI] host env:', neuron);
+      console.log('[AgentAPI] Host set to', event.data.Domain);
 
-      // if (event.data.AgentApiToken) {
-      //   console.log('[AgentAPI] AgentApiToken received in event. Authenticating directly.');
-      //   AgentAPI.Account.SaveSessionToken(event.data.AgentApiToken, 3600, 1800);
-      //   AgentAPI.Account.AuthenticateJwt(event.data.AgentApiToken);
-      // } else if (event.type === 'SignatureReceivedBE') {
-      //   console.log('[QuickLogin] No AgentApiToken in event — calling /Account/QuickLogin fallback');
-
-      //   try {
-      //     const res = await fetch('/api/auth/quickLogin/token', {
-      //       method: 'POST',
-      //       credentials: 'include',
-      //     });
-
-      //     if (!res.ok) throw new Error(await res.text());
-
-      //     const { jwt } = await res.json();
-
-      //     AgentAPI.Account.SaveSessionToken(jwt, 3600, 1800);
-      //     AgentAPI.Account.AuthenticateJwt(jwt);
-      //   } catch (err) {
-      //     console.error('[QuickLogin] Fallback token request failed:', err);
-      //   }
-      // }
+      try {
+        const Response = await fetch('/api/auth/quickLogin/token', { method: 'POST', credentials: 'include' });
+        console.log(Response)
+        if (!Response.ok) {
+          console.warn('[QuickLogin] /Account/QuickLogin failed', Response.status);
+        } else {
+          const json = await Response.json().catch(()=>({}));
+          const jwt = json?.jwt 
+          if (jwt) {
+            try { AgentAPI.Account.AuthenticateJwt?.(jwt); } catch { }
+            try { AgentAPI.Account.SaveSessionToken?.(jwt, 3600, 1800); } catch { }
+          } else {
+            console.warn('[QuickLogin] No JWT in response');
+          }
+        }
+      } catch (err) {
+        console.error('[QuickLogin] Error performing Account/QuickLogin', err);
+      }
     }
   };
 
@@ -227,6 +218,7 @@ export default function QuickLogin({
             <img
               src={`${window.location.protocol}//${neuron}/QR/${tagSign}`}
               alt="QR Code"
+              className='rounded-2xl'
             />
             <Typography
               variant="body2"

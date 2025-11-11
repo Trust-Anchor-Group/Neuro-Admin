@@ -2,8 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { applyBrandTheme, getInitialMode, toggleMode } from '../../utils/brandTheme';
+import { useLanguage, content } from '../../../context/LanguageContext';
 
 const getBrandConfig = (host) => {
   const lowerHost = host?.toLowerCase() || '';
@@ -24,13 +27,18 @@ const getBrandConfig = (host) => {
   };
 };
 
+
 const Menu = ({ menuItems }) => {
+  const pathname = usePathname();
   const [open, setOpen] = useState(true);
   const [hoveredItem, setHoveredItem] = useState(null);
+  const [mode, setMode] = useState('light');
   const [isClient, setIsClient] = useState(false);
   const [host, setHost] = useState('');
   const filterRef = useRef(null);
   const hideTimeoutRef = useRef(null);
+  const { language } = useLanguage();
+  const t = content?.[language] || {};
 
   useEffect(() => {
     document.addEventListener('mousedown', (e) => {
@@ -45,20 +53,54 @@ const Menu = ({ menuItems }) => {
     setIsClient(true);
     const storedHost = sessionStorage.getItem('AgentAPI.Host');
     if (storedHost) setHost(storedHost);
+    const initial = getInitialMode();
+    setMode(initial);
   }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      applyBrandTheme(host, mode);
+    }
+  }, [host, mode, isClient]);
+
+  // Listen for global mode changes dispatched by toggleMode (Navbar) or other tabs
+  useEffect(() => {
+    if (!isClient) return;
+    const handler = (e) => {
+      const next = e?.detail || localStorage.getItem('ui.mode');
+      if (next === 'light' || next === 'dark') {
+        setMode(next);
+      }
+    };
+    window.addEventListener('ui-mode-changed', handler);
+    window.addEventListener('storage', handler);
+    return () => {
+      window.removeEventListener('ui-mode-changed', handler);
+      window.removeEventListener('storage', handler);
+    };
+  }, [isClient]);
+
 
   if (!isClient) return null;
 
   const { logo, name, subtitle, themeClass } = getBrandConfig(host);
+  const dynamicSubtitle = (pathname && pathname.toLowerCase().includes('asset'))
+    ? (t?.AssetMenu?.title || 'Assets')
+    : (t?.menu?.access || subtitle || 'Access');
 
   return (
     <aside
       ref={filterRef}
-      className={`h-screen shadow-md border-r border-gray-200 transition-all duration-300 flex flex-col justify-between ${open ? 'w-64' : 'w-16'} ${themeClass}`}
+      className={`h-screen shadow-md transition-all duration-300 flex flex-col justify-between ${open ? 'w-64' : 'w-16'} ${themeClass}`}
+      style={{
+        background: 'var(--brand-sidebar-bg)',
+        borderRight: '1px solid border-[var(--brand-border)]'
+      }}
     >
       <div>
         {/* HEADER */}
-        <div className="flex flex-col items-center px-3 py-4 border-b relative bg-brand text-brand-on">
+     <div className="flex flex-col items-center px-3 py-4 relative text-brand-on"
+       style={{ background: 'var(--brand-primary)', borderBottom: '1px solid var(--brand-border)' }}>
           {open && (
             <div className="text-center w-full mb-4">
               <div className="bg-[var(--brand-third)] py-2 px-4 rounded-lg text-sm font-medium text-brand-on">
@@ -69,7 +111,7 @@ const Menu = ({ menuItems }) => {
 
           <div className={`relative transition-all ${open ? 'w-16 aspect-[1/1]' : 'w-10 aspect-[1/1] my-1'}`}>
             <Image
-              src={logo}
+              src={mode === 'dark' ? '/NeuroLogoLight.svg' : '/NeuroLogo.svg'}
               alt="Brand Logo"
               fill
               className="object-contain rounded-full shadow-sm"
@@ -81,8 +123,9 @@ const Menu = ({ menuItems }) => {
             <div className="w-full px-2 mt-4 mb-4">
               <div className="bg-[var(--brand-third)] p-2 rounded-lg text-sm text-center text-brand-on">
                 <strong className="block">{name}</strong>
-                <span className="text-xs block opacity-80">{subtitle}</span>
+                <span className="text-xs block opacity-80">{dynamicSubtitle}</span>
               </div>
+              {/* Theme toggle moved to Navbar */}
             </div>
           )}
 
@@ -124,10 +167,10 @@ const Menu = ({ menuItems }) => {
                   }, 200);
                 }}
               >
-                <div className="border-t pt-3">
+                <div className="border-t border-[var(--brand-border)] pt-3">
                   <Link
                     href={item.href || '#'}
-                    className="flex gap-3 items-center text-[var(--brand-text-color)] text-base font-medium rounded hover:bg-brand-accent hover-text-on-brand p-3 w-full transition-colors"
+                    className="menu-item flex gap-3 items-center text-base font-medium p-3 w-full"
                   >
                     <span>{item.icon}</span>
                     {open && <span>{item.title}</span>}
@@ -141,7 +184,7 @@ const Menu = ({ menuItems }) => {
                       <li key={subItem.label}>
                         <Link
                           href={subItem.href}
-                          className="block px-2 py-1 rounded hover:bg-gray-200 text-[var(--brand-text-color)] transition"
+                          className="submenu-item"
                         >
                           {subItem.label}
                         </Link>
@@ -153,7 +196,7 @@ const Menu = ({ menuItems }) => {
                 {/* Floating submenu (hover + collapsed) */}
                 {!open && hoveredItem === idx && (
                   <ul
-                    className="absolute left-full top-3 ml-2 bg-white shadow-lg rounded-lg text-sm p-2 z-30"
+                    className="submenu-container absolute left-full top-3 ml-2 text-sm p-2 z-30"
                     onMouseEnter={() => clearTimeout(hideTimeoutRef.current)}
                     onMouseLeave={() => {
                       hideTimeoutRef.current = setTimeout(() => {
@@ -161,14 +204,14 @@ const Menu = ({ menuItems }) => {
                       }, 200);
                     }}
                   >
-                    <li className="font-semibold text-brand-accent border-b pb-1 mb-1">
+                    <li className="font-semibold text-brand-accent border-b border-[var(--brand-border)] pb-1 mb-1">
                       <Link href={item.href}>{item.title}</Link>
                     </li>
                     {item.subItems?.map((subItem) => (
                       <li key={subItem.label}>
                         <Link
                           href={subItem.href}
-                          className="block px-2 py-1 rounded hover:bg-gray-100 text-[var(--brand-text-color)] transition whitespace-nowrap"
+                          className="submenu-item whitespace-nowrap"
                         >
                           {subItem.label}
                         </Link>
@@ -186,7 +229,7 @@ const Menu = ({ menuItems }) => {
       <footer className="p-4">
         <Link href="/landingpage" className="flex justify-center">
           <Image
-            src={logo}
+            src={mode === 'dark' ? '/NeuroLogoLight.svg' : '/NeuroLogo.svg'}
             alt="Brand Logo"
             width={open ? 80 : 32}
             height={open ? 80 : 32}

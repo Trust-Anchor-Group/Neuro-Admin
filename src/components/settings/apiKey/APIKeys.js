@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
 import { useRouter } from 'next/navigation'
 import { MaterialReactTable } from 'material-react-table'
 import { FaEye, FaEyeSlash, FaCopy } from 'react-icons/fa'
 import { FiSearch } from 'react-icons/fi'
 
 export default function APIKeys() {
+  const { language } = useLanguage();
+  const t = i18nContent?.[language]?.apiKeysList || {};
   const [apiKeys, setApiKeys] = useState([])
   const [visibleKeys, setVisibleKeys] = useState({})
   const [loading, setLoading] = useState(true)
@@ -65,26 +68,27 @@ export default function APIKeys() {
     () => [
       {
         accessorKey: 'owner',
-        header: 'Owner',
+        header: t.columns?.owner || 'Owner',
         Cell: ({ row }) => (
-          <span className="text-sm text-gray-900 font-medium">
+          <span className="text-sm font-medium" style={{ color: 'var(--brand-text-color)' }}>
             {row.original.owner}
           </span>
         ),
       },
       {
         accessorKey: 'key',
-        header: 'API key',
+        header: t.columns?.apiKey || 'API key',
         Cell: ({ row }) => (
-          <div className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-lg font-mono text-sm w-full overflow-hidden">
-            <span className="truncate w-full">
+          <div className="flex items-center gap-2 bg-[var(--brand-third)] px-3 py-1 rounded-lg font-mono text-sm w-full overflow-hidden">
+            <span className="truncate w-full" style={{ color: 'var(--brand-text-color)' }}>
               {visibleKeys[row.original.id]
                 ? row.original.key
-                : '••••••••••••••••••••••••••••••••'}
+                : (row.original.key ? row.original.key.replace(/./g, '*') : '********')}
             </span>
             <button
               onClick={(e) => toggleVisibility(row.original.id, e)}
-              className="text-gray-500 hover:text-gray-700"
+              className="transition-colors"
+              style={{ color: 'var(--brand-text-color)' }}
             >
               {visibleKeys[row.original.id] ? (
                 <FaEyeSlash size={14} />
@@ -94,39 +98,43 @@ export default function APIKeys() {
             </button>
             <button
               onClick={(e) => copyToClipboard(row.original.key, e)}
-              className="text-gray-500 hover:text-gray-700"
+              className="transition-colors"
+              style={{ color: 'var(--brand-text-color)' }}
             >
               <FaCopy size={14} />
             </button>
           </div>
         ),
       },
-
       {
         accessorKey: 'email',
-        header: 'Owner email',
+        header: t.columns?.ownerEmail || 'Owner email',
         Cell: ({ row }) => (
-          <span className="text-sm text-gray-800">{row.original.email}</span>
+          <span className="text-sm" style={{ color: 'var(--brand-text-secondary)' }}>
+            {row.original.email}
+          </span>
         ),
-        size: 250, 
+        size: 250,
       },
       {
         accessorKey: 'created',
-        header: 'Created',
+        header: t.columns?.created || 'Created',
         Cell: ({ row }) => (
-          <span className="text-sm text-gray-800">{row.original.created}</span>
+          <span className="text-sm" style={{ color: 'var(--brand-text-secondary)' }}>
+            {row.original.created}
+          </span>
         ),
         size: 150,
       },
     ],
-    [visibleKeys]
+    [visibleKeys, t]
   )
 
   return (
-    <div className="bg-white rounded-2xl  font-grotesk">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">API keys</h2>
+    <div className="bg-[var(--brand-navbar)] rounded-2xl font-grotesk text-[var(--brand-text-color)] p-6">
+      <h2 className="text-2xl font-bold text-[var(--brand-text-color)] mb-6">{t.title || 'API keys'}</h2>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm">
+      <div className="border border-[var(--brand-border)] rounded-2xl shadow-sm bg-[var(--brand-navbar)] text-[var(--brand-text-color)]">
         <MaterialReactTable
           columns={columns}
           data={apiKeys}
@@ -147,67 +155,139 @@ export default function APIKeys() {
                 gap: '8px',
                 padding: '8px',
               },
+              '& .MuiTablePagination-toolbar': {
+                color: 'var(--brand-text-color)',
+              },
+              '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                color: 'var(--brand-text-color)',
+              },
+              '& .MuiSelect-icon': {
+                color: 'var(--brand-text-color)',
+              },
               '& .MuiPaginationItem-root': {
-                borderRadius: '4px',
+                borderRadius: '6px',
                 minWidth: '32px',
                 height: '32px',
                 fontSize: '14px',
                 fontWeight: 500,
                 fontFamily: '"Space Grotesk", sans-serif',
-                color: '#4B5563',
+                color: 'var(--brand-text-color)',
               },
-              '& .Mui-selected': {
-                backgroundColor: '#E9DDF8 !important',
-                color: '#722FAD !important',
+              '& .MuiPaginationItem-root.Mui-selected': {
+                backgroundColor: 'var(--brand-primary)',
+                color: 'var(--brand-background)',
                 fontWeight: 600,
               },
               '& .MuiPaginationItem-ellipsis': {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '35px',
-                color: '#9CA3AF',
-                paddingBottom: '1rem',
-                borderRadius: '4px',
+                fontSize: '24px',
+                color: 'var(--brand-text-color)',
               },
-
               '& .MuiPaginationItem-icon': {
-                color: '#9CA3AF',
+                color: 'var(--brand-text-color)',
+              },
+              '& .MuiSvgIcon-root': {
+                color: 'var(--brand-text-color)',
               },
             },
           }}
-          muiTablePaperProps={{ elevation: 0 }}
+          muiTablePaperProps={{
+            elevation: 0,
+            sx: {
+              backgroundColor: 'var(--brand-navbar)',
+              borderRadius: '16px',
+              border: '1px solid var(--brand-border)',
+              color: 'var(--brand-text-color)',
+            },
+          }}
           muiTableContainerProps={{
-            sx: { borderRadius: '16px', overflow: 'hidden' },
+            sx: {
+              borderRadius: '16px',
+              overflow: 'hidden',
+              backgroundColor: 'var(--brand-third)',
+            },
           }}
           muiTableHeadCellProps={{
             sx: {
-              backgroundColor: '#F9FAFB',
-              color: '#4B5563',
+              backgroundColor: 'var(--brand-third)',
+              color: 'var(--brand-text-color) !important',
               fontSize: '13px',
               fontWeight: 600,
               textTransform: 'none',
               fontFamily: '"Space Grotesk", sans-serif',
+              borderBottom: '1px solid var(--brand-border)',
+              '& .MuiTableSortLabel-root': {
+                color: 'var(--brand-text-color) !important',
+              },
+              '& .MuiTableSortLabel-root.Mui-active': {
+                color: 'var(--brand-text-color) !important',
+              },
+              '& .MuiTableSortLabel-icon': {
+                color: 'var(--brand-text-color) !important',
+                opacity: 1,
+              },
+              '& .MuiIconButton-root': {
+                color: 'var(--brand-text-color)',
+                '& svg': {
+                  color: 'var(--brand-text-color)',
+                },
+              },
             },
           }}
           muiTableBodyCellProps={{
             sx: {
               fontSize: '14px',
-              borderBottom: '1px solid #E5E7EB',
+              borderBottom: '1px solid var(--brand-border)',
               paddingTop: '12px',
               paddingBottom: '12px',
               fontFamily: '"Space Grotesk", sans-serif',
+              color: 'var(--brand-text-color)',
+              backgroundColor: 'var(--brand-third)',
             },
           }}
-           muiTableBodyRowProps={({ row }) => ({
+          muiTableBodyRowProps={({ row }) => ({
             onClick: () => handleRowClick(row.original.key),
             sx: {
               cursor: "pointer",
-              "&:hover": { backgroundColor: "#f9fafb" },
+              '& .MuiTableCell-root': {
+                backgroundColor: 'var(--brand-third)',
+              },
+              "&:hover .MuiTableCell-root": {
+                backgroundColor: 'var(--brand-third)',
+                filter: 'brightness(1.05)',
+              },
             },
           })}
+          muiTopToolbarProps={{
+            sx: {
+              backgroundColor: 'var(--brand-navbar)',
+              color: 'var(--brand-text-color)',
+              borderBottom: '1px solid var(--brand-border)',
+              '& .MuiIconButton-root': {
+                color: 'var(--brand-text-color)',
+                '& svg': { color: 'var(--brand-text-color)' },
+              },
+              '& .MuiInputBase-root': {
+                backgroundColor: 'var(--brand-third)',
+                color: 'var(--brand-text-color)',
+                borderRadius: '8px',
+                paddingInline: '6px',
+                '& fieldset': { borderColor: 'var(--brand-border)' },
+                '&:hover fieldset': { borderColor: 'var(--brand-border)' },
+                '&.Mui-focused fieldset': { borderColor: 'var(--brand-primary)' },
+                '& .MuiSvgIcon-root': { color: 'var(--brand-text-color)' },
+              },
+              '& .MuiTypography-root': {
+                color: 'var(--brand-text-color)',
+              },
+            },
+          }}
         />
       </div>
     </div>
   )
 }
+
+

@@ -10,6 +10,7 @@ import Link from 'next/link.js';
 import { Modal } from '../shared/Modal.jsx';
 import { pendingAction } from './pendingFetch.js';
 import { getModalText } from '@/utils/getModalText.js';
+import { useLanguage, content } from '../../../context/LanguageContext'
 
 
 // Max items used when limit=all
@@ -17,6 +18,8 @@ const MAX_ITEMS = 1000000;
 
 
 export const AccessContent = () => {
+    const { language } = useLanguage()
+    const t = content[language]
     const searchParams = useSearchParams()  //Check the page number in the url
     const pathname = usePathname()
     const params = new URLSearchParams(searchParams)
@@ -146,9 +149,10 @@ export const AccessContent = () => {
 // }
  
    {/* To hide Id name and State column in Accounts page if you filter for Unverifed ID */}  
+const baseColumns = userColoumnsAccount(language);
 const filteredColumns = filterAccount === 'noID'
-  ? userColoumnsAccount.filter(col => col.accessorKey !== 'name' && col.accessorKey !== 'state')
-  : userColoumnsAccount;
+  ? baseColumns.filter(col => col.accessorKey !== 'name' && col.accessorKey !== 'state')
+  : baseColumns;
   
     const prevPage = page - 1 > 0 ? page - 1 : 1
 
@@ -162,7 +166,7 @@ const filteredColumns = filterAccount === 'noID'
                 totalPages={totalPages}
                 prevPage={prevPage}
                 limit={limit}
-                customCellRenderers={customCellAcountTable}
+                customCellRenderers={customCellAcountTable(language)}
                 userColoumns={filteredColumns}
                 pending={false}
                 query={query}
@@ -178,8 +182,8 @@ const filteredColumns = filterAccount === 'noID'
                   prevPage={prevPage}
                   limit={limit}
                   customCellRenderers={customCellPendingTable}
-                  userColoumns={userColoumnsPending}
-                  renderRowActions={(props) => pendingActions({...props,onToggleHandler,pathnameWithFilter})}
+                  userColoumns={userColoumnsPending(language)}
+                  renderRowActions={(props) => pendingActions({...props,onToggleHandler,pathnameWithFilter, language})}
                   pending={true}
                   totalItems={totalItems}
           />
@@ -188,7 +192,7 @@ const filteredColumns = filterAccount === 'noID'
         {/* Modal */}
         {toggle && selectedUser && (
           <Modal
-            text={getModalText(actionButtonName, buttonName)}
+            text={getModalText(actionButtonName, buttonName, t)}
             setToggle={setToggle}
             onHandleModal={onHandleModal}
             user={selectedUser}

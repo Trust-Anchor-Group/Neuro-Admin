@@ -7,9 +7,12 @@ import { AccountDetails, DisplayDetails } from '@/components/access/Buttons/Disp
 import { Identity } from '@/components/access/Identity';
 import { ActivityDetailspage } from './ActivityDetailspage';
 import { TabNavigation } from '../shared/TabNavigation';
+import { useLanguage, content } from '../../../context/LanguageContext';
 
 
 export default function DetailPageContent() {
+    const { language } = useLanguage();
+    const t = content[language];
     const { id } = useParams()
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -51,7 +54,7 @@ export default function DetailPageContent() {
                 ...data.data,
                 properties: {
                     ...data.data.properties,
-                    FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
+                    // FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
                 }
             })
   
@@ -88,7 +91,7 @@ export default function DetailPageContent() {
             ...data.data,
             properties: {
                 ...data.data.properties,
-                FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
+                // FULLNAME: `${data.data.properties?.FIRST || ''} ${data.data.properties?.LAST || ''}`.trim()
             }
         })
   
@@ -133,35 +136,34 @@ export default function DetailPageContent() {
         }
     }, [urlTab, searchParams, pathname, router]);
 
-  const fieldsToShowMetadata = [
-    { label: "ID status", key: "state" },
-    { label: "ID created", key: "created" },
-  ]
+    const fieldsToShowMetadata = [
+        { label: t?.Identity?.labels?.idStatus || "ID status", key: "state" },
+        { label: t?.Identity?.labels?.idCreated || "ID created", key: "created" },
+    ]
 
     const fieldsToShow = [
-        { label: "Account", key: "account" },
-        { label: "Email", key: "properties.EMAIL" },
-        { label: "Country", key: "properties.COUNTRY" },
-        { label: "Phone", key: "properties.PHONE" },
-        { label: "Created", key: "created" }
-      ];
+        { label: t?.Identity?.labels?.account || "Account", key: "account" },
+        { label: t?.Identity?.labels?.email || "Email", key: "properties.EMAIL" },
+        { label: t?.Identity?.labels?.country || "Country", key: "properties.COUNTRY" },
+        { label: t?.Identity?.labels?.phone || "Phone", key: "properties.PHONE" },
+        { label: t?.Identity?.labels?.created || "Created", key: "created" }
+            ];
 
-      const fieldsToShowIdentity = [
-        { label: "Full Name", key: "properties.FULLNAME" },
-        { label: "Nationality", key: "properties.COUNTRY" },
-        { label: "Address", key: "properties.ADDR" },
-        { label: "Personal number", key: "properties.PNR" },
-        { label: "Phone", key: "properties.PHONE" },
-        
-      ];
+      // Dynamic identity fields: show all user.properties keys
+      const fieldsToShowIdentity = user?.properties
+        ? Object.keys(user.properties).map(key => ({
+            label: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            key: `properties.${key}`,
+          }))
+        : [];
     
-      const fieldsToShowWithNoID = [
-        { label: "Account", key: "data.userName" },
-        { label: "Email", key: "data.eMail" },
-        { label: "Country", key: "data.country" },
-        { label: "Phone", key: "data.phoneNr" },
-        { label: "Created", key: "data.created" },
-      ];
+            const fieldsToShowWithNoID = [
+                { label: t?.Identity?.labels?.account || "Account", key: "data.userName" },
+                { label: t?.Identity?.labels?.email || "Email", key: "data.eMail" },
+                { label: t?.Identity?.labels?.country || "Country", key: "data.country" },
+                { label: t?.Identity?.labels?.phone || "Phone", key: "data.phoneNr" },
+                { label: t?.Identity?.labels?.created || "Created", key: "data.created" },
+            ];
 
     return (
         <div className='p-5'>
@@ -170,9 +172,9 @@ export default function DetailPageContent() {
         <div className='flex mb-5 gap-5 max-sm:flex-col'>
             <div className=''>
                 <button aria-label='Back to Access Page' className='flex 
-                items-center gap-5 border-2 p-2 rounded-lg' onClick={() => backPath ? router.push(backPath) : router.back()}>
+                items-center gap-5 border-2 border-[var(--brand-border)] p-2 rounded-lg' onClick={() => backPath ? router.push(backPath) : router.back()}>
                     <FaArrowLeft className='transition-opacity size-5 hover:opacity-50'/>
-                    Back
+                    {t?.Identity?.labels?.back || 'Back'}
                 </button>
             </div>
         </div>
@@ -194,7 +196,7 @@ export default function DetailPageContent() {
                   <DisplayDetails 
                   fieldsToShow={isAccount ? fieldsToShowWithNoID : fieldsToShow}
                   userData={user}
-                  title={'Account Information'}/>
+                  title={t?.Identity?.labels?.accountInformation || 'Account Information'}/>
                 )
                 
             }
@@ -218,14 +220,14 @@ export default function DetailPageContent() {
                     gridCols='grid-cols-2'
                     tabArray={[
                         {
-                        title: 'Account',
+                        title: t?.Identity?.labels?.accountTab || 'Account',
                         href: '/neuro-access/detailpage',
                         tabDesination: 'details&page',
                         icon: FaUser,
                         tabRef: 'details',
                         },
                         {
-                        title: 'Identity',
+                        title: t?.Identity?.labels?.identityTab || 'Identity',
                         href: '/neuro-access/detailpage',
                         tabDesination: 'identity',
                         icon: FaShieldAlt,
