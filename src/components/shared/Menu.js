@@ -29,7 +29,6 @@ const getBrandConfig = (host) => {
 
 
 const Menu = ({ menuItems }) => {
-  // All hooks must be called unconditionally and in the same order
   const pathname = usePathname();
   const [open, setOpen] = useState(true);
   const [hoveredItem, setHoveredItem] = useState(null);
