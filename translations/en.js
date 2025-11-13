@@ -214,8 +214,16 @@
     confirmDelete: 'Delete',
     cancel: 'Cancel',
     deletedMessage: 'Your account has been successfully deleted.',
-    certificateTitle: 'Certificate Information',
-    certificateDescription: 'The token validates the process of a tokenized Carbon Emissions Offset. The owner purchases the Carbon Token from Creturner which offsets a specific amount of CO₂e.'
+    certificateTitle: 'Description',
+    certificateDescription: 'The token validates the process of a tokenized Carbon Emissions Offset. The owner purchases the Carbon Token from Creturner which offsets a specific amount of CO₂e.',
+    assetType: 'Asset Type',
+    coffeeBean: 'Coffee bean',
+    imagesTitle: 'Asset images',
+    imagesSubtitle: 'Tap a placeholder to view the large preview.',
+    imagesHint: 'View',
+    imagesModalHint: 'This is a placeholder for the enlarged asset image.',
+    openPreview: 'Open preview',
+    closePreview: 'Close preview'
   },
   buttons: {
     save: 'Save',
@@ -333,7 +341,7 @@
     title: 'Assets',
     carbonCredit: 'Carbon Credit',
     clients: 'Clients',
-    coffee: 'Coffee'
+    Tokens: 'Tokens'
   },
   Clients: {
     title: 'Asset Clients',
@@ -344,7 +352,8 @@
       total: 'Total',
       activeOrders: 'Active orders',
       totalClients: 'Total clients',
-      pendingOrders: 'Pending orders'
+      pendingOrders: 'Pending orders',
+      averageDailySales: 'Average daily sales'
     },
     table: {
       columns: {
@@ -502,7 +511,7 @@
   }
   ,
   assetOrders: {
-    heading: 'Asset Orders',
+    heading: 'Live tokens',
     summary: {
       total: 'Total',
       active: 'Active orders',
@@ -569,13 +578,13 @@
   }
   ,
   certificateButtons: {
-    download: 'Download certificate',
-    share: 'Share certificate'
+    download: 'Download',
+    share: 'Share'
   }
   ,
   assetOrderDetail: {
     tabs: {
-      order: 'Order detail',
+      token: 'Token detail',
       certificate: 'Certificate',
       process: 'Process'
     },
@@ -610,6 +619,28 @@
       progress: 'Progress',
       amount: 'Amount',
       complete: 'complete'
+    },
+    certificateBox: {
+      title: 'Certificate',
+      openPreview: 'Open certificate preview',
+      closePreview: 'Close certificate preview',
+      imageAlt: 'Certificate preview',
+      hint: 'Tap to enlarge',
+      modalHint: 'Full-size certificate preview.'
+    },
+    publishBox: {
+      title: 'Publish status',
+      description: 'Set how this asset appears in the marketplace.',
+      label: 'Status',
+      button: 'Save changes',
+      saving: 'Saving…',
+      saveSuccess: 'Status updated.',
+      saveError: 'Failed to update status.',
+      options: {
+        published: 'Published',
+        draft: 'Draft',
+        archived: 'Archived'
+      }
     }
   },
   clientOverview: {

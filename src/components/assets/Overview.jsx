@@ -40,7 +40,7 @@ const Overview = () => {
   <div className=" bg-[var(--brand-background)] col-span-3 flex flex-col gap-5">
     {/* Client Info Card - unified */}
     <div
-      className="rounded-2xl shadow-lg p-8 border text-base"
+      className="rounded-2xl p-8 border text-base"
       style={{
         minHeight: '260px',
         color: 'var(--brand-text)',
@@ -143,7 +143,7 @@ const Overview = () => {
       </div>
     </div>
         {/* Pricing Agreements Section */}     
-        <div className="bg-[var(--brand-navbar)] rounded-lg shadow-md p-5 border border-[var(--brand-border)]">
+        <div className="bg-[var(--brand-navbar)] rounded-lg p-5 border border-[var(--brand-border)]">
           <div className="font-semibold text-xl mb-3 text-[var(--brand-text)]">{t?.pricingAgreementsSection?.title || 'Pricing agreements'}</div>
             <div className="flex justify-between items-center mb-4">
               <input

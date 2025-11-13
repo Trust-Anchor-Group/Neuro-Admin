@@ -44,6 +44,7 @@ export async function fetchOrders() {
       orderDate: token.createdDate,
       amount: `${token.value} ${token.currency}`,
       status: "pending",
+      "payment status": token.paymentStatus || "Pending",
     }));
 
     return { orders: formattedOrders, loading: false };
