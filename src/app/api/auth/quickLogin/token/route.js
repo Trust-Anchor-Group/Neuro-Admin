@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import config from '@/config/config';
 
 export async function POST() {
-  const { host } = config.api.agent;               // t.ex. 'lab.tagroot.io'
+  const { host } = config.api.agent;
   const url = `https://${host}/Agent/Account/QuickLogin`;
 
   // Hämta klientens kopierade sessions-cookie (lagrad på er domän)
