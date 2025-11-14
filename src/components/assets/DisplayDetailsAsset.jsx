@@ -129,6 +129,7 @@ export const DisplayDetailsAsset = ({
               height={450}
               alt={t?.displayDetails?.brazilMapAlt || 'Brazil production map'}
               priority
+              unoptimized
             />
 
             <div className="bg-[var(--brand-background)] rounded-xl p-5 overflow-auto">
