@@ -34,15 +34,13 @@ export const StatusBox = ({ statusCard, title }) => {
   const t = content[language];
   const currentStyle = statusStyles[statusCard.status] || statusStyles['Not started'];
   const statusLabel = title || t?.assetOrderDetail?.statusBox?.status || 'Status';
-  const completeLabel = t?.assetOrderDetail?.statusBox?.complete || 'complete';
   return (
     <div
-      className="shadow-sm rounded-xl border p-4 w-full max-w-sm"
+      className="shadow-md rounded-xl p-4 w-full max-w-sm"
       style={{
 
         background: 'var(--brand-navbar)',
         color: 'var(--brand-text)',
-        borderColor: 'var(--brand-border)',
       }}
     >
       <div
@@ -63,7 +61,6 @@ export const StatusBox = ({ statusCard, title }) => {
       <div className="flex items-center justify-between mb-2">
         <span className="text-2xl font-bold" style={{ color: 'var(--brand-text)' }}>
           {statusCard.progress}%
-          <span className="text-sm font-bold ml-2" style={{ color: 'var(--brand-text-secondary)' }}>{completeLabel}</span>
         </span>
         <span className="font-semibold text-sm" style={{ color: 'var(--brand-text-secondary)' }}>
           {statusCard.amount}

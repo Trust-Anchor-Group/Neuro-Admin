@@ -212,8 +212,16 @@
     confirmDelete: 'Cancelar',
     cancel: 'Cancelar',
     deletedMessage: 'Sua conta foi excluída com sucesso.',
-    certificateTitle: 'Informações do Certificado',
-    certificateDescription: 'O token valida o processo de compensação tokenizada de emissões de carbono. O proprietário compra o Carbon Token da Creturner que compensa uma quantidade específica de CO₂e.'
+    certificateTitle: 'Descrição',
+    certificateDescription: 'O token valida o processo de compensação tokenizada de emissões de carbono. O proprietário compra o Carbon Token da Creturner que compensa uma quantidade específica de CO₂e.',
+    assetType: 'Tipo de asset',
+    coffeeBean: 'Grão de café',
+    imagesTitle: 'Imagens do ativo',
+    imagesSubtitle: 'Toque em um espaço reservado para ver o preview ampliado.',
+    imagesHint: 'Ver',
+    imagesModalHint: 'Este é um espaço reservado para a imagem ampliada do ativo.',
+    openPreview: 'Abrir preview',
+    closePreview: 'Fechar preview'
   },
   buttons: {
     save: 'Salvar',
@@ -331,7 +339,7 @@
     title: 'Assets',
     orders: 'Pedidos',
     clients: 'Clientes',
-    coffee: 'Café'
+    Tokens: 'Tokens'
   },
   Clients: {
     title: 'Clientes de Assets',
@@ -342,7 +350,8 @@
       total: 'Total',
       activeOrders: 'Pedidos ativos',
       totalClients: 'Total de clientes',
-      pendingOrders: 'Pedidos pendentes'
+      pendingOrders: 'Pedidos pendentes',
+      averageDailySales: 'Vendas diárias médias'
     },
     table: {
       columns: {
@@ -500,7 +509,7 @@
   }
   ,
   assetOrders: {
-    heading: 'Pedidos de Assets',
+    heading: 'Tokens ativos',
     summary: {
       total: 'Total',
       active: 'Pedidos ativos',
@@ -567,8 +576,8 @@
   }
   ,
   certificateButtons: {
-    download: 'Baixar certificado',
-    share: 'Compartilhar certificado'
+    download: 'Baixar',
+    share: 'Compartilhar'
   }
   ,
   assetOrderDetail: {
@@ -608,6 +617,28 @@
       progress: 'Progresso',
       amount: 'Quantidade',
       complete: 'concluído'
+    },
+    certificateBox: {
+      title: 'Certificado',
+      openPreview: 'Abrir preview do certificado',
+      closePreview: 'Fechar preview do certificado',
+      imageAlt: 'Preview do certificado',
+      hint: 'Toque para ampliar',
+      modalHint: 'Preview do certificado em tamanho completo.'
+    },
+    publishBox: {
+      title: 'Status de publicação',
+      description: 'Defina como este ativo aparece no marketplace.',
+      label: 'Status',
+      button: 'Salvar alterações',
+      saving: 'Salvando…',
+      saveSuccess: 'Status atualizado.',
+      saveError: 'Falha ao atualizar o status.',
+      options: {
+        published: 'Publicado',
+        draft: 'Rascunho',
+        archived: 'Arquivado'
+      }
     }
   },
   clientOverview: {
@@ -727,6 +758,13 @@
   partiesBox: {
     buyer: 'Comprador',
     issuer: 'Emissor'
+  }
+  ,
+  sidebox: {
+    privateNotesTitle: 'Notas cliente',
+    addNotePlaceholder: 'Digite uma nota...',
+    addNoteButton: 'Adicionar nota',
+    noNotes: 'Nenhuma nota adicionada ainda.'
   }
 };
 

@@ -65,7 +65,7 @@ export default function OrdersPage() {
           </div>
         ))}
       </section>
-      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">{t.heading || 'Asset Orders'}</h1>
+      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">{t.heading || 'Live tokens'}</h1>
       <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading || 'Loading orders...'}</p>}>
         <AssetOrdersTable orders={ordersData.orders} isLoading={ordersData.loading} />
       </Suspense>
