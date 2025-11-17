@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies and build app
         env:
-          # 🟡 Just keep as-is for now. När du tar bort NEXT_PUBLIC_AGENT_HOST-problemet kan vi städa här.
+          # Kan städas senare när vi tagit bort NEXT_PUBLIC_AGENT_HOST, men vi låter det vara nu
           NEXT_PUBLIC_PROTOCOL: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_PROTOCOL || secrets.NEXT_PUBLIC_PROTOCOL }}
           NEXT_PUBLIC_ORIGIN: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_ORIGIN || secrets.NEXT_PUBLIC_ORIGIN_DEV }}
           NEXT_PUBLIC_AGENT_HOST: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_AGENT_HOST || secrets.NEXT_PUBLIC_AGENT_HOST_DEV }}
@@ -51,6 +51,7 @@ jobs:
           name: node-app
           path: release.zip
 
+  # ========================= DEV DEPLOY =========================
   deploy-dev:
     runs-on: ubuntu-latest
     needs: build
@@ -61,17 +62,14 @@ jobs:
     strategy:
       matrix:
         app:
-          # Lägg till en rad per kund/host (dev-slot)
-          - name: 'Neuro-Admin'            # nuvarande dev-app
+          # Nuvarande dev-app (med slot "dev")
+          - name: 'Neuro-Admin'
             slot: 'dev'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_DEV'
-          # Exempel för fler hosts (bara exempel-namn):
-          - name: 'Neuro-Admin-Innova'
-            slot: 'dev'
-            publishProfileSecret: 'AZURE_NEURO_ADMIN_INNOVA_DEV'
-          # - name: 'Neuro-Admin-Host3'
-          #   slot: 'dev'
-          #   publishProfileSecret: 'AZURE_NEURO_ADMIN_HOST3_DEV'
+          # Vill du senare ha en dev-miljö för Innova kan du lägga till:
+          # - name: 'Innova'
+          #   slot: ''  # om du inte har dev-slot för Innova
+          #   publishProfileSecret: 'AZURE_NEURO_ADMIN_INNOVA_DEV'
 
     steps:
       - name: Download artifact from build job
@@ -95,6 +93,7 @@ jobs:
           package: ./deploy
           publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
 
+  # ========================= PROD DEPLOY =========================
   deploy-prod:
     runs-on: ubuntu-latest
     needs: build
@@ -105,21 +104,14 @@ jobs:
     strategy:
       matrix:
         app:
-          # Lägg till en rad per kund/host (prod-slot)
-          - name: 'Neuro-Admin'            # nuvarande prod-app
+          # Prod för huvudappen (har slot "Production")
+          - name: 'Neuro-Admin'
             slot: 'Production'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_PROD'
-          # Exempel för fler hosts (bara exempel-namn):
+          # Prod för Innova – INGEN slot, bara default production
           - name: 'Innova'
-            slot: ''
+            slot: ''   # default prod, ej slot
             publishProfileSecret: 'AZURE_NEURO_ADMIN_INNOVA_PROD'
-          # Exempel för fler hosts:
-          # - name: 'Neuro-Admin-Host2'
-          #   slot: 'Production'
-          #   publishProfileSecret: 'AZURE_NEURO_ADMIN_HOST2_PROD'
-          # - name: 'Neuro-Admin-Host3'
-          #   slot: 'Production'
-          #   publishProfileSecret: 'AZURE_NEURO_ADMIN_HOST3_PROD'
 
     steps:
       - name: Download artifact from build job
@@ -135,10 +127,21 @@ jobs:
           echo "Checking deployed files..."
           ls -la ./deploy
 
-      - name: Deploy to Azure Web App (PROD)
+      # Appar SOM har slot (t.ex. Neuro-Admin)
+      - name: Deploy to Azure Web App (PROD) with slot
+        if: ${{ matrix.app.slot != '' }}
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ matrix.app.name }}
           slot-name: ${{ matrix.app.slot }}
+          package: ./deploy
+          publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
+
+      # Appar UTAN slot (Innova)
+      - name: Deploy to Azure Web App (PROD) without slot
+        if: ${{ matrix.app.slot == '' }}
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ matrix.app.name }}
           package: ./deploy
           publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
