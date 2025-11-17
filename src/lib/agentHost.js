@@ -16,8 +16,8 @@ export function resolveAgentHost(headersLike) {
         if (validateHost(h)) return h;
       }
     }
-    return process.env.AGENT_HOST || 'kikkin.lab.tagroot.io';
+    return process.env.AGENT_HOST ;
   } catch {
-    return process.env.AGENT_HOST || 'kikkin.lab.tagroot.io';
+    return process.env.AGENT_HOST ;
   }
 }

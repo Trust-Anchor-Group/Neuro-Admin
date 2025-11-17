@@ -3,7 +3,7 @@ const config = {
   origin: process.env.NEXT_PUBLIC_ORIGIN ,
   api: {
     agent: {
-      host: process.env.AGENT_HOST || 'kikkin.lab.tagroot.io',
+      host: process.env.AGENT_HOST ,
     },
   },
   jwt: {
