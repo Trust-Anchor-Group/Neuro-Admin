@@ -110,8 +110,8 @@ jobs:
             slot: 'Production'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_PROD'
           # Exempel för fler hosts (bara exempel-namn):
-          - name: 'Neuro-Admin-Innova'
-            slot: 'Production'
+          - name: 'Innova'
+            slot: ''
             publishProfileSecret: 'AZURE_NEURO_ADMIN_INNOVA_PROD'
           # Exempel för fler hosts:
           # - name: 'Neuro-Admin-Host2'
