@@ -1,9 +1,10 @@
+"use server";
 const config = {
   protocol: process.env.NEXT_PUBLIC_PROTOCOL,
   origin: process.env.NEXT_PUBLIC_ORIGIN ,
   api: {
     agent: {
-      host: process.env.NEXT_PUBLIC_AGENT_HOST,
+      host: process.env.AGENT_HOST || 'kikkin.lab.tagroot.io',
     },
   },
   jwt: {
