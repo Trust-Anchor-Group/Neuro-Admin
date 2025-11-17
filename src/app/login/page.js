@@ -3,13 +3,13 @@
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { useState, useEffect, useCallback } from 'react'
-import config from '@/config/config'
 import { FaQrcode } from 'react-icons/fa'
 import { applyBrandTheme, getInitialMode, toggleMode } from '@/utils/brandTheme'
 import { useLanguage } from '../../../context/LanguageContext'
 import { useRouter } from 'next/navigation'
 import { Sun, Moon } from 'lucide-react'
 
+// QuickLogin (client-only)
 const QuickLogin = dynamic(() => import('@/components/quickLogin/QuickLogin'), {
   ssr: false,
 })
@@ -17,15 +17,21 @@ const QuickLogin = dynamic(() => import('@/components/quickLogin/QuickLogin'), {
 export default function LoginPage() {
   const [showQR, setShowQR] = useState(false)
   const [mode, setMode] = useState('light')
+  const [neuronHost, setNeuronHost] = useState('') // 🟣 new runtime host
+
   const { language, content } = useLanguage()
   const t = content?.[language] || {}
   const router = useRouter()
 
+  // -----------------------
+  // Check Logged In Session
+  // -----------------------
   const checkLogin = useCallback(async () => {
     const dynamicHost =
       typeof window !== 'undefined'
         ? sessionStorage.getItem('AgentAPI.Host')
         : null
+
     const res = await fetch('/api/accounts', {
       method: 'POST',
       headers: {
@@ -43,15 +49,41 @@ export default function LoginPage() {
     }
   }, [router])
 
+  // -----------------------
+  // Set initial theme mode
+  // -----------------------
   useEffect(() => {
     const initial = getInitialMode()
     setMode(initial)
   }, [])
 
+  // -----------------------
+  // Apply brand theme
+  // -----------------------
   useEffect(() => {
-    const host = typeof window !== 'undefined' ? (sessionStorage.getItem('AgentAPI.Host') || '') : ''
+    const host =
+      typeof window !== 'undefined'
+        ? sessionStorage.getItem('AgentAPI.Host') || ''
+        : ''
     applyBrandTheme(host, mode)
   }, [mode])
+
+  // -----------------------
+  // NEW: Load host from <meta name="NEURON">
+  // -----------------------
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const meta = document.querySelector('meta[name="NEURON"]')
+      if (meta?.content) {
+        setNeuronHost(meta.content)
+      } else {
+        console.warn('No <meta name="NEURON"> found in document head.')
+      }
+    }
+  }, [])
+
+  // If host still loading → block QR
+  const isReady = Boolean(neuronHost)
 
   return (
     <div className="relative min-h-screen font-grotesk overflow-hidden">
@@ -69,21 +101,24 @@ export default function LoginPage() {
           />
         </div>
         <button
-        onClick={() => setMode(prev => toggleMode(prev))}
-        className="p-2 rounded-full border border-[var(--brand-border)] transition"
-      >
-        {mode === 'dark' ? <Moon className="w-5 h-5 text-blue-400" /> : <Sun className="w-5 h-5 text-yellow-400" />}
-      </button>
+          onClick={() => setMode(prev => toggleMode(prev))}
+          className="p-2 rounded-full border border-[var(--brand-border)] transition"
+        >
+          {mode === 'dark' ? (
+            <Moon className="w-5 h-5 text-blue-400" />
+          ) : (
+            <Sun className="w-5 h-5 text-yellow-400" />
+          )}
+        </button>
       </header>
 
       {/* MAIN */}
       <main className="relative z-10 flex justify-center items-center px-4 pt-20 pb-10">
-        {/* LOGIN CARD */}
         <div className="bg-[var(--brand-navbar)] rounded-[1.5rem] shadow-[0px_4px_10px_rgba(24,31,37,0.05)] w-full max-w-6xl flex flex-col md:flex-row px-12 py-10 gap-16">
-          {/* LEFT COLUMN: phone + badges */}
+
+          {/* LEFT COLUMN */}
           <div className="order-2 md:order-1 md:w-1/2 flex justify-end">
             <div className="flex flex-col md:flex-row items-center md:items-start bg-[var(--brand-background)] p-10 rounded-2xl">
-              {/* Phone mockup (hidden on mobile, visible from md up) */}
               <Image
                 src="/Neuro-Access-preview.png"
                 alt="Phone preview"
@@ -93,7 +128,6 @@ export default function LoginPage() {
                 unoptimized
               />
 
-              {/* Badge column */}
               <div className="flex flex-col items-center md:items-start md:-ml-16 md:mt-28">
                 <span className="text-base text-[var(--brand-text-secondary)] mb-0 md:ml-2">
                   Get the app today
@@ -141,14 +175,20 @@ export default function LoginPage() {
               unoptimized
             />
 
+            {/* QR LOGIN */}
             {showQR ? (
               <>
-                <QuickLogin
-                  neuron={config.api.agent.host}
-                  purpose="Login to Neuro-admin"
-                  active
-                  onLoginSuccess={() => checkLogin()}
-                />
+                {!isReady ? (
+                  <div className="py-20 text-gray-500">Loading host…</div>
+                ) : (
+                  <QuickLogin
+                    neuron={neuronHost}
+                    purpose="Login to Neuro-admin"
+                    active
+                    onLoginSuccess={checkLogin}
+                  />
+                )}
+
                 <button
                   onClick={() => setShowQR(false)}
                   className="mt-6 text-sm font-medium text-gray-600 hover:text-gray-800"
