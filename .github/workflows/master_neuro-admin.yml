@@ -21,6 +21,7 @@ jobs:
 
       - name: Install dependencies and build app
         env:
+          # Kan städas senare när vi tagit bort NEXT_PUBLIC_AGENT_HOST, men vi låter det vara nu
           NEXT_PUBLIC_PROTOCOL: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_PROTOCOL || secrets.NEXT_PUBLIC_PROTOCOL }}
           NEXT_PUBLIC_ORIGIN: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_ORIGIN || secrets.NEXT_PUBLIC_ORIGIN_DEV }}
           NEXT_PUBLIC_AGENT_HOST: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_AGENT_HOST || secrets.NEXT_PUBLIC_AGENT_HOST_DEV }}
@@ -30,30 +31,45 @@ jobs:
         run: |
           npm install
           npm run build
+
       - name: Prepare deployment package
         run: |
           mkdir -p deploy
-          cp -r .next deploy/.next  # ✅ Copy Next.js build output
+          cp -r .next deploy/.next
           cp -r node_modules deploy/node_modules
           cp -r public deploy/public
           cp package.json deploy/
           cp package-lock.json deploy/
           cp server.js deploy/ || echo "⚠️ server.js NOT found!"
-          # Debugging: Check deploy structure
           echo "Final deploy folder structure:"
           ls -la deploy
           zip -r release.zip deploy/
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
           path: release.zip
 
-  deploy:
+  # ========================= DEV DEPLOY =========================
+  deploy-dev:
     runs-on: ubuntu-latest
     needs: build
+    if: github.ref == 'refs/heads/dev'
     environment:
-      name: ${{ github.ref == 'refs/heads/master' && 'Production' || 'Development' }}
+      name: Development
+
+    strategy:
+      matrix:
+        app:
+          # Nuvarande dev-app (med slot "dev")
+          - name: 'Neuro-Admin'
+            slot: 'dev'
+            publishProfileSecret: 'AZURE_NEURO_ADMIN_DEV'
+          # Vill du senare ha en dev-miljö för Innova kan du lägga till:
+          # - name: 'Innova'
+          #   slot: ''  # om du inte har dev-slot för Innova
+          #   publishProfileSecret: 'AZURE_NEURO_ADMIN_INNOVA_DEV'
 
     steps:
       - name: Download artifact from build job
@@ -68,11 +84,64 @@ jobs:
         run: |
           echo "Checking deployed files..."
           ls -la ./deploy
-      - name: Deploy to Azure Web App
+
+      - name: Deploy to Azure Web App (DEV)
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'Neuro-Admin'
-          slot-name: ${{ github.ref == 'refs/heads/master' && 'Production' || 'dev' }}
+          app-name: ${{ matrix.app.name }}
+          slot-name: ${{ matrix.app.slot }}
           package: ./deploy
-          publish-profile: ${{ github.ref == 'refs/heads/master' && secrets.AZURE_NEURO_ADMIN_PROD || secrets.AZURE_NEURO_ADMIN_DEV }}
+          publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
 
+  # ========================= PROD DEPLOY =========================
+  deploy-prod:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    environment:
+      name: Production
+
+    strategy:
+      matrix:
+        app:
+          # Prod för huvudappen (har slot "Production")
+          - name: 'Neuro-Admin'
+            slot: 'Production'
+            publishProfileSecret: 'AZURE_NEURO_ADMIN_PROD'
+          # Prod för Innova – INGEN slot, bara default production
+          - name: 'Innova'
+            slot: ''   # default prod, ej slot
+            publishProfileSecret: 'AZURE_NEURO_ADMIN_INNOVA_PROD'
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: node-app
+
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+
+      - name: Debug Deployed Files
+        run: |
+          echo "Checking deployed files..."
+          ls -la ./deploy
+
+      # Appar SOM har slot (t.ex. Neuro-Admin)
+      - name: Deploy to Azure Web App (PROD) with slot
+        if: ${{ matrix.app.slot != '' }}
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ matrix.app.name }}
+          slot-name: ${{ matrix.app.slot }}
+          package: ./deploy
+          publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
+
+      # Appar UTAN slot (Innova)
+      - name: Deploy to Azure Web App (PROD) without slot
+        if: ${{ matrix.app.slot == '' }}
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ matrix.app.name }}
+          package: ./deploy
+          publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
