@@ -197,7 +197,7 @@ const DigitalAssetsTable = ({ assets = [] }) => {
       }}
       muiTableBodyRowProps={({ row }) => ({
         onClick: () => {
-          router.push('/neuro-assets/detailpageclient');
+          router.push('/neuro-assets/detailpageIssuer');
         },
         sx: {
           cursor: "pointer",

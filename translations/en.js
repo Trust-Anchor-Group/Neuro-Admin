@@ -344,7 +344,7 @@
     Tokens: 'Tokens'
   },
   Clients: {
-    title: 'Asset Clients',
+    title: 'Issuers',
     subtitle: 'Overview of asset-related client activity',
     loading: 'Loading clients...',
     empty: 'No clients available',
@@ -353,7 +353,8 @@
       activeOrders: 'Active orders',
       totalClients: 'Total clients',
       pendingOrders: 'Pending orders',
-      averageDailySales: 'Average daily sales'
+      averageDailySales: 'Average daily sales',
+      activeIssuers: 'Active Issuers'
     },
     table: {
       columns: {

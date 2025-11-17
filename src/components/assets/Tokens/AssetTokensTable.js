@@ -17,7 +17,7 @@ const muiTheme = createTheme({
     MuiTypography: {
       styleOverrides: {
         root: { color: "var(--brand-text)" },
-        body1: { color: "var(--brand-text-secondary)" }, // "No orders to display"
+        body1: { color: "var(--brand-text-secondary)" }, 
       },
     },
     MuiFormLabel: {
@@ -81,7 +81,7 @@ const muiTheme = createTheme({
   },
 });
 
-export default function AssetOrdersTable({ orders = [], isLoading = false }) {
+export default function AssetTokensTable({ orders = [], isLoading = false }) {
   const columns = useMemo(
     () => [
       { accessorKey: "assetName", header: "Asset Name", size: 250 },
@@ -354,7 +354,7 @@ export default function AssetOrdersTable({ orders = [], isLoading = false }) {
         }}
 
         localization={{
-          noRecordsToDisplay: "No orders to display",
+          noRecordsToDisplay: "No tokens to display",
         }}
       />
     </ThemeProvider>
