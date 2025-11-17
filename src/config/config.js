@@ -1,4 +1,3 @@
-"use server";
 const config = {
   protocol: process.env.NEXT_PUBLIC_PROTOCOL,
   origin: process.env.NEXT_PUBLIC_ORIGIN ,
