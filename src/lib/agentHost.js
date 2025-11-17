@@ -1,6 +1,6 @@
-"use server";
 // Runtime agent host resolution.
 // Falls back to runtime env if no override cookie.
+
 
 export function validateHost(host) {
   return typeof host === 'string' && /^[a-zA-Z0-9.-]+$/.test(host) && !host.includes('..');
