@@ -3,7 +3,7 @@ const config = {
   origin: process.env.NEXT_PUBLIC_ORIGIN ,
   api: {
     agent: {
-      host: process.env.NEXT_PUBLIC_AGENT_HOST,
+      host: process.env.AGENT_HOST,
     },
   },
   jwt: {

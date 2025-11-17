@@ -16,16 +16,16 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }) {
-  const baseUrl = (process.env.NEXT_PUBLIC_AGENT_API_URL || 'https://kikkin.lab.tagroot.io')
-  const baseURI = (process.env.NEXT_PUBLIC_AGENT_HOST || 'kikkin.lab.tagroot.io')
+  const agentHost = process.env.AGENT_HOST
+  const agentApiUrl = process.env.AGENT_API_URL || `https://${agentHost}`;
   const cookieStore = await cookies();
   const analyticsConsent = cookieStore.get("analytics_consent")?.value === "granted";
-  const eventsScript = `${baseUrl}/Events.js`
+  const eventsScript = `${agentApiUrl}/Events.js`;
 
   return (
     <html lang="en" >
       <head>
-        <meta name="NEURON" content={baseURI} />
+        <meta name="NEURON" content={agentHost} />
         <Script src={eventsScript} strategy="beforeInteractive" />
       </head>
       <body className={`${inter.className} ${grotesk.className}`}>

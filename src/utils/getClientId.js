@@ -1,24 +1,29 @@
 // src/utils/getClientId.js
 
 export function getClientId() {
-  if (typeof window === 'undefined') return null
+  if (typeof window === 'undefined') return null;
 
-  const host = window.location.hostname
-  const envHost = process.env.NEXT_PUBLIC_AGENT_HOST || ''
+  // Try to get host from <meta name="NEURON" content="..." />
+  let host = null;
+  if (typeof document !== 'undefined') {
+    const meta = document.querySelector('meta[name="NEURON"]');
+    if (meta && meta.content) {
+      host = meta.content;
+    }
+  }
+  if (!host) {
+    host = window.location.hostname;
+  }
 
   const domainMap = {
     'kikkin.tagroot.io': 'kikkin',
     'mateo.lab.tagroot.io': 'Mateo',
-  }
+  };
 
-  // 1. Försök hitta client från actual domän
+  // 1. Try to find client from actual domain
   for (const domain in domainMap) {
-    if (host.includes(domain)) return domainMap[domain]
+    if (host.includes(domain)) return domainMap[domain];
   }
 
-  for (const domain in domainMap) {
-    if (envHost.includes(domain)) return domainMap[domain]
-  }
-
-  return 'Mateo'
+  return null;
 }
