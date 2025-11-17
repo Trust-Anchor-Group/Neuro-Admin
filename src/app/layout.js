@@ -16,7 +16,7 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }) {
-  const agentHost = process.env.AGENT_HOST || 'kikkin.lab.tagroot.io';
+  const agentHost = process.env.AGENT_HOST
   const agentApiUrl = process.env.AGENT_API_URL || `https://${agentHost}`;
   const cookieStore = await cookies();
   const analyticsConsent = cookieStore.get("analytics_consent")?.value === "granted";
