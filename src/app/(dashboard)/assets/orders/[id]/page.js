@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import Certificate from "@/components/assets/orders/Certificate";
+import Certificate from "@/components/assets/Tokens/Certificate";
 
 const OrderDetailsPage = () => {
   const { id } = useParams();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, Trash2 } from 'lucide-react';
+import { Mail, Phone, Trash2, Activity } from 'lucide-react';
 
 export const Sidebox = ({
 	t = {},
@@ -62,16 +62,26 @@ export const Sidebox = ({
 	{/* Purchases Card */}
 	<div className="bg-[var(--brand-navbar)] border border-[var(--brand-border)] rounded-lg p-5 mb-2 w-full">
   	  <div className="text-l mb-2 text-[var(--brand-text-secondary)]">
-		{t?.clientOverview?.totalPurchases || 'Total purchases'}
+		{t?.clientOverview?.totalPurchase || 'Total sales revenue'}
 	  </div>
-	  <div className="text-3xl font-bold text-[var(--brand-text)]">{purchasesValue}</div>
+	  <div className="flex flex-row items-center gap-3">
+		<span className="flex items-center justify-center rounded-full p-2 bg-emerald-100">
+		  <Activity className="h-5 w-5 text-emerald-500" />
+		</span>
+		<div className="text-3xl font-bold text-[var(--brand-text)]">{purchasesValue}</div>
 	  </div>
+	</div>
 		{/* Compensation Card */}
 		<div className="bg-[var(--brand-navbar)] border border-[var(--brand-border)] rounded-lg p-5 mb-2 w-full">
 		  <div className="text-l mb-2 text-[var(--brand-text-secondary)]">
-			{t?.clientOverview?.totalCompensation || 'Total compensation'}
+			{t?.clientOverview?.totalCompensatio || 'Total asset volume'}
 		  </div>
-  		  <div className="text-3xl font-bold text-[var(--brand-text)]">{compensationValue}</div>
+  		  <div className="flex flex-row items-center gap-3">
+			<span className="flex items-center justify-center rounded-full p-2 bg-emerald-100">
+			  <Activity className="h-5 w-5 text-emerald-500" />
+			</span>
+		  	<div className="text-3xl font-bold text-[var(--brand-text)]">{compensationValue}</div>
+		  </div>
 		</div>
 		{/* Contacts Card */}
 		<div className="bg-[var(--brand-navbar)] border border-[var(--brand-border)] rounded-lg p-5 w-full">
@@ -85,26 +95,26 @@ export const Sidebox = ({
 			  onClick={() => alert(`Navigating to ${c.name}'s profile...`)}
 			>
               <div className=" text-base font-bold text-[var(--brand-text)]">{c.name}</div>
-                <div className="border-b mb-3 pb-3 border-[var(--brand-border)] text-sm text-[var(--brand-text-secondary)] mb-1">{c.role}</div>
-                    {idx < maxContactDetails && (
-                    <>
-						{c.email && (
-							<div className="border-b mb-3 pb-3 border-[var(--brand-border)] flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
-								<Mail className="text-[var(--brand-text)]" /> {c.email}
-							</div>
-						)}
-						{c.phone && (
-							<div className="flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
-				    			<Phone className="text-[var(--brand-text)]" /> {c.phone}
-							</div>
-						)}
-					</>
+              <div className="border-b mb-3 pb-3 border-[var(--brand-border)] text-sm text-[var(--brand-text-secondary)] mb-1">{c.role}</div>
+              {idx < maxContactDetails && (
+                <>
+				{c.email && (
+				  <div className="border-b mb-3 pb-3 border-[var(--brand-border)] flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
+					<Mail className="text-[var(--brand-text)]" /> {c.email}
+				  </div>
+					)}
+					{c.phone && (
+						<div className="flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
+				    	  <Phone className="text-[var(--brand-text)]" /> {c.phone}
+						</div>
+					)}
+				  </>
 				)}
 			</div>
 		  ))}
 		</div>
         {/* Private Notes Section */}
-		<div className="bg-[var(--brand-navbar)] border border-[var(--brand-border)] rounded-lg p-5 mb-2 w-full">
+		{/* <div className="bg-[var(--brand-navbar)] border border-[var(--brand-border)] rounded-lg p-5 mb-2 w-full">
 			<div className="font-semibold text-lg mb-3 text-[var(--brand-text)]">
 				{t?.sidebox?.privateNotesTitle || 'Private notes'}
 			</div>
@@ -145,7 +155,7 @@ export const Sidebox = ({
 					</div>
 				))}
 			</div>
-		</div>
+		</div> */}
 	</div>
   );
 };

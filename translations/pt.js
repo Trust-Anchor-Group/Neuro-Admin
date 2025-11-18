@@ -342,7 +342,7 @@
     Tokens: 'Tokens'
   },
   Clients: {
-    title: 'Clientes de Assets',
+    title: 'Issuers',
     subtitle: 'Visão geral da atividade de clientes relacionada a ativos',
     loading: 'Carregando clientes...',
     empty: 'Nenhum cliente disponível',
