@@ -66,10 +66,10 @@ jobs:
           - name: 'Neuro-Admin'
             slot: 'dev'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_DEV'
-          # Vill du senare ha en dev-miljö för Innova kan du lägga till:
-          # - name: 'Innova'
-          #   slot: ''  # om du inte har dev-slot för Innova
-          #   publishProfileSecret: 'AZURE_NEURO_ADMIN_INNOVA_DEV'
+          - name: 'kikkin-neuro-admin'
+            slot: 'dev'
+            publishProfileSecret: 'AZURE_NEURO_ADMIN_KIKKIN_DEV'
+          
 
     steps:
       - name: Download artifact from build job
@@ -108,6 +108,9 @@ jobs:
           - name: 'Neuro-Admin'
             slot: 'Production'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_PROD'
+          - name: 'kikkin-neuro-admin'
+            slot: 'Production'
+            publishProfileSecret: 'AZURE_NEURO_ADMIN_KIKKIN_PROD' 
           # Prod för Innova – INGEN slot, bara default production
           - name: 'Innova'
             slot: ''   # default prod, ej slot
