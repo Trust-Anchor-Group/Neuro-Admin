@@ -1,11 +1,11 @@
 "use client";
-import AssetOrdersTable from "@/components/assets/orders/AssetOrdersTable";
+import AssetTokensTable from "@/components/assets/Tokens/AssetTokensTable";
 import { Suspense, useEffect, useState } from "react";
 import { fetchOrders } from "@/lib/fetchOrders"; 
 import { Award, Activity, Timer } from "lucide-react";
 import { useLanguage, content as i18nContent } from '../../../../../context/LanguageContext';
 
-export default function OrdersPage() {
+export default function TokensPage() {
   const { language } = useLanguage();
   const t = i18nContent[language]?.assetOrders || {};
   const [ordersData, setOrdersData] = useState({ loading: true, orders: [] });
@@ -31,7 +31,7 @@ export default function OrdersPage() {
       accentClass: 'text-emerald-500 bg-emerald-100',
     },
     {
-      label: t.summary?.active || 'Active orders',
+      label: t.summary?.active || 'Live tokens',
       value: '6',
       Icon: Activity,
       accentClass: 'text-blue-500 bg-blue-100',
@@ -67,7 +67,7 @@ export default function OrdersPage() {
       </section>
       <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">{t.heading || 'Live tokens'}</h1>
       <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading || 'Loading orders...'}</p>}>
-        <AssetOrdersTable orders={ordersData.orders} isLoading={ordersData.loading} />
+        <AssetTokensTable orders={ordersData.orders} isLoading={ordersData.loading} />
       </Suspense>
     </div>
   );

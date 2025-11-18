@@ -4,16 +4,14 @@ import { Mail, Phone } from "lucide-react";
 import Sidebox from './Sidebox.jsx';
 
 const pricingAgreements = [
-  { title: 'Carbon capture EU (Q2 2025)', date: 'Apr 15, 2025', price: '250,000 SEK', status: 'Active' },
-  { title: 'Renewable Energy Purchase (2025)', date: 'Jan 10, 2025', price: '120,000 SEK', status: 'Active' },
-  { title: 'Offset Credits (2024)', date: 'Dec 1, 2024', price: '80,000 SEK', status: 'Active' },
+  { title: 'Coffee bean tokenization (2025)', date: 'Apr 15, 2025', price: '250,000 SEK', status: 'Active' },
+  { title: 'Soy bean tokenization (2025)', date: 'Jan 10, 2025', price: '120,000 SEK', status: 'Active' },
+  { title: 'Coffee bean tokenization (2026)', date: 'Dec 1, 2024', price: '80,000 SEK', status: 'Active' },
 ];
 const contacts = [
   { name: 'Alexander Ozaeta Arce', role: 'CEO', email: 'alexander@trustanchorgroup.com', phone: '+46 70 123 4567' },
   { name: 'Maria Svensson', role: 'CFO', email: 'maria@trustanchorgroup.com', phone: '+46 70 987 6543' },
   { name: 'Johan Lindberg', role: 'CTO', email: 'johan@trustanchorgroup.com', phone: '+46 70 555 1234' },
-  { name: 'Sara Nilsson', role: 'Legal Advisor' },
-  { name: 'Erik Johansson', role: 'Sustainability Lead' },
 ];
 
 const Overview = () => {
@@ -25,7 +23,7 @@ const Overview = () => {
   const [createAgreementModal, setCreateAgreementModal] = useState(false);
   const [clientIcon, setClientIcon] = useState('🏢');
   const [clientIconDark, setClientIconDark] = useState('🌑');
-  const [clientName, setClientName] = useState('EcoTech Solutions');
+  const [clientName, setClientName] = useState('FCB Import & Export');
   const [industry, setIndustry] = useState('Technology');
   const [regNumber, setRegNumber] = useState('556677-8899');
   const [address, setAddress] = useState('456 Oak Ave, CA 94102, San Francisco, USA');
@@ -55,8 +53,8 @@ const Overview = () => {
             C
           </span>
           <div className="ml-28">
-            <div className="font-bold text-2xl  text-[var(--brand-text)]">EcoTech Solutions</div>
-            <div className="text-base text-gray-400 text-[var(--brand-text-secondary)]">Client since Feb 23, 2025, 15:29</div>
+            <div className="font-bold text-2xl  text-[var(--brand-text)]">FCB Import & Export</div>
+            <div className="text-base text-gray-400 text-[var(--brand-text-secondary)]">Agriculture</div>
           </div>
         </div>
         <div className="border-t border-gray-200 border-[var(--brand-border)] absolute left-28 right-0 top-20" />
@@ -71,12 +69,12 @@ const Overview = () => {
           </div>
           <div className="grid grid-cols-3 items-center border-b border-[var(--brand-border)] bg-[var(--brand-background)] animate-fade-in">
             <span className="text-sm text-[var(--brand-text-secondary)]  my-2">{t?.clientOverview?.industry || 'Industry'}</span>
-            <span className="text-base font-semibold text-[var(--brand-text-primary)] text-start my-2">Technology</span>
+            <span className="text-base font-semibold text-[var(--brand-text-primary)] text-start my-2">Agriculture</span>
           </div>
           <div className="grid grid-cols-3 items-center  bg-[var(--brand-background)] animate-fade-in">
             <span className="text-sm text-[var(--brand-text-secondary)]  my-2">{t?.clientOverview?.location || 'Location'}</span>
             <span className="flex flex-col items-start justify-start my-2">
-              <span className="text-base font-semibold text-[var(--brand-text-primary)]">San Francisco, USA</span>
+              <span className="text-base font-semibold text-[var(--brand-text-primary)]">Rio de Janeiro, Brazil</span>
               <span className="text-xs text-[var(--brand-text-secondary)]">456 Oak Ave, CA 94102</span>
             </span>
           </div>
@@ -329,7 +327,7 @@ const Overview = () => {
                 </div>
                 <div className="flex justify-between border-b border-[var(--brand-border)] mb-3">
                   <span className="font-medium text-[var(--brand-text-secondary)] mb-3">{t?.agreementDetailModal?.buyerLabel || 'Buyer:'}</span>
-                    <span className="text-[var(--brand-text)]">EcoTech Solutions</span>
+                    <span className="text-[var(--brand-text)]">FCB Import & Export</span>
                 </div>
                 <div className="flex justify-between border-b border-[var(--brand-border)] mb-3">
                   <span className="font-medium text-[var(--brand-text-secondary)] mb-3">{t?.agreementDetailModal?.sellerLabel || 'Seller:'}</span>
@@ -423,7 +421,7 @@ function EditProposalModal({ agreement, onClose, onSave }) {
                 C
               </span>
             <div className=" ml-4 flex flex-col">
-            <span className="text-[var(--brand-text)]">EcoTech Solutions</span>
+            <span className="text-[var(--brand-text)]">FCB Import & Export</span>
             <span className="text-[var(--brand-text-secondary)]">{t?.agreementEditModal?.clientRole || 'Client'}</span>
             </div>
             </div>

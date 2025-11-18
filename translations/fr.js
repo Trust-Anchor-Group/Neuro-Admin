@@ -329,7 +329,7 @@ const fr = {
     Tokens: 'Tokens'
   },
   Clients: {
-    title: 'Clients Assets',
+    title: 'Issuers',
     subtitle: 'Vue d\'ensemble de l\'activité client liée aux actifs',
     loading: 'Chargement des clients...',
     empty: 'Aucun client disponible',

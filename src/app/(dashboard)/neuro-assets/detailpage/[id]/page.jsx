@@ -1,18 +1,16 @@
 'use client'
 import { DisplayDetailsAsset } from '@/components/assets/DisplayDetailsAsset'
-import AssetOrdersTable from "@/components/assets/orders/AssetOrdersTable";
+import AssetTokensTable from "@/components/assets/Tokens/AssetTokensTable";
 import { TabNavigation } from '@/components/shared/TabNavigation';
 import { useParams, useSearchParams } from 'next/navigation';
 import { Activity } from "lucide-react";
 // Using public logo asset; Next/Image can take a string path referencing /public
 import React, { useContext, useMemo, useState, useCallback, useEffect, Suspense } from 'react'
-import { FaCertificate, FaChartLine, FaRegFileAlt } from 'react-icons/fa';
+import { FaCertificate, FaRegFileAlt } from 'react-icons/fa';
 import { StatusBox } from '@/components/assets/StatusBox';
 import { CertificateBox } from '@/components/assets/CertificateBox';
 import { PublishBox } from '@/components/assets/PublishBox';
-import Image from 'next/image';
 import { useLanguage } from '../../../../../../context/LanguageContext'
-import { PdfButton } from '@/components/assets/PdfButton';
 import { fetchOrders } from '@/lib/fetchOrders';
 
 
@@ -25,7 +23,7 @@ const DetailPageAssets = () => {
   const [ordersData, setOrdersData] = useState({ loading: true, orders: [] });
    const searchParams = useSearchParams()
    const { id } = useParams()
-   const tab = searchParams.get('tab') || 'order'
+   const tab = searchParams.get('tab') || 'Token'
 
   const { language, content: translations } = useLanguage();
   const t = translations[language];
@@ -160,11 +158,11 @@ const DetailPageAssets = () => {
     <div className='p-5'>
     <TabNavigation tab={tab} id={id} gridCols={'grid-cols-2'} tabArray={[
       {
-        title: t?.assetOrderDetail?.tabs?.token || 'Order detail',
+        title: t?.assetOrderDetail?.tabs?.token || 'Token detail',
         href:'/neuro-assets/detailpage',
-        tabDesination:'order&overview',
+        tabDesination:'Token',
         icon:FaRegFileAlt,
-        tabRef:'order'
+        tabRef:'Token'
       },
       {   
         title: t?.assetOrderDetail?.tabs?.certificat || 'Sales',
@@ -178,7 +176,7 @@ const DetailPageAssets = () => {
       <div className='mt-5'>
 
       {
-        tab === 'order' && 
+        tab === 'Token' && 
         <>
         <div className='grid grid-cols-4 gap-5'>
           <div className='col-span-3'>
@@ -215,7 +213,7 @@ const DetailPageAssets = () => {
                     Sales
                   </h1>
                   <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading || 'Loading orders...'}</p>}>
-                    <AssetOrdersTable orders={ordersData.orders} isLoading={ordersData.loading} />
+                    <AssetTokensTable orders={ordersData.orders} isLoading={ordersData.loading} />
                   </Suspense>
                 </div>
                 <div className='flex flex-col gap-5'>
