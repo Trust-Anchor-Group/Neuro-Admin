@@ -224,6 +224,7 @@ export default function AssetsPageIssuer() {
               height={450}
               alt={t?.displayDetails?.brazilMapAlt || 'Brazil production map'}
               priority
+              unoptimized
             />
           </div>
         </div>
