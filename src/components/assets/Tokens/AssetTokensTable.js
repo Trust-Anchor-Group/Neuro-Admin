@@ -81,7 +81,7 @@ const muiTheme = createTheme({
   },
 });
 
-export default function AssetTokensTable({ orders = [], isLoading = false }) {
+export default function AssetTokensTable({ orders = [], isLoading = false, onRowClick }) {
   const columns = useMemo(
     () => [
       { accessorKey: "assetName", header: "Asset Name", size: 250 },
@@ -307,17 +307,23 @@ export default function AssetTokensTable({ orders = [], isLoading = false }) {
           },
         }}
 
-        muiTableBodyRowProps={({ row }) => ({
-          onClick: () => {
-            window.location.href = `/neuro-assets/detailpage/${row.original.id}`;
-          },
-          sx: {
-            cursor: "pointer",
-            backgroundColor: "transparent",
-            color: "var(--brand-text)",
-            "&:hover": { backgroundColor: "rgba(255,255,255,0.02)" },
-          },
-        })}
+        muiTableBodyRowProps={({ row }) => {
+          const handleClick = onRowClick
+            ? () => onRowClick(row.original)
+            : () => {
+                window.location.href = `/neuro-assets/detailpage/${row.original.id}`;
+              };
+
+          return {
+            onClick: handleClick,
+            sx: {
+              cursor: "pointer",
+              backgroundColor: "transparent",
+              color: "var(--brand-text)",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.02)" },
+            },
+          };
+        }}
 
         muiPaginationProps={{
           shape: "rounded",
