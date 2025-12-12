@@ -17,7 +17,7 @@ const muiTheme = createTheme({
     MuiTypography: {
       styleOverrides: {
         root: { color: "var(--brand-text)" },
-        body1: { color: "var(--brand-text-secondary)" }, // "No orders to display"
+        body1: { color: "var(--brand-text-secondary)" }, 
       },
     },
     MuiFormLabel: {
@@ -81,18 +81,9 @@ const muiTheme = createTheme({
   },
 });
 
-export default function AssetOrdersTable({ orders = [], isLoading = false }) {
+export default function AssetTokensTable({ orders = [], isLoading = false }) {
   const columns = useMemo(
     () => [
-      {
-        accessorKey: "id",
-        header: "Token ID",
-        size: 300,
-        Cell: ({ cell }) => {
-          const id = cell.getValue();
-          return id?.toString?.()?.slice?.(0, 10) ?? id ?? "";
-        },
-      },
       { accessorKey: "assetName", header: "Asset Name", size: 250 },
       { accessorKey: "category", header: "Category", size: 250 },
       { accessorKey: "amount", header: "Amount", size: 150 },
@@ -131,6 +122,48 @@ export default function AssetOrdersTable({ orders = [], isLoading = false }) {
               </span>
             </Box>
           );
+        },
+      },
+      {
+        accessorKey: "payment status",
+        header: "Payment Status",
+        size: 170,
+        Cell: ({ cell }) => {
+          const status = cell.getValue();
+          const icon =
+            status === "Completed" ? (
+              <FaCheckCircle style={{ color: "var(--status-success,#16a34a)" }} />
+            ) : status === "Pending" ? (
+              <FaShippingFast style={{ color: "var(--status-info,#2563eb)" }} />
+            ) : status === "cancelled" ? (
+              <FaTimesCircle style={{ color: "var(--status-error,#dc2626)" }} />
+            ) : (
+              <FaClock style={{ color: "var(--status-warn,#d97706)" }} />
+            );
+
+          const statusColor =
+            status === "Completed"
+              ? "var(--status-success,#16a34a)"
+              : status === "Pending"
+              ? "var(--status-info,#2563eb)"
+              : status === "cancelled"
+              ? "var(--status-error,#dc2626)"
+              : "var(--status-warn,#d97706)";
+
+          return (
+            <Box display="flex" alignItems="center" gap={1}>
+              {icon}
+              <span style={{ fontWeight: 700, color: statusColor }}>
+                {String(status ?? "").charAt(0).toUpperCase() + String(status ?? "").slice(1)}
+              </span>
+            </Box>
+          );
+        },
+      },
+      { accessorKey: "id", header: "Token ID", size: 300,
+        Cell: ({ cell }) => {
+          const id = cell.getValue();
+          return id?.toString?.()?.slice?.(0, 10) ?? id ?? "";
         },
       },
     ],
@@ -321,7 +354,7 @@ export default function AssetOrdersTable({ orders = [], isLoading = false }) {
         }}
 
         localization={{
-          noRecordsToDisplay: "No orders to display",
+          noRecordsToDisplay: "No tokens to display",
         }}
       />
     </ThemeProvider>

@@ -238,8 +238,16 @@ const fr = {
     confirmDelete: 'Annuler',
     cancel: 'Annuler',
     deletedMessage: 'Votre compte a été supprimé avec succès.',
-    certificateTitle: 'Informations sur le certificat',
-    certificateDescription: 'Le jeton valide le processus de compensation tokenisée des émissions de carbone. Le propriétaire achète le Carbon Token auprès de Creturner ce qui compense une quantité spécifique de CO₂e.'
+    certificateTitle: 'Description',
+    certificateDescription: 'Le jeton valide le processus de compensation tokenisée des émissions de carbone. Le propriétaire achète le Carbon Token auprès de Creturner ce qui compense une quantité spécifique de CO₂e.',
+    assetType: 'Type d\'asset',
+    coffeeBean: 'Grain de café',
+    imagesTitle: 'Images de l\'actif',
+    imagesSubtitle: 'Touchez un espace réservé pour afficher l\'aperçu agrandi.',
+    imagesHint: 'Voir',
+    imagesModalHint: 'Ceci est un espace réservé pour l\'image agrandie de l\'actif.',
+    openPreview: 'Ouvrir l\'aperçu',
+    closePreview: 'Fermer l\'aperçu'
   },
   buttons: {
     save: 'Enregistrer',
@@ -343,10 +351,10 @@ const fr = {
     title: 'Assets',
     orders: 'Commandes',
     clients: 'Clients',
-    coffee: 'Café'
+    Tokens: 'Tokens'
   },
   Clients: {
-    title: 'Clients Assets',
+    title: 'Issuers',
     subtitle: 'Vue d\'ensemble de l\'activité client liée aux actifs',
     loading: 'Chargement des clients...',
     empty: 'Aucun client disponible',
@@ -354,7 +362,8 @@ const fr = {
       total: 'Total',
       activeOrders: 'Commandes actives',
       totalClients: 'Nombre total de clients',
-      pendingOrders: 'Commandes en attente'
+      pendingOrders: 'Commandes en attente',
+      averageDailySales: 'Ventes quotidiennes moyennes'
     },
     table: {
       columns: {
@@ -512,7 +521,7 @@ const fr = {
   }
   ,
   assetOrders: {
-    heading: 'Commandes Assets',
+    heading: 'Tokens actifs',
     summary: {
       total: 'Total',
       active: 'Commandes actives',
@@ -532,12 +541,55 @@ const fr = {
     }
   },
   assetDashboard: {
-    heading: 'Tableau de bord des Assets'
+    heading: 'Tableau de bord des actifs',
+    clients: {
+      title: 'Sociétés sous-jacentes',
+      subtitle: 'Statut le plus récent des émetteurs connectés',
+      cta: 'Gérer les clients',
+      columns: {
+        client: 'Client',
+        sector: 'Secteur',
+        tokens: 'Tokens',
+        lastOrder: 'Dernière commande',
+        status: 'Statut'
+      },
+      statuses: {
+        active: 'Actif',
+        onboarding: 'En intégration',
+        paused: 'Suspendu',
+        review: 'En revue'
+      }
+    },
+    transactions: {
+      title: 'Dernières transactions',
+      subtitle: 'Cinq opérations de mint/burn les plus récentes',
+      tokensLabel: 'tokens',
+      statuses: {
+        settled: 'Validée',
+        pending: 'En attente',
+        failed: 'Échec'
+      }
+    },
+    monthlySummary: {
+      title: 'Résumé mensuel',
+      subtitle: 'Tokens et ordres créés',
+      tokens: 'Tokens',
+      orders: 'Ordres'
+    },
+    certificates: {
+      title: 'Certificats dans les tokens',
+      subtitle: 'Comment les certificats couvrent l’offre active',
+      total: 'Certificats émis',
+      tokenized: 'Liés à des tokens',
+      pending: 'En attente de vérification',
+      expiring: 'Expire bientôt',
+      breakdownTitle: 'Répartition par type'
+    }
   }
   ,
   certificateButtons: {
-    download: 'Télécharger le certificat',
-    share: 'Partager le certificat'
+    download: 'Télécharger',
+    share: 'Partager'
   }
   ,
   assetOrderDetail: {
@@ -577,47 +629,28 @@ const fr = {
       progress: 'Progression',
       amount: 'Montant',
       complete: 'terminé'
-    }
-  }
-  ,
-  processPage: {
-    progress: {
-      title: 'Progression de la compensation',
-      descriptionTotal: 'Suivi du volume compensé dans le temps',
-      descriptionRelative: 'Comparaison de chaque phase par rapport au total',
-      relative: 'Relatif',
-      total: 'Total',
-      noData: 'Aucune donnée disponible'
     },
-    summary: {
-      totalValue: 'Valeur totale',
-      totalCompensation: 'Compensation totale'
+    certificateBox: {
+      title: 'Certificat',
+      openPreview: 'Ouvrir l\'aperçu du certificat',
+      closePreview: 'Fermer l\'aperçu du certificat',
+      imageAlt: 'Aperçu du certificat',
+      hint: 'Touchez pour agrandir',
+      modalHint: 'Aperçu du certificat en pleine taille.'
     },
-    activity: {
-      title: 'Activité du processus',
-      searchPlaceholder: 'Rechercher des mises à jour',
-      filterAll: 'Tout',
-      comingSoon: 'Bientôt disponible'
-    },
-    units: {
-      tons: 'tonnes'
-    },
-    misc: {
-      completeSuffix: '% terminé'
-    },
-    status: {
+    publishBox: {
+      title: 'Statut de publication',
+      description: 'Définissez comment cet actif apparaît sur la place de marché.',
       label: 'Statut',
-      states: {
-        inProgress: 'En cours',
-        paused: 'En pause',
-        aborted: 'Annulé',
-        complete: 'Terminé',
-        notStarted: 'Non démarré'
-      },
-      terminate: 'Terminer le processus'
-    },
-    actions: {
-      terminate: 'Terminer le processus'
+      button: 'Enregistrer les changements',
+      saving: 'Enregistrement…',
+      saveSuccess: 'Statut mis à jour.',
+      saveError: 'Impossible de mettre à jour le statut.',
+      options: {
+        published: 'Publié',
+        draft: 'Brouillon',
+        archived: 'Archivé'
+      }
     }
   },
   clientOverview: {
@@ -727,6 +760,23 @@ const fr = {
     },
     nextField: 'Champ suivant',
     selectStep: 'Sélectionnez une étape dans la checklist pour voir les détails.'
+  }
+  ,
+  editBox: {
+    editOrder: 'Modifier la commande',
+    issueRefund: 'Effectuer un remboursement'
+  }
+  ,
+  partiesBox: {
+    buyer: 'Acheteur',
+    issuer: 'Émetteur'
+  }
+  ,
+  sidebox: {
+    privateNotesTitle: 'Notes client',
+    addNotePlaceholder: 'Ajouter une note...',
+    addNoteButton: 'Ajouter',
+    noNotes: 'Aucune note pour l\'instant.'
   }
 };
 

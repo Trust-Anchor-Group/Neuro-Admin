@@ -36,7 +36,7 @@ export const clientConfigs = {
   mateo: {
     modes: {
       light: {
-        primaryColor: '#8F40D4',
+        primaryColor: '#FAFAFA',
         secondaryColor: '#FFFFFF',
         backgroundColor: '#FAFAFA',
         thirdColor: '#FFFFFF',
@@ -47,10 +47,11 @@ export const clientConfigs = {
         borderColor: '#e2e8f0',
         navbarBg: '#FFFFFF',
         sidebarBg: '#3b3b3bff',
-        hover: '#f3f4f6'
+        hover: '#f3f4f6',
+        button: '#A160E8'
       },
       dark: {
-        primaryColor: '#A160E8',
+        primaryColor: '#161617',
         secondaryColor: '#1E1E1E',
         backgroundColor: '#161617',
         thirdColor: '#1F1F1F',
@@ -61,7 +62,8 @@ export const clientConfigs = {
         borderColor: '#2A2A2A',
         sidebarBg: '#a53a3aff',
         navbarBg: '#252526',
-        hover: '#A160E8'
+        hover: '#161617',
+        button: '#A160E8',
       },
     },
   },

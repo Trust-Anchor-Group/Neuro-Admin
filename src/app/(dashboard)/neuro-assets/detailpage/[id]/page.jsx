@@ -1,17 +1,18 @@
 'use client'
 import { DisplayDetailsAsset } from '@/components/assets/DisplayDetailsAsset'
+import AssetTokensTable from "@/components/assets/Tokens/AssetTokensTable";
 import { TabNavigation } from '@/components/shared/TabNavigation';
 import { useParams, useSearchParams } from 'next/navigation';
+import { Activity } from "lucide-react";
 // Using public logo asset; Next/Image can take a string path referencing /public
-import React, { useContext, useMemo } from 'react'
-import { FaCertificate, FaChartLine, FaRegFileAlt } from 'react-icons/fa';
+import React, { useContext, useMemo, useState, useCallback, useEffect, Suspense } from 'react'
+import { FaCertificate, FaRegFileAlt } from 'react-icons/fa';
 import { StatusBox } from '@/components/assets/StatusBox';
-import { PartiesBox } from '@/components/assets/PartiesBox';
-import Image from 'next/image';
-import certificateImage from '../../../../../../public/certificate.jpg'
+import { CertificateBox } from '@/components/assets/CertificateBox';
+import { PublishBox } from '@/components/assets/PublishBox';
 import { useLanguage } from '../../../../../../context/LanguageContext'
-import { PdfButton } from '@/components/assets/PdfButton';
-import Process from '@/components/assets/Process';
+import { fetchOrders } from '@/lib/fetchOrders';
+
 
 
 
@@ -19,13 +20,61 @@ import Process from '@/components/assets/Process';
 const DetailPageAssets = () => {
 
 
-
+  const [ordersData, setOrdersData] = useState({ loading: true, orders: [] });
    const searchParams = useSearchParams()
    const { id } = useParams()
-   const tab = searchParams.get('tab') || 'order'
+   const tab = searchParams.get('tab') || 'Token'
 
   const { language, content: translations } = useLanguage();
   const t = translations[language];
+  const [publishStatus, setPublishStatus] = useState('published');
+  // Fetch orders for certificate tab
+  useEffect(() => {
+    let mounted = true;
+    if (tab === 'sales' && ordersData.loading) {
+      (async () => {
+        const data = await fetchOrders();
+        if (mounted) setOrdersData(data);
+      })();
+    }
+    return () => { mounted = false; };
+  }, [tab, ordersData.loading]);
+
+  const handlePublishSave = useCallback(async (nextStatus) => {
+    const response = await fetch('/api/assets/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ assetId: id, status: nextStatus }),
+    });
+
+    const payload = await response.json();
+
+    if (!response.ok) {
+      throw new Error(payload?.message || 'Failed to update publish status');
+    }
+
+    const savedStatus = payload?.data?.status || nextStatus;
+    setPublishStatus(savedStatus);
+    return savedStatus;
+  }, [id]);
+
+  const summaryCards = [
+    {
+      label: t.Clients?.summary?.averageDailySales || 'Average daily sales',
+      value: '14',
+      Icon: Activity,
+      accentClass: 'text-blue-500 bg-blue-100',
+    },
+  ];
+
+  const popularRegions = [
+    'South America',
+    'Central America',
+    'Europe',
+    'North America',
+    'SE Asia',
+  ];
 
   const userData = {
     orderName:'Sweden compensation 2024-2025',
@@ -36,6 +85,42 @@ const DetailPageAssets = () => {
     orderedBy:'EcoTech Solutions',
     created:'2024-02-03, 08:30'
   }
+  const productionData = {
+    facility: 'Factory 3 Malmö, Sweden',
+    method: 'Direct-air capture',
+    startDate: '2024-03-31, 15:29',
+    endDate: '2025-03-13, 15:29'
+  }
+  const productionFields = useMemo(() => [
+    { label: t?.assetOrderDetail?.production?.facility || 'Facility', key: 'facility' },
+    { label: t?.assetOrderDetail?.production?.method || 'Method', key: 'method' },
+    { label: t?.assetOrderDetail?.production?.startDate || 'Start date', key: 'startDate' },
+    { label: t?.assetOrderDetail?.production?.endDate || 'End date', key: 'endDate' },
+  ], [t])
+
+  // Pricing / Agreement data (third block)
+  const pricingData = {
+    agreement: 'Carbon capture EU (Q2 2025)\n €230.00 per ton',
+  }
+
+  const pricingFields = useMemo(() => [
+    { label: t?.assetOrderDetail?.pricing?.agreement || 'Agreement', key: 'agreement' },
+  ], [t])
+
+  // Company Information block (fourth block)
+  const companyData = {
+    totalPrice: '204,210 EUR',
+    paymentMethod: 'Invoice',
+    paymentDue: '2025-03-28',
+    paymentReceived: '2025-03-26, 15:29'
+  }
+
+  const companyFields = useMemo(() => [
+    { label: t?.assetOrderDetail?.company?.totalPrice || 'Total price', key: 'totalPrice' },
+    { label: t?.assetOrderDetail?.company?.paymentMethod || 'Payment method', key: 'paymentMethod' },
+    { label: t?.assetOrderDetail?.company?.paymentDue || 'Payment due', key: 'paymentDue' },
+    { label: t?.assetOrderDetail?.company?.paymentReceived || 'Payment received', key: 'paymentReceived' },
+  ], [t])
 
   const fieldsToShow = useMemo(() => [
     { label: t?.assetOrderDetail?.fields?.orderName || 'Order Name', key: 'orderName' },
@@ -48,55 +133,50 @@ const DetailPageAssets = () => {
   ], [t])
 
   const headTitle = {
-    title: 'Q3 Compensation',
+    title: 'Coffee Bean',
     credit: '204-210 EUR',
     created: '2024-02-03',
     tons: '73 tons |230.30 per ton',
     image: '/neuroAdminLogo.svg', // served from public/neuroAdminLogo.svg
+    issuer: 'Bress Capital',
   };
 
   const statusCard = {
     progress:'75',
-    amount:'47 tons',
+    amount:'47 of 73 tons',
     status:'In progress'
   }  
 
-  const parties = {
-    
+  // Payment status card (duplicate of StatusBox for payment tracking)
+  const paymentStatusCard = {
+    progress: '100',
+    status: 'Complete',
   }
 
 
   return (
     <div className='p-5'>
-    <TabNavigation tab={tab} id={id} gridCols={'grid-cols-3'} tabArray={[
+    <TabNavigation tab={tab} id={id} gridCols={'grid-cols-2'} tabArray={[
       {
-        title: t?.assetOrderDetail?.tabs?.order || 'Order detail',
+        title: t?.assetOrderDetail?.tabs?.token || 'Token detail',
         href:'/neuro-assets/detailpage',
-        tabDesination:'order&overview',
+        tabDesination:'Token',
         icon:FaRegFileAlt,
-        tabRef:'order'
+        tabRef:'Token'
       },
       {   
-        title: t?.assetOrderDetail?.tabs?.certificate || 'Certificate',
+        title: t?.assetOrderDetail?.tabs?.certificat || 'Sales',
         href:'/neuro-assets/detailpage',
-        tabDesination:'certificate',
+        tabDesination:'sales',
         icon:FaCertificate,
-        tabRef:'certificate'
+        tabRef:'sales'
 
       },
-          {   
-        title: t?.assetOrderDetail?.tabs?.process || 'Process',
-        href:'/neuro-assets/detailpage',
-        tabDesination:'process',
-        icon:FaChartLine,
-        tabRef:'process'
-
-      }
     ]}/> 
       <div className='mt-5'>
 
       {
-        tab === 'order' && 
+        tab === 'Token' && 
         <>
         <div className='grid grid-cols-4 gap-5'>
           <div className='col-span-3'>
@@ -105,95 +185,87 @@ const DetailPageAssets = () => {
               userData={userData}
               title={'Order details'}
               header={headTitle}
+              extraData={productionData}
+              extraFields={productionFields}
+              extraTitle={'Production process'}
+              extraPrice={pricingData}
+              priceFields={pricingFields}
+              priceTitle={'Pricing agreement'}
+              extraCompany={companyData}
+              companyFields={companyFields}
+              companyTitle={'Company Information'}
             />
           </div>
-          <div className='col-start-4 col-end-5 flex flex-col items-start gap-2'>
-            <StatusBox statusCard={statusCard}/>
-            <PartiesBox/>
+          <div className='col-start-4 col-end-5 flex flex-col items-start gap-5 mt-5'>
+            <PublishBox status={publishStatus} onSave={handlePublishSave}/>
+            <StatusBox statusCard={statusCard} title={'Asset status'} />
+            <StatusBox statusCard={paymentStatusCard} title={'Sales status'} />
+            <CertificateBox/>
           </div>
         </div>
         </>
       }
             {
-              tab === 'certificate' &&
-              <div className='mx-auto w-full h-[60%] border-2 bg-[var(--brand-navbar)] border-[var(--brand-border)] p-5 rounded-lg '>
-                <h1 className='font-semibold text-xl mb-5'>
-                  {t?.assetOrderDetail?.headings?.orderCertificate || 'Order certificate'}
-                </h1>
-                <div className='flex flex-row'>
-                  <div className='flex w-[50%] flex-col items-start gap-6 bg-[var(--brand-background)] p-5 rounded-lg mr-5'>
-                    <h1 className='text-lg font-semibold'>
-                      {t?.assetOrderDetail?.headings?.certificateInformation || 'Certificate Information'}
-                    </h1>
-                    <div className='grid w-full gap-x-10 gap-y-6 text-sm text-[var(--brand-text)] sm:grid-cols-2'>
-                      <div className='space-y-5'>
-                        <div>
-                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.name || 'NAME'}</h2>
-                          <p className='mt-1 break-words text-[var(--brand-text)]'>Creturner Carbon Credit</p>
-                        </div>
-                        <div>
-                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.creator || 'CREATOR'}</h2>
-                          <p className='mt-1 break-words text-[var(--brand-text)]'>2e915fd2-4695-e555-f802-87bbe2cbb750@legal.mateo.lab.tagroot.io</p>
-                        </div>
-                        <div>
-                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.category || 'CATEGORY'}</h2>
-                          <p className='mt-1 break-words text-[var(--brand-text)]'>Carbon Offsets</p>
-                        </div>
-                        <div>
-                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.visibility || 'VISIBILITY'}</h2>
-                          <p className='mt-1 break-words text-[var(--brand-text)]'>Public</p>
-                        </div>
-                        <div>
-                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.updated || 'UPDATED'}</h2>
-                          <p className='mt-1 break-words text-[var(--brand-text)]'>12/16/2024</p>
-                        </div>
+              tab === 'sales' &&
+              <div className='grid grid-cols-4 gap-5'>
+                <div className='mx-auto col-span-3 w-full bg-[var(--brand-navbar)] shadow-md p-5 rounded-lg '>
+                  <h1 className='font-semibold text-xl mb-5'>
+                    Sales
+                  </h1>
+                  <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading || 'Loading orders...'}</p>}>
+                    <AssetTokensTable orders={ordersData.orders} isLoading={ordersData.loading} />
+                  </Suspense>
+                </div>
+                <div className='flex flex-col gap-5'>
+                  <StatusBox statusCard={paymentStatusCard} title={'Sales status'} />
+                  {summaryCards.map(({ label, value, Icon, accentClass }) => (
+                    <div
+                      key={label}
+                      className="flex flex-col rounded-2xl gap-2 bg-[var(--brand-navbar)] p-5 shadow-md backdrop-blur"
+                    >
+                      <p className="text-sm font-medium text-[var(--brand-text-secondary)]">{label}</p>
+                      <div className="flex flex-row items-center gap-3">
+                        <span className={`flex items-center justify-center rounded-full p-2 ${accentClass}`}>
+                          <Icon className="h-5 w-5" strokeWidth={2.2} />
+                        </span>
+                        <p className="text-3xl font-semibold text-[var(--brand-text)]">{value}</p>
                       </div>
-                      <div className='space-y-5'>
-                        <div>
-                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.tokenId || 'TOKEN ID'}</h2>
-                          <p className='mt-1 break-words text-[var(--brand-text)]'>cc71e0cc-78de-4689-828c-aa9e404b1de5@edaler.mateo.lab.tagroot.io</p>
-                        </div>
-                        <div>
-                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.owner || 'Owner'}</h2>
-                          <p className='mt-1 break-words text-[var(--brand-text)]'>2eeed87a-e8a8-9a4d-400b-c2f0538661b9@legal.mateo.lab.tagroot.io</p>
-                        </div>
-                        <div>
-                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.currency || 'CURRENCY'}</h2>
-                          <p className='mt-1 break-words text-[var(--brand-text)]'>TST</p>
-                        </div>
-                        <div>
-                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.created || 'Created'}</h2>
-                          <p className='mt-1 break-words text-[var(--brand-text)]'>12/16/2024 3:25:30 PM</p>
-                        </div>
-                        <div>
-                          <h2 className='text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]'>{t?.assetOrderDetail?.certificateFields?.validUntil || 'VALID UNTIL'}</h2>
-                          <p className='mt-1 break-words text-[var(--brand-text)]'>12/16/2029</p>
-                        </div>
-                      </div>
+                      
                     </div>
-                  </div>
-                  <div className='bg-[var(--brand-background)] p-5 rounded-lg w-[50%] flex flex-col items-center'>
-                    <Image
-                    className='bg-gray-100 p-4 rounded-lg justify-right items-right'
-                    src={certificateImage}
-                    width={600}
-                    height={600}
-                    alt='certificate'/>
+                  ))}
+                  <div className="flex flex-col rounded-2xl bg-[var(--brand-navbar)] p-5 shadow-md">
+                    <div className="mb-4 flex items-center justify-between">
+                      <p className="text-sm font-semibold text-[var(--brand-text-secondary)]">Popular regions</p>
+                      <button
+                        type="button"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--brand-border)] text-lg text-[var(--brand-text-secondary)]"
+                        aria-label="Popular regions actions"
+                      >
+                        ···
+                      </button>
+                    </div>
+                    <ol className="space-y-2 text-sm text-[var(--brand-text)]">
+                      {popularRegions.map((region, index) => (
+                        <li
+                          key={region}
+                          className={`flex items-center py-1 text-base font-medium ${
+                            index === popularRegions.length - 1 ? '' : 'border-b border-[var(--brand-border)]'
+                          }`}
+                        >
+                          <span className="w-6 text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]">
+                            {index + 1}
+                          </span>
+                          <span className="ml-3 flex-1">{region}</span>
+                        </li>
+                      ))}
+                    </ol>
                   </div>
                 </div>
-                <PdfButton/>
+                
               </div>
             }
-            {
-              tab === 'process' &&
-              <Process />
-            }
           </div>
-  
     </div>
-                
-                
-
   )
 }
 

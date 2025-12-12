@@ -2,19 +2,19 @@
 import { TabNavigation } from '@/components/shared/TabNavigation';
 import { useParams, useSearchParams } from 'next/navigation';
 import React from 'react'
-import { FaChartLine, FaRegFileAlt, FaFirstOrderAlt } from 'react-icons/fa';
+import { FaChartLine, FaRegFileAlt, FaRegBuilding } from 'react-icons/fa';
 import { Award, Activity, Timer } from 'lucide-react';
-import Manage from '@/components/assets/Manage';
+import Sales from '@/components/assets/Sales';
 import Overview from '@/components/assets/Overview';
 // NOTE: context folder is at project root (not under src), so we need five parent traversals
 import { useLanguage, content as i18nContent } from '../../../../../context/LanguageContext';
 import { Suspense } from 'react';
-import AssetOrdersTable from '@/components/assets/orders/AssetOrdersTable';
+import AssetTokensTable from '@/components/assets/Tokens/AssetTokensTable';
 
 
 
 
-const DetailPageClient = () => {
+const DetailPageIssuer = () => {
    const searchParams = useSearchParams()
    const { id } = useParams()
    const tab = searchParams.get('tab') || 'overview'
@@ -26,7 +26,7 @@ const DetailPageClient = () => {
   React.useEffect(() => {
     async function fetchOrders() {
       try {
-        const result = await import('@/components/assets/orders/tokenFetch');
+        const result = await import('@/components/assets/Tokens/tokenFetch');
         const response = await result.fetchTokensClientSide(10, 0);
         const rawOrders = response?.data || response;
         // Map raw token data to table format
@@ -70,34 +70,26 @@ const DetailPageClient = () => {
     fetchOrders();
   }, []);
 
-  // Hardcoded orders data and summary, matching the cards
-  const orders = [
-    { id: '1', assetName: 'Asset A', category: 'Type 1', amount: 100, orderDate: '2025-10-01', status: 'active' },
-    { id: '2', assetName: 'Asset B', category: 'Type 2', amount: 200, orderDate: '2025-10-02', status: 'pending' },
-    { id: '3', assetName: 'Asset C', category: 'Type 1', amount: 150, orderDate: '2025-10-03', status: 'active' },
-    { id: '4', assetName: 'Asset D', category: 'Type 3', amount: 50, orderDate: '2025-10-04', status: 'pending' },
-    { id: '5', assetName: 'Asset E', category: 'Type 2', amount: 75, orderDate: '2025-10-05', status: 'active' },
-    { id: '6', assetName: 'Asset F', category: 'Type 1', amount: 125, orderDate: '2025-10-06', status: 'active' },
-  ];
+
 
   const summaryCards = [
     {
-      label: t.summary?.total || 'Total',
-      value: `450 ${t.units?.tons || 'ton'}`,
-      Icon: Award,
-      accentClass: 'text-emerald-500 bg-emerald-100',
-    },
-    {
-      label: t.summary?.activeOrders || 'Active orders',
-      value: '6',
+      label: t.summary?.tota || 'Live tokens',
+      value: `23`,
       Icon: Activity,
       accentClass: 'text-blue-500 bg-blue-100',
     },
     {
-      label: t.summary?.pendingOrders || 'Pending orders',
+      label: t.summary?.activeOrde || '[Stat]',
       value: '4',
-      Icon: Timer,
+      Icon: Activity,
       accentClass: 'text-amber-500 bg-amber-100',
+    },
+    {
+      label: t.summary?.pendingOrde || '[Stat]',
+      value: '450 000 kg',
+      Icon: Timer,
+      accentClass: 'text-emerald-500 bg-emerald-100',
     },
   ];
 
@@ -106,28 +98,28 @@ const DetailPageClient = () => {
       <TabNavigation tab={tab} id={id} gridCols={'grid-cols-3'} tabArray={[
         {
           title: t.tabs?.overview || 'Overview',
-          href: '/neuro-assets/detailpageclient',
+          href: '/neuro-assets/detailpageIssuer',
           tabDesination: 'overview',
-          icon: FaRegFileAlt,
+          icon: FaRegBuilding,
           tabRef: 'overview',
         },
         {
-          title: t.tabs?.orders || 'Orders',
-          href: '/neuro-assets/detailpageclient',
-          tabDesination: 'orders',
-          icon: FaFirstOrderAlt,
-          tabRef: 'orders',
+          title: t.tabs?.order || 'Tokens',
+          href: '/neuro-assets/detailpageIssuer',
+          tabDesination: 'Tokens',
+          icon: FaRegFileAlt,
+          tabRef: 'Tokens',
         },
         {
-          title: t.tabs?.manage || 'Manage',
-          href: '/neuro-assets/detailpageclient',
-          tabDesination: 'manage',
+          title: t.tabs?.manae || 'Sales',
+          href: '/neuro-assets/detailpageIssuer',
+          tabDesination: 'Sales',
           icon: FaChartLine,
-          tabRef: 'manage',
+          tabRef: 'Sales',
         },
       ]} />
       {/* Summary cards section */}
-      {tab === 'orders' && (
+      {tab === 'Tokens' && (
         <section className='mt-4 mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3'>
           {summaryCards.map(({ label, value, Icon, accentClass }) => (
             <div
@@ -136,28 +128,28 @@ const DetailPageClient = () => {
             >
               <div className='flex items-start justify-between'>
                 <p className='text-sm font-medium text-[var(--brand-text-secondary)]'>{label}</p>
-                <span
-                  className={`inline-flex items-center justify-center rounded-full p-2 ${accentClass}`}
-                >
+              </div>
+              <div className='flex flex-row items-center gap-3 mt-3'>
+                <span className={`flex items-center justify-center rounded-full p-2 ${accentClass}`}>
                   <Icon className='h-5 w-5' strokeWidth={2.2} />
                 </span>
+                <p className='text-3xl font-semibold text-[var(--brand-text)]'>{value}</p>
               </div>
-              <p className='mt-5 text-3xl font-semibold text-[var(--brand-text)]'>{value}</p>
             </div>
           ))}
         </section>
       )}
       <div className='mt-5'>
         {tab === 'overview' && <Overview />}
-        {tab === 'orders' && (
+        {tab === 'Tokens' && (
           <div className='rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-5'>
-            <h1 className='font-semibold text-xl mb-5 text-[var(--brand-text)]'>{t.headings?.orders || 'Orders'}</h1>
+            <h1 className='font-semibold text-xl mb-5 text-[var(--brand-text)]'>{t.headings?.tokens || 'Tokens'}</h1>
             <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading?.orders || 'Loading orders...'}</p>}>
-              <AssetOrdersTable orders={ordersData.orders} isLoading={ordersData.loading} />
+              <AssetTokensTable orders={ordersData.orders} isLoading={ordersData.loading} />
             </Suspense>
           </div>
         )}
-        {tab === 'manage' && <Manage />}
+        {tab === 'Sales' && <Sales />}
       </div>
   
     </div>
@@ -167,4 +159,4 @@ const DetailPageClient = () => {
   )}  
 
 
-export default DetailPageClient
+export default DetailPageIssuer

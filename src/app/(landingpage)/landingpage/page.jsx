@@ -51,17 +51,6 @@ const LandingServices = (t) => ([
   //   locked: true,
   // },
   {
-    title: 'Neuro-Monitor',
-    description: t?.landing?.services?.neuroMonitor?.description,
-    icon: MdOutlineTimeline,
-    iconColor: 'text-[#8B5CF6]',
-    iconBg: 'bg-[#F3E8FF]',
-    href: 'https://neuro-exchange.com/pri/dashboard/',
-    status: t?.landing?.status?.learnMore,
-    locked: false,
-    newTab: true,
-  },
-  {
     title: 'Neuro-Payments',
     description: t?.landing?.services?.neuroPayments?.description,
     icon: MdAccountBalance,
@@ -72,6 +61,18 @@ const LandingServices = (t) => ([
     locked: false,
     newTab: true,
   },
+  {
+    title: 'Neuro-Monitor',
+    description: t?.landing?.services?.neuroMonitor?.description,
+    icon: MdOutlineTimeline,
+    iconColor: 'text-[#8B5CF6]',
+    iconBg: 'bg-[#F3E8FF]',
+    href: 'https://neuro-exchange.com/pri/dashboard/',
+    status: t?.landing?.status?.learnMore,
+    locked: false,
+    newTab: true,
+  },
+
   {
     title: 'Neuro-Leasing',
     description: t?.landing?.services?.neuroLeasing?.description,

@@ -1,144 +1,170 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { MapOutInput } from '../shared/MapOutInput';
 import { useLanguage, content } from '../../../context/LanguageContext';
 
-export const DisplayDetailsAsset = ({ userData, fieldsToShow, title, header }) => {
+const PLACEHOLDER_IMAGES = Array.from({ length: 5 }, (_, index) => ({
+  id: index + 1,
+  label: '[ IMAGE ]',
+}));
+
+// Added optional props: extraData, extraFields, extraTitle to render a second information block
+export const DisplayDetailsAsset = ({
+  userData,
+  fieldsToShow,
+  title,
+  header,
+  extraData,
+  extraFields,
+  extraTitle,
+  // Pricing block props
+  extraPrice,
+  priceFields,
+  priceTitle,
+  // Company info block props
+  extraCompany,
+  companyFields,
+  companyTitle,
+}) => {
   const { language } = useLanguage();
   const t = content[language];
-  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
-  const [showDeletedMessage, setShowDeletedMessage] = useState(false);
-  const router = useRouter();
-
-  const handleDeleteAccount = async () => {
-    try {
-      let objBody
-      if (userData.data === undefined) {
-        objBody = { accountName: userData.account };
-      } else {
-        objBody = { accountName: userData.data.userName };
-      }
-      const res = await fetch('/api/deleteAccount', {
-        method: 'POST',
-        headers: { 'Content-type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(objBody),
-      });
-
-      if (res.ok) {
-        setShowConfirmPopup(false);
-        setShowDeletedMessage(true);
-        // Optionally, redirect after a delay:
-        setTimeout(() => router.push('/neuro-access/account'), 1300);
-      } else {
-        const errorText = await res.text();
-        alert(`Failed to delete account: ${errorText || res.statusText}`);
-      }
-    } catch (err) {
-      alert(`An error occurred: ${err.message}`);
-    }
-  };
+  const [selectedImage, setSelectedImage] = useState(null);
+  const placeholders = useMemo(() => PLACEHOLDER_IMAGES, []);
 
   if (!userData) return <p>{t?.displayDetails?.noData || 'No data available'}</p>;
 
+  const openPreview = (image) => setSelectedImage(image);
+  const closePreview = () => setSelectedImage(null);
+
   return (
     <div className="flex flex-col h-full max-md:grid-cols-1">
-      <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-xl shadow-sm p-6 max-md:col-span-1 max-sm:p-0 max-sm:pb-5 max-sm:overflow-auto">
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-5"
+          onClick={closePreview}
+        >
+          <div
+            className="relative w-full max-w-3xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex h-[600px] w-full items-center justify-center rounded-2xl border border-[var(--brand-border)] bg-gradient-to-br from-[#B3B6B8] to-[#9A9A9A] text-xl font-semibold text-[var(--brand-text-secondary)] tracking-[0.35em]">
+              {selectedImage?.label}
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="max-md:col-span-1 max-sm:p-0 max-sm:pb-5 max-sm:overflow-auto">
         <div className="grid grid-cols-1 gap-5 max-sm:grid-cols-1 max-sm:px-5">
           <div className="flex justify-between items-center gap-3 max-sm:flex-col max-sm:mt-5">
             <p className="text-text28 font-semibold max-sm:text-xl">
               {userData?.account || userData?.data?.userName}
             </p>
           </div>
-          {
-            header && (
-              <div className='flex justify-between border-b-2 pb-5'>
-                <div className='flex gap-10'>
+          {header && (
+            <div className='flex flex-col justify-between p-5 bg-[var(--brand-navbar)] shadow-md rounded-xl'>
+              <div className="flex justify-between p-5">
+                <div className="flex gap-10 w-full">
                   <Image
-                    className='w-[100px] h-[100px]'
-                    src='/neuroAdminLogo.svg'
+                    className="w-[100px] h-[100px]"
+                    src="/neuroAdminLogo.svg"
                     width={120}
                     height={120}
                     unoptimized
-                    alt='neuroAdminLogo.svg'/>
-                  <div className=''>
-                    <h1 className=' text-2xl font-semibold' >{header.title}</h1>
-                    <p className='text16 text-[var(--brand-text)]'>{header.created}</p>
+                    alt="neuroAdminLogo.svg"
+                  />
+                  <div className='border-b border-[var(--brand-border)] w-full'>
+                    <h1 className="text-2xl font-semibold">{header.title}-{header.created} </h1>
+                    <p className="text16 text-[var(--brand-text)]">{header.issuer}</p>
                   </div>
                 </div>
-                <div className=''>
-                  <p className='text-2xl font-semibold '>{header.credit}</p>
-                  <p className='text16 text-[var(--brand-text)]'>{header.tons}</p>
-                </div>
               </div>
-            )
-          }
-          <div className='bg-[var(--brand-background)] rounded-xl p-5'>
-            <h1 className='text-lg font-semibold text-[var(--brand-text)]'>
-              {t?.displayDetails?.certificateTitle || 'Certificate Information'}
-            </h1>
-            <p className='text-sm text-[var(--brand-text-secondary)]'>
-              {t?.displayDetails?.certificateDescription || 'The token validates the process of a tokenized Carbon Emissions Offset. The owner purchases the Carbon Token from Creturner which offsets a specific amount of CO₂e.'}
-            </p>
-          </div>
-          <div className="bg-[var(--brand-background)] rounded-xl p-5 overflow-auto">
-            <h2 className="font-semibold text-[var(--brand-text-secondary)] border-b-2 border-[var(--brand-border)] pb-2">
-              {title}
-            </h2>
-            <MapOutInput fieldsToShow={fieldsToShow} user={userData} />
-          </div>
-          <button
-            onClick={() => setShowConfirmPopup(true)}
-            className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-xl text-xl shadow-lg transition-colors"
-          >
-            {t?.displayDetails?.cancelOrder || 'Cancel Order'}
-          </button>
-        </div>
-      </div>
-      {showConfirmPopup && (
-        <div className="fixed inset-0 flex justify-center items-center z-[9999] bg-black/40 px-4">
-          <div className="relative bg-white rounded-lg border border-gray-200 w-[90%] max-w-md p-6 text-center">
-            <button
-              onClick={() => setShowConfirmPopup(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-            >
-              ×
-            </button>
-            <p className="text-lg font-semibold text-gray-800 mb-2">
-              {t?.displayDetails?.confirmTitle || 'Are you sure you want to delete your account?'}
-            </p>
-            <p className="text-sm text-gray-500 mb-6">
-              {t?.displayDetails?.confirmSubtitle || 'This action cannot be undone.'}
-            </p>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={handleDeleteAccount}
-                className="px-4 py-2 bg-red-600 text-white rounded font-semibold hover:opacity-80 transition"
-              >
-                {t?.displayDetails?.confirmDelete || 'Delete'}
-              </button>
-              <button
-                onClick={() => setShowConfirmPopup(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded font-semibold hover:opacity-80 transition"
-              >
-                {t?.displayDetails?.cancel || 'Cancel'}
-              </button>
+                <div className="mt-4 mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                  {placeholders.map((image) => (
+                    <button
+                      type="button"
+                      key={image.id}
+                      onClick={() => openPreview(image)}
+                      className="group relative flex h-40 w-full items-center justify-center rounded-md bg-gradient-to-br from-[#B3B6B8] to-[#9A9A9A] text-xs font-semibold uppercase tracking-[0.35em] text-[var(--brand-text-secondary)] transition-all hover:-translate-y-0.5 hover:border-[var(--brand-primary)] hover:shadow-lg"
+                      aria-label={`${t?.displayDetails?.openPreview || 'Open preview'} ${image.id}`}
+                    >
+                      {image.label}
+                    </button>
+                  ))}
+                </div>
+              <div className='bg-[var(--brand-background)] rounded-xl p-5 overflow-auto'>
+                <h1 className="text-lg font-semibold text-[var(--brand-text)] border-b border-[var(--brand-border)] pb-2 mb-3">
+                  {t?.displayDetails?.certificateTitle || 'Description'}
+                </h1>
+                <p className="text-sm text-[var(--brand-text-secondary)]">
+                  {t?.displayDetails?.certificateDescription ||
+                    'The token validates the process of a tokenized Carbon Emissions Offset. The owner purchases the Carbon Token from Creturner which offsets a specific amount of CO2e.'}
+                </p>
+              </div>
+            </div>  
+          )}
+          <div className="bg-[var(--brand-navbar)] rounded-xl p-5 shadow-md">
+            <div className="mb-5 border-b border-[var(--brand-border)] pb-3">
+              <h1 className="text-base text-[var(--brand-text-secondary)] font-semibold mb-2">
+                {t?.displayDetails?.assetType || 'Asset Type'}
+              </h1>
+              <p className="text-xl font-bold text-[var(--brand-text)]">
+                {t?.displayDetails?.coffeeBean || 'Coffee bean'}
+              </p>
+            </div>
+            <div className='bg-[var(--brand-background)] rounded-xl p-5 overflow-auto'>
+              <h1 className="text-lg font-semibold text-[var(--brand-text)] border-b border-[var(--brand-border)] pb-2 mb-3">
+                {t?.displayDetails?.certificateTitle || 'Description'}
+              </h1>
+              <p className="text-sm text-[var(--brand-text-secondary)]">
+                {t?.displayDetails?.certificateDescription ||
+                  'The token validates the process of a tokenized Carbon Emissions Offset. The owner purchases the Carbon Token from Creturner which offsets a specific amount of CO2e.'}
+              </p>
             </div>
           </div>
-        </div>
-      )}
-      {showDeletedMessage && (
-        <div className="fixed inset-0 flex justify-center items-center z-[9999] bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-lg p-8 shadow-lg text-center">
-            <p className="text-2xl font-semibold text-gray-800">
-              {t?.displayDetails?.deletedMessage || 'Your account has been successfully deleted.'}
-            </p>
+          <div className="grid grid-cols-1 gap-5 max-sm:grid-cols-1 max-sm:px-5 p-5 bg-[var(--brand-navbar)] rounded-xl shadow-md">
+            <Image
+              className='mb-5 w-full h-auto rounded-xl border border-[var(--brand-border)]'
+              src='/brazilMap.svg'
+              width={800}
+              height={450}
+              alt={t?.displayDetails?.brazilMapAlt || 'Brazil production map'}
+              priority
+              unoptimized
+            />
+
+            <div className="bg-[var(--brand-background)] rounded-xl p-5 overflow-auto">
+              <h2 className="font-semibold text-[var(--brand-text-secondary)] border-b-2 border-[var(--brand-border)] pb-2">
+                {title}
+              </h2>
+              <MapOutInput fieldsToShow={fieldsToShow} user={userData} />
+            </div>
+            {extraData && (
+              <div className="bg-[var(--brand-background)] rounded-xl p-5 overflow-auto">
+                <h2 className="font-semibold text-[var(--brand-text-secondary)] border-b-2 border-[var(--brand-border)] pb-2">
+                  {extraTitle || t?.displayDetails?.extraTitle || 'Production process'}
+                </h2>
+                <MapOutInput fieldsToShow={extraFields || fieldsToShow} user={extraData} />
+              </div>
+            )}
+            {extraPrice && (
+              <div className="bg-[var(--brand-background)] rounded-xl p-5 overflow-auto">
+                <h2 className="font-semibold text-[var(--brand-text-secondary)] border-b-2 border-[var(--brand-border)] pb-2">
+                  {priceTitle || t?.displayDetails?.priceTitle || 'Pricing Information'}
+                </h2>
+                <MapOutInput fieldsToShow={priceFields || fieldsToShow} user={extraPrice} />
+              </div>
+            )}
+            {extraCompany && (
+              <div className="bg-[var(--brand-background)] rounded-xl p-5 overflow-auto">
+                <h2 className="font-semibold text-[var(--brand-text-secondary)] border-b-2 border-[var(--brand-border)] pb-2">
+                  {companyTitle || t?.displayDetails?.companyTitle || 'Company Information'}
+                </h2>
+                <MapOutInput fieldsToShow={companyFields || fieldsToShow} user={extraCompany} />
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
-
-

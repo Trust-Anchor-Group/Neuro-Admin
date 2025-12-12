@@ -237,8 +237,16 @@ const pt = {
     confirmDelete: 'Cancelar',
     cancel: 'Cancelar',
     deletedMessage: 'Sua conta foi excluída com sucesso.',
-    certificateTitle: 'Informações do Certificado',
-    certificateDescription: 'O token valida o processo de compensação tokenizada de emissões de carbono. O proprietário compra o Carbon Token da Creturner que compensa uma quantidade específica de CO₂e.'
+    certificateTitle: 'Descrição',
+    certificateDescription: 'O token valida o processo de compensação tokenizada de emissões de carbono. O proprietário compra o Carbon Token da Creturner que compensa uma quantidade específica de CO₂e.',
+    assetType: 'Tipo de asset',
+    coffeeBean: 'Grão de café',
+    imagesTitle: 'Imagens do ativo',
+    imagesSubtitle: 'Toque em um espaço reservado para ver o preview ampliado.',
+    imagesHint: 'Ver',
+    imagesModalHint: 'Este é um espaço reservado para a imagem ampliada do ativo.',
+    openPreview: 'Abrir preview',
+    closePreview: 'Fechar preview'
   },
   buttons: {
     save: 'Salvar',
@@ -356,10 +364,10 @@ const pt = {
     title: 'Assets',
     orders: 'Pedidos',
     clients: 'Clientes',
-    coffee: 'Café'
+    Tokens: 'Tokens'
   },
   Clients: {
-    title: 'Clientes de Assets',
+    title: 'Issuers',
     subtitle: 'Visão geral da atividade de clientes relacionada a ativos',
     loading: 'Carregando clientes...',
     empty: 'Nenhum cliente disponível',
@@ -367,7 +375,8 @@ const pt = {
       total: 'Total',
       activeOrders: 'Pedidos ativos',
       totalClients: 'Total de clientes',
-      pendingOrders: 'Pedidos pendentes'
+      pendingOrders: 'Pedidos pendentes',
+      averageDailySales: 'Vendas diárias médias'
     },
     table: {
       columns: {
@@ -525,7 +534,7 @@ const pt = {
   }
   ,
   assetOrders: {
-    heading: 'Pedidos de Assets',
+    heading: 'Tokens ativos',
     summary: {
       total: 'Total',
       active: 'Pedidos ativos',
@@ -545,12 +554,55 @@ const pt = {
     }
   },
   assetDashboard: {
-    heading: 'Painel de Assets'
+    heading: 'Painel de Assets',
+    clients: {
+      title: 'Empresas subjacentes',
+      subtitle: 'Status mais recente dos emissores conectados',
+      cta: 'Gerenciar clientes',
+      columns: {
+        client: 'Cliente',
+        sector: 'Setor',
+        tokens: 'Tokens',
+        lastOrder: 'Último pedido',
+        status: 'Status'
+      },
+      statuses: {
+        active: 'Ativo',
+        onboarding: 'Em integração',
+        paused: 'Pausado',
+        review: 'Em revisão'
+      }
+    },
+    transactions: {
+      title: 'Últimas transações',
+      subtitle: 'Cinco eventos de mint/burn mais recentes',
+      tokensLabel: 'tokens',
+      statuses: {
+        settled: 'Liquidada',
+        pending: 'Pendente',
+        failed: 'Falhou'
+      }
+    },
+    monthlySummary: {
+      title: 'Resumo mensal',
+      subtitle: 'Tokens e pedidos criados',
+      tokens: 'Tokens',
+      orders: 'Pedidos'
+    },
+    certificates: {
+      title: 'Certificados nos tokens',
+      subtitle: 'Como os certificados lastreiam o supply ativo',
+      total: 'Certificados emitidos',
+      tokenized: 'Vinculados a tokens',
+      pending: 'Aguardando verificação',
+      expiring: 'Expirando em breve',
+      breakdownTitle: 'Distribuição por tipo'
+    }
   }
   ,
   certificateButtons: {
-    download: 'Baixar certificado',
-    share: 'Compartilhar certificado'
+    download: 'Baixar',
+    share: 'Compartilhar'
   }
   ,
   assetOrderDetail: {
@@ -590,47 +642,28 @@ const pt = {
       progress: 'Progresso',
       amount: 'Quantidade',
       complete: 'concluído'
-    }
-  }
-  ,
-  processPage: {
-    progress: {
-      title: 'Progresso da compensação',
-      descriptionTotal: 'Acompanhando o volume compensado ao longo do tempo',
-      descriptionRelative: 'Comparando cada fase em relação ao total do pedido',
-      relative: 'Relativo',
-      total: 'Total',
-      noData: 'Nenhum dado disponível'
     },
-    summary: {
-      totalValue: 'Valor total',
-      totalCompensation: 'Compensação total'
+    certificateBox: {
+      title: 'Certificado',
+      openPreview: 'Abrir preview do certificado',
+      closePreview: 'Fechar preview do certificado',
+      imageAlt: 'Preview do certificado',
+      hint: 'Toque para ampliar',
+      modalHint: 'Preview do certificado em tamanho completo.'
     },
-    activity: {
-      title: 'Atividade do processo',
-      searchPlaceholder: 'Buscar atualizações',
-      filterAll: 'Tudo',
-      comingSoon: 'Em breve'
-    },
-    units: {
-      tons: 'tons'
-    },
-    misc: {
-      completeSuffix: '% concluído'
-    },
-    status: {
+    publishBox: {
+      title: 'Status de publicação',
+      description: 'Defina como este ativo aparece no marketplace.',
       label: 'Status',
-      states: {
-        inProgress: 'Em progresso',
-        paused: 'Pausado',
-        aborted: 'Abortado',
-        complete: 'Concluído',
-        notStarted: 'Não iniciado'
-      },
-      terminate: 'Encerrar processo'
-    },
-    actions: {
-      terminate: 'Encerrar processo'
+      button: 'Salvar alterações',
+      saving: 'Salvando…',
+      saveSuccess: 'Status atualizado.',
+      saveError: 'Falha ao atualizar o status.',
+      options: {
+        published: 'Publicado',
+        draft: 'Rascunho',
+        archived: 'Arquivado'
+      }
     }
   },
   clientOverview: {
@@ -740,6 +773,23 @@ const pt = {
     },
     nextField: 'Próximo campo',
     selectStep: 'Selecione uma etapa na lista para ver os detalhes.'
+  }
+  ,
+  editBox: {
+    editOrder: 'Editar pedido',
+    issueRefund: 'Emitir reembolso'
+  }
+  ,
+  partiesBox: {
+    buyer: 'Comprador',
+    issuer: 'Emissor'
+  }
+  ,
+  sidebox: {
+    privateNotesTitle: 'Notas cliente',
+    addNotePlaceholder: 'Digite uma nota...',
+    addNoteButton: 'Adicionar nota',
+    noNotes: 'Nenhuma nota adicionada ainda.'
   }
 };
 

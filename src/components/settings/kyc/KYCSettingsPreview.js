@@ -49,7 +49,7 @@ export default function KYCSettingsPreview({
 
     return (
 		<div className="w-full  flex flex-col">
-            <h2 className="text-2xl font-semibold text-[var(--brand-text)] mb-6">{t?.kycPreview?.previewTitle || 'Preview Beta'}</h2>
+            <h2 className="text-2xl font-semibold text-[var(--brand-text)] mb-6">{t?.kycPreview?.previewTitle || 'Preview (Beta)'}</h2>
 			<div className="flex flex-col flex-shrink-0 bg-[var(--brand-background)] border border-[var(--brand-border)] rounded-xl p-5 lg:self-stretch">
                 <p className="text-sm text-[var(--brand-text-secondary)] mb-4">
                     {t?.kycPreview?.intro || 'This miniature flow mirrors the end-user onboarding. Toggle required fields to see how the checklist adapts in real time.'}

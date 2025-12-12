@@ -239,8 +239,16 @@ const en = {
     confirmDelete: 'Delete',
     cancel: 'Cancel',
     deletedMessage: 'Your account has been successfully deleted.',
-    certificateTitle: 'Certificate Information',
-    certificateDescription: 'The token validates the process of a tokenized Carbon Emissions Offset. The owner purchases the Carbon Token from Creturner which offsets a specific amount of CO₂e.'
+    certificateTitle: 'Description',
+    certificateDescription: 'The token validates the process of a tokenized Carbon Emissions Offset. The owner purchases the Carbon Token from Creturner which offsets a specific amount of CO₂e.',
+    assetType: 'Asset Type',
+    coffeeBean: 'Coffee bean',
+    imagesTitle: 'Asset images',
+    imagesSubtitle: 'Tap a placeholder to view the large preview.',
+    imagesHint: 'View',
+    imagesModalHint: 'This is a placeholder for the enlarged asset image.',
+    openPreview: 'Open preview',
+    closePreview: 'Close preview'
   },
   buttons: {
     save: 'Save',
@@ -358,10 +366,10 @@ const en = {
     title: 'Assets',
     carbonCredit: 'Carbon Credit',
     clients: 'Clients',
-    coffee: 'Coffee'
+    Tokens: 'Tokens'
   },
   Clients: {
-    title: 'Asset Clients',
+    title: 'Issuers',
     subtitle: 'Overview of asset-related client activity',
     loading: 'Loading clients...',
     empty: 'No clients available',
@@ -369,7 +377,9 @@ const en = {
       total: 'Total',
       activeOrders: 'Active orders',
       totalClients: 'Total clients',
-      pendingOrders: 'Pending orders'
+      pendingOrders: 'Pending orders',
+      averageDailySales: 'Average daily sales',
+      activeIssuers: 'Active Issuers'
     },
     table: {
       columns: {
@@ -527,7 +537,7 @@ const en = {
   }
   ,
   assetOrders: {
-    heading: 'Asset Orders',
+    heading: 'Live tokens',
     summary: {
       total: 'Total',
       active: 'Active orders',
@@ -547,17 +557,60 @@ const en = {
     }
   },
   assetDashboard: {
-    heading: 'Assets Dashboard'
+    heading: 'Assets Dashboard',
+    clients: {
+      title: 'Underlying clients',
+      subtitle: 'Latest status across connected issuers',
+      cta: 'Manage clients',
+      columns: {
+        client: 'Client',
+        sector: 'Sector',
+        tokens: 'Tokens',
+        lastOrder: 'Last order',
+        status: 'Status'
+      },
+      statuses: {
+        active: 'Active',
+        onboarding: 'Onboarding',
+        paused: 'Paused',
+        review: 'Under review'
+      }
+    },
+    transactions: {
+      title: 'Latest transactions',
+      subtitle: 'Five most recent token mints and burns',
+      tokensLabel: 'tokens',
+      statuses: {
+        settled: 'Settled',
+        pending: 'Pending',
+        failed: 'Failed'
+      }
+    },
+    monthlySummary: {
+      title: 'Monthly summary',
+      subtitle: 'Created tokens and orders',
+      tokens: 'Tokens',
+      orders: 'Orders'
+    },
+    certificates: {
+      title: 'Certificates in tokens',
+      subtitle: 'How certificates back the active supply',
+      total: 'Certificates issued',
+      tokenized: 'Linked to tokens',
+      pending: 'Awaiting verification',
+      expiring: 'Expiring soon',
+      breakdownTitle: 'Breakdown by type'
+    }
   }
   ,
   certificateButtons: {
-    download: 'Download certificate',
-    share: 'Share certificate'
+    download: 'Download',
+    share: 'Share'
   }
   ,
   assetOrderDetail: {
     tabs: {
-      order: 'Order detail',
+      token: 'Token detail',
       certificate: 'Certificate',
       process: 'Process'
     },
@@ -592,47 +645,28 @@ const en = {
       progress: 'Progress',
       amount: 'Amount',
       complete: 'complete'
-    }
-  }
-  ,
-  processPage: {
-    progress: {
-      title: 'Compensation progress',
-      descriptionTotal: 'Tracking compensated volume over time',
-      descriptionRelative: 'Comparing each phase share of the total order',
-      relative: 'Relative',
-      total: 'Total',
-      noData: 'No data available'
     },
-    summary: {
-      totalValue: 'Total value',
-      totalCompensation: 'Total compensation'
+    certificateBox: {
+      title: 'Certificate',
+      openPreview: 'Open certificate preview',
+      closePreview: 'Close certificate preview',
+      imageAlt: 'Certificate preview',
+      hint: 'Tap to enlarge',
+      modalHint: 'Full-size certificate preview.'
     },
-    activity: {
-      title: 'Process activity',
-      searchPlaceholder: 'Search updates',
-      filterAll: 'All',
-      comingSoon: 'Coming soon'
-    },
-    units: {
-      tons: 'tons'
-    },
-    misc: {
-      completeSuffix: '% complete'
-    },
-    status: {
+    publishBox: {
+      title: 'Publish status',
+      description: 'Set how this asset appears in the marketplace.',
       label: 'Status',
-      states: {
-        inProgress: 'In progress',
-        paused: 'Paused',
-        aborted: 'Aborted',
-        complete: 'Complete',
-        notStarted: 'Not started'
-      },
-      terminate: 'Terminate process'
-    },
-    actions: {
-      terminate: 'Terminate process'
+      button: 'Save changes',
+      saving: 'Saving…',
+      saveSuccess: 'Status updated.',
+      saveError: 'Failed to update status.',
+      options: {
+        published: 'Published',
+        draft: 'Draft',
+        archived: 'Archived'
+      }
     }
   },
   clientOverview: {
@@ -717,7 +751,7 @@ const en = {
     statusExpired: 'Expired'
   },
   kycPreview: {
-    previewTitle: 'Preview Beta',
+    previewTitle: 'Preview (Beta)',
     intro: 'This miniature flow mirrors the end-user onboarding. Toggle required fields to see how the checklist adapts in real time.',
     empty: 'No required fields selected. Enable at least one field to view the onboarding preview.',
     progressLabel: 'Progress',
@@ -741,6 +775,23 @@ const en = {
     },
     nextField: 'Next field',
     selectStep: 'Select a step from the checklist to inspect the preview.'
+  }
+  ,
+  editBox: {
+    editOrder: 'Edit order',
+    issueRefund: 'Issue refund'
+  }
+  ,
+  partiesBox: {
+    buyer: 'Buyer',
+    issuer: 'Issuer'
+  }
+  ,
+  sidebox: {
+    privateNotesTitle: 'Client notes',
+    addNotePlaceholder: 'Enter note...',
+    addNoteButton: 'Add note',
+    noNotes: 'No notes added yet.'
   }
 };
 

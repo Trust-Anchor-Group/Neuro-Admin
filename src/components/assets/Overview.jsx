@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import { useLanguage, content } from '../../../context/LanguageContext';
 import { Mail, Phone } from "lucide-react";
+import Sidebox from './Sidebox.jsx';
 
 const pricingAgreements = [
-  { title: 'Carbon capture EU (Q2 2025)', date: 'Apr 15, 2025', price: '250,000 SEK', status: 'Active' },
-  { title: 'Renewable Energy Purchase (2025)', date: 'Jan 10, 2025', price: '120,000 SEK', status: 'Active' },
-  { title: 'Offset Credits (2024)', date: 'Dec 1, 2024', price: '80,000 SEK', status: 'Active' },
+  { title: 'Coffee bean tokenization (2025)', date: 'Apr 15, 2025', price: '250,000 SEK', status: 'Active' },
+  { title: 'Soy bean tokenization (2025)', date: 'Jan 10, 2025', price: '120,000 SEK', status: 'Active' },
+  { title: 'Coffee bean tokenization (2026)', date: 'Dec 1, 2024', price: '80,000 SEK', status: 'Active' },
 ];
 const contacts = [
   { name: 'Alexander Ozaeta Arce', role: 'CEO', email: 'alexander@trustanchorgroup.com', phone: '+46 70 123 4567' },
   { name: 'Maria Svensson', role: 'CFO', email: 'maria@trustanchorgroup.com', phone: '+46 70 987 6543' },
   { name: 'Johan Lindberg', role: 'CTO', email: 'johan@trustanchorgroup.com', phone: '+46 70 555 1234' },
-  { name: 'Sara Nilsson', role: 'Legal Advisor' },
-  { name: 'Erik Johansson', role: 'Sustainability Lead' },
 ];
 
 const Overview = () => {
@@ -24,7 +23,7 @@ const Overview = () => {
   const [createAgreementModal, setCreateAgreementModal] = useState(false);
   const [clientIcon, setClientIcon] = useState('🏢');
   const [clientIconDark, setClientIconDark] = useState('🌑');
-  const [clientName, setClientName] = useState('EcoTech Solutions');
+  const [clientName, setClientName] = useState('FCB Import & Export');
   const [industry, setIndustry] = useState('Technology');
   const [regNumber, setRegNumber] = useState('556677-8899');
   const [address, setAddress] = useState('456 Oak Ave, CA 94102, San Francisco, USA');
@@ -39,7 +38,7 @@ const Overview = () => {
   <div className=" bg-[var(--brand-background)] col-span-3 flex flex-col gap-5">
     {/* Client Info Card - unified */}
     <div
-      className="rounded-2xl shadow-lg p-8 border text-base"
+      className="rounded-2xl p-8 border text-base"
       style={{
         minHeight: '260px',
         color: 'var(--brand-text)',
@@ -54,8 +53,8 @@ const Overview = () => {
             C
           </span>
           <div className="ml-28">
-            <div className="font-bold text-2xl  text-[var(--brand-text)]">EcoTech Solutions</div>
-            <div className="text-base text-gray-400 text-[var(--brand-text-secondary)]">Client since Feb 23, 2025, 15:29</div>
+            <div className="font-bold text-2xl  text-[var(--brand-text)]">FCB Import & Export</div>
+            <div className="text-base text-gray-400 text-[var(--brand-text-secondary)]">Agriculture</div>
           </div>
         </div>
         <div className="border-t border-gray-200 border-[var(--brand-border)] absolute left-28 right-0 top-20" />
@@ -70,12 +69,12 @@ const Overview = () => {
           </div>
           <div className="grid grid-cols-3 items-center border-b border-[var(--brand-border)] bg-[var(--brand-background)] animate-fade-in">
             <span className="text-sm text-[var(--brand-text-secondary)]  my-2">{t?.clientOverview?.industry || 'Industry'}</span>
-            <span className="text-base font-semibold text-[var(--brand-text-primary)] text-start my-2">Technology</span>
+            <span className="text-base font-semibold text-[var(--brand-text-primary)] text-start my-2">Agriculture</span>
           </div>
           <div className="grid grid-cols-3 items-center  bg-[var(--brand-background)] animate-fade-in">
             <span className="text-sm text-[var(--brand-text-secondary)]  my-2">{t?.clientOverview?.location || 'Location'}</span>
             <span className="flex flex-col items-start justify-start my-2">
-              <span className="text-base font-semibold text-[var(--brand-text-primary)]">San Francisco, USA</span>
+              <span className="text-base font-semibold text-[var(--brand-text-primary)]">Rio de Janeiro, Brazil</span>
               <span className="text-xs text-[var(--brand-text-secondary)]">456 Oak Ave, CA 94102</span>
             </span>
           </div>
@@ -142,7 +141,7 @@ const Overview = () => {
       </div>
     </div>
         {/* Pricing Agreements Section */}     
-        <div className="bg-[var(--brand-navbar)] rounded-lg shadow-md p-5 border border-[var(--brand-border)]">
+        <div className="bg-[var(--brand-navbar)] rounded-lg p-5 border border-[var(--brand-border)]">
           <div className="font-semibold text-xl mb-3 text-[var(--brand-text)]">{t?.pricingAgreementsSection?.title || 'Pricing agreements'}</div>
             <div className="flex justify-between items-center mb-4">
               <input
@@ -206,43 +205,8 @@ const Overview = () => {
         )}
         </div>
       </div>
-      {/* Right column: sidebar (1/4) */}
-      <div className="col-start-4 col-end-5 flex flex-col gap-5">
-        {/* Purchases Card */}
-        <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-lg p-5 mb-2 w-full">
-          <div className="text-l mb-2 text-[var(--brand-text-secondary)]">{t?.clientOverview?.totalPurchases || 'Total purchases'}</div>
-          <div className="text-3xl font-bold text-[var(--brand-text)]">0.8 MSEK</div>
-        </div>
-        {/* Compensation Card */}
-        <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-lg p-5 mb-2 w-full">
-          <div className="text-l mb-2 text-[var(--brand-text-secondary)]">{t?.clientOverview?.totalCompensation || 'Total compensation'}</div>
-          <div className="text-3xl font-bold text-[var(--brand-text)]">125 tons</div>
-        </div>
-        {/* Contacts Card */}
-        <div className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-lg p-5 w-full">
-          <div className="font-bold text-xl mb-3 text-[var(--brand-text)]">{t?.clientOverview?.contacts || 'Contacts'}</div>
-          {contacts.map((c, idx) => (
-            <div
-              key={idx}
-              className={`bg-[var(--brand-background)] mb-4 pb-5 pt-5 pl-5 rounded-md cursor-pointer hover:border hover:border-purple-500 ${idx < contacts.length - 1 ? '' : ''}`}
-              onClick={() => alert(`Navigating to ${c.name}'s profile...`)}
-            >
-              <div className=" text-base font-bold text-[var(--brand-text)]">{c.name}</div>
-              <div className="border-b mb-3 pb-3 border-[var(--brand-border)] text-sm text-[var(--brand-text-secondary)] mb-1">{c.role}</div>
-              {idx < 3 && (
-                <>
-                  <div className="border-b mb-3 pb-3 border-[var(--brand-border)] flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
-                    <Mail className="text-[var(--brand-text)]" /> {c.email}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
-                    <Phone className="text-[var(--brand-text)]" /> {c.phone}
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Right column extracted to Sidebox */}
+      <Sidebox t={t} contacts={contacts} purchasesValue="0.8 MSEK" compensationValue="125 tons" maxContactDetails={3} />
       </div>
       {/* Modal Popup for Editing Client Info */}
       {showModal && (
@@ -363,7 +327,7 @@ const Overview = () => {
                 </div>
                 <div className="flex justify-between border-b border-[var(--brand-border)] mb-3">
                   <span className="font-medium text-[var(--brand-text-secondary)] mb-3">{t?.agreementDetailModal?.buyerLabel || 'Buyer:'}</span>
-                    <span className="text-[var(--brand-text)]">EcoTech Solutions</span>
+                    <span className="text-[var(--brand-text)]">FCB Import & Export</span>
                 </div>
                 <div className="flex justify-between border-b border-[var(--brand-border)] mb-3">
                   <span className="font-medium text-[var(--brand-text-secondary)] mb-3">{t?.agreementDetailModal?.sellerLabel || 'Seller:'}</span>
@@ -457,7 +421,7 @@ function EditProposalModal({ agreement, onClose, onSave }) {
                 C
               </span>
             <div className=" ml-4 flex flex-col">
-            <span className="text-[var(--brand-text)]">EcoTech Solutions</span>
+            <span className="text-[var(--brand-text)]">FCB Import & Export</span>
             <span className="text-[var(--brand-text-secondary)]">{t?.agreementEditModal?.clientRole || 'Client'}</span>
             </div>
             </div>

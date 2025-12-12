@@ -1,11 +1,11 @@
 "use client";
-import AssetOrdersTable from "@/components/assets/orders/AssetOrdersTable";
+import AssetTokensTable from "@/components/assets/Tokens/AssetTokensTable";
 import { Suspense, useEffect, useState } from "react";
 import { fetchOrders } from "@/lib/fetchOrders"; 
 import { Award, Activity, Timer } from "lucide-react";
 import { useLanguage, content as i18nContent } from '../../../../../context/LanguageContext';
 
-export default function OrdersPage() {
+export default function TokensPage() {
   const { language } = useLanguage();
   const t = i18nContent[language]?.assetOrders || {};
   const [ordersData, setOrdersData] = useState({ loading: true, orders: [] });
@@ -31,7 +31,7 @@ export default function OrdersPage() {
       accentClass: 'text-emerald-500 bg-emerald-100',
     },
     {
-      label: t.summary?.active || 'Active orders',
+      label: t.summary?.active || 'Live tokens',
       value: '6',
       Icon: Activity,
       accentClass: 'text-blue-500 bg-blue-100',
@@ -46,7 +46,7 @@ export default function OrdersPage() {
 
   return (
     <div className="p-6 min-h-screen bg-[var(--brand-background)]">
-      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">Carbon Credit Overview</h1>
+      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">Asset Overview</h1>
       <section className="mt-4 mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {summaryCards.map(({ label, value, Icon, accentClass }) => (
           <div
@@ -65,9 +65,9 @@ export default function OrdersPage() {
           </div>
         ))}
       </section>
-      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">{t.heading || 'Asset Orders'}</h1>
+      <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">{t.heading || 'Live tokens'}</h1>
       <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading || 'Loading orders...'}</p>}>
-        <AssetOrdersTable orders={ordersData.orders} isLoading={ordersData.loading} />
+        <AssetTokensTable orders={ordersData.orders} isLoading={ordersData.loading} />
       </Suspense>
     </div>
   );

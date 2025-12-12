@@ -1,7 +1,7 @@
 
-import AssetsPageClient from "@/components/assets/AssetsPageClient";
+import AssetsPageIssuer from "@/components/assets/AssetsPageIssuer";
 
 // Render client component directly; it will fetch data on the client side.
 export default function AssetsPage() {
-  return <AssetsPageClient />;
+  return <AssetsPageIssuer />;
 }
