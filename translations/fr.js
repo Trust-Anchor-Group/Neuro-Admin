@@ -1,3 +1,4 @@
+  
 const fr = {
   home: {
     title: 'Bienvenue',
@@ -120,6 +121,30 @@ const fr = {
       body: "Les privilèges d'administrateur sont requis pour gérer les paramètres KYC.",
       help: "Veuillez contacter votre administrateur pour obtenir de l'aide."
     }
+  },
+  serpro: {
+    title: 'Validation automatisée (Serpro)',
+    subtitle: 'Résumé de la validation système. Vérifiez manuellement les champs restants.',
+    source: 'Serpro',
+    complete: 'Terminé',
+    progressLabel: 'Progression de la validation',
+    validatedClaims: 'Champs validés',
+    missingClaims: 'Champs manquants',
+    photoStatus: 'Statut des photos',
+    validatedShort: 'OK',
+    missingShort: 'Manquant',
+    photosTitle: 'Photos',
+    pending: 'En attente de vérification',
+    requiresManual: 'Nécessite une vérification manuelle',
+    requiresManualPhoto: 'Nécessite une validation manuelle',
+    emptyCategory: 'Aucune donnée pour cette catégorie.',
+    photosOk: 'Toutes les photos requises sont validées.',
+    validatedBadge: 'Validé',
+    missingBadge: 'Manquant',
+    photosBadge: 'Photos',
+    totalBadge: 'Total',
+    errorLabel: 'Erreur du service',
+    errorMeta: 'Type/Service'
   },
   apiKeyDetails: {
     title: 'Clé API',

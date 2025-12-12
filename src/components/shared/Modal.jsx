@@ -46,8 +46,8 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
       // Unvalidated photos
       const unvalidatedPhotos = Array.from(xmlDoc.getElementsByTagName('unvalidatedPhoto')).map(p => p.getAttribute('fileName'));
       return { error, validatedClaims, unvalidatedClaims, unvalidatedPhotos };
-    } catch {
-      return null;
+    } catch (e) {
+      return { error: { message: e.message, type: 'ParseError', service: 'XML' }, rawXml: xmlString };
     }
   }
 
@@ -55,9 +55,13 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
   let serproResults = null;
   if (applicationReviewXml?.data) {
     try {
-      const xmlString = atob(applicationReviewXml.data); // base64 decode
+      let xmlString = atob(applicationReviewXml.data); // base64 decode
+      // Remove any trailing non-printable or non-XML characters (e.g., \uFFFD, \0, etc.)
+      xmlString = xmlString.replace(/[^\x20-\x7E\r\n\t]+$/g, '');
       serproResults = parseSerproXml(xmlString);
-    } catch {}
+    } catch (e) {
+      serproResults = { error: { message: e.message, type: 'Base64DecodeError', service: 'XML' }, rawXml: applicationReviewXml.data };
+    }
   }
 
 
@@ -103,47 +107,144 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
           <h2 className="text-2xl font-semibold text-[var(--brand-text-color)]">{t.title || 'Review ID application'}</h2>
         </header>
 
-        {/* Serpro Validation Results */}
-        {/* {serproResults && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded p-4">
-            <div className="text-base font-bold text-blue-700 mb-2">Serpro Validation Results</div>
-            <ul className="text-sm text-blue-900 space-y-1">
+        {/* Enhanced Serpro Validation Panel */}
+        {serproResults && serproResults.error && serproResults.error.type === 'ParseError' && (
+          <section className="mb-6 rounded-xl border border-red-400 bg-red-50 p-5">
+            <h3 className="text-lg font-semibold text-red-700 mb-2">Malformed XML</h3>
+            <div className="text-sm text-red-800 mb-2">{serproResults.error.message}</div>
+            <details className="bg-white border border-red-200 rounded p-2 text-xs overflow-x-auto" open>
+              <summary className="cursor-pointer select-none font-mono text-red-600">Show raw XML</summary>
+              <pre className="whitespace-pre-wrap break-all text-[10px] text-red-900">{serproResults.rawXml}</pre>
+            </details>
+          </section>
+        )}
+        {serproResults && (!serproResults.error || serproResults.error.type !== 'ParseError') && (() => {
+          const totalClaims = (serproResults.validatedClaims?.length || 0) + (serproResults.unvalidatedClaims?.length || 0);
+          const validatedCount = serproResults.validatedClaims?.length || 0;
+          const percent = totalClaims ? Math.round((validatedCount / totalClaims) * 100) : 0;
+          // Simple categories mapping (group common fields); fallback to 'Other'
+          const categoryMap = {
+            FIRST: 'Identity', LAST: 'Identity', MID: 'Identity', DOB: 'Identity', BDAY:'Identity', BMONTH:'Identity', BYEAR:'Identity',
+            PNR: 'Identity', GENDER: 'Identity', NATIONALITY: 'Identity',
+            EMAIL: 'Contact', PHONE: 'Contact',
+            ADDR: 'Location', ZIP:'Location', CITY:'Location', COUNTRY:'Location', AREA:'Location', REGION:'Location'
+          };
+          const groupClaims = (arr, validated) => arr.reduce((acc, c) => {
+            const key = c.claim || c; // c is either object (validated) or string (unvalidated)
+            const cat = categoryMap[key] || 'Other';
+            acc[cat] = acc[cat] || [];
+            acc[cat].push({ name: key, service: c.service, validated });
+            return acc;
+          }, {});
+          const groupedValidated = groupClaims(serproResults.validatedClaims || [], true);
+          const groupedMissing = groupClaims(serproResults.unvalidatedClaims || [], false);
+          const allCategories = Array.from(new Set([...Object.keys(groupedValidated), ...Object.keys(groupedMissing)]));
+          return (
+            <section aria-labelledby="serpro-review-heading" className="mb-6 rounded-xl border border-[var(--brand-border)] bg-[var(--brand-background)]/80 backdrop-blur p-5">
+              <header className="mb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 id="serpro-review-heading" className="text-lg font-semibold text-[var(--brand-text)]">
+                      {t.serpro?.title || 'Automated Validation (Serpro)'}
+                    </h3>
+                    <p className="text-xs text-[var(--brand-text-secondary)]">
+                      {t.serpro?.subtitle || 'System validation summary. Manually verify any remaining fields.'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] px-2 py-1 rounded bg-blue-100 text-blue-700 font-medium">{t.serpro?.source || 'Serpro'}</span>
+                    <span className="text-[10px] px-2 py-1 rounded bg-green-100 text-green-700 font-medium">{percent}% {t.serpro?.complete || 'Complete'}</span>
+                  </div>
+                </div>
+                <div className="mt-3 h-2 w-full rounded bg-[var(--brand-navbar)] overflow-hidden" aria-label={t.serpro?.progressLabel || 'Validation progress'}>
+                  <div className="h-full bg-green-500 transition-all" style={{ width: `${percent}%` }} />
+                </div>
+              </header>
               {serproResults.error && (
-                <li className="text-red-700 font-semibold">Error: {serproResults.error.message} (Type: {serproResults.error.type}, Service: {serproResults.error.service})</li>
+                <div className="mb-4 flex items-start gap-3 rounded-md border border-red-300 bg-red-50 p-3" role="alert">
+                  <span className="text-red-600 font-semibold">{t.serpro?.errorLabel || 'Service Error'}:</span>
+                  <div className="text-sm text-red-700">
+                    {serproResults.error.message}
+                    <div className="text-xs mt-1 opacity-80">
+                      {(t.serpro?.errorMeta || 'Type/Service')}:{' '}{serproResults.error.type} / {serproResults.error.service}
+                    </div>
+                  </div>
+                </div>
               )}
-              {serproResults.validatedClaims && serproResults.validatedClaims.length > 0 && (
-                <li>
-                  <span className="font-medium">Validated Claims:</span>
-                  <ul className="ml-4 list-disc">
-                    {serproResults.validatedClaims.map((c, i) => (
-                      <li key={c.claim + c.service + i}>{c.claim} <span className="text-xs text-gray-500">({c.service})</span></li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-              {serproResults.unvalidatedClaims && serproResults.unvalidatedClaims.length > 0 && (
-                <li>
-                  <span className="font-medium">Unvalidated Claims:</span>
-                  <ul className="ml-4 list-disc">
-                    {serproResults.unvalidatedClaims.map((c, i) => (
-                      <li key={c + i}>{c}</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-              {serproResults.unvalidatedPhotos && serproResults.unvalidatedPhotos.length > 0 && (
-                <li>
-                  <span className="font-medium">Unvalidated Photos:</span>
-                  <ul className="ml-4 list-disc">
-                    {serproResults.unvalidatedPhotos.map((f, i) => (
-                      <li key={f + i}>{f}</li>
-                    ))}
-                  </ul>
-                </li>
-              )}
-            </ul>
-          </div>
-        )} */}
+              <div className="space-y-3">
+                {allCategories.map(cat => {
+                  const validated = groupedValidated[cat] || [];
+                  const missing = groupedMissing[cat] || [];
+                  return (
+                    <details key={cat} className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-navbar)]" open>
+                      <summary className="cursor-pointer select-none px-4 py-2 flex items-center justify-between">
+                        <span className="text-sm font-semibold text-[var(--brand-text)]">{cat}</span>
+                        <span className="flex gap-2 text-[10px] uppercase tracking-wide">
+                          <span className="px-2 py-1 rounded bg-green-100 text-green-700">{validated.length} {t.serpro?.validatedShort || 'OK'}</span>
+                          <span className="px-2 py-1 rounded bg-orange-100 text-orange-700">{missing.length} {t.serpro?.missingShort || 'Pending'}</span>
+                        </span>
+                      </summary>
+                      <div className="px-4 pb-3">
+                        {validated.length > 0 && (
+                          <ul className="mb-2 text-sm space-y-1" aria-label={t.serpro?.validatedClaims || 'Validated Claims'}>
+                            {validated.map(item => (
+                              <li key={item.name} className="flex items-center gap-2">
+                                <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
+                                <span className="font-medium" title={item.service}>{item.name}</span>
+                                <span className="text-[10px] text-[var(--brand-text-secondary)]">{item.service?.split('.').pop()}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {missing.length > 0 && (
+                          <ul className="text-sm space-y-1" aria-label={t.serpro?.missingClaims || 'Missing Claims'}>
+                            {missing.map(item => (
+                              <li key={item.name} className="flex items-center gap-2">
+                                <span className="inline-block h-2 w-2 rounded-full bg-orange-500" />
+                                <span className="font-medium" title={t.serpro?.requiresManual || 'Requires manual review'}>{item.name}</span>
+                                <span className="text-[10px] text-[var(--brand-text-secondary)]">{t.serpro?.pending || 'Pending review'}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {!validated.length && !missing.length && (
+                          <p className="text-xs italic text-[var(--brand-text-secondary)]">{t.serpro?.emptyCategory || 'No data for this category.'}</p>
+                        )}
+                      </div>
+                    </details>
+                  );
+                })}
+                <details className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-navbar)]" open>
+                  <summary className="cursor-pointer select-none px-4 py-2 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-[var(--brand-text)]">{t.serpro?.photosTitle || 'Photos'}</span>
+                    <span className="text-[10px] px-2 py-1 rounded bg-yellow-100 text-yellow-700">{serproResults.unvalidatedPhotos?.length || 0} {t.serpro?.pending || 'Pending'}</span>
+                  </summary>
+                  <div className="px-4 pb-3">
+                    {serproResults.unvalidatedPhotos?.length ? (
+                      <ul className="text-sm space-y-1" aria-label={t.serpro?.photoStatus || 'Photo Status'}>
+                        {serproResults.unvalidatedPhotos.map(f => (
+                          <li key={f} className="flex items-center gap-2">
+                            <span className="inline-block h-2 w-2 rounded-full bg-yellow-500" />
+                            <span className="font-medium" title={t.serpro?.requiresManualPhoto || 'Needs manual validation'}>{f}</span>
+                            <span className="text-[10px] text-[var(--brand-text-secondary)]">{t.serpro?.pending || 'Pending review'}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-xs italic text-[var(--brand-text-secondary)]">{t.serpro?.photosOk || 'All required photos validated.'}</p>
+                    )}
+                  </div>
+                </details>
+              </div>
+              <footer className="mt-4 flex flex-wrap gap-3 text-[10px] uppercase tracking-wide">
+                <span className="px-2 py-1 rounded bg-green-100 text-green-700">{t.serpro?.validatedBadge || 'Validated'}: {validatedCount}</span>
+                <span className="px-2 py-1 rounded bg-orange-100 text-orange-700">{t.serpro?.missingBadge || 'Missing'}: {serproResults.unvalidatedClaims?.length || 0}</span>
+                <span className="px-2 py-1 rounded bg-yellow-100 text-yellow-700">{t.serpro?.photosBadge || 'Photos'}: {serproResults.unvalidatedPhotos?.length || 0}</span>
+                <span className="px-2 py-1 rounded bg-blue-100 text-blue-700">{t.serpro?.totalBadge || 'Total'}: {totalClaims}</span>
+              </footer>
+            </section>
+          );
+        })()}
 
         <div className="text-sm font-bold mb-2">Applicant photo</div>
         <div className="flex mb-6">

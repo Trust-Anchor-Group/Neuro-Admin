@@ -1,4 +1,5 @@
-﻿const pt = {
+﻿
+const pt = {
   home: {
     title: 'Bem-vindo',
     subtitle: 'Seu painel em um relance',
@@ -119,6 +120,30 @@
       body: 'Privilégios de administrador são necessários para gerenciar as configurações de KYC.',
       help: 'Entre em contato com o administrador para obter ajuda.'
     }
+  },
+    serpro: {
+    title: 'Validação automatizada (Serpro)',
+  subtitle: 'Resumo da validação do sistema. Verifique manualmente os campos restantes.',
+    source: 'Serpro',
+    complete: 'Concluído',
+    progressLabel: 'Progresso da validação',
+    validatedClaims: 'Campos validados',
+    missingClaims: 'Campos ausentes',
+    photoStatus: 'Status das fotos',
+    validatedShort: 'OK',
+    missingShort: 'Ausente',
+    photosTitle: 'Fotos',
+    pending: 'Aguardando revisão',
+    requiresManual: 'Requer revisão manual',
+    requiresManualPhoto: 'Necessita validação manual',
+    emptyCategory: 'Nenhum dado para esta categoria.',
+    photosOk: 'Todas as fotos obrigatórias validadas.',
+    validatedBadge: 'Validado',
+    missingBadge: 'Ausente',
+    photosBadge: 'Fotos',
+    totalBadge: 'Total',
+    errorLabel: 'Erro do serviço',
+    errorMeta: 'Tipo/Serviço'
   },
   apiKeyDetails: {
     title: 'Chave de API',

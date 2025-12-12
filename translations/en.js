@@ -1,4 +1,5 @@
-﻿const en = {
+﻿
+const en = {
   home: {
     title: 'Welcome',
     subtitle: 'Your dashboard at a glance',
@@ -120,6 +121,30 @@
       body: 'Administrator privileges are required to manage KYC settings.',
       help: 'Please contact your administrator for further help.'
     }
+  },
+  serpro: {
+    title: 'Automated Validation (Serpro)',
+    subtitle: 'System validation summary. Manually verify any remaining fields.',
+    source: 'Serpro',
+    complete: 'Complete',
+    progressLabel: 'Validation progress',
+    validatedClaims: 'Validated Claims',
+    missingClaims: 'Missing Claims',
+    photoStatus: 'Photo Status',
+    validatedShort: 'OK',
+    missingShort: 'Missing',
+    photosTitle: 'Photos',
+    pending: 'Pending review',
+    requiresManual: 'Requires manual review',
+    requiresManualPhoto: 'Needs manual validation',
+    emptyCategory: 'No data for this category.',
+    photosOk: 'All required photos validated.',
+    validatedBadge: 'Validated',
+    missingBadge: 'Missing',
+    photosBadge: 'Photos',
+    totalBadge: 'Total',
+    errorLabel: 'Service Error',
+    errorMeta: 'Type/Service'
   },
   apiKeyDetails: {
     title: 'API key',
