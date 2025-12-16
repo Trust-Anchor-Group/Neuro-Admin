@@ -146,7 +146,7 @@ const DetailPageAssets = () => {
 
       <div className='mt-5'>
         {tab === 'Token' && (
-          <div className='grid grid-cols-4 gap-5 max-xl:grid-cols-1'>
+          <div className='grid grid-cols-2 gap-5 max-xl:grid-cols-1'>
             <div className='col-span-3'>
               <DisplayDetailsAsset
                 header={headTitle}
@@ -172,12 +172,12 @@ const DetailPageAssets = () => {
               />
             </div>
 
-            <div className='col-start-4 col-end-5 flex flex-col items-start gap-5 max-xl:col-span-1 max-xl:w-full'>
+            {/* <div className='col-start-4 col-end-5 flex flex-col items-start gap-5 max-xl:col-span-1 max-xl:w-full'>
               <PublishBox status={publishStatus} onSave={handlePublishSave} />
               <StatusBox statusCard={statusCard} title={'Asset status'} />
               <StatusBox statusCard={paymentStatusCard} title={'Token status'} />
               <CertificateBox />
-            </div>
+            </div> */}
           </div>
         )}
 
