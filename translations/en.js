@@ -366,7 +366,8 @@ const en = {
     title: 'Assets',
     carbonCredit: 'Carbon Credit',
     clients: 'Clients',
-    Tokens: 'Tokens'
+    Tokens: 'Tokens',
+    Projects: 'Projects',
   },
   Clients: {
     title: 'Issuers',
@@ -537,7 +538,7 @@ const en = {
   }
   ,
   assetOrders: {
-    heading: 'Live tokens',
+    heading: 'Live projects',
     summary: {
       total: 'Total',
       active: 'Active orders',

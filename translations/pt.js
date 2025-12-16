@@ -364,7 +364,8 @@ const pt = {
     title: 'Assets',
     orders: 'Pedidos',
     clients: 'Clientes',
-    Tokens: 'Tokens'
+    Tokens: 'Tokens',
+    Projects: 'Projetos'
   },
   Clients: {
     title: 'Issuers',
@@ -534,7 +535,7 @@ const pt = {
   }
   ,
   assetOrders: {
-    heading: 'Tokens ativos',
+    heading: 'Projetos ao vivo',
     summary: {
       total: 'Total',
       active: 'Pedidos ativos',
