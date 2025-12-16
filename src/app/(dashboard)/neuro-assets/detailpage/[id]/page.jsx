@@ -1,270 +1,199 @@
 'use client'
+import React, { useMemo, useState, useCallback, Suspense } from 'react'
+import { useParams, useSearchParams } from 'next/navigation';
+import { FaCertificate, FaRegFileAlt } from 'react-icons/fa';
+
+// Components
 import { DisplayDetailsAsset } from '@/components/assets/DisplayDetailsAsset'
 import AssetTokensTable from "@/components/assets/Tokens/AssetTokensTable";
 import { TabNavigation } from '@/components/shared/TabNavigation';
-import { useParams, useSearchParams } from 'next/navigation';
-import { Activity } from "lucide-react";
-// Using public logo asset; Next/Image can take a string path referencing /public
-import React, { useContext, useMemo, useState, useCallback, useEffect, Suspense } from 'react'
-import { FaCertificate, FaRegFileAlt } from 'react-icons/fa';
 import { StatusBox } from '@/components/assets/StatusBox';
 import { CertificateBox } from '@/components/assets/CertificateBox';
 import { PublishBox } from '@/components/assets/PublishBox';
-import { useLanguage } from '../../../../../../context/LanguageContext'
-import { fetchOrders } from '@/lib/fetchOrders';
 
-
-
-
+// Hooks & Data
+import { useLanguage, content as translations } from '../../../../../../context/LanguageContext';
+import projectsData from '@/data/projects.json';
 
 const DetailPageAssets = () => {
+  const { id } = useParams();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab') || 'Token';
 
-
-  const [ordersData, setOrdersData] = useState({ loading: true, orders: [] });
-   const searchParams = useSearchParams()
-   const { id } = useParams()
-   const tab = searchParams.get('tab') || 'Token'
-
-  const { language, content: translations } = useLanguage();
+  const { language } = useLanguage();
   const t = translations[language];
-  const [publishStatus, setPublishStatus] = useState('published');
-  // Fetch orders for certificate tab
-  useEffect(() => {
-    let mounted = true;
-    if (tab === 'sales' && ordersData.loading) {
-      (async () => {
-        const data = await fetchOrders();
-        if (mounted) setOrdersData(data);
-      })();
-    }
-    return () => { mounted = false; };
-  }, [tab, ordersData.loading]);
 
-  const handlePublishSave = useCallback(async (nextStatus) => {
-    const response = await fetch('/api/assets/publish', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ assetId: id, status: nextStatus }),
-    });
-
-    const payload = await response.json();
-
-    if (!response.ok) {
-      throw new Error(payload?.message || 'Failed to update publish status');
-    }
-
-    const savedStatus = payload?.data?.status || nextStatus;
-    setPublishStatus(savedStatus);
-    return savedStatus;
+  // 1. Find the specific project
+  const project = useMemo(() => {
+    return projectsData.find(p => p.id == id);
   }, [id]);
 
-  const summaryCards = [
-    {
-      label: t.Clients?.summary?.averageDailySales || 'Average daily sales',
-      value: '14',
-      Icon: Activity,
-      accentClass: 'text-blue-500 bg-blue-100',
-    },
-  ];
+  const [publishStatus, setPublishStatus] = useState('published');
 
-  const popularRegions = [
-    'South America',
-    'Central America',
-    'Europe',
-    'North America',
-    'SE Asia',
-  ];
+  // -- Data Mapping --
+  const seriesData = project?.series?.[0] || {};
+  const tokenContent = seriesData?.tokenContent || {};
 
-  const userData = {
-    orderName:'Sweden compensation 2024-2025',
-    comment:'“Covers all flight C-comp. to and from Sweden”',
-    orderType:'CO carbon capture',
-    orderQuantity:'73.00 tons',
-    orderDate:'2024-02-02, 15:29',
-    orderedBy:'EcoTech Solutions',
-    created:'2024-02-03, 08:30'
-  }
-  const productionData = {
-    facility: 'Factory 3 Malmö, Sweden',
-    method: 'Direct-air capture',
-    startDate: '2024-03-31, 15:29',
-    endDate: '2025-03-13, 15:29'
-  }
+  const headTitle = useMemo(() => ({
+    title: project?.projectTitle || 'Unknown Project',
+    issuer: project?.organizationName || 'Unknown Issuer',
+    created: seriesData.tokenContent?.Coffee_HarvestSeason || '2025/2026',
+    tons: `${seriesData.quantity || 0} Bags | ${seriesData.price || 0} BRL`,
+    image: project?.logoPath || '/neuroAdminLogo.svg',
+    categories: project?.categories || []
+  }), [project, seriesData]);
+
+  const generalData = useMemo(() => ({
+    introTitle: project?.introTitle,
+    shortTitle: project?.projectShortTitle,
+    location: project?.location,
+    tags: project?.tags?.join(', '),
+  }), [project]);
+
+  const generalFields = useMemo(() => [
+    { label: 'Introduction', key: 'introTitle' },
+    { label: 'Short Title', key: 'shortTitle' },
+    { label: 'Location', key: 'location' },
+    { label: 'Tags', key: 'tags' },
+  ], []);
+
+  const productionData = useMemo(() => ({
+    producer: tokenContent.Coffee_ProducerName,
+    product: tokenContent.Coffee_ProductDescription,
+    quality: tokenContent.Coffee_QualityStandard,
+    sieve: tokenContent.Coffee_Sieve,
+    harvest: tokenContent.Coffee_HarvestSeason,
+    cpr: tokenContent.Coffee_CPR_Number,
+  }), [tokenContent]);
+
   const productionFields = useMemo(() => [
-    { label: t?.assetOrderDetail?.production?.facility || 'Facility', key: 'facility' },
-    { label: t?.assetOrderDetail?.production?.method || 'Method', key: 'method' },
-    { label: t?.assetOrderDetail?.production?.startDate || 'Start date', key: 'startDate' },
-    { label: t?.assetOrderDetail?.production?.endDate || 'End date', key: 'endDate' },
-  ], [t])
+    { label: 'Producer', key: 'producer' },
+    { label: 'Product', key: 'product' },
+    { label: 'Quality Standard', key: 'quality' },
+    { label: 'Sieve', key: 'sieve' },
+    { label: 'Harvest Season', key: 'harvest' },
+    { label: 'CPR Number', key: 'cpr' },
+  ], []);
 
-  // Pricing / Agreement data (third block)
-  const pricingData = {
-    agreement: 'Carbon capture EU (Q2 2025)\n €230.00 per ton',
-  }
+  const pricingData = useMemo(() => ({
+    basePrice: `${tokenContent.Coffee_BasePricePerBag} BRL`,
+    premium: `${tokenContent.Coffee_PremiumPerBag} BRL`,
+    totalCPR: `${tokenContent.Coffee_InitialCPRValue?.toLocaleString()} BRL`,
+    maturity: tokenContent.Coffee_MaturityDate ? new Date(tokenContent.Coffee_MaturityDate).toLocaleDateString() : 'N/A',
+  }), [tokenContent]);
 
   const pricingFields = useMemo(() => [
-    { label: t?.assetOrderDetail?.pricing?.agreement || 'Agreement', key: 'agreement' },
-  ], [t])
+    { label: 'Base Price (per bag)', key: 'basePrice' },
+    { label: 'Premium (per bag)', key: 'premium' },
+    { label: 'Total CPR Value', key: 'totalCPR' },
+    { label: 'Maturity Date', key: 'maturity' },
+  ], []);
 
-  // Company Information block (fourth block)
-  const companyData = {
-    totalPrice: '204,210 EUR',
-    paymentMethod: 'Invoice',
-    paymentDue: '2025-03-28',
-    paymentReceived: '2025-03-26, 15:29'
-  }
+  const companyData = useMemo(() => ({
+    producerId: tokenContent.Coffee_ProducerId,
+    insurance: tokenContent.Coffee_HasAgriculturalInsurance === 'SANT' ? 'Yes (Santander)' : 'No',
+    endorsement: tokenContent.Coffee_HasPersonalEndorsement === 'SANT' ? 'Yes (Santander)' : 'No',
+    collateral: tokenContent.Asset_CollateralReference,
+  }), [tokenContent]);
 
   const companyFields = useMemo(() => [
-    { label: t?.assetOrderDetail?.company?.totalPrice || 'Total price', key: 'totalPrice' },
-    { label: t?.assetOrderDetail?.company?.paymentMethod || 'Payment method', key: 'paymentMethod' },
-    { label: t?.assetOrderDetail?.company?.paymentDue || 'Payment due', key: 'paymentDue' },
-    { label: t?.assetOrderDetail?.company?.paymentReceived || 'Payment received', key: 'paymentReceived' },
-  ], [t])
+    { label: 'Producer CNPJ', key: 'producerId' },
+    { label: 'Agricultural Insurance', key: 'insurance' },
+    { label: 'Personal Endorsement', key: 'endorsement' },
+    { label: 'Collateral Ref', key: 'collateral' },
+  ], []);
 
-  const fieldsToShow = useMemo(() => [
-    { label: t?.assetOrderDetail?.fields?.orderName || 'Order Name', key: 'orderName' },
-    { label: t?.assetOrderDetail?.fields?.comment || 'Comment', key: 'comment' },
-    { label: t?.assetOrderDetail?.fields?.orderType || 'Order type', key: 'orderType' },
-    { label: t?.assetOrderDetail?.fields?.orderQuantity || 'Order Quantity', key: 'orderQuantity' },
-    { label: t?.assetOrderDetail?.fields?.orderDate || 'Order Date', key: 'orderDate' },
-    { label: t?.assetOrderDetail?.fields?.orderedBy || 'Ordered By', key: 'orderedBy' },
-    { label: t?.assetOrderDetail?.fields?.created || 'Created', key: 'created' },
-  ], [t])
-
-  const headTitle = {
-    title: 'Coffee Bean',
-    credit: '204-210 EUR',
-    created: '2024-02-03',
-    tons: '73 tons |230.30 per ton',
-    image: '/neuroAdminLogo.svg', // served from public/neuroAdminLogo.svg
-    issuer: 'Bress Capital',
-  };
+  const handlePublishSave = useCallback(async (nextStatus) => {
+    setPublishStatus(nextStatus);
+  }, []);
 
   const statusCard = {
-    progress:'75',
-    amount:'47 of 73 tons',
-    status:'In progress'
-  }  
+    progress: '100',
+    amount: `${seriesData.quantity || 0} Bags`,
+    status: 'Live'
+  };
 
-  // Payment status card (duplicate of StatusBox for payment tracking)
   const paymentStatusCard = {
     progress: '100',
-    status: 'Complete',
-  }
+    status: 'Tokenized',
+  };
 
+  if (!project) {
+    return <div className="p-10 text-center text-xl">Project not found</div>;
+  }
 
   return (
     <div className='p-5'>
-    <TabNavigation tab={tab} id={id} gridCols={'grid-cols-2'} tabArray={[
-      {
-        title: t?.assetOrderDetail?.tabs?.token || 'Token detail',
-        href:'/neuro-assets/detailpage',
-        tabDesination:'Token',
-        icon:FaRegFileAlt,
-        tabRef:'Token'
-      },
-      {   
-        title: t?.assetOrderDetail?.tabs?.certificat || 'Sales',
-        href:'/neuro-assets/detailpage',
-        tabDesination:'sales',
-        icon:FaCertificate,
-        tabRef:'sales'
+      {/* FIX: Removed `${id}` from href. 
+         TabNavigation likely appends the 'id' prop to the 'href' automatically.
+      */}
+      <TabNavigation tab={tab} id={id} gridCols={'grid-cols-1'} tabArray={[
+        {
+          title: t?.assetOrderDetail?.tabs?.token || 'Token detail',
+          href: '/neuro-assets/detailpage',
+          tabDesination: 'Token',
+          icon: FaRegFileAlt,
+          tabRef: 'Token'
+        },
+        // {
+        //   title: t?.assetOrderDetail?.tabs?.certificat || 'Sales',
+        //   href: '/neuro-assets/detailpage',
+        //   tabDesination: 'sales',
+        //   icon: FaCertificate,
+        //   tabRef: 'sales'
+        // },
+      ]} />
 
-      },
-    ]}/> 
       <div className='mt-5'>
+        {tab === 'Token' && (
+          <div className='grid grid-cols-4 gap-5 max-xl:grid-cols-1'>
+            <div className='col-span-3'>
+              <DisplayDetailsAsset
+                header={headTitle}
+                title={'Project Overview'}
+                userData={generalData}
+                fieldsToShow={generalFields}
 
-      {
-        tab === 'Token' && 
-        <>
-        <div className='grid grid-cols-4 gap-5'>
-          <div className='col-span-3'>
-            <DisplayDetailsAsset
-              fieldsToShow={fieldsToShow}
-              userData={userData}
-              title={'Order details'}
-              header={headTitle}
-              extraData={productionData}
-              extraFields={productionFields}
-              extraTitle={'Production process'}
-              extraPrice={pricingData}
-              priceFields={pricingFields}
-              priceTitle={'Pricing agreement'}
-              extraCompany={companyData}
-              companyFields={companyFields}
-              companyTitle={'Company Information'}
-            />
+                descriptionTitle={project.projectDescriptionTitle}
+                descriptionText={project.projectDescription?.join('\n\n')}
+                images={project.images}
+
+                extraTitle={'Production Details'}
+                extraData={productionData}
+                extraFields={productionFields}
+
+                priceTitle={'Financial Specifics'}
+                extraPrice={pricingData}
+                priceFields={pricingFields}
+
+                companyTitle={'Legal & Collateral'}
+                extraCompany={companyData}
+                companyFields={companyFields}
+              />
+            </div>
+
+            <div className='col-start-4 col-end-5 flex flex-col items-start gap-5 max-xl:col-span-1 max-xl:w-full'>
+              <PublishBox status={publishStatus} onSave={handlePublishSave} />
+              <StatusBox statusCard={statusCard} title={'Asset status'} />
+              <StatusBox statusCard={paymentStatusCard} title={'Token status'} />
+              <CertificateBox />
+            </div>
           </div>
-          <div className='col-start-4 col-end-5 flex flex-col items-start gap-5 mt-5'>
-            <PublishBox status={publishStatus} onSave={handlePublishSave}/>
-            <StatusBox statusCard={statusCard} title={'Asset status'} />
-            <StatusBox statusCard={paymentStatusCard} title={'Sales status'} />
-            <CertificateBox/>
+        )}
+
+        {tab === 'sales' && (
+          <div className='grid grid-cols-1 gap-5'>
+            <div className='mx-auto w-full bg-[var(--brand-navbar)] shadow-md p-5 rounded-lg '>
+              <h1 className='font-semibold text-xl mb-5'>
+                Sales Activity (Mock)
+              </h1>
+              <Suspense fallback={<p>Loading...</p>}>
+                <AssetTokensTable orders={[project]} isLoading={false} />
+              </Suspense>
+            </div>
           </div>
-        </div>
-        </>
-      }
-            {
-              tab === 'sales' &&
-              <div className='grid grid-cols-4 gap-5'>
-                <div className='mx-auto col-span-3 w-full bg-[var(--brand-navbar)] shadow-md p-5 rounded-lg '>
-                  <h1 className='font-semibold text-xl mb-5'>
-                    Sales
-                  </h1>
-                  <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading || 'Loading orders...'}</p>}>
-                    <AssetTokensTable orders={ordersData.orders} isLoading={ordersData.loading} />
-                  </Suspense>
-                </div>
-                <div className='flex flex-col gap-5'>
-                  <StatusBox statusCard={paymentStatusCard} title={'Sales status'} />
-                  {summaryCards.map(({ label, value, Icon, accentClass }) => (
-                    <div
-                      key={label}
-                      className="flex flex-col rounded-2xl gap-2 bg-[var(--brand-navbar)] p-5 shadow-md backdrop-blur"
-                    >
-                      <p className="text-sm font-medium text-[var(--brand-text-secondary)]">{label}</p>
-                      <div className="flex flex-row items-center gap-3">
-                        <span className={`flex items-center justify-center rounded-full p-2 ${accentClass}`}>
-                          <Icon className="h-5 w-5" strokeWidth={2.2} />
-                        </span>
-                        <p className="text-3xl font-semibold text-[var(--brand-text)]">{value}</p>
-                      </div>
-                      
-                    </div>
-                  ))}
-                  <div className="flex flex-col rounded-2xl bg-[var(--brand-navbar)] p-5 shadow-md">
-                    <div className="mb-4 flex items-center justify-between">
-                      <p className="text-sm font-semibold text-[var(--brand-text-secondary)]">Popular regions</p>
-                      <button
-                        type="button"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--brand-border)] text-lg text-[var(--brand-text-secondary)]"
-                        aria-label="Popular regions actions"
-                      >
-                        ···
-                      </button>
-                    </div>
-                    <ol className="space-y-2 text-sm text-[var(--brand-text)]">
-                      {popularRegions.map((region, index) => (
-                        <li
-                          key={region}
-                          className={`flex items-center py-1 text-base font-medium ${
-                            index === popularRegions.length - 1 ? '' : 'border-b border-[var(--brand-border)]'
-                          }`}
-                        >
-                          <span className="w-6 text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]">
-                            {index + 1}
-                          </span>
-                          <span className="ml-3 flex-1">{region}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                </div>
-                
-              </div>
-            }
-          </div>
+        )}
+      </div>
     </div>
   )
 }

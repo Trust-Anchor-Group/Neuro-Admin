@@ -1,0 +1,396 @@
+[
+  {
+    "id": "1",
+    "cornerColor": "#6b4f2c",
+    "projectTitle": "FCB • Token de Café — Good Cup 14/16",
+    "introTitle": "Café brasileiro tokenizado com lastro físico",
+    "introText": [
+      "Tokens de café que conectam produção e investidores com rastreabilidade, liquidez e prova de propriedade em tempo real. Construído para a cadeia de valor do café no Brasil."
+    ],
+    "projectDescriptionTitle": "Do lote ao token",
+    "projectDescription": [
+      "Lotes de café arábica são vinculados a tokens digitais com metadados de origem, qualidade e logística. A tokenização permite fracionamento, transferência e liquidez em mercado secundário, além de auditoria on-chain do fluxo do ativo.",
+      "O modelo é focado em impacto social e transparência para o produtor, com melhor precificação, acesso a capital de giro e visibilidade de toda a CPR digital registrada na B3.",
+      "Esta CPR digital de café arábica Good Cup 14/16 é registrada e tokenizada em uma blockchain permissionada integrada à B3. Cada token representa uma saca de 60 kg, com indexação ao CEPEA/ESALQ Café Arábica e prêmio específico por qualidade.",
+      "O investidor pode comprar, custodiar e negociar esses tokens com prova on-chain da titularidade, redução de fricções operacionais e acesso a um ativo real da economia brasileira."
+    ],
+    "purchaseTitle": "",
+    "projectShortTitle": "Token de Café GC 14/16",
+    "euroPrice": 0,
+    "tokenParagraph": [
+      "1 token corresponde a uma saca (60 kg) de café arábica, tipo 6, peneira 14/16, padrão Good Cup, vinculada a uma CPR digital registrada na B3."
+    ],
+    "series": [
+      {
+        "name": "Token de Café — Good Cup 14/16",
+        "quantity": 20000,
+        "pricePer": "saca (60 kg)",
+        "isAmount": "true",
+        "price": 3194.59,
+        "buyInstructions": {
+          "buyDescription": "Compra de Token de Café — Good Cup 14/16",
+          "baseBuyAmount": 1,
+          "id": "1",
+          "contractId": "30c495e1-e614-f03e-b419-487afcda1420@legal.innova.tagroot.io",
+          "parameters": {
+           
+            "Project_Id": "FCB-COFFEE-GC-1416-2025",
+            "Project_Label": "FCB Arabica Coffee CPR – Good Cup 14/16 – 20,000 bags – 2025/26",
+            "Coffee_CPR_Number": "25L00008540",
+            "Coffee_ProductDescription": "Café Arábica, Tipo 6, peneira 14/16, padrão Good Cup",
+            "Coffee_Sieve": "14/16",
+            "Coffee_QualityStandard": "Good Cup",
+            "Asset_CollateralReference": "CPR Digital – Good Cup 14/16 – registrar entry TBD"
+
+
+          }
+        },
+        "description": "Token de café arábica Good Cup 14/16, tipo 6, peneira 14/16. Cada token representa uma saca de 60 kg, safra 2025/2026.",
+        "tokenContent": {
+          "Project_Id": "FCB-COFFEE-GC-1416-2025",
+          "Project_Label": "FCB Arabica Coffee CPR – Good Cup 14/16 – 20,000 bags – 2025/26",
+          "Coffee_ProducerName": "FCB Import & Export Ltda",
+          "Coffee_ProducerId": "32.287.975/0001-39",
+          "Coffee_CPR_Number": "25L00008540",
+          "Coffee_ProductDescription": "Café Arábica, Tipo 6, peneira 14/16, padrão Good Cup",
+          "Coffee_Sieve": "14/16",
+          "Coffee_QualityStandard": "Good Cup",
+          "Coffee_HarvestSeason": "2025/2026",
+          "Coffee_TotalBagsInCPR": 20000,
+          "Coffee_IndexName": "CEPEA/ESALQ – Café Arábica",
+          "Coffee_BasePricePerBag": 2323.66,
+          "Coffee_PremiumPerBag": 870.93,
+          "Coffee_InitialCPRValue": 63891853.19,
+          "Coffee_CurrencyCode": "BRL",
+          "Coffee_MaturityDate": "2026-12-02T00:00:00",
+          "Coffee_HasAgriculturalInsurance": "SANT",
+          "Coffee_HasPersonalEndorsement": "SANT",
+          "Coffee_Notes": "CPR digital registrada na B3; seguro agrícola; endosso pessoal; assinatura digital via ICP-Brasil.",
+          "Asset_HasCollateral": "SANT",
+          "Asset_CollateralReference": "CPR Digital – Good Cup 14/16 – registrar entry TBD"
+        }
+      }
+    ],
+    "organizationName": "FCB",
+    "logoPath": "FCB.jpeg",
+    "imagePath": "FCB-Foto1.webp",
+    "images": [
+      "FCB-Foto1.webp",
+      "FCB-Foto2.webp",
+      "FCB-Foto3.webp",
+      "FCB-Foto4.webp",
+      "FCB-Good-Cup.png"
+      
+    ],
+    "organizationDescription": [
+      "Estrutura de tokenização voltada ao café brasileiro, com rastreabilidade ponta a ponta, melhoria de margens para o produtor e liquidez ao investidor."
+    ],
+    "websiteLink": "",
+    "categories": ["Agriculture", "ESG"],
+    "tags": ["Café", "Tokenização", "Rastreabilidade", "Impacto"],
+    "location": "Igarapava SP, Pedreggulho SP, Brutizal SP, Franca SP",
+     "resources": [
+      {
+        "id": "p1-whitepaper-en",
+        "kind": "file",
+        "title": "Whitepaper (EN-US)",
+        "label": "Whitepaper-Card2(EN-US).pdf",
+        "url": "/resources/fcb/Whitepaper-Card2(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p1-whitepaper-pt",
+        "kind": "file",
+        "title": "Whitepaper (PT-BR)",
+        "label": "Whitepaper-Card2(PT-BR).pdf",
+        "url": "/resources/fcb/Whitepaper-Card2(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p1-onepage-en",
+        "kind": "file",
+        "title": "One-Pager (EN-US)",
+        "label": "OnePage-Card2(EN-US).pdf",
+        "url": "/resources/fcb/OnePage-Card2(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p1-onepage-pt",
+        "kind": "file",
+        "title": "One-Pager (PT-BR)",
+        "label": "OnePage-Card2(PT-BR).pdf",
+        "url": "/resources/fcb/OnePage-Card2(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p1-token-coffee-en",
+        "kind": "file",
+        "title": "FCB Token Coffee (EN-US)",
+        "label": "FCBTokenCoffee(EN-US).pdf",
+        "url": "/resources/fcb/FCBTokenCoffee(EN-US).pdf",
+        "download": true
+      }
+    ]
+},
+  {
+    "id": "2",
+    "cornerColor": "#6b4f2c",
+    "projectTitle": "FCB • Token de Café — Fine Cup NY 2/3 17/18",
+    "introTitle": "Café brasileiro tokenizado com lastro físico",
+    "introText": [
+      "Tokens de café que conectam produção e investidores com rastreabilidade, liquidez e prova de propriedade em tempo real. Construído para a cadeia de valor do café no Brasil."
+    ],
+    "projectDescriptionTitle": "Do lote ao token",
+    "projectDescription": [
+      "Lotes de café arábica Fine Cup NY 2/3 17/18 são vinculados a tokens digitais com metadados de origem, qualidade e logística.",
+      "A CPR digital é registrada e tokenizada em uma blockchain permissionada integrada à B3; cada token representa uma saca de 60 kg com indexação ao CEPEA/ESALQ Café Arábica e prêmio adicional pela qualidade Fine Cup.",
+      "O investidor pode comprar, custodiar e negociar esses tokens com prova on-chain da titularidade, redução de fricções operacionais e acesso a um ativo real da economia brasileira."
+    ],
+    "purchaseTitle": "",
+    "projectShortTitle": "Token de Café Fine Cup 17/18",
+    "euroPrice": 0,
+    "tokenParagraph": [
+      "1 token corresponde a uma saca (60 kg) de café arábica, tipo 4, peneira 17/18, padrão Fine Cup NY 2/3, vinculada a uma CPR digital registrada na B3."
+    ],
+    "series": [
+      {
+        "name": "Token de Café — Fine Cup NY 2/3 17/18",
+        "quantity": 10000,
+        "pricePer": "saca (60 kg)",
+        "isAmount": "true",
+        "price": 3626.67,
+        "buyInstructions": {
+          "buyDescription": "Compra de Token de Café — Fine Cup NY 2/3 17/18",
+          "baseBuyAmount": 1,
+          "id": "2",
+          "contractId": "30c495e1-e614-f03e-b419-487afcda1420@legal.innova.tagroot.io",
+          "parameters": {
+        
+            "Project_Id": "FCB-COFFEE-FC-1718-2025",
+            "Project_Label": "FCB Arabica Coffee CPR – Fine Cup NY 2/3 17/18 – 10,000 bags – 2025/26",
+            "Coffee_CPR_Number": "25L00008536",
+            "Coffee_ProductDescription": "Café Arábica, Tipo 4, peneira 17/18, Fine Cup NY 2/3",
+            "Coffee_Sieve": "17/18",
+            "Coffee_QualityStandard": "Fine Cup NY 2/3",
+            "Asset_CollateralReference": "CPR Digital – Fine Cup NY 2/3 – registrar entry TBD"
+          }
+        },
+        "description": "Token de café arábica Fine Cup NY 2/3, tipo 4, peneira 17/18. Cada token representa uma saca de 60 kg, safra 2025/2026.",
+        "tokenContent": {
+          "Project_Id": "FCB-COFFEE-FC-1718-2025",
+          "Project_Label": "FCB Arabica Coffee CPR – Fine Cup NY 2/3 17/18 – 10,000 bags – 2025/26",
+          "Coffee_ProducerName": "FCB Import & Export Ltda",
+          "Coffee_ProducerId": "32.287.975/0001-39",
+          "Coffee_CPR_Number": "25L00008536",
+          "Coffee_ProductDescription": "Café Arábica, Tipo 4, peneira 17/18, Fine Cup NY 2/3",
+          "Coffee_Sieve": "17/18",
+          "Coffee_QualityStandard": "Fine Cup NY 2/3",
+          "Coffee_HarvestSeason": "2025/2026",
+          "Coffee_TotalBagsInCPR": 10000,
+          "Coffee_IndexName": "CEPEA/ESALQ – Café Arábica",
+          "Coffee_BasePricePerBag": 2323.66,
+          "Coffee_PremiumPerBag": 1303.01,
+          "Coffee_InitialCPRValue": 36266703.86,
+          "Coffee_CurrencyCode": "BRL",
+          "Coffee_MaturityDate": "2026-12-02T00:00:00",
+          "Coffee_HasAgriculturalInsurance": "SANT",
+          "Coffee_HasPersonalEndorsement": "SANT",
+          "Coffee_Notes": "CPR digital registrada na B3; seguro agrícola; endosso pessoal; assinatura digital via ICP-Brasil.",
+          "Asset_HasCollateral": "SANT",
+          "Asset_CollateralReference": "CPR Digital – Fine Cup NY 2/3 – registrar entry TBD"
+        }
+      }
+    ],
+    "organizationName": "FCB",
+    "logoPath": "FCB.jpeg",
+    "imagePath": "FCB-Foto2.webp",
+    "images": [
+      "FCB-Foto2.webp",
+      "FCB-Foto1.webp",
+      "FCB-Foto3.webp",
+      "FCB-Foto4.webp",
+      "FCB-Fine-Cup.png"
+      
+    ],
+    "organizationDescription": [
+      "Estrutura de tokenização voltada ao café brasileiro, com rastreabilidade ponta a ponta, melhoria de margens para o produtor e liquidez ao investidor."
+    ],
+    "websiteLink": "",
+    "categories": ["Agriculture", "ESG"],
+    "tags": ["Café", "Tokenização", "Rastreabilidade", "Impacto"],
+    "location": "Igarapava SP, Pedreggulho SP, Brutizal SP, Franca SP",
+    "resources": [
+      {
+        "id": "p2-whitepaper-en",
+        "kind": "file",
+        "title": "Whitepaper (EN-US)",
+        "label": "Whitepaper-Card2(EN-US).pdf",
+        "url": "/resources/fcb/Whitepaper-Card2(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-whitepaper-pt",
+        "kind": "file",
+        "title": "Whitepaper (PT-BR)",
+        "label": "Whitepaper-Card2(PT-BR).pdf",
+        "url": "/resources/fcb/Whitepaper-Card2(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-onepage-en",
+        "kind": "file",
+        "title": "One-Pager (EN-US)",
+        "label": "OnePage-Card2(EN-US).pdf",
+        "url": "/resources/fcb/OnePage-Card2(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-onepage-pt",
+        "kind": "file",
+        "title": "One-Pager (PT-BR)",
+        "label": "OnePage-Card2(PT-BR).pdf",
+        "url": "/resources/fcb/OnePage-Card2(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-token-coffee-en",
+        "kind": "file",
+        "title": "FCB Token Coffee (EN-US)",
+        "label": "FCBTokenCoffee(EN-US).pdf",
+        "url": "/resources/fcb/FCBTokenCoffee(EN-US).pdf",
+        "download": true
+      }
+    ]
+
+  },
+  {
+    "id": "3",
+    "cornerColor": "#6b4f2c",
+    "projectTitle": "FCB • Token de Café — BC Natural",
+    "introTitle": "Café brasileiro tokenizado com lastro físico",
+    "introText": [
+      "Tokens de café que conectam produção e investidores com rastreabilidade, liquidez e prova de propriedade em tempo real. Construído para a cadeia de valor do café no Brasil."
+    ],
+    "projectDescriptionTitle": "Do lote ao token",
+    "projectDescription": [
+      "Lotes de café arábica BC Natural (Bica Corrida) são vinculados a tokens digitais com metadados de origem, qualidade e logística.",
+      "A CPR digital é registrada e tokenizada em uma blockchain permissionada integrada à B3; cada token representa uma saca de 60 kg indexada ao CEPEA/ESALQ Café Arábica, com prêmio específico para o padrão BC Natural.",
+      "O investidor pode comprar, custodiar e negociar esses tokens com prova on-chain da titularidade, redução de fricções operacionais e acesso a um ativo real da economia brasileira."
+    ],
+    "purchaseTitle": "",
+    "projectShortTitle": "Token de Café BC Natural",
+    "euroPrice": 0,
+    "tokenParagraph": [
+      "1 token corresponde a uma saca (60 kg) de café arábica, tipo 6, padrão BC Natural (Bica Corrida), vinculada a uma CPR digital registrada na B3."
+    ],
+    "series": [
+      {
+        "name": "Token de Café — BC Natural",
+        "quantity": 20000,
+        "pricePer": "saca (60 kg)",
+        "isAmount": "true",
+        "price": 3086.57,
+        "buyInstructions": {
+          "buyDescription": "Compra de Token de Café — BC Natural",
+          "baseBuyAmount": 1,
+          "id": "3",
+          "contractId": "30c495e1-e614-f03e-b419-487afcda1420@legal.innova.tagroot.io",
+          "parameters": {
+            
+            "Project_Id": "FCB-COFFEE-BCNAT-2025",
+            "Project_Label": "FCB Arabica Coffee CPR – BC Natural – 20,000 bags – 2025/26",
+            "Coffee_CPR_Number": "25L00008323",
+            "Coffee_ProductDescription": "Café Arábica, Tipo 6, Bica Corrida",
+            "Coffee_Sieve": "-",
+            "Coffee_QualityStandard": "Bica Corrida",
+            "Asset_CollateralReference": "CPR Digital – BC Natural – registrar entry TBD"
+          }
+        },
+        "description": "Token de café arábica BC Natural (Bica Corrida), tipo 6. Cada token representa uma saca de 60 kg, safra 2025/2026.",
+        "tokenContent": {
+          "Project_Id": "FCB-COFFEE-BCNAT-2025",
+          "Project_Label": "FCB Arabica Coffee CPR – BC Natural – 20,000 bags – 2025/26",
+          "Coffee_ProducerName": "FCB Import & Export Ltda",
+          "Coffee_ProducerId": "32.287.975/0001-39",
+          "Coffee_CPR_Number": "25L00008323",
+          "Coffee_ProductDescription": "Café Arábica, Tipo 6, Bica Corrida",
+          "Coffee_Sieve": "-",
+          "Coffee_QualityStandard": "Bica Corrida",
+          "Coffee_HarvestSeason": "2025/2026",
+          "Coffee_TotalBagsInCPR": 20000,
+          "Coffee_IndexName": "CEPEA/ESALQ – Café Arábica",
+          "Coffee_BasePricePerBag": 2323.66,
+          "Coffee_PremiumPerBag": 762.91,
+          "Coffee_InitialCPRValue": 61731464.57,
+          "Coffee_CurrencyCode": "BRL",
+          "Coffee_MaturityDate": "2026-12-02T00:00:00",
+          "Coffee_HasAgriculturalInsurance": "SANT",
+          "Coffee_HasPersonalEndorsement": "SANT",
+          "Coffee_Notes": "CPR digital registrada na B3; seguro agrícola; endosso pessoal; assinatura digital via ICP-Brasil.",
+          "Asset_HasCollateral": "SANT",
+          "Asset_CollateralReference": "CPR Digital – BC Natural – registrar entry TBD"
+        }
+      }
+    ],
+    "organizationName": "FCB",
+    "logoPath": "FCB.jpeg",
+    "imagePath": "FCB-Foto4.webp",
+     "images": [
+      "FCB-Foto4.webp",
+      "FCB-Foto1.webp",
+      "FCB-Foto2.webp",
+      "FCB-Foto3.webp",
+      "FCB-Bica-Corrida.png"
+      
+    ],
+    "organizationDescription": [
+      "Estrutura de tokenização voltada ao café brasileiro, com rastreabilidade ponta a ponta, melhoria de margens para o produtor e liquidez ao investidor."
+    ],
+    "websiteLink": "",
+    "categories": ["Agriculture", "ESG"],
+    "tags": ["Café", "Tokenização", "Rastreabilidade", "Impacto"],
+    "location": "Igarapava SP, Pedreggulho SP, Brutizal SP, Franca SP",
+    "resources": [
+      {
+        "id": "p2-whitepaper-en",
+        "kind": "file",
+        "title": "Whitepaper (EN-US)",
+        "label": "Whitepaper-Card2(EN-US).pdf",
+        "url": "/resources/fcb/Whitepaper-Card2(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-whitepaper-pt",
+        "kind": "file",
+        "title": "Whitepaper (PT-BR)",
+        "label": "Whitepaper-Card2(PT-BR).pdf",
+        "url": "/resources/fcb/Whitepaper-Card2(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-onepage-en",
+        "kind": "file",
+        "title": "One-Pager (EN-US)",
+        "label": "OnePage-Card2(EN-US).pdf",
+        "url": "/resources/fcb/OnePage-Card2(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-onepage-pt",
+        "kind": "file",
+        "title": "One-Pager (PT-BR)",
+        "label": "OnePage-Card2(PT-BR).pdf",
+        "url": "/resources/fcb/OnePage-Card2(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-token-coffee-en",
+        "kind": "file",
+        "title": "FCB Token Coffee (EN-US)",
+        "label": "FCBTokenCoffee(EN-US).pdf",
+        "url": "/resources/fcb/FCBTokenCoffee(EN-US).pdf",
+        "download": true
+      }
+    ]
+  }
+]
