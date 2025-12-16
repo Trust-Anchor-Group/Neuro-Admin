@@ -234,12 +234,12 @@ const AdminPage = () => {
         <SectionCard
           title={tDash.projects?.title || "Project Portfolio"}
           subtitle={tDash.projects?.subtitle || "Overview of active tokenized assets"}
-          action={
-            <button className="inline-flex items-center gap-2 rounded-full border border-[var(--brand-border)] px-4 py-2 text-sm font-semibold text-[var(--brand-text)] hover:bg-[var(--brand-hover)]">
-              {tDash.projects?.cta || "Manage Projects"}
-              <FiArrowUpRight />
-            </button>
-          }
+          // action={
+          //   <button className="inline-flex items-center gap-2 rounded-full border border-[var(--brand-border)] px-4 py-2 text-sm font-semibold text-[var(--brand-text)] hover:bg-[var(--brand-hover)]">
+          //     {tDash.projects?.cta || "Manage Projects"}
+          //     <FiArrowUpRight />
+          //   </button>
+          // }
         >
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
