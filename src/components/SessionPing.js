@@ -60,7 +60,7 @@ export default function SessionPing() {
     setCountdown(60);
     inactivityTimeoutRef.current = setTimeout(() => {
       setShowModal(true);
-    }, 5 * 60 * 1000); // 5 min inactivity for testing
+    }, 25 * 60 * 1000); // 25 min inactivity
   };
 
   // Countdown effect for modal
