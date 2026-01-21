@@ -4,12 +4,10 @@ import React, { useMemo } from "react";
 import { MaterialReactTable } from "material-react-table";
 import { Box, CircularProgress } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { FaCheckCircle, FaTimesCircle, FaShippingFast, FaClock } from "react-icons/fa";
+import { FaCheckCircle, FaLeaf, FaBoxOpen } from "react-icons/fa";
 
 /*
-  Theme overrides to force MUI internals (labels, select, displayedRows, typography)
-  to use your CSS variables. Added stronger overrides for Select/Input variants so the
-  displayed "10" (MuiSelect-select / MuiInputBase-input) uses var(--brand-text).
+  Theme overrides to force MUI internals to use your CSS variables.
 */
 const muiTheme = createTheme({
   typography: { fontFamily: '"Space Grotesk", sans-serif' },
@@ -17,11 +15,11 @@ const muiTheme = createTheme({
     MuiTypography: {
       styleOverrides: {
         root: { color: "var(--brand-text)" },
-        body1: { color: "var(--brand-text-secondary)" }, 
+        body1: { color: "var(--brand-text-secondary)" },
       },
     },
     MuiFormLabel: {
-      styleOverrides: { root: { color: "var(--brand-text-secondary)" } }, // "Rows per page" label
+      styleOverrides: { root: { color: "var(--brand-text-secondary)" } },
     },
     MuiInputLabel: {
       styleOverrides: { root: { color: "var(--brand-text-secondary)" } },
@@ -29,7 +27,7 @@ const muiTheme = createTheme({
     MuiInputBase: {
       styleOverrides: {
         root: { color: "var(--brand-text) !important" },
-        input: { color: "var(--brand-text) !important" }, // covers MuiInputBase-input
+        input: { color: "var(--brand-text) !important" },
       },
     },
     MuiOutlinedInput: {
@@ -47,7 +45,7 @@ const muiTheme = createTheme({
     MuiSelect: {
       styleOverrides: {
         select: {
-          color: "var(--brand-text) !important", // ensures displayed select value (the "10") is correct
+          color: "var(--brand-text) !important",
         },
         standard: {
           color: "var(--brand-text) !important",
@@ -62,7 +60,7 @@ const muiTheme = createTheme({
       },
     },
     MuiSvgIcon: {
-      styleOverrides: { root: { color: "var(--brand-text-color)" } }, // header & table icons
+      styleOverrides: { root: { color: "var(--brand-text-color)" } },
     },
     MuiIconButton: {
       styleOverrides: { root: { color: "var(--brand-text-color)" } },
@@ -84,86 +82,88 @@ const muiTheme = createTheme({
 export default function AssetTokensTable({ orders = [], isLoading = false, onRowClick }) {
   const columns = useMemo(
     () => [
-      { accessorKey: "assetName", header: "Asset Name", size: 250 },
-      { accessorKey: "category", header: "Category", size: 250 },
-      { accessorKey: "amount", header: "Amount", size: 150 },
-      { accessorKey: "orderDate", header: "Created Date", size: 200 },
+      // 1. Mapped to 'projectShortTitle'
       {
-        accessorKey: "status",
-        header: "Status",
+        accessorKey: "projectShortTitle",
+        header: "Project Name",
+        size: 250,
+        Cell: ({ cell, row }) => (
+          <Box>
+            <div className="font-bold text-[var(--brand-text)]">{cell.getValue()}</div>
+            <div className="text-xs text-[var(--brand-text-secondary)]">
+              {row.original.organizationName}
+            </div>
+          </Box>
+        )
+      },
+      // 2. Mapped to 'categories' array
+      {
+        accessorKey: "categories",
+        header: "Category",
         size: 150,
         Cell: ({ cell }) => {
-          const status = cell.getValue();
-          const icon =
-            status === "delivered" ? (
-              <FaCheckCircle style={{ color: "var(--status-success,#16a34a)" }} />
-            ) : status === "shipped" ? (
-              <FaShippingFast style={{ color: "var(--status-info,#2563eb)" }} />
-            ) : status === "cancelled" ? (
-              <FaTimesCircle style={{ color: "var(--status-error,#dc2626)" }} />
-            ) : (
-              <FaClock style={{ color: "var(--status-warn,#d97706)" }} />
-            );
-
-          const statusColor =
-            status === "delivered"
-              ? "var(--status-success,#16a34a)"
-              : status === "shipped"
-              ? "var(--status-info,#2563eb)"
-              : status === "cancelled"
-              ? "var(--status-error,#dc2626)"
-              : "var(--status-warn,#d97706)";
-
+          const cats = cell.getValue();
           return (
-            <Box display="flex" alignItems="center" gap={1}>
-              {icon}
-              <span style={{ fontWeight: 700, color: statusColor }}>
-                {String(status ?? "").charAt(0).toUpperCase() + String(status ?? "").slice(1)}
-              </span>
-            </Box>
-          );
-        },
+            <div className="flex gap-1">
+              {cats?.map((c, i) => (
+                <span key={i} className="px-2 py-1 text-xs rounded-full bg-[var(--brand-navbar)] border border-[var(--brand-border)]">
+                  {c}
+                </span>
+              ))}
+            </div>
+          )
+        }
       },
+      // 3. Mapped to 'series[0].quantity'
       {
-        accessorKey: "payment status",
-        header: "Payment Status",
-        size: 170,
-        Cell: ({ cell }) => {
-          const status = cell.getValue();
-          const icon =
-            status === "Completed" ? (
-              <FaCheckCircle style={{ color: "var(--status-success,#16a34a)" }} />
-            ) : status === "Pending" ? (
-              <FaShippingFast style={{ color: "var(--status-info,#2563eb)" }} />
-            ) : status === "cancelled" ? (
-              <FaTimesCircle style={{ color: "var(--status-error,#dc2626)" }} />
-            ) : (
-              <FaClock style={{ color: "var(--status-warn,#d97706)" }} />
-            );
-
-          const statusColor =
-            status === "Completed"
-              ? "var(--status-success,#16a34a)"
-              : status === "Pending"
-              ? "var(--status-info,#2563eb)"
-              : status === "cancelled"
-              ? "var(--status-error,#dc2626)"
-              : "var(--status-warn,#d97706)";
-
+        accessorKey: "series.0.quantity",
+        header: "Volume (Bags)",
+        size: 150,
+        Cell: ({ cell }) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            <FaBoxOpen style={{ color: "var(--brand-accent)" }} />
+            <span>{cell.getValue()?.toLocaleString()}</span>
+          </Box>
+        )
+      },
+      // 4. Mapped to 'series[0].price'
+      {
+        accessorKey: "series.0.price",
+        header: "Price (BRL)",
+        size: 150,
+        Cell: ({ cell }) => (
+          <span className="font-mono text-[var(--brand-text)]">
+            R$ {cell.getValue()?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          </span>
+        )
+      },
+      // 5. Mapped to 'series[0].tokenContent.Coffee_HarvestSeason'
+      {
+        accessorKey: "series.0.tokenContent.Coffee_HarvestSeason",
+        header: "Harvest",
+        size: 150,
+        Cell: ({ cell }) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            <FaLeaf className="text-emerald-500" />
+            <span>{cell.getValue()}</span>
+          </Box>
+        )
+      },
+      // 6. Custom Status Column
+      {
+        id: "status",
+        header: "Status",
+        size: 150,
+        accessorFn: () => "Live",
+        Cell: () => {
           return (
             <Box display="flex" alignItems="center" gap={1}>
-              {icon}
-              <span style={{ fontWeight: 700, color: statusColor }}>
-                {String(status ?? "").charAt(0).toUpperCase() + String(status ?? "").slice(1)}
+              <FaCheckCircle style={{ color: "var(--status-success,#16a34a)" }} />
+              <span style={{ fontWeight: 700, color: "var(--status-success,#16a34a)" }}>
+                Live
               </span>
             </Box>
           );
-        },
-      },
-      { accessorKey: "id", header: "Token ID", size: 300,
-        Cell: ({ cell }) => {
-          const id = cell.getValue();
-          return id?.toString?.()?.slice?.(0, 10) ?? id ?? "";
         },
       },
     ],
@@ -242,7 +242,6 @@ export default function AssetTokensTable({ orders = [], isLoading = false, onRow
             "& .MuiIconButton-root": { color: "var(--brand-text-color) !important", opacity: 0.95 },
             "& .MuiButton-root": { color: "var(--brand-text)" },
             "& .MuiFormHelperText-root": { color: "var(--brand-text-secondary)" },
-            // extra specificity for select/displayed value inside pagination
             "& .MuiTablePagination-root .MuiSelect-select, & .MuiTablePagination-root .MuiInputBase-input": {
               color: "var(--brand-text) !important",
             },

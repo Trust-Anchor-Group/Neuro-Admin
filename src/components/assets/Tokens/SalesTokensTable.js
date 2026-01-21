@@ -77,79 +77,19 @@ export default function SalesTokensTable({ orders = [], isLoading = false, onRow
     () => [
       { accessorKey: "assetName", header: "Asset Name", size: 250 },
       { accessorKey: "category", header: "Category", size: 250 },
-      { accessorKey: "amount", header: "Amount", size: 150 },
+      { accessorKey: "amount", header: "Amount", size: 140 },
       { accessorKey: "orderDate", header: "Created Date", size: 200 },
+      
       {
-        accessorKey: "status",
-        header: "Status",
-        size: 150,
-        Cell: ({ cell }) => {
-          const status = cell.getValue();
-          const icon =
-            status === "delivered" ? (
-              <FaCheckCircle style={{ color: "var(--status-success,#16a34a)" }} />
-            ) : status === "shipped" ? (
-              <FaShippingFast style={{ color: "var(--status-info,#2563eb)" }} />
-            ) : status === "cancelled" ? (
-              <FaTimesCircle style={{ color: "var(--status-error,#dc2626)" }} />
-            ) : (
-              <FaClock style={{ color: "var(--status-warn,#d97706)" }} />
-            );
-
-          const statusColor =
-            status === "delivered"
-              ? "var(--status-success,#16a34a)"
-              : status === "shipped"
-              ? "var(--status-info,#2563eb)"
-              : status === "cancelled"
-              ? "var(--status-error,#dc2626)"
-              : "var(--status-warn,#d97706)";
-
-          return (
-            <Box display="flex" alignItems="center" gap={1}>
-              {icon}
-              <span style={{ fontWeight: 700, color: statusColor }}>
-                {String(status ?? "").charAt(0).toUpperCase() + String(status ?? "").slice(1)}
-              </span>
-            </Box>
-          );
-        },
-      },
-      {
-        accessorKey: "payment status",
-        header: "Payment Status",
-        size: 170,
-        Cell: ({ cell }) => {
-          const status = cell.getValue();
-          const icon =
-            status === "Completed" ? (
-              <FaCheckCircle style={{ color: "var(--status-success,#16a34a)" }} />
-            ) : status === "Pending" ? (
-              <FaShippingFast style={{ color: "var(--status-info,#2563eb)" }} />
-            ) : status === "cancelled" ? (
-              <FaTimesCircle style={{ color: "var(--status-error,#dc2626)" }} />
-            ) : (
-              <FaClock style={{ color: "var(--status-warn,#d97706)" }} />
-            );
-
-          const statusColor =
-            status === "Completed"
-              ? "var(--status-success,#16a34a)"
-              : status === "Pending"
-              ? "var(--status-info,#2563eb)"
-              : status === "cancelled"
-              ? "var(--status-error,#dc2626)"
-              : "var(--status-warn,#d97706)";
-
-          return (
-            <Box display="flex" alignItems="center" gap={1}>
-              {icon}
-              <span style={{ fontWeight: 700, color: statusColor }}>
-                {String(status ?? "").charAt(0).toUpperCase() + String(status ?? "").slice(1)}
-              </span>
-            </Box>
-          );
-        },
+        header: "Payment",
+        size: 140,
+        accessorFn: () => 'Paid',
+        Cell: () => (
+          <Box display="flex" alignItems="center" gap={1}>
+            <FaCheckCircle style={{ color: "var(--status-success,#16a34a)" }} />
+            <span style={{ fontWeight: 700, color: "var(--status-success,#16a34a)" }}>Paid</span>
+          </Box>
+        ),
       },
       {
         accessorKey: "id",
@@ -177,6 +117,7 @@ export default function SalesTokensTable({ orders = [], isLoading = false, onRow
       <MaterialReactTable
         columns={columns}
         data={orders}
+        initialState={{ density: 'compact' }}
         enableColumnFilters
         enableSorting
         enablePagination
@@ -241,12 +182,16 @@ export default function SalesTokensTable({ orders = [], isLoading = false, onRow
             borderRadius: "16px",
             overflow: "hidden",
             backgroundColor: "var(--brand-background)",
+            overflowX: 'auto',
             "& .MRTNoDataOverlay-root, & .MRTNoDataOverlay-root .MuiTypography-root, & .mrt-no-data-overlay, & .mrt-no-data-text": {
               color: "var(--brand-text-secondary) !important",
               backgroundColor: "transparent",
             },
             "& .mrt-table, & .mrt-table thead, & .mrt-table tbody": {
               borderColor: "var(--brand-border) !important",
+            },
+            "& .MuiTableCell-root": {
+              verticalAlign: 'middle',
             },
           },
         }}

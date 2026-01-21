@@ -1,136 +1,53 @@
-
 "use client";
-import { FiTrendingUp, FiArrowUpRight, FiCheckCircle, FiClock } from "react-icons/fi";
+import React, { useEffect, useState, useMemo } from "react";
+import { FiTrendingUp, FiArrowUpRight, FiCheckCircle, FiActivity, FiLoader } from "react-icons/fi";
 import UserCard from "@/components/ui/UserCard";
 import { useLanguage, content as i18nContent } from "../../../../context/LanguageContext";
+import projectsData from "@/data/projects.json";
 
+// --- Helpers for Date Processing ---
+const parseDate = (dateStr, timeStr) => {
+  try {
+    const d = new Date(`${dateStr} ${timeStr}`);
+    return isNaN(d.getTime()) ? new Date() : d;
+  } catch (e) {
+    return new Date();
+  }
+};
+
+const getRelativeTime = (date) => {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+
+  if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+  return date.toLocaleDateString();
+};
+
+const getLast3Months = (locale) => {
+  const months = [];
+  const today = new Date();
+  for (let i = 0; i < 3; i++) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const key = d.toLocaleString(locale, { month: 'short', year: 'numeric' });
+    months.push({ key, dateObj: d });
+  }
+  return months;
+};
+
+// --- Components ---
 const statusClasses = {
   active: "bg-neuroGreen/20 text-neuroGreen",
   Pending: "bg-neuroOrange/20 text-neuroDarkOrange",
-  Obsoleted: "bg-obsoletedRed/20 text-obsoletedRed",
+  Live: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20",
 };
 
 const transactionStatusClasses = {
+  Paid: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20", // New "Paid" style
   Delivered: "bg-neuroGreen/20 text-neuroGreen",
-  Shipped: "bg-neuroOrange/20 text-neuroDarkOrange",
   Cancelled: "bg-obsoletedRed/20 text-obsoletedRed",
-};
-
-const clients = [
-  {
-    id: "CL-902",
-    name: "Nordic Carbon AB",
-    sector: "Forestry & Land Use",
-    country: "SE",
-    tokens: 12450,
-    lastOrder: "2025-02-10",
-    status: "active",
-  },
-  {
-    id: "CL-857",
-    name: "Öresund Energy Coop",
-    sector: "Renewable Energy",
-    country: "DK",
-    tokens: 9800,
-    lastOrder: "2025-02-09",
-    status: "Pending",
-  },
-  {
-    id: "CL-811",
-    name: "Aurora Biofuels",
-    sector: "Bioenergy",
-    country: "FI",
-    tokens: 7325,
-    lastOrder: "2025-02-07",
-    status: "active",
-  },
-  {
-    id: "CL-780",
-    name: "Baltic Capture",
-    sector: "Direct Air Capture",
-    country: "EE",
-    tokens: 6150,
-    lastOrder: "2025-02-04",
-    status: "Pending",
-  },
-  {
-    id: "CL-766",
-    name: "Skellefteå Industrials",
-    sector: "Manufacturing",
-    country: "SE",
-    tokens: 4800,
-    lastOrder: "2025-01-29",
-    status: "Obsoleted",
-  },
-];
-
-const recentTransactions = [
-  {
-    id: "TX-4839",
-    client: "Nordic Carbon AB",
-    asset: "Verra REDD+",
-    tokens: 2500,
-    status: "Delivered",
-    time: "2 hours ago",
-  },
-  {
-    id: "TX-4834",
-    client: "Aurora Biofuels",
-    asset: "Biochar Series B",
-    tokens: 1800,
-    status: "Shipped",
-    time: "6 hours ago",
-  },
-  {
-    id: "TX-4826",
-    client: "Öresund Energy Coop",
-    asset: "EU ETS",
-    tokens: 950,
-    status: "Delivered",
-    time: "Yesterday",
-  },
-  {
-    id: "TX-4818",
-    client: "Baltic Capture",
-    asset: "DAC Pilot",
-    tokens: 640,
-    status: "Cancelled",
-    time: "Yesterday",
-  },
-  {
-    id: "TX-4811",
-    client: "Skellefteå Industrials",
-    asset: "ISO 14064",
-    tokens: 500,
-    status: "Delivered",
-    time: "2 days ago",
-  },
-];
-
-const monthlySummary = [
-  { month: "Feb 2025", tokens: 4200, orders: 36, trend: 8 },
-  { month: "Jan 2025", tokens: 3880, orders: 32, trend: -3 },
-  { month: "Dec 2024", tokens: 3550, orders: 28, trend: 5 },
-  { month: "Nov 2024", tokens: 3100, orders: 25, trend: 2 },
-];
-
-const certificateStats = {
-  totalCertificates: 182,
-  tokensWithCertificates: 156,
-  pendingCertificates: 12,
-  expiringSoon: 5,
-  breakdown: [
-    { label: "EU ETS", value: 68, color: "bg-indigo-500" },
-    { label: "Verra VCU", value: 54, color: "bg-emerald-500" },
-    { label: "Gold Standard", value: 38, color: "bg-amber-500" },
-    { label: "Other", value: 22, color: "bg-slate-400" },
-  ],
-};
-
-const localeMap = {
-  en: "en-US",
-  pt: "pt-PT",
-  fr: "fr-FR",
 };
 
 const SectionCard = ({ title, subtitle, children, action }) => (
@@ -147,12 +64,15 @@ const SectionCard = ({ title, subtitle, children, action }) => (
 );
 
 const TrendChip = ({ trend }) => {
-  const positive = trend >= 0;
+  // If trend is 0 (like for empty months), render neutral gray
+  if (trend === 0) return <span className="text-xs font-semibold text-[var(--brand-text-secondary)]">-</span>;
+
+  const positive = trend > 0;
   return (
     <span className={`flex items-center gap-1 text-xs font-semibold ${positive ? "text-emerald-500" : "text-rose-500"}`}>
       <FiTrendingUp className={`text-base ${positive ? "" : "rotate-180"}`} />
-      {positive ? "+" : "-"}
-      {Math.abs(trend)}%
+      {positive ? "+" : ""}
+      {trend}%
     </span>
   );
 };
@@ -174,178 +94,309 @@ const CertificateStat = ({ value, label, icon }) => (
 const AdminPage = () => {
   const { language } = useLanguage();
   const tDash = i18nContent[language]?.assetDashboard || {};
-  const locale = localeMap[language] || "en-US";
+  const locale = language === 'pt' ? 'pt-PT' : 'en-US';
+
+  const [realData, setRealData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const formatNumber = (value) => new Intl.NumberFormat(locale).format(value);
+  const formatCurrency = (value) => new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value);
+
+  // -- 1. Fetch Real Data --
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('/api/tokens', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ maxCount: 100, offset: 0 })
+        });
+
+        const json = await res.json();
+
+        if (json.success && Array.isArray(json.data)) {
+          setRealData(json.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // -- 2. Process Monthly Summary (Ensure 3 months displayed) --
+  const monthlySummary = useMemo(() => {
+    // Group real data
+    const grouped = {};
+    realData.forEach(item => {
+      const date = parseDate(item.createdDate, item.createdTime);
+      const key = date.toLocaleString(locale, { month: 'short', year: 'numeric' });
+
+      if (!grouped[key]) {
+        grouped[key] = { tokens: 0, orders: 0 };
+      }
+      grouped[key].tokens += (item.value || 0);
+      grouped[key].orders += 1;
+    });
+
+    // Generate last 3 months structure (filling 0 if no data)
+    const last3Months = getLast3Months(locale);
+
+    return last3Months.map((m, index) => {
+      const data = grouped[m.key] || { tokens: 0, orders: 0 };
+
+      // Calculate Trend vs previous month (which is index + 1 in this descending list)
+      // Since we generated the list, we can peek at the "next" month in the loop or mock it for the last item
+      let trend = 0;
+      // Simple mock logic: if it's the current month (index 0) and has data, show +100% vs 0
+      if (data.tokens > 0 && index === 0) trend = 100;
+
+      return {
+        month: m.key,
+        tokens: data.tokens,
+        orders: data.orders,
+        trend: trend
+      };
+    });
+
+  }, [realData, locale]);
+
   const maxTokens = monthlySummary.reduce((acc, item) => Math.max(acc, item.tokens), 0) || 1;
 
+  // -- 3. Process Recent Transactions (Status forced to "Paid") --
+  const transactionsList = useMemo(() => {
+    // Sort by date descending first
+    const sorted = [...realData].sort((a, b) => {
+      return parseDate(b.createdDate, b.createdTime) - parseDate(a.createdDate, a.createdTime);
+    });
+
+    return sorted.slice(0, 5).map(item => ({
+      id: item.tokenId,
+      shortId: `TX-${item.tokenId.substring(0, 6)}...`,
+      client: "Anonymous",
+      asset: item.friendlyName || "Coffee Token",
+      category: item.category,
+      tokens: item.value,
+      status: "Paid", // Forced status
+      time: getRelativeTime(parseDate(item.createdDate, item.createdTime))
+    }));
+  }, [realData]);
+
+  // -- 4. Certificate Stats --
+  const certStats = useMemo(() => {
+    const total = realData.length || 0;
+    return {
+      totalCertificates: total,
+      breakdown: [
+        { label: "Coffee CPR", value: total, color: "bg-emerald-500" },
+      ]
+    };
+  }, [realData]);
+  const userCardStats = useMemo(() => {
+    if (!realData.length) return { volume: 0, transactions: 0 };
+
+    // 1. Sum of all token values (Real BRL value from API)
+    const totalValue = realData.reduce((acc, item) => acc + (item.value || 0), 0);
+
+    // 2. Total count of transactions/events
+    const totalCount = realData.length;
+
+    return {
+      // Format as currency (e.g., R$ 250.000)
+      formattedValue: formatCurrency(totalValue),
+      // Format as number (e.g., 1,234)
+      formattedCount: formatNumber(totalCount)
+    };
+  }, [realData, formatCurrency, formatNumber ]);// Add dependencies
   return (
     <div className="p-6 lg:p-8 flex flex-col gap-6 bg-[var(--brand-background)] text-[var(--brand-text)] min-h-screen">
       <header className="flex flex-col gap-4">
         <div className="flex flex-wrap gap-4">
-          <UserCard typeKey="amountSold" />
-          <UserCard typeKey="totalVolumeCompensated" />
+          <UserCard
+            typeKey="tokenizedValue"
+            value={loading ? "..." : userCardStats.formattedValue}
+          />
+
+          {/* Card 2: Transaction Count */}
+          <UserCard
+            typeKey="totalTransactions"
+            value={loading ? "..." : userCardStats.formattedCount}
+          />
         </div>
-          <h1 className="text-3xl font-bold">{tDash.heading || "Assets Dashboard"}</h1>
+        <h1 className="text-3xl font-bold">{tDash.heading || "Assets Dashboard"}</h1>
       </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* SECTION 1: Projects Portfolio */}
         <SectionCard
-          title={tDash.clients?.title || "underlying clients"}
-          subtitle={tDash.clients?.subtitle || "Latest status of connected clients"}
-          action={
-            <button className="inline-flex items-center gap-2 rounded-full border border-[var(--brand-border)] px-4 py-2 text-sm font-semibold text-[var(--brand-text)] hover:bg-[var(--brand-hover)]">
-              {tDash.clients?.cta || "manage clients"}
-              <FiArrowUpRight />
-            </button>
-          }
+          title={tDash.projects?.title || "Project Portfolio"}
+          subtitle={tDash.projects?.subtitle || "Overview of active tokenized assets"}
+          // action={
+          //   <button className="inline-flex items-center gap-2 rounded-full border border-[var(--brand-border)] px-4 py-2 text-sm font-semibold text-[var(--brand-text)] hover:bg-[var(--brand-hover)]">
+          //     {tDash.projects?.cta || "Manage Projects"}
+          //     <FiArrowUpRight />
+          //   </button>
+          // }
         >
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="text-[var(--brand-text-secondary)] uppercase text-xs tracking-wide">
+              <thead className="text-[var(--brand-text-secondary)] uppercase text-xs tracking-wide border-b border-[var(--brand-border)]">
                 <tr>
-                  <th className="py-2">{tDash.clients?.columns?.client || "Client"}</th>
-                  <th className="py-2">{tDash.clients?.columns?.sector || "Sector"}</th>
-                  <th className="py-2">{tDash.clients?.columns?.tokens || "Tokens"}</th>
-                  <th className="py-2">{tDash.clients?.columns?.lastOrder || "Last Order"}</th>
-                  <th className="py-2">{tDash.clients?.columns?.status || "Status"}</th>
+                  <th className="py-3 pl-2">Project Name</th>
+                  <th className="py-3">Category</th>
+                  <th className="py-3">Volume (Bags)</th>
+                  <th className="py-3">Value (CPR)</th>
+                  <th className="py-3">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--brand-border)]/60">
-                {clients.map((client) => (
-                  <tr key={client.id} className="hover:bg-[var(--brand-hover)]/60">
-                    <td className="py-3">
-                      <p className="font-semibold text-[var(--brand-text)]">{client.name}</p>
-                      <p className="text-xs text-[var(--brand-text-secondary)]">
-                        {client.id} · {client.country}
-                      </p>
-                    </td>
-                    <td className="py-3 text-[var(--brand-text-secondary)]">{client.sector}</td>
-                    <td className="py-3 font-semibold">{formatNumber(client.tokens)}</td>
-                    <td className="py-3 text-[var(--brand-text-secondary)]">{client.lastOrder}</td>
-                    <td className="py-3">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          statusClasses[client.status] || "bg-slate-100 text-slate-600"
-                        }`}
-                      >
-                        {tDash.clients?.statuses?.[client.status] || client.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {projectsData.map((project) => {
+                  const series = project.series?.[0] || {};
+                  return (
+                    <tr key={project.id} className="hover:bg-[var(--brand-hover)]/60 transition-colors">
+                      <td className="py-4 pl-2">
+                        <p className="font-semibold text-[var(--brand-text)]">{project.projectShortTitle || project.projectTitle}</p>
+                        <p className="text-xs text-[var(--brand-text-secondary)]">
+                          ID: {project.id} · {project.location?.split(',')[0]}
+                        </p>
+                      </td>
+                      <td className="py-4">
+                        <span className="inline-flex items-center rounded-md bg-[var(--brand-background)] px-2 py-1 text-xs font-medium text-[var(--brand-text-secondary)] ring-1 ring-inset ring-[var(--brand-border)]">
+                          {project.categories?.[0]}
+                        </span>
+                      </td>
+                      <td className="py-4 font-semibold font-mono">
+                        {formatNumber(series.quantity || 0)}
+                      </td>
+                      <td className="py-4 text-[var(--brand-text-secondary)] font-mono text-xs">
+                        {formatCurrency(series.tokenContent?.Coffee_InitialCPRValue || 0)}
+                      </td>
+                      <td className="py-4">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClasses.Live}`}>
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                          </span>
+                          Live
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
         </SectionCard>
 
+        {/* SECTION 2: Monthly Summary */}
         <SectionCard
-          title={tDash.monthlySummary?.title || "Månatlig summering"}
-          subtitle={tDash.monthlySummary?.subtitle || "Skapade tokens och ordrar"}
+          title={tDash.monthlySummary?.title || "Monthly Activity"}
+          subtitle={tDash.monthlySummary?.subtitle || "Real-time token creation volume"}
         >
-          <ul className="flex flex-col gap-5">
-            {monthlySummary.map((entry) => (
-              <li key={entry.month} className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-[var(--brand-text)]">{entry.month}</p>
-                    <p className="text-xs text-[var(--brand-text-secondary)]">
-                      {tDash.monthlySummary?.orders || "Ordrar"}: {entry.orders}
-                    </p>
+          {loading ? (
+            <div className="flex justify-center p-10"><FiLoader className="animate-spin text-2xl" /></div>
+          ) : (
+            <ul className="flex flex-col gap-5">
+              {monthlySummary.map((entry) => (
+                <li key={entry.month} className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-[var(--brand-text)]">{entry.month}</p>
+                      <p className="text-xs text-[var(--brand-text-secondary)]">
+                        {tDash.monthlySummary?.orders || "Events"}: {entry.orders}
+                      </p>
+                    </div>
+                    <TrendChip trend={entry.trend} />
                   </div>
-                  <TrendChip trend={entry.trend} />
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-2.5 flex-1 rounded-full bg-[var(--brand-border)]/40">
-                    <div
-                      className="h-full rounded-full bg-[var(--brand-primary)]"
-                      style={{ width: `${Math.max((entry.tokens / maxTokens) * 100, 8)}%` }}
-                    />
+                  <div className="flex items-center gap-3">
+                    <div className="h-2.5 flex-1 rounded-full bg-[var(--brand-border)]/40">
+                      <div
+                        className="h-full rounded-full bg-[var(--brand-primary)]"
+                        style={{ width: `${Math.max((entry.tokens / maxTokens) * 100, 8)}%` }}
+                      />
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-[var(--brand-text)]">
+                        {formatCurrency(entry.tokens)}
+                      </p>
+                      <p className="text-[10px] uppercase tracking-wide text-[var(--brand-text-secondary)]">
+                        Value
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-[var(--brand-text)]">
-                      {formatNumber(entry.tokens)}
-                    </p>
-                    <p className="text-[10px] uppercase tracking-wide text-[var(--brand-text-secondary)]">
-                      {tDash.monthlySummary?.tokens || "Tokens"}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          )}
         </SectionCard>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* SECTION 3: Recent Transactions (Forced "Paid") */}
         <SectionCard
-          title={tDash.transactions?.title || "Senaste transaktionerna"}
-          subtitle={tDash.transactions?.subtitle || "Fem senaste mint/burn events"}
+          title={tDash.transactions?.title || "Live Feed"}
+          subtitle={tDash.transactions?.subtitle || "Latest token events from blockchain"}
         >
-          <ul className="flex flex-col gap-4">
-            {recentTransactions.map((tx) => (
-              <li
-                key={tx.id}
-                className="flex flex-col gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-background)] p-4 backdrop-blur-sm md:flex-row md:items-center md:justify-between"
-              >
-                <div>
-                  <p className="text-sm font-semibold text-[var(--brand-text)]">{tx.client}</p>
-                  <p className="text-xs text-[var(--brand-text-secondary)]">
-                    {tx.asset} · {tx.time}
-                  </p>
-                </div>
-                <div className="flex flex-col items-start md:items-end gap-2">
-                  <div className="flex items-center gap-2 text-[var(--brand-text)] font-semibold">
-                    <FiArrowUpRight className="text-[var(--brand-text-secondary)]" />
-                    {formatNumber(tx.tokens)}{" "}
-                    <span className="text-xs text-[var(--brand-text-secondary)]">
-                      {tDash.transactions?.tokensLabel || "tokens"}
+          {loading ? (
+            <div className="flex justify-center p-10"><FiLoader className="animate-spin text-2xl" /></div>
+          ) : transactionsList.length === 0 ? (
+            <p className="text-sm text-[var(--brand-text-secondary)]">No recent transactions.</p>
+          ) : (
+            <ul className="flex flex-col gap-4">
+              {transactionsList.map((tx) => (
+                <li
+                  key={tx.id}
+                  className="flex flex-col gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-background)] p-4 backdrop-blur-sm md:flex-row md:items-center md:justify-between"
+                >
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-[var(--brand-text)]">{tx.asset}</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--brand-border)] text-[var(--brand-text-secondary)]">
+                        {tx.shortId}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[var(--brand-text-secondary)] mt-1">
+                      {tx.category} · {tx.time}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-start md:items-end gap-2">
+                    <div className="flex items-center gap-2 text-[var(--brand-text)] font-semibold">
+                      <FiActivity className="text-[var(--brand-text-secondary)]" />
+                      {formatCurrency(tx.tokens)}{" "}
+                    </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${transactionStatusClasses.Paid}`}
+                    >
+                      Paid
                     </span>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      transactionStatusClasses[tx.status] || "bg-slate-50 text-slate-600 border border-slate-100"
-                    }`}
-                  >
-                    {tDash.transactions?.statuses?.[tx.status] || tx.status}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          )}
         </SectionCard>
 
+        {/* SECTION 4: Certificates (Reduced) */}
         <SectionCard
-          title={tDash.certificates?.title || "Certifikat i tokens"}
-          subtitle={tDash.certificates?.subtitle || "Hur många certifikat backar dagens tokens"}
+          title={tDash.certificates?.title || "Asset Certificates"}
+          subtitle={tDash.certificates?.subtitle || "Digital CPR backing status"}
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <CertificateStat
-              value={formatNumber(certificateStats.totalCertificates)}
-              label={tDash.certificates?.total || "Utfärdade certifikat"}
+              value={formatNumber(certStats.totalCertificates)}
+              label={tDash.certificates?.total || "Total Validated Events"}
               icon={<FiCheckCircle />}
-            />
-            <CertificateStat
-              value={formatNumber(certificateStats.tokensWithCertificates)}
-              label={tDash.certificates?.tokenized || "Kopplade till tokens"}
-              icon={<FiTrendingUp />}
-            />
-            <CertificateStat
-              value={formatNumber(certificateStats.pendingCertificates)}
-              label={tDash.certificates?.pending || "Inväntar verifiering"}
-              icon={<FiClock />}
-            />
-            <CertificateStat
-              value={formatNumber(certificateStats.expiringSoon)}
-              label={tDash.certificates?.expiring || "Löper ut snart"}
-              icon={<FiArrowUpRight />}
             />
           </div>
           <div className="mt-6">
             <p className="text-xs uppercase tracking-wide text-[var(--brand-text-secondary)] mb-3">
-              {tDash.certificates?.breakdownTitle || "Fördelning per typ"}
+              Breakdown by Category
             </p>
             <ul className="flex flex-col gap-3">
-              {certificateStats.breakdown.map((item) => (
+              {certStats.breakdown.map((item) => (
                 <li key={item.label} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className={`h-3 w-3 rounded-full ${item.color}`} />

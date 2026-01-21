@@ -1,0 +1,819 @@
+[
+  {
+    "id": "1",
+    "cornerColor": "#6b4f2c",
+    "projectTitle": "FCB • Token de Café — Good Cup 14/16",
+    "introTitle": "Café brasileiro tokenizado com lastro físico",
+    "introText": [
+      "Tokens de café que conectam produção e investidores com rastreabilidade, liquidez e prova de propriedade em tempo real. Construído para a cadeia de valor do café no Brasil."
+    ],
+    "projectDescriptionTitle": "Do lote ao token",
+    "projectDescription": [
+      "Tokenização de Café Arábica: Impacto Social e Oportunidade de Investimento",
+      "Lotes de café arábica são vinculados a tokens digitais com metadados de origem, qualidade e logística. A tokenização permite fracionamento, transferência e liquidez em mercado secundário, além de auditoria on-chain do fluxo do ativo.",
+      "O modelo é focado em impacto social e transparência para o produtor, garantindo melhor precificação, acesso a capital de giro e visibilidade de toda a CPR digital registrada na B3.",
+      "O Ativo: Café Arábica Good Cup 14/16",
+      "•\tCada token representa uma saca de 60 kg.",
+      "•\tIndexação ao CEPEA/ESALQ Café Arábica, com prêmio específico por qualidade.",
+      "•\tRegistro e tokenização em blockchain permissionada integrada à B3.",
+      "•\tRastreabilidade completa: origem, qualidade e logística auditáveis on-chain.",
+      "A Oportunidade para o Investidor",
+      "•\tValorização histórica: o café arábica tem apresentado aumento consistente de valor nos últimos 5 anos, reforçando seu papel como ativo resiliente da economia brasileira.",
+      "•\tLiquidez imediata: tokens podem ser fracionados e negociados em mercado secundário, reduzindo barreiras de entrada.",
+      "•\tSegurança e transparência: prova on-chain de titularidade e redução de fricções operacionais.",
+      "•\tExposição à economia real: acesso direto a uma commodity estratégica, com demanda global crescente.",
+      "•\tDiversificação inteligente: combinação de impacto social com retorno financeiro, unindo sustentabilidade e rentabilidade.",
+      "Significado Estratégico",
+      "Este modelo conecta agricultura, finanças e tecnologia, criando:",
+      "•\tUm mercado mais justo para produtores.",
+      "•\tUm ativo digital sólido para investidores.",
+      "•\tUma ponte entre inovação financeira e commodities tradicionais.",
+      "Em resumo: o investidor não apenas apoia a cadeia produtiva do café com transparência e impacto social, mas também se posiciona em um ativo que vem se valorizando de forma consistente, com liquidez e segurança digital.",
+      "",
+      "O modelo é focado em impacto social e transparência para o produtor, com melhor precificação, acesso a capital de giro e visibilidade de toda a CPR digital registrada na B3.",
+      "",
+      "Esta CPR digital de café arábica Good Cup 14/16 é registrada e tokenizada em uma blockchain permissionada integrada à B3. Cada token representa uma saca de 60 kg, com indexação ao CEPEA/ESALQ Café Arábica e prêmio específico por qualidade.",
+      "",
+      "O investidor pode comprar, custodiar e negociar esses tokens com prova on-chain da titularidade, redução de fricções operacionais e acesso a um ativo real da economia brasileira."
+    ],
+    "projectDescription_en": [
+      "Arabica Coffee Tokenization: Social Impact and Investment Opportunity",
+      "Arabica coffee lots are linked to digital tokens with metadata on origin, quality, and logistics. Tokenization allows for fractionation, transfer, and liquidity in the secondary market, as well as on-chain auditing of the asset's flow.",
+      "The model focuses on social impact and transparency for the producer, ensuring better pricing, access to working capital, and visibility of all digital CPRs registered with B3.",
+      "The Asset: Good Cup 14/16 Arabica Coffee",
+      "•\tEach token represents a 60 kg bag.",
+      "•\tIndexed to CEPEA/ESALQ Arabica Coffee, with a specific premium for quality.",
+      "•\tRegistration and tokenization on a permissioned blockchain integrated with B3.",
+      "•\tComplete traceability: origin, quality, and logistics auditable on-chain.",
+      "The Opportunity for the Investor",
+      "•\tHistorical appreciation: Arabica coffee has shown a consistent increase in value over the last 5 years, reinforcing its role as a resilient asset in the Brazilian economy. ",
+      "•\tImmediate liquidity: tokens can be fractioned and traded on the secondary market, reducing barriers to entry.",
+      "•\tSecurity and transparency: on-chain proof of ownership and reduced operational friction.",
+      "•\tExposure to the real economy: direct access to a strategic commodity with growing global demand.",
+      "•\tSmart diversification: combining social impact with financial return, uniting sustainability and profitability.",
+      "Strategic Significance",
+      "This model connects agriculture, finance, and technology, creating:",
+      "•\tA fairer market for producers.",
+      "•\tA solid digital asset for investors.",
+      "•\tA bridge between financial innovation and traditional commodities.",
+      "In short: the investor not only supports the coffee production chain with transparency and social impact, but also positions themselves in an asset that has been consistently appreciating, with liquidity and digital security.",
+      "",
+      "The model is focused on social impact and transparency for the producer, with better pricing, access to working capital, and visibility of all digital CPRs registered on the B3.",
+      "This digital CPR (Certificate of Agricultural Receivables) for Good Cup 14/16 Arabica coffee is registered and tokenized on a permissioned blockchain integrated with B3 (Brazilian Stock Exchange). Each token represents a 60 kg bag, indexed to CEPEA/ESALQ Arabica Coffee and with a specific quality premium.",
+      "Investors can buy, hold, and trade these tokens with on-chain proof of ownership, reduced operational friction, and access to a real asset of the Brazilian economy.",
+      ""
+    ],
+    "purchaseTitle": "",
+    "projectShortTitle": "Token de Café GC 14/16",
+    "euroPrice": 0,
+    "tokenParagraph": [
+      "1 token corresponde a uma saca (60 kg) de café arábica, tipo 6, peneira 14/16, padrão Good Cup, vinculada a uma CPR digital registrada na B3."
+    ],
+    "tokenParagraph_en": [
+      "1 token corresponds to one 60 kg bag of Arabica coffee, type 6, sieve 14/16, Good Cup standard, linked to a digital CPR registered at B3."
+    ],
+    "series": [
+      {
+        "name": "Token de Café — Good Cup 14/16",
+        "quantity": 20000,
+        "pricePer": "saca (60 kg)",
+        "pricePer_en": "bag (60 kg)",
+        "isAmount": "true",
+        "price": 3194.59,
+        "buyInstructions": {
+          "buyDescription": "Compra de Token de Café — Good Cup 14/16",
+          "baseBuyAmount": 1,
+          "id": "1",
+          "contractId": "30d6e19d-02bb-c5d2-9814-dcb52ab06071@legal.innova.tagroot.io",
+          "parameters": {
+            "Product_Id": "1",
+            "FriendlyName": "Token de Café Good Cup 14/16",
+            "Project_Id": "FCB-COFFEE-GC-1416-2025",
+            "Project_Label": "FCB Arabica Coffee CPR – Good Cup 14/16 – 20,000 bags – 2025/26",
+            "Coffee_CPR_Number": "25L00008540",
+            "Coffee_ProductDescription": "Café Arábica, Tipo 6, peneira 14/16, padrão Good Cup",
+            "Coffee_Sieve": "14/16",
+            "Coffee_QualityStandard": "Good Cup",
+            "Asset_CollateralReference": "CPR Digital – Good Cup 14/16 – registrar entry TBD"
+          }
+        },
+        "description": "Token de café arábica Good Cup 14/16, tipo 6, peneira 14/16. Cada token representa uma saca de 60 kg, safra 2025/2026.",
+        "tokenContent": {
+          "Project_Id": "FCB-COFFEE-GC-1416-2025",
+          "Project_Label": "FCB Arabica Coffee CPR – Good Cup 14/16 – 20,000 bags – 2025/26",
+          "Coffee_ProducerName": "FCB Import & Export Ltda",
+          "Coffee_ProducerId": "32.287.975/0001-39",
+          "Coffee_CPR_Number": "25L00008540",
+          "Coffee_ProductDescription": "Café Arábica, Tipo 6, peneira 14/16, padrão Good Cup",
+          "Coffee_Sieve": "14/16",
+          "Coffee_QualityStandard": "Good Cup",
+          "Coffee_HarvestSeason": "2025/2026",
+          "Coffee_TotalBagsInCPR": 20000,
+          "Coffee_IndexName": "CEPEA/ESALQ – Café Arábica",
+          "Coffee_BasePricePerBag": 2323.66,
+          "Coffee_PremiumPerBag": 870.93,
+          "Coffee_InitialCPRValue": 63891853.19,
+          "Coffee_CurrencyCode": "BRL",
+          "Coffee_MaturityDate": "2026-12-02T00:00:00",
+          "Coffee_HasAgriculturalInsurance": "SANT",
+          "Coffee_HasPersonalEndorsement": "SANT",
+          "Coffee_Notes": "CPR digital registrada na B3; seguro agrícola; endosso pessoal; assinatura digital via ICP-Brasil.",
+          "Asset_HasCollateral": "SANT",
+          "Asset_CollateralReference": "CPR Digital – Good Cup 14/16 – registrar entry TBD"
+        }
+      }
+    ],
+    "organizationName": "FCB",
+    "logoPath": "FCB.jpeg",
+    "imagePath": "FCB-Foto1.webp",
+    "images": [
+      "FCB-Foto1.webp",
+      "FCB-Foto2.webp",
+      "FCB-Foto3.webp",
+      "FCB-Foto4.webp",
+      "FCB-Good-Cup.png"
+    ],
+    "organizationDescription": [
+      "A Família Basso é formada por três gerações de homens que carregam a letra “A” no sangue e no nome, de aventureiros. Alfonso deixa a Itália, levando consigo esposa, filhos e as marcas da agricultura. Chega à Fazenda Santa Rita, no interior do estado de São Paulo, seguem adquirindo propriedades no oeste do estado da Bahia, onde fundam o Grupo Basso. Eles conseguem definir um blend perfeito de café Arábica e criam a marca Penhasco Café. Eles expandem seus recursos para criação e abate de animais e lançam uma nova marca, Basso Carnes Nobres. Para gerenciar e administrar esses e outros negócios familiares, é criada a empresa Oeste Agro. Logo após a família se consolidar no setor agropecuário e devido à qualidade de tudo o que produziam em suas fazendas, a Família Basso teve a oportunidade de exportar. No entanto, como a família possui um espírito empreendedor dinâmico, eles criaram sua própria empresa de trading, a FCB Trading Global, que hoje possui filiais no Brasil, Reino Unido, China, Emirados Árabes Unidos, Estados Unidos e Ilhas Cayman. A FCB Trading Global exporta sua produção e a de parceiros selecionados, respeitando as práticas socioambientais da agricultura e a segurança do consumidor internacional."
+    ],
+    "organizationDescription_en": [
+      "The Basso family is made up of three generations of men who carry the letter \"A\" in their blood and in their name, representing adventurers.",
+      "Alfonso left Italy, taking his wife, children, and the marks of agriculture with him. He arrived at Fazenda Santa Rita, in the interior of the state of São Paulo, and they continued acquiring properties in the west of the state of Bahia, where they founded the Basso Group. They managed to define a perfect blend of Arabica coffee and created the Penhasco Café brand. They expanded their resources to include animal breeding and slaughter and launched a new brand, Basso Carnes Nobres. To manage and administer these and other family businesses, the company Oeste Agro was created. Soon after the family consolidated itself in the agricultural sector and due to the quality of everything they produced on their farms, the Basso family had the opportunity to export. However, as the family possesses a dynamic entrepreneurial spirit, they created their own trading company, FCB Trading Global, which today has branches in Brazil, the United Kingdom, China, the United Arab Emirates, the United States, and the Cayman Islands. FCB Trading Global exports its own production and that of selected partners, respecting the socio-environmental practices of agriculture and the safety of the international consumer."
+    ],
+    "websiteLink": "",
+    "categories": ["Agriculture", "ESG"],
+    "tags": ["Café", "Tokenização", "Rastreabilidade", "Impacto","CPR"],
+    "tags_en": ["Coffee", "Tokenization", "Traceability", "Impact", "CPR"],
+    "location": "Igarapava SP, Pedreggulho SP, Brutizal SP, Franca SP",
+    "resources": [
+      {
+        "id": "p1-whitepaper-en",
+        "kind": "file",
+        "title": "Whitepaper (EN-US)",
+        "label": "Whitepaper-Card3(EN-US).pdf",
+        "url": "/resources/fcb/Whitepaper-Card3(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p1-whitepaper-pt",
+        "kind": "file",
+        "title": "Whitepaper (PT-BR)",
+        "label": "Whitepaper-Card3(PT-BR).pdf",
+        "url": "/resources/fcb/Whitepaper-Card3(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p1-onepage-en",
+        "kind": "file",
+        "title": "One-Pager (EN-US)",
+        "label": "OnePage-Card3(EN-US).pdf",
+        "url": "/resources/fcb/OnePage-Card3(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p1-onepage-pt",
+        "kind": "file",
+        "title": "One-Pager (PT-BR)",
+        "label": "OnePage-Card3(PT-BR).pdf",
+        "url": "/resources/fcb/OnePage-Card3(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p1-token-coffee-en",
+        "kind": "file",
+        "title": "FCB Token Coffee (EN-US)",
+        "label": "FCBTokenCoffee(EN-US).pdf",
+        "url": "/resources/fcb/FCBTokenCoffee(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p1-good-cup-cpr",
+        "kind": "file",
+        "title": "CPR",
+        "label": "CPR-FCB-Cafe-Arabica-Good-Cup-25L03760150.pdf",
+        "url": "/resources/fcb/CPR-FCB-Cafe-Arabica-Good-Cup-25L03760150.pdf",
+        "download": true
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "cornerColor": "#6b4f2c",
+    "projectTitle": "FCB • Token de Café — Fine Cup NY 2/3 17/18",
+    "introTitle": "Café brasileiro tokenizado com lastro físico",
+    "introText": [
+      "Tokens de café que conectam produção e investidores com rastreabilidade, liquidez e prova de propriedade em tempo real. Construído para a cadeia de valor do café no Brasil."
+    ],
+    "projectDescriptionTitle": "Do lote ao token",
+    "projectDescription": [
+      "Tokenização de Café Arábica: Impacto Social e Oportunidade de Investimento",
+      "Lotes de café arábica são vinculados a tokens digitais com metadados de origem, qualidade e logística. A tokenização permite fracionamento, transferência e liquidez em mercado secundário, além de auditoria on-chain do fluxo do ativo.",
+      "O modelo é focado em impacto social e transparência para o produtor, garantindo melhor precificação, acesso a capital de giro e visibilidade de toda a CPR digital registrada na B3.",
+      "O Ativo: Café Arábica Fine Cup NY 2/3 17/18",
+      "• Cada token representa uma saca de 60 kg.",
+      "• Indexação ao CEPEA/ESALQ Café Arábica, com prêmio específico por qualidade.",
+      "• Registro e tokenização em blockchain permissionada integrada à B3.",
+      "• Rastreabilidade completa: origem, qualidade e logística auditáveis on-chain.",
+      "A Oportunidade para o Investidor",
+      "• Valorização histórica: o café arábica tem apresentado aumento consistente de valor nos últimos 5 anos, reforçando seu papel como ativo resiliente da economia brasileira.",
+      "• Liquidez imediata: tokens podem ser fracionados e negociados em mercado secundário, reduzindo barreiras de entrada.",
+      "• Segurança e transparência: prova on-chain de titularidade e redução de fricções operacionais.",
+      "• Exposição à economia real: acesso direto a uma commodity estratégica, com demanda global crescente.",
+      "• Diversificação inteligente: combinação de impacto social com retorno financeiro, unindo sustentabilidade e rentabilidade.",
+      "Significado Estratégico",
+      "Este modelo conecta agricultura, finanças e tecnologia, criando:",
+      "• Um mercado mais justo para produtores.",
+      "• Um ativo digital sólido para investidores.",
+      "• Uma ponte entre inovação financeira e commodities tradicionais.",
+      "Em resumo: o investidor não apenas apoia a cadeia produtiva do café com transparência e impacto social, mas também se posiciona em um ativo que vem se valorizando de forma consistente, com liquidez e segurança digital.",
+      ""
+    ],
+    "projectDescription_en": [
+      "Arabica Coffee Tokenization: Social Impact and Investment Opportunity",
+      "Arabica coffee lots are linked to digital tokens with metadata on origin, quality, and logistics. Tokenization allows for fractionation, transfer, and liquidity in the secondary market, as well as on-chain auditing of the asset's flow.",
+      "The model focuses on social impact and transparency for the producer, ensuring better pricing, access to working capital, and visibility of all digital CPRs registered with B3.",
+      "The Asset: Fine Cup NY 2/3 17/18 Arabica Coffee",
+      "• Each token represents a 60 kg bag.",
+      "• Indexed to CEPEA/ESALQ Arabica Coffee, with a specific premium for quality.",
+      "• Registration and tokenization on a permissioned blockchain integrated with B3.",
+      "• Complete traceability: origin, quality, and logistics auditable on-chain.",
+      "The Opportunity for the Investor",
+      "• Historical appreciation: Arabica coffee has shown a consistent increase in value over the last 5 years, reinforcing its role as a resilient asset in the Brazilian economy. ",
+      "• Immediate liquidity: tokens can be fractioned and traded on the secondary market, reducing barriers to entry.",
+      "• Security and transparency: on-chain proof of ownership and reduced operational friction.",
+      "• Exposure to the real economy: direct access to a strategic commodity with growing global demand.",
+      "• Smart diversification: combining social impact with financial return, uniting sustainability and profitability.",
+      "Strategic Significance",
+      "This model connects agriculture, finance, and technology, creating:",
+      "• A fairer market for producers.",
+      "• A solid digital asset for investors.",
+      "• A bridge between financial innovation and traditional commodities.",
+      "In short: the investor not only supports the coffee production chain with transparency and social impact, but also positions themselves in an asset that has been consistently appreciating, with liquidity and digital security.",
+      "",
+      "The model is focused on social impact and transparency for the producer, with better pricing, access to working capital, and visibility of all digital CPRs registered on the B3.",
+      "This digital CPR (Certificate of Agricultural Receivables) for Good Cup 14/16 Arabica coffee is registered and tokenized on a permissioned blockchain integrated with B3 (Brazilian Stock Exchange). Each token represents a 60 kg bag, indexed to CEPEA/ESALQ Arabica Coffee and with a specific quality premium.",
+      "Investors can buy, hold, and trade these tokens with on-chain proof of ownership, reduced operational friction, and access to a real asset of the Brazilian economy.",
+      ""
+    ],
+    "purchaseTitle": "",
+    "projectShortTitle": "Token de Café Fine Cup 17/18",
+    "euroPrice": 0,
+    "tokenParagraph": [
+      "1 token corresponde a uma saca (60 kg) de café arábica, tipo 4, peneira 17/18, padrão Fine Cup NY 2/3, vinculada a uma CPR digital registrada na B3."
+    ],
+    "tokenParagraph_en": [
+      "1 token corresponds to one 60 kg bag of Arabica coffee, type 4, sieve 17/18, Fine Cup NY 2/3 standard, linked to a digital CPR registered at B3."
+    ],
+    "series": [
+      {
+        "name": "Token de Café — Fine Cup NY 2/3 17/18",
+        "quantity": 10000,
+        "pricePer": "saca (60 kg)",
+        "pricePer_en": "bag (60 kg)",
+        "isAmount": "true",
+        "price": 3626.67,
+        "buyInstructions": {
+          "buyDescription": "Compra de Token de Café — Fine Cup NY 2/3 17/18",
+          "baseBuyAmount": 1,
+          "id": "2",
+          "contractId": "30d6e19d-02bb-c5d2-9814-dcb52ab06071@legal.innova.tagroot.io",
+          "parameters": {
+            "Product_Id": "2",
+            "FriendlyName": "Token de Café Fine Cup 17/18",
+            "Project_Id": "FCB-COFFEE-FC-1718-2025",
+            "Project_Label": "FCB Arabica Coffee CPR – Fine Cup NY 2/3 17/18 – 10,000 bags – 2025/26",
+            "Coffee_CPR_Number": "25L00008536",
+            "Coffee_ProductDescription": "Café Arábica, Tipo 4, peneira 17/18, Fine Cup NY 2/3",
+            "Coffee_Sieve": "17/18",
+            "Coffee_QualityStandard": "Fine Cup NY 2/3",
+            "Asset_CollateralReference": "CPR Digital – Fine Cup NY 2/3 – registrar entry TBD"
+          }
+        },
+        "description": "Token de café arábica Fine Cup NY 2/3, tipo 4, peneira 17/18. Cada token representa uma saca de 60 kg, safra 2025/2026.",
+        "tokenContent": {
+          "Project_Id": "FCB-COFFEE-FC-1718-2025",
+          "Project_Label": "FCB Arabica Coffee CPR – Fine Cup NY 2/3 17/18 – 10,000 bags – 2025/26",
+          "Coffee_ProducerName": "FCB Import & Export Ltda",
+          "Coffee_ProducerId": "32.287.975/0001-39",
+          "Coffee_CPR_Number": "25L00008536",
+          "Coffee_ProductDescription": "Café Arábica, Tipo 4, peneira 17/18, Fine Cup NY 2/3",
+          "Coffee_Sieve": "17/18",
+          "Coffee_QualityStandard": "Fine Cup NY 2/3",
+          "Coffee_HarvestSeason": "2025/2026",
+          "Coffee_TotalBagsInCPR": 10000,
+          "Coffee_IndexName": "CEPEA/ESALQ – Café Arábica",
+          "Coffee_BasePricePerBag": 2323.66,
+          "Coffee_PremiumPerBag": 1303.01,
+          "Coffee_InitialCPRValue": 36266703.86,
+          "Coffee_CurrencyCode": "BRL",
+          "Coffee_MaturityDate": "2026-12-02T00:00:00",
+          "Coffee_HasAgriculturalInsurance": "SANT",
+          "Coffee_HasPersonalEndorsement": "SANT",
+          "Coffee_Notes": "CPR digital registrada na B3; seguro agrícola; endosso pessoal; assinatura digital via ICP-Brasil.",
+          "Asset_HasCollateral": "SANT",
+          "Asset_CollateralReference": "CPR Digital – Fine Cup NY 2/3 – registrar entry TBD"
+        }
+      }
+    ],
+    "organizationName": "FCB",
+    "logoPath": "FCB.jpeg",
+    "imagePath": "FCB-Foto2.webp",
+    "images": [
+      "FCB-Foto2.webp",
+      "FCB-Foto1.webp",
+      "FCB-Foto3.webp",
+      "FCB-Foto4.webp",
+      "FCB-Fine-Cup.png"
+    ],
+    "organizationDescription": [
+      "A Família Basso é formada por três gerações de homens que carregam a letra “A” no sangue e no nome, de aventureiros. Alfonso deixa a Itália, levando consigo esposa, filhos e as marcas da agricultura. Chega à Fazenda Santa Rita, no interior do estado de São Paulo, seguem adquirindo propriedades no oeste do estado da Bahia, onde fundam o Grupo Basso. Eles conseguem definir um blend perfeito de café Arábica e criam a marca Penhasco Café. Eles expandem seus recursos para criação e abate de animais e lançam uma nova marca, Basso Carnes Nobres. Para gerenciar e administrar esses e outros negócios familiares, é criada a empresa Oeste Agro. Logo após a família se consolidar no setor agropecuário e devido à qualidade de tudo o que produziam em suas fazendas, a Família Basso teve a oportunidade de exportar. No entanto, como a família possui um espírito empreendedor dinâmico, eles criaram sua própria empresa de trading, a FCB Trading Global, que hoje possui filiais no Brasil, Reino Unido, China, Emirados Árabes Unidos, Estados Unidos e Ilhas Cayman. A FCB Trading Global exporta sua produção e a de parceiros selecionados, respeitando as práticas socioambientais da agricultura e a segurança do consumidor internacional."
+    ],
+    "organizationDescription_en": [
+      "The Basso family is made up of three generations of men who carry the letter \"A\" in their blood and in their name, representing adventurers. Alfonso left Italy, taking his wife, children, and the marks of agriculture with him. He arrived at Fazenda Santa Rita, in the interior of the state of São Paulo, and they continued acquiring properties in the west of the state of Bahia, where they founded the Basso Group. They managed to define a perfect blend of Arabica coffee and created the Penhasco Café brand. They expanded their resources to include animal breeding and slaughter and launched a new brand, Basso Carnes Nobres. To manage and administer these and other family businesses, the company Oeste Agro was created. Soon after the family consolidated itself in the agricultural sector and due to the quality of everything they produced on their farms, the Basso family had the opportunity to export. However, as the family possesses a dynamic entrepreneurial spirit, they created their own trading company, FCB Trading Global, which today has branches in Brazil, the United Kingdom, China, the United Arab Emirates, the United States, and the Cayman Islands. FCB Trading Global exports its own production and that of selected partners, respecting the socio-environmental practices of agriculture and the safety of the international consumer."
+    ],
+    "websiteLink": "",
+    "categories": ["Agriculture", "ESG"],
+    "tags": ["Café", "Tokenização", "Rastreabilidade", "Impacto"],
+    "tags_en": ["Coffee", "Tokenization", "Traceability", "Impact"],
+    "location": "Igarapava SP, Pedreggulho SP, Brutizal SP, Franca SP",
+    "resources": [
+      {
+        "id": "p2-whitepaper-en",
+        "kind": "file",
+        "title": "Whitepaper (EN-US)",
+        "label": "Whitepaper-Card2(EN-US).pdf",
+        "url": "/resources/fcb/Whitepaper-Card2(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-whitepaper-pt",
+        "kind": "file",
+        "title": "Whitepaper (PT-BR)",
+        "label": "Whitepaper-Card2(PT-BR).pdf",
+        "url": "/resources/fcb/Whitepaper-Card2(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-onepage-en",
+        "kind": "file",
+        "title": "One-Pager (EN-US)",
+        "label": "OnePage-Card2(EN-US).pdf",
+        "url": "/resources/fcb/OnePage-Card2(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-onepage-pt",
+        "kind": "file",
+        "title": "One-Pager (PT-BR)",
+        "label": "OnePage-Card2(PT-BR).pdf",
+        "url": "/resources/fcb/OnePage-Card2(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-token-coffee-en",
+        "kind": "file",
+        "title": "FCB Token Coffee (EN-US)",
+        "label": "FCBTokenCoffee(EN-US).pdf",
+        "url": "/resources/fcb/FCBTokenCoffee(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-fine-cup-cpr",
+        "kind": "file",
+        "title": "CPR",
+        "label": "CPR-FCB-Cafe-Arabica-Fine-Cup-NY-25L03757482.pdf",
+        "url": "/resources/fcb/CPR-FCB-Cafe-Arabica-Fine-Cup-NY-25L03757482.pdf",
+        "download": true
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "cornerColor": "#6b4f2c",
+    "projectTitle": "FCB • Token de Café — BC Natural",
+    "introTitle": "Café brasileiro tokenizado com lastro físico",
+    "introText": [
+      "Tokens de café que conectam produção e investidores com rastreabilidade, liquidez e prova de propriedade em tempo real. Construído para a cadeia de valor do café no Brasil."
+    ],
+    "projectDescriptionTitle": "Do lote ao token",
+    "projectDescription": [
+      "Tokenização de Café Arábica: Impacto Social e Oportunidade de Investimento",
+      "Lotes de café arábica são vinculados a tokens digitais com metadados de origem, qualidade e logística. A tokenização permite fracionamento, transferência e liquidez em mercado secundário, além de auditoria on-chain do fluxo do ativo.",
+      "O modelo é focado em impacto social e transparência para o produtor, garantindo melhor precificação, acesso a capital de giro e visibilidade de toda a CPR digital registrada na B3.",
+      "O Ativo: Café Arábica Bica Corrida",
+      "• Cada token representa uma saca de 60 kg.",
+      "• Indexação ao CEPEA/ESALQ Café Arábica, com prêmio específico por qualidade.",
+      "• Registro e tokenização em blockchain permissionada integrada à B3.",
+      "• Rastreabilidade completa: origem, qualidade e logística auditáveis on-chain.",
+      "A Oportunidade para o Investidor",
+      "• Valorização histórica: o café arábica tem apresentado aumento consistente de valor nos últimos 5 anos, reforçando seu papel como ativo resiliente da economia brasileira.",
+      "• Liquidez imediata: tokens podem ser fracionados e negociados em mercado secundário, reduzindo barreiras de entrada.",
+      "• Segurança e transparência: prova on-chain de titularidade e redução de fricções operacionais.",
+      "• Exposição à economia real: acesso direto a uma commodity estratégica, com demanda global crescente.",
+      "• Diversificação inteligente: combinação de impacto social com retorno financeiro, unindo sustentabilidade e rentabilidade.",
+      "Significado Estratégico",
+      "Este modelo conecta agricultura, finanças e tecnologia, criando:",
+      "• Um mercado mais justo para produtores.",
+      "• Um ativo digital sólido para investidores.",
+      "• Uma ponte entre inovação financeira e commodities tradicionais.",
+      "Em resumo: o investidor não apenas apoia a cadeia produtiva do café com transparência e impacto social, mas também se posiciona em um ativo que vem se valorizando de forma consistente, com liquidez e segurança digital.",
+      ""
+    ],
+    "projectDescription_en": [
+      "Arabica Coffee Tokenization: Social Impact and Investment Opportunity",
+      "Arabica coffee lots are linked to digital tokens with metadata on origin, quality, and logistics. Tokenization allows for fractionation, transfer, and liquidity in the secondary market, as well as on-chain auditing of the asset's flow.",
+      "The model focuses on social impact and transparency for the producer, ensuring better pricing, access to working capital, and visibility of all digital CPRs registered with B3.",
+      "The Asset: BC Natural Arabica Coffee",
+      "• Each token represents a 60 kg bag.",
+      "• Indexed to CEPEA/ESALQ Arabica Coffee, with a specific premium for quality.",
+      "• Registration and tokenization on a permissioned blockchain integrated with B3.",
+      "• Complete traceability: origin, quality, and logistics auditable on-chain.",
+      "The Opportunity for the Investor",
+      "• Historical appreciation: Arabica coffee has shown a consistent increase in value over the last 5 years, reinforcing its role as a resilient asset in the Brazilian economy. ",
+      "• Immediate liquidity: tokens can be fractioned and traded on the secondary market, reducing barriers to entry.",
+      "• Security and transparency: on-chain proof of ownership and reduced operational friction.",
+      "• Exposure to the real economy: direct access to a strategic commodity with growing global demand.",
+      "• Smart diversification: combining social impact with financial return, uniting sustainability and profitability.",
+      "Strategic Significance",
+      "This model connects agriculture, finance, and technology, creating:",
+      "• A fairer market for producers.",
+      "• A solid digital asset for investors.",
+      "• A bridge between financial innovation and traditional commodities.",
+      "In short: the investor not only supports the coffee production chain with transparency and social impact, but also positions themselves in an asset that has been consistently appreciating, with liquidity and digital security.",
+      "",
+      "The model is focused on social impact and transparency for the producer, with better pricing, access to working capital, and visibility of all digital CPRs registered on the B3.",
+      "This digital CPR (Certificate of Agricultural Receivables) for Good Cup 14/16 Arabica coffee is registered and tokenized on a permissioned blockchain integrated with B3 (Brazilian Stock Exchange). Each token represents a 60 kg bag, indexed to CEPEA/ESALQ Arabica Coffee and with a specific quality premium.",
+      "Investors can buy, hold, and trade these tokens with on-chain proof of ownership, reduced operational friction, and access to a real asset of the Brazilian economy.",
+      ""
+    ],
+    "purchaseTitle": "",
+    "projectShortTitle": "Token de Café BC Natural",
+    "euroPrice": 0,
+    "tokenParagraph": [
+      "1 token corresponde a uma saca (60 kg) de café arábica, tipo 6, padrão BC Natural (Bica Corrida), vinculada a uma CPR digital registrada na B3."
+    ],
+    "tokenParagraph_en": [
+      "1 token corresponds to one 60 kg bag of Arabica coffee, type 6, BC Natural (Bica Corrida) standard, linked to a digital CPR registered at B3."
+    ],
+    "series": [
+      {
+        "name": "Token de Café — BC Natural",
+        "quantity": 20000,
+        "pricePer": "saca (60 kg)",
+        "pricePer_en": "bag (60 kg)",
+        "isAmount": "true",
+        "price": 3086.57,
+        "buyInstructions": {
+          "buyDescription": "Compra de Token de Café — BC Natural",
+          "baseBuyAmount": 1,
+          "id": "3",
+          "contractId": "30d6e19d-02bb-c5d2-9814-dcb52ab06071@legal.innova.tagroot.io",
+          "parameters": {
+            "Product_Id": "3",
+            "FriendlyName": "Token de Café BC Natural",
+            "Project_Id": "FCB-COFFEE-BCNAT-2025",
+            "Project_Label": "FCB Arabica Coffee CPR – BC Natural – 20,000 bags – 2025/26",
+            "Coffee_CPR_Number": "25L00008323",
+            "Coffee_ProductDescription": "Café Arábica, Tipo 6, Bica Corrida",
+            "Coffee_Sieve": "-",
+            "Coffee_QualityStandard": "Bica Corrida",
+            "Asset_CollateralReference": "CPR Digital – BC Natural – registrar entry TBD"
+          }
+        },
+        "description": "Token de café arábica BC Natural (Bica Corrida), tipo 6. Cada token representa uma saca de 60 kg, safra 2025/2026.",
+        "tokenContent": {
+          "Project_Id": "FCB-COFFEE-BCNAT-2025",
+          "Project_Label": "FCB Arabica Coffee CPR – BC Natural – 20,000 bags – 2025/26",
+          "Coffee_ProducerName": "FCB Import & Export Ltda",
+          "Coffee_ProducerId": "32.287.975/0001-39",
+          "Coffee_CPR_Number": "25L00008323",
+          "Coffee_ProductDescription": "Café Arábica, Tipo 6, Bica Corrida",
+          "Coffee_Sieve": "-",
+          "Coffee_QualityStandard": "Bica Corrida",
+          "Coffee_HarvestSeason": "2025/2026",
+          "Coffee_TotalBagsInCPR": 20000,
+          "Coffee_IndexName": "CEPEA/ESALQ – Café Arábica",
+          "Coffee_BasePricePerBag": 2323.66,
+          "Coffee_PremiumPerBag": 762.91,
+          "Coffee_InitialCPRValue": 61731464.57,
+          "Coffee_CurrencyCode": "BRL",
+          "Coffee_MaturityDate": "2026-12-02T00:00:00",
+          "Coffee_HasAgriculturalInsurance": "SANT",
+          "Coffee_HasPersonalEndorsement": "SANT",
+          "Coffee_Notes": "CPR digital registrada na B3; seguro agrícola; endosso pessoal; assinatura digital via ICP-Brasil.",
+          "Asset_HasCollateral": "SANT",
+          "Asset_CollateralReference": "CPR Digital – BC Natural – registrar entry TBD"
+        }
+      }
+    ],
+    "organizationName": "FCB",
+    "logoPath": "FCB.jpeg",
+    "imagePath": "FCB-Foto4.webp",
+    "images": [
+      "FCB-Foto4.webp",
+      "FCB-Foto1.webp",
+      "FCB-Foto2.webp",
+      "FCB-Foto3.webp",
+      "FCB-Bica-Corrida.png"
+    ],
+    "organizationDescription": [
+      "A Família Basso é formada por três gerações de homens que carregam a letra “A” no sangue e no nome, de aventureiros. Alfonso deixa a Itália, levando consigo esposa, filhos e as marcas da agricultura. Chega à Fazenda Santa Rita, no interior do estado de São Paulo, seguem adquirindo propriedades no oeste do estado da Bahia, onde fundam o Grupo Basso. Eles conseguem definir um blend perfeito de café Arábica e criam a marca Penhasco Café. Eles expandem seus recursos para criação e abate de animais e lançam uma nova marca, Basso Carnes Nobres. Para gerenciar e administrar esses e outros negócios familiares, é criada a empresa Oeste Agro. Logo após a família se consolidar no setor agropecuário e devido à qualidade de tudo o que produziam em suas fazendas, a Família Basso teve a oportunidade de exportar. No entanto, como a família possui um espírito empreendedor dinâmico, eles criaram sua própria empresa de trading, a FCB Trading Global, que hoje possui filiais no Brasil, Reino Unido, China, Emirados Árabes Unidos, Estados Unidos e Ilhas Cayman. A FCB Trading Global exporta sua produção e a de parceiros selecionados, respeitando as práticas socioambientais da agricultura e a segurança do consumidor internacional."
+    ],
+    "organizationDescription_en": [
+      "The Basso family is made up of three generations of men who carry the letter \"A\" in their blood and in their name, representing adventurers. Alfonso left Italy, taking his wife, children, and the marks of agriculture with him. He arrived at Fazenda Santa Rita, in the interior of the state of São Paulo, and they continued acquiring properties in the west of the state of Bahia, where they founded the Basso Group. They managed to define a perfect blend of Arabica coffee and created the Penhasco Café brand. They expanded their resources to include animal breeding and slaughter and launched a new brand, Basso Carnes Nobres. To manage and administer these and other family businesses, the company Oeste Agro was created. Soon after the family consolidated itself in the agricultural sector and due to the quality of everything they produced on their farms, the Basso family had the opportunity to export. However, as the family possesses a dynamic entrepreneurial spirit, they created their own trading company, FCB Trading Global, which today has branches in Brazil, the United Kingdom, China, the United Arab Emirates, the United States, and the Cayman Islands. FCB Trading Global exports its own production and that of selected partners, respecting the socio-environmental practices of agriculture and the safety of the international consumer."
+    ],
+    "websiteLink": "",
+    "categories": ["Agriculture", "ESG"],
+    "tags": ["Café", "Tokenização", "Rastreabilidade", "Impacto"],
+    "tags_en": ["Coffee", "Tokenization", "Traceability", "Impact"],
+    "location": "Igarapava SP, Pedreggulho SP, Brutizal SP, Franca SP",
+    "resources": [
+      {
+        "id": "p2-whitepaper-en",
+        "kind": "file",
+        "title": "Whitepaper (EN-US)",
+        "label": "Whitepaper-Card1(EN-US).pdf",
+        "url": "/resources/fcb/Whitepaper-Card1(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-whitepaper-pt",
+        "kind": "file",
+        "title": "Whitepaper (PT-BR)",
+        "label": "Whitepaper-Card1(PT-BR).pdf",
+        "url": "/resources/fcb/Whitepaper-Card1(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-onepage-en",
+        "kind": "file",
+        "title": "One-Pager (EN-US)",
+        "label": "OnePage-Card1(EN-US).pdf",
+        "url": "/resources/fcb/OnePage-Card1(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-onepage-pt",
+        "kind": "file",
+        "title": "One-Pager (PT-BR)",
+        "label": "OnePage-Card1(PT-BR).pdf",
+        "url": "/resources/fcb/OnePage-Card1(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p2-token-coffee-en",
+        "kind": "file",
+        "title": "FCB Token Coffee (EN-US)",
+        "label": "FCBTokenCoffee(EN-US).pdf",
+        "url": "/resources/fcb/FCBTokenCoffee(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p3-bc-natural-sharepoint",
+        "kind": "file",
+        "title": "CPR",
+        "label": "CPR-FCB-Cafe-Arabica-Bica-Corrida-25L03758430.pdf",
+        "url": "/resources/fcb/CPR-FCB-Cafe-Arabica-Bica-Corrida-25L03758430.pdf",
+        "download": true
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "cornerColor": "#2b3a67",
+    "projectTitle": "FACES • CET — Christian Education Token",
+    "introTitle": "Programa de financiamento tokenizado para educação cristã",
+    "introText": [
+      "Programa de financiamento tokenizado para apoiar infraestrutura educacional, plataformas digitais de aprendizagem, criação de conteúdo cristão e crescimento operacional do Colégio Faces. Cada token equivale a 1 cota de R$ 500,00."
+    ],
+    "projectDescriptionTitle": "Crescimento & digitalização com propósito",
+    "projectDescription": [
+      "Propósito e Compromisso",
+      "Nossa instituição de ensino tem como missão ampliar o acesso à educação de qualidade, promovendo inclusão social, inovação acadêmica e desenvolvimento sustentável. Acreditamos que a educação é capaz de transformar vidas e comunidades, formando cidadãos críticos e preparados para os desafios do futuro.",
+      "",
+      "Parcerias Estratégicas",
+      "Buscamos estabelecer relações sólidas com financiadores, empresas e organizações que compartilhem dessa visão. Cada investimento realizado será direcionado para iniciativas com impacto positivo, transparente e mensurável, fortalecendo o compromisso com a formação integral de nossos estudantes.",
+      "",
+      "Oportunidade de Investimento",
+      "O investimento terá papel fundamental em:",
+      "•\tCriação de novas turmas com foco na pauta cristã, ampliando a diversidade acadêmica e cultural.",
+      "•\tMelhoria das dependências físicas, garantindo ambientes mais modernos e acolhedores.",
+      "•\tExpansão das turmas existentes, aumentando o alcance e a inclusão de novos alunos.",
+      "",
+      "Impacto para o Investidor",
+      "Ao apoiar nossa instituição, o parceiro investidor:",
+      "•\tContribui para um projeto educacional com propósito social e espiritual.",
+      "•\tGera impacto direto e mensurável na vida de centenas de estudantes.",
+      "•\tParticipa de uma iniciativa que une valores, inovação e sustentabilidade.",
+      "•\tFortalece sua imagem institucional ao se associar a uma causa de transformação social e educacional.",
+      "",
+      "Cada aporte realizado é mais do que um investimento financeiro — é um investimento em pessoas, valores e futuro. Nossa proposta oferece aos parceiros a oportunidade de unir propósito e resultado, ampliando o impacto social por meio da educação.",
+      "",
+      ""
+    ],
+    "projectDescription_en": [
+      "Purpose and Commitment",
+      "Our educational institution's mission is to broaden access to quality education, promoting social inclusion, academic innovation, and sustainable development. We believe that education can transform lives and communities, forming critical citizens prepared for the challenges of the future.",
+      "",
+      "Strategic Partnerships",
+      "We seek to establish solid relationships with funders, companies, and organizations that share this vision. Each investment made will be directed towards initiatives with a positive, transparent, and measurable impact, strengthening our commitment to the holistic education of our students.",
+      "",
+      "Investment Opportunity",
+      "The investment will play a fundamental role in:",
+      "•\tCreating new classes focused on Christian themes, expanding academic and cultural diversity.",
+      "•\tImproving physical facilities, ensuring more modern and welcoming environments.",
+      "•\tExpanding existing classes, increasing reach and inclusion of new students.",
+      "",
+      "Impact for the Investor",
+      "By supporting our institution, the investing partner:",
+      "•\tContributes to an educational project with a social and spiritual purpose.",
+      "•\tGenerates a direct and measurable impact on the lives of hundreds of students.",
+      "•\tParticipates in an initiative that unites values, innovation, and sustainability.",
+      "•\tStrengthens its institutional image by associating itself with a cause of social and educational transformation.",
+      "",
+      "Each contribution made is more than a financial investment—it's an investment in people, values, and the future. Our proposal offers partners the opportunity to unite purpose and results, expanding social impact through education.",
+      ""
+    ],
+    "purchaseTitle": "",
+    "projectShortTitle": "CET — Education Token",
+    "euroPrice": 0,
+    "tokenParagraph": [
+      "Programa de financiamento tokenizado para apoiar a infraestrutura educacional, plataformas de aprendizagem digital, criação de conteúdo cristão e crescimento operacional do Colégio Faces. Cada token é igual a 1 cota de R$ 500,00. ",
+      "Retorno Previsto: 135% do CDI"
+    ],
+    "tokenParagraph_en": [
+      "Tokenized funding program to support the educational infrastructure, digital learning platforms, creation of Christian content, and operational growth of Colégio Faces. Each token is equal to 1 share of R$ 500.00.",
+      "Projected Return: 135% of CDI"
+    ],
+    "series": [
+      {
+        "name": "CET — Christian Education Token",
+        "quantity": 1000,
+        "pricePer": "cota (R$ 500)",
+        "pricePer_en": "quota (R$ 500)",
+        "isAmount": "true",
+        "price": 500,
+        "buyInstructions": {
+          "buyDescription": "Compra de CET — Christian Education Token",
+          "baseBuyAmount": 1,
+          "id": "4",
+          "contractId": "30fa26d1-f8e7-c6bc-d40c-b50c30fd7e15@legal.innova.tagroot.io",
+          "parameters": {
+            "Product_Id": "4",
+            "FriendlyName": "CET-CHRISTIAN-EDUCATION-TOKEN",
+            "Project_Id": "FACES-EDU-2026-001",
+            "Project_Label": "Colégio Faces – Education Growth & Digitalization Program",
+            "Project_Description": "Programa de financiamento tokenizado para apoiar infraestrutura educacional, plataformas digitais de aprendizagem, criação de conteúdo cristão e crescimento operacional do Colégio Faces.",
+            "Project_Category": "Education",
+            "Project_Sector": "Private Education",
+            "Project_Country": "Brazil",
+            "Project_City": "São Gonçalo / Rio de Janeiro",
+            "Issuer_Name": "Instituto Novo de Educação Cristã",
+            "Issuer_CNPJ": "63.627.587/0001-83",
+            "Operator_Name": "Colégio Faces",
+            "Operator_Type": "Educational Institution",
+            "Revenue_Source": "Tuition fees, educational services, and institutional programs",
+            "Revenue_Distribution_Model": "Off-chain profit participation, subject to project performance",
+            "Reporting_Frequency": "Quarterly (manual / off-chain)",
+            "Expected_Project_Duration": "Long-term",
+            "Currency": "BRL",
+            "Value": 500,
+            "Expires": "2027-01-15",
+            "Project_Notes": "This token does not represent equity, ownership, or voting rights in the educational institution. Economic participation is governed by contractual agreements and off-chain reporting.",
+            "Asset_HasCollateral": "SANT",
+            "Asset_CollateralType": "Contractual / Institutional",
+            "Asset_CollateralReference": "Service Agreement dated Dec 22, 2025 between INNOVA Investments and Instituto Novo de Educação Cristã, including Token Agreement and Exhibit A.",
+            "Asset_CollateralDocuments": "[\"Token-Contrato-v1\",\"Token-Contrato-Anexo-A\",\"Colégio Faces Project Presentation\"]"
+          }
+        },
+        "description": "Token de financiamento para infraestrutura, plataformas digitais e expansão do Colégio Faces. Cada token equivale a 1 cota de R$ 500,00.",
+        "tokenContent": {
+          "Project_Id": "FACES-EDU-2026-001",
+          "Project_Label": "Colégio Faces – Education Growth & Digitalization Program",
+          "FriendlyName": "CET-CHRISTIAN-EDUCATION-TOKEN",
+          "Issuer_Name": "Instituto Novo de Educação Cristã",
+          "Issuer_CNPJ": "63.627.587/0001-83",
+          "Operator_Name": "Colégio Faces",
+          "Project_Category": "Education",
+          "Project_Sector": "Private Education",
+          "Project_Country": "Brazil",
+          "Project_City": "São Gonçalo / Rio de Janeiro",
+          "Value": 500,
+          "Currency": "BRL",
+          "Expires": "2027-01-15",
+          "Revenue_Source": "Tuition fees, educational services, and institutional programs",
+          "Revenue_Distribution_Model": "Off-chain profit participation, subject to project performance",
+          "Reporting_Frequency": "Quarterly (manual / off-chain)",
+          "Asset_HasCollateral": "SANT",
+          "Asset_CollateralType": "Contractual / Institutional",
+          "Asset_CollateralReference": "Service Agreement dated Dec 22, 2025 between INNOVA Investments and Instituto Novo de Educação Cristã, including Token Agreement and Exhibit A.",
+          "Asset_CollateralDocuments": [
+            "Token-Contrato-v1",
+            "Token-Contrato-Anexo-A",
+            "Colégio Faces Project Presentation"
+          ],
+          "Notes": "No equity/ownership/voting rights. Economic participation is contractual and off-chain."
+        }
+      }
+    ],
+    "organizationName": "FACES",
+    "logoPath": "LogoFaces.png",
+    "imagePath": "imgbannercard.png",
+    "images": [
+      "Faces-Kids.png",
+      "Faces-Tecnica.png",
+      "Faces-TeologiaTeen.png",
+      "Faces-Colegio.png",
+      "LogoFaces.png"
+    ],
+    "organizationDescription": [
+      "Colégio FACES é uma escola cristã fundada em 2021, focada em discipular a próxima geração por meio da educação cristã, unindo inclusão social, formação acadêmica e propósito."
+    ],
+    "organizationDescription_en": [
+      "FACES College is a Christian school founded in 2021, focused on discipling the next generation through Christian education, combining social inclusion, academic formation, and purpose."
+    ],
+    "websiteLink": "",
+    "categories": ["Education", "ESG"],
+    "tags": [
+      "Educação",
+      "Tokenização",
+      "Rastreabilidade",
+      "Impacto",
+      "Teologia"
+    ],
+    "tags_en": [
+      "Education",
+      "Tokenization",
+      "Traceability",
+      "Impact",
+      "Theology"
+    ],
+    "location": "São Gonçalo - RJ, Brazil",
+    "resources": [
+      {
+        "id": "p4-whitepaper-en",
+        "kind": "file",
+        "title": "Whitepaper (EN-US)",
+        "label": "Whitepaper-Faces(EN-US).pdf",
+        "url": "/resources/faces/Whitepaper-Faces(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p4-whitepaper-pt",
+        "kind": "file",
+        "title": "Whitepaper (PT-BR)",
+        "label": "Whitepaper-Faces(PT-BR).pdf",
+        "url": "/resources/faces/Whitepaper-Faces(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p4-onepage-en",
+        "kind": "file",
+        "title": "One-Pager (EN-US)",
+        "label": "OnePage-Faces(EN-US).pdf",
+        "url": "/resources/faces/OnePage-Faces(EN-US).pdf",
+        "download": true
+      },
+      {
+        "id": "p4-onepage-pt",
+        "kind": "file",
+        "title": "One-Pager (PT-BR)",
+        "label": "OnePage-Faces(PT-BR).pdf",
+        "url": "/resources/faces/OnePage-Faces(PT-BR).pdf",
+        "download": true
+      },
+      {
+        "id": "p4-bachelor-theology",
+        "kind": "file",
+        "title": "Christian Education - Bachelor of Theology",
+        "label": "Educação Cristã - Bacharel em Teologia.pdf",
+        "url": "/resources/faces/Educação Cristã - Bacharel em Teologia.pdf",
+        "download": true
+      },
+      {
+        "id": "p4-ministerial-training",
+        "kind": "file",
+        "title": "Christian Education - Ministerial Training",
+        "label": "Educação Cristã - Capacitação Ministerial.pdf",
+        "url": "/resources/faces/Educação Cristã - Capacitação Ministerial.pdf",
+        "download": true
+      },
+      {
+        "id": "p4-post-theology",
+        "kind": "file",
+        "title": "Christian Education - Post-Theology",
+        "label": "Educação Cristã - Pós Teologia.pdf",
+        "url": "/resources/faces/Educação Cristã - Pós Teologia.pdf",
+        "download": true
+      },
+      {
+        "id": "p4-institutional",
+        "kind": "file",
+        "title": "Institutional Presentation of FACES",
+        "label": "Institucional-Instituto-Grupo-Faces.pdf",
+        "url": "/resources/faces/Institucional-Instituto-Grupo-Faces.pdf",
+        "download": true
+      }
+    ]
+  }
+]
