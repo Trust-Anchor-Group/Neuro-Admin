@@ -1,6 +1,6 @@
 "use client";
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { fetchOrders } from "@/lib/fetchOrders"; 
+import { fetchOrders } from "@/lib/fetchOrders";
 import { Award, Activity, Timer } from "lucide-react";
 import { useLanguage, content as i18nContent } from '../../../../../context/LanguageContext';
 import SalesTokensTable from "@/components/assets/Tokens/SalesTokensTable";
@@ -24,7 +24,7 @@ export default function SalesPage() {
     return () => { mounted = false; };
   }, []);
 
-  
+
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState("");
   const buyerDisplay = useMemo(() => {
@@ -54,7 +54,7 @@ export default function SalesPage() {
     if (selectedToken?.amount && cur) return `${selectedToken.amount} ${cur}`;
     return '';
   }, [selectedToken, currencyDisplay]);
- 
+
   const handleTokenClick = async (token) => {
     setSelectedToken(token);
     setDetailError("");
@@ -83,10 +83,10 @@ export default function SalesPage() {
     <div className="p-6 min-h-screen bg-[var(--brand-background)]">
       <div className="grid grid-cols-2 gap-6">
         <div className="col-span-3 bg-[var(--brand-navbar)] shadow-md rounded-2xl p-5">
-            <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">{t.headin || 'Sales'}</h1>
-            <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading || 'Loading orders...'}</p>}>
-                <SalesTokensTable orders={ordersData.orders} isLoading={ordersData.loading} onRowClick={handleTokenClick} />
-            </Suspense>
+          <h1 className="p-3 text-3xl font-bold text-[var(--brand-text)]">{t.headin || 'Sales'}</h1>
+          <Suspense fallback={<p className="text-[var(--brand-text-secondary)]">{t.loading || 'Loading orders...'}</p>}>
+            <SalesTokensTable orders={ordersData.orders} isLoading={ordersData.loading} onRowClick={handleTokenClick} />
+          </Suspense>
         </div>
       </div>
       {selectedToken && (
@@ -126,40 +126,40 @@ export default function SalesPage() {
               ) : detailError ? (
                 <div className="py-6 text-sm text-red-500">{detailError}</div>
               ) : (
-              <dl className="mt-3 space-y-2 text-sm">
-                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="text-[var(--brand-text-secondary)]">Token name:</dt>
-                  <dd className="font-medium">{selectedToken.assetName || selectedToken.friendlyName || 'Token batch'}</dd>
-                </div>
-                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="text-[var(--brand-text-secondary)]">Token type:</dt>
-                  <dd className="font-medium">{selectedToken.category || 'Commodity'}</dd>
-                </div>
-                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="text-[var(--brand-text-secondary)]">Issuer:</dt>
-                  <dd className="font-medium">{ 'FCB Import & Export'}</dd>
-                </div>
-                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="text-[var(--brand-text-secondary)]">Time of sale:</dt>
-                  <dd className="font-medium">{selectedToken.createdDate || selectedToken.orderDate || '—'}</dd>
-                </div>
-                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="text-[var(--brand-text-secondary)]">Purchased by:</dt>
-                  <dd className="font-medium">{buyerDisplay || '—'}</dd>
-                </div>
-                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="text-[var(--brand-text-secondary)]">Amount:</dt>
-                  <dd className="font-medium">{amountDisplay || '—'}</dd>
-                </div>
-                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="text-[var(--brand-text-secondary)]">Currency:</dt>
-                  <dd className="font-medium">{currencyDisplay || '—'}</dd>
-                </div>
-                <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
-                  <dt className="text-[var(--brand-text-secondary)]">Payment status:</dt>
-                        <dd className="font-medium">{'Paid'}</dd>
-                </div>
-              </dl>
+                <dl className="mt-3 space-y-2 text-sm">
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+                    <dt className="text-[var(--brand-text-secondary)]">Token name:</dt>
+                    <dd className="font-medium">{selectedToken.assetName || selectedToken.friendlyName || 'Token batch'}</dd>
+                  </div>
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+                    <dt className="text-[var(--brand-text-secondary)]">Token type:</dt>
+                    <dd className="font-medium">{selectedToken.category || 'Commodity'}</dd>
+                  </div>
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+                    <dt className="text-[var(--brand-text-secondary)]">Issuer:</dt>
+                    <dd className="font-medium">{'FCB Import & Export'}</dd>
+                  </div>
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+                    <dt className="text-[var(--brand-text-secondary)]">Time of sale:</dt>
+                    <dd className="font-medium">{selectedToken.createdDate || selectedToken.orderDate || '—'}</dd>
+                  </div>
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+                    <dt className="text-[var(--brand-text-secondary)]">Purchased by:</dt>
+                    <dd className="font-medium">{buyerDisplay || '—'}</dd>
+                  </div>
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+                    <dt className="text-[var(--brand-text-secondary)]">Amount:</dt>
+                    <dd className="font-medium">{amountDisplay || '—'}</dd>
+                  </div>
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+                    <dt className="text-[var(--brand-text-secondary)]">Currency:</dt>
+                    <dd className="font-medium">{currencyDisplay || '—'}</dd>
+                  </div>
+                  <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+                    <dt className="text-[var(--brand-text-secondary)]">Payment status:</dt>
+                    <dd className="font-medium">{'Paid'}</dd>
+                  </div>
+                </dl>
               )}
             </section>
 
@@ -168,14 +168,14 @@ export default function SalesPage() {
               {tags.length === 0 ? (
                 <div className="py-3 text-sm text-[var(--brand-text-secondary)]">No company tags available.</div>
               ) : (
-              <dl className="mt-3 space-y-2 text-sm">
-                {tags.map((tag, idx) => (
-                  <div key={idx} className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
-                    <dt className="text-[var(--brand-text-secondary)]">{tag?.Name || 'Tag'}</dt>
-                    <dd className="font-medium">{String(tag?.Value)}</dd>
-                  </div>
-                ))}
-              </dl>
+                <dl className="mt-3 space-y-2 text-sm">
+                  {tags.map((tag, idx) => (
+                    <div key={idx} className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+                      <dt className="text-[var(--brand-text-secondary)]">{tag?.Name || 'Tag'}</dt>
+                      <dd className="font-medium">{String(tag?.Value)}</dd>
+                    </div>
+                  ))}
+                </dl>
               )}
             </section>
 
