@@ -39,7 +39,9 @@ export const DisplayDetailsAsset = ({
     process.env.NEXT_PUBLIC_AGENT_HOST ||
     process.env.AGENT_HOST ||
     'mateo.lab.tagroot.io';
-
+  console.log("NEXT_PUBLIC_AGENT_HOST:", process.env.NEXT_PUBLIC_AGENT_HOST);
+  console.log("AGENT_HOST:", process.env.AGENT_HOST);
+  console.log("backendHost:", backendHost);
   // Helper to resolve image paths (assuming images are in public root or a specific folder)
   // If your images are in public/images/, change the return to `/images/${src}`
   const getImagePath = (src) => {
