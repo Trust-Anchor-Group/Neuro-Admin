@@ -107,7 +107,7 @@ export default function AssetTokensTable({ orders = [], isLoading = false, onRow
       },
       {
         id: "country",
-        accessorFn: (row) => row?.token?.project_country || "-",
+        accessorFn: (row) => row?.token?.project_country_code || row?.token?.project_country || "-",
         header: "Country",
         size: 150,
         Cell: ({ cell }) => (
