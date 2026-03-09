@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { MapOutInput } from '../shared/MapOutInput';
 import { useLanguage, content } from '../../../context/LanguageContext'; 
@@ -35,13 +35,20 @@ export const DisplayDetailsAsset = ({
   const openPreview = (image) => setSelectedImage(image);
   const closePreview = () => setSelectedImage(null);
 
-  const backendHost =
-    process.env.NEXT_PUBLIC_AGENT_HOST ||
-    process.env.AGENT_HOST ||
-    'mateo.lab.tagroot.io';
-  console.log("NEXT_PUBLIC_AGENT_HOST:", process.env.NEXT_PUBLIC_AGENT_HOST);
-  console.log("AGENT_HOST:", process.env.AGENT_HOST);
-  console.log("backendHost:", backendHost);
+  const backendHost = useMemo(() => {
+    const storedHost = typeof window !== 'undefined'
+      ? String(sessionStorage.getItem('AgentAPI.Host') || '').trim()
+      : '';
+
+    const sanitizedStoredHost = storedHost.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+    if (sanitizedStoredHost) return sanitizedStoredHost;
+
+    return (
+      process.env.NEXT_PUBLIC_AGENT_HOST ||
+      process.env.AGENT_HOST ||
+      'mateo.lab.tagroot.io'
+    );
+  }, []);
   // Helper to resolve image paths (assuming images are in public root or a specific folder)
   // If your images are in public/images/, change the return to `/images/${src}`
   const getImagePath = (src) => {
