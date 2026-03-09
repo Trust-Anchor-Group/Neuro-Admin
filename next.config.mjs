@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const backendHost = process.env.NEXT_PUBLIC_AGENT_HOST || process.env.AGENT_HOST || 'mateo.lab.tagroot.io';
+
 const nextConfig = {
 
   async redirects() {
@@ -36,6 +38,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'api.dicebear.com',
+      },
+      {
+        protocol: 'https',
+        hostname: backendHost,
       },
     ],
   },

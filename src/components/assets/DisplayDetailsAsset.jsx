@@ -22,7 +22,9 @@ export const DisplayDetailsAsset = ({
   // New props for dynamic content
   descriptionTitle,
   descriptionText,
-  images = [] // Array of image strings from JSON
+  images = [],
+  resources = [],
+  resourcesTitle,
 }) => {
   const { language } = useLanguage();
   const t = content[language];
@@ -33,9 +35,27 @@ export const DisplayDetailsAsset = ({
   const openPreview = (image) => setSelectedImage(image);
   const closePreview = () => setSelectedImage(null);
 
+  const backendHost =
+    process.env.NEXT_PUBLIC_AGENT_HOST ||
+    process.env.AGENT_HOST ||
+    'mateo.lab.tagroot.io';
+
   // Helper to resolve image paths (assuming images are in public root or a specific folder)
   // If your images are in public/images/, change the return to `/images/${src}`
-  const getImagePath = (src) => src.startsWith('/') ? src : `/${src}`;
+  const getImagePath = (src) => {
+    const value = String(src || '').trim();
+    if (!value) return '/';
+
+    if (/^https?:\/\//i.test(value)) {
+      return value;
+    }
+
+    if (value.startsWith('/nex-resources/')) {
+      return `https://${backendHost}${value}`;
+    }
+
+    return value.startsWith('/') ? value : `/${value}`;
+  };
 
   return (
     <div className="flex flex-col h-full max-md:grid-cols-1">
@@ -131,6 +151,29 @@ export const DisplayDetailsAsset = ({
                 <p className="text-sm text-[var(--brand-text-secondary)] whitespace-pre-line">
                   {descriptionText || t?.displayDetails?.certificateDescription || 'No description available.'}
                 </p>
+              </div>
+
+              <div className='bg-[var(--brand-background)] rounded-xl p-5 overflow-auto mt-2'>
+                <h1 className="text-lg font-semibold text-[var(--brand-text)] border-b border-[var(--brand-border)] pb-2 mb-3">
+                  {resourcesTitle || 'Project Resources'}
+                </h1>
+                {Array.isArray(resources) && resources.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    {resources.map((resource, index) => (
+                      <a
+                        key={resource?.id || `resource-${index}`}
+                        href={getImagePath(resource?.url || '')}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-[var(--brand-text)] underline"
+                      >
+                        {resource?.title || resource?.name || resource?.id || `Resource ${index + 1}`}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-[var(--brand-text-secondary)]">No resources available</p>
+                )}
               </div>
             </div>
           )}
