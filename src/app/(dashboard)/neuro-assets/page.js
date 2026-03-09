@@ -1,9 +1,8 @@
 "use client";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { FiTrendingUp, FiArrowUpRight, FiCheckCircle, FiActivity, FiLoader } from "react-icons/fi";
 import UserCard from "@/components/ui/UserCard";
 import { useLanguage, content as i18nContent } from "../../../../context/LanguageContext";
-import projectsData from "@/data/projects.json";
 
 // --- Helpers for Date Processing ---
 const parseDate = (dateStr, timeStr) => {
@@ -39,9 +38,10 @@ const getLast3Months = (locale) => {
 
 // --- Components ---
 const statusClasses = {
-  active: "bg-neuroGreen/20 text-neuroGreen",
-  Pending: "bg-neuroOrange/20 text-neuroDarkOrange",
-  Live: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20",
+  live: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20",
+  soldOut: "bg-rose-500/10 text-rose-500 border border-rose-500/20",
+  upcoming: "bg-amber-500/10 text-amber-600 border border-amber-500/20",
+  closed: "bg-slate-500/10 text-slate-500 border border-slate-500/20",
 };
 
 const transactionStatusClasses = {
@@ -93,29 +93,99 @@ const CertificateStat = ({ value, label, icon }) => (
 
 const AdminPage = () => {
   const { language } = useLanguage();
-  const tDash = i18nContent[language]?.assetDashboard || {};
+  const tDash = useMemo(() => i18nContent[language]?.assetDashboard || {}, [language]);
   const locale = language === 'pt' ? 'pt-PT' : 'en-US';
+  const isPt = language === 'pt';
+  const isFr = language === 'fr';
 
   const [realData, setRealData] = useState([]);
+  const [projectsData, setProjectsData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const formatNumber = (value) => new Intl.NumberFormat(locale).format(value);
-  const formatCurrency = (value) => new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value);
+  const formatNumber = useCallback((value) => new Intl.NumberFormat(locale).format(value), [locale]);
+  const formatCurrency = useCallback((value) => new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value), [locale]);
+
+  const uiText = useMemo(() => ({
+    projectTableTitle: tDash.projects?.title || (isPt ? 'Portfólio de Projetos' : isFr ? 'Portefeuille de projets' : 'Project Portfolio'),
+    projectTableSubtitle: tDash.projects?.subtitle || (isPt ? 'Visão dos ativos tokenizados ativos' : isFr ? 'Vue des actifs tokenisés actifs' : 'Overview of active tokenized assets'),
+    columns: {
+      project: tDash.projects?.columns?.project || (isPt ? 'Projeto' : isFr ? 'Projet' : 'Project'),
+      issuer: tDash.projects?.columns?.issuer || (isPt ? 'Emissor' : isFr ? 'Émetteur' : 'Issuer'),
+      type: tDash.projects?.columns?.type || (isPt ? 'Tipo' : isFr ? 'Type' : 'Type'),
+      supply: tDash.projects?.columns?.supply || (isPt ? 'Oferta' : isFr ? 'Offre' : 'Supply'),
+      price: tDash.projects?.columns?.price || (isPt ? 'Preço do Token' : isFr ? 'Prix du token' : 'Token Price'),
+      media: tDash.projects?.columns?.media || (isPt ? 'Mídia' : isFr ? 'Médias' : 'Media'),
+      status: tDash.projects?.columns?.status || (isPt ? 'Status' : isFr ? 'Statut' : 'Status'),
+    },
+    labels: {
+      id: isPt ? 'ID' : isFr ? 'ID' : 'ID',
+      country: isPt ? 'País' : isFr ? 'Pays' : 'Country',
+      sold: isPt ? 'vendidos' : isFr ? 'vendus' : 'sold',
+      imgs: isPt ? 'imgs' : isFr ? 'imgs' : 'imgs',
+      resources: isPt ? 'docs' : isFr ? 'docs' : 'docs',
+      value: isPt ? 'Valor' : isFr ? 'Valeur' : 'Value',
+    },
+    status: {
+      live: isPt ? 'Ao vivo' : isFr ? 'Actif' : 'Live',
+      soldOut: isPt ? 'Esgotado' : isFr ? 'Épuisé' : 'Sold Out',
+      upcoming: isPt ? 'Em breve' : isFr ? 'À venir' : 'Upcoming',
+      closed: isPt ? 'Encerrado' : isFr ? 'Clôturé' : 'Closed',
+      paid: isPt ? 'Pago' : isFr ? 'Payé' : 'Paid',
+    },
+    monthlyValue: isPt ? 'Valor' : isFr ? 'Valeur' : 'Value',
+    noRecentTransactions: isPt ? 'Nenhuma transação recente.' : isFr ? 'Aucune transaction récente.' : 'No recent transactions.',
+    noProjects: isPt ? 'Nenhum projeto encontrado.' : isFr ? 'Aucun projet trouvé.' : 'No projects found.',
+    breakdownByCategory: tDash.certificates?.breakdownTitle || (isPt ? 'Distribuição por categoria' : isFr ? 'Répartition par catégorie' : 'Breakdown by Category'),
+    anonymous: isPt ? 'Anônimo' : isFr ? 'Anonyme' : 'Anonymous',
+    fallbackAsset: isPt ? 'Token de Ativo' : isFr ? 'Token d’actif' : 'Asset Token',
+    unclassified: isPt ? 'Sem categoria' : isFr ? 'Sans catégorie' : 'Unclassified',
+    notAvailable: isPt ? 'N/D' : isFr ? 'N/D' : 'N/A',
+  }), [tDash, isPt, isFr]);
+
+  const getProjectStatus = useCallback((project) => {
+    const now = new Date();
+    const token = project?.token || {};
+    const total = Number(token?.token_quantity || 0);
+    const left = Number(token?.tokens_left || 0);
+    const startDate = project?.start_date ? new Date(project.start_date) : null;
+    const endDate = project?.end_date ? new Date(project.end_date) : null;
+
+    if (total > 0 && left <= 0) return 'soldOut';
+    if (startDate && startDate > now) return 'upcoming';
+    if (endDate && endDate < now) return 'closed';
+    return 'live';
+  }, []);
 
   // -- 1. Fetch Real Data --
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('/api/tokens', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ maxCount: 100, offset: 0 })
-        });
+        const [tokensRes, projectsRes] = await Promise.all([
+          fetch('/api/tokens', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ maxCount: 100, offset: 0 })
+          }),
+          fetch('/api/projects?localization=en-US', {
+            method: 'GET',
+            headers: { Accept: 'application/json' },
+            credentials: 'include',
+            cache: 'no-store',
+          }),
+        ]);
 
-        const json = await res.json();
+        const [tokensJson, projectsJson] = await Promise.all([
+          tokensRes.json(),
+          projectsRes.json(),
+        ]);
 
-        if (json.success && Array.isArray(json.data)) {
-          setRealData(json.data);
+        if (tokensJson?.success && Array.isArray(tokensJson?.data)) {
+          setRealData(tokensJson.data);
+        }
+
+        const projectsList = projectsJson?.data?.data;
+        if (projectsJson?.success && Array.isArray(projectsList)) {
+          setProjectsData(projectsList);
         }
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
@@ -176,14 +246,14 @@ const AdminPage = () => {
     return sorted.slice(0, 5).map(item => ({
       id: item.tokenId,
       shortId: `TX-${item.tokenId.substring(0, 6)}...`,
-      client: "Anonymous",
-      asset: item.friendlyName || "Coffee Token",
-      category: item.category,
+      client: uiText.anonymous,
+      asset: item.friendlyName || uiText.fallbackAsset,
+      category: item.category || uiText.unclassified,
       tokens: item.value,
-      status: "Paid", // Forced status
+      status: uiText.status.paid,
       time: getRelativeTime(parseDate(item.createdDate, item.createdTime))
     }));
-  }, [realData]);
+  }, [realData, uiText]);
 
   // -- 4. Certificate Stats --
   const certStats = useMemo(() => {
@@ -232,8 +302,8 @@ const AdminPage = () => {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* SECTION 1: Projects Portfolio */}
         <SectionCard
-          title={tDash.projects?.title || "Project Portfolio"}
-          subtitle={tDash.projects?.subtitle || "Overview of active tokenized assets"}
+          title={uiText.projectTableTitle}
+          subtitle={uiText.projectTableSubtitle}
           // action={
           //   <button className="inline-flex items-center gap-2 rounded-full border border-[var(--brand-border)] px-4 py-2 text-sm font-semibold text-[var(--brand-text)] hover:bg-[var(--brand-hover)]">
           //     {tDash.projects?.cta || "Manage Projects"}
@@ -245,42 +315,69 @@ const AdminPage = () => {
             <table className="w-full text-left text-sm">
               <thead className="text-[var(--brand-text-secondary)] uppercase text-xs tracking-wide border-b border-[var(--brand-border)]">
                 <tr>
-                  <th className="py-3 pl-2">Project Name</th>
-                  <th className="py-3">Category</th>
-                  <th className="py-3">Volume (Bags)</th>
-                  <th className="py-3">Value (CPR)</th>
-                  <th className="py-3">Status</th>
+                  <th className="py-3 pl-2">{uiText.columns.project}</th>
+                  <th className="py-3">{uiText.columns.issuer}</th>
+                  <th className="py-3">{uiText.columns.type}</th>
+                  <th className="py-3">{uiText.columns.supply}</th>
+                  <th className="py-3">{uiText.columns.price}</th>
+                  <th className="py-3">{uiText.columns.media}</th>
+                  <th className="py-3">{uiText.columns.status}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--brand-border)]/60">
+                {projectsData.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="py-6 text-center text-sm text-[var(--brand-text-secondary)]">{uiText.noProjects}</td>
+                  </tr>
+                )}
                 {projectsData.map((project) => {
-                  const series = project.series?.[0] || {};
+                  const projectId = project?.project_id || "-";
+                  const token = project?.token || {};
+                  const localization = project?.localization || {};
+                  const title = localization?.title || token?.project_label || token?.friendly_name || "Untitled Project";
+                  const location = token?.project_country || uiText.notAvailable;
+                  const issuerName = token?.issuer_name || project?.issuer?.localization?.name || uiText.notAvailable;
+                  const category = localization?.asset_type || token?.project_type || "-";
+                  const totalQuantity = Number(token?.token_quantity || 0);
+                  const tokensLeft = Number(token?.tokens_left || 0);
+                  const soldQuantity = Math.max(0, totalQuantity - tokensLeft);
+                  const soldPercentage = totalQuantity > 0 ? Math.round((soldQuantity / totalQuantity) * 100) : 0;
+                  const value = Number(project?.token_price || 0);
+                  const imagesCount = Array.isArray(localization?.images) ? localization.images.length : 0;
+                  const resourcesCount = Array.isArray(localization?.resources) ? localization.resources.length : 0;
+                  const statusKey = getProjectStatus(project);
+
                   return (
-                    <tr key={project.id} className="hover:bg-[var(--brand-hover)]/60 transition-colors">
+                    <tr key={projectId} className="hover:bg-[var(--brand-hover)]/60 transition-colors">
                       <td className="py-4 pl-2">
-                        <p className="font-semibold text-[var(--brand-text)]">{project.projectShortTitle || project.projectTitle}</p>
+                        <p className="font-semibold text-[var(--brand-text)]">{title}</p>
                         <p className="text-xs text-[var(--brand-text-secondary)]">
-                          ID: {project.id} · {project.location?.split(',')[0]}
+                          {uiText.labels.id}: {projectId} · {uiText.labels.country}: {String(location).toUpperCase()}
                         </p>
                       </td>
+                      <td className="py-4 text-sm text-[var(--brand-text)]">{issuerName}</td>
                       <td className="py-4">
                         <span className="inline-flex items-center rounded-md bg-[var(--brand-background)] px-2 py-1 text-xs font-medium text-[var(--brand-text-secondary)] ring-1 ring-inset ring-[var(--brand-border)]">
-                          {project.categories?.[0]}
+                          {category}
                         </span>
                       </td>
                       <td className="py-4 font-semibold font-mono">
-                        {formatNumber(series.quantity || 0)}
+                        <p>{formatNumber(soldQuantity)} / {formatNumber(totalQuantity)}</p>
+                        <p className="text-[10px] text-[var(--brand-text-secondary)]">{soldPercentage}% {uiText.labels.sold}</p>
                       </td>
                       <td className="py-4 text-[var(--brand-text-secondary)] font-mono text-xs">
-                        {formatCurrency(series.tokenContent?.Coffee_InitialCPRValue || 0)}
+                        {formatCurrency(value)}
+                      </td>
+                      <td className="py-4 text-xs text-[var(--brand-text-secondary)]">
+                        {imagesCount} {uiText.labels.imgs} · {resourcesCount} {uiText.labels.resources}
                       </td>
                       <td className="py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClasses.Live}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClasses[statusKey]}`}>
                           <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            {statusKey === 'live' ? <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span> : null}
+                            <span className={`relative inline-flex rounded-full h-2 w-2 ${statusKey === 'live' ? 'bg-emerald-500' : statusKey === 'soldOut' ? 'bg-rose-500' : statusKey === 'upcoming' ? 'bg-amber-500' : 'bg-slate-500'}`}></span>
                           </span>
-                          Live
+                          {uiText.status[statusKey]}
                         </span>
                       </td>
                     </tr>
@@ -323,7 +420,7 @@ const AdminPage = () => {
                         {formatCurrency(entry.tokens)}
                       </p>
                       <p className="text-[10px] uppercase tracking-wide text-[var(--brand-text-secondary)]">
-                        Value
+                        {uiText.labels.value}
                       </p>
                     </div>
                   </div>
@@ -343,7 +440,7 @@ const AdminPage = () => {
           {loading ? (
             <div className="flex justify-center p-10"><FiLoader className="animate-spin text-2xl" /></div>
           ) : transactionsList.length === 0 ? (
-            <p className="text-sm text-[var(--brand-text-secondary)]">No recent transactions.</p>
+            <p className="text-sm text-[var(--brand-text-secondary)]">{uiText.noRecentTransactions}</p>
           ) : (
             <ul className="flex flex-col gap-4">
               {transactionsList.map((tx) => (
@@ -370,7 +467,7 @@ const AdminPage = () => {
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${transactionStatusClasses.Paid}`}
                     >
-                      Paid
+                      {uiText.status.paid}
                     </span>
                   </div>
                 </li>
@@ -393,7 +490,7 @@ const AdminPage = () => {
           </div>
           <div className="mt-6">
             <p className="text-xs uppercase tracking-wide text-[var(--brand-text-secondary)] mb-3">
-              Breakdown by Category
+              {uiText.breakdownByCategory}
             </p>
             <ul className="flex flex-col gap-3">
               {certStats.breakdown.map((item) => (
