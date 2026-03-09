@@ -198,7 +198,16 @@ const DetailPageAssets = () => {
     return id || '';
   }, [id]);
 
-  const backendHost = process.env.NEXT_PUBLIC_AGENT_HOST || process.env.AGENT_HOST || 'mateo.lab.tagroot.io';
+  const backendHost = useMemo(() => {
+    const storedHost = typeof window !== 'undefined'
+      ? String(sessionStorage.getItem('AgentAPI.Host') || '').trim()
+      : '';
+
+    const sanitizedStoredHost = storedHost.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+    if (sanitizedStoredHost) return sanitizedStoredHost;
+
+    return process.env.NEXT_PUBLIC_AGENT_HOST || process.env.AGENT_HOST || 'mateo.lab.tagroot.io';
+  }, []);
   const countryOptions = ISO_COUNTRY_ALPHA3;
   const countryNameByCode = useMemo(
     () => new Map(countryOptions.map((item) => [item.code, item.name])),
