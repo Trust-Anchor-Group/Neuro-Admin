@@ -20,8 +20,8 @@ export function mapBackendValidationError(error) {
 
   const fieldErrors = {};
 
-  if (/project_country\s+have to be between\s+2\s+and\s+2\s+characters/i.test(message)) {
-    fieldErrors.projectCountry = "Country code must be exactly 2 characters.";
+  if (/project_country(_code)?\s+have to be between\s+3\s+and\s+3\s+characters/i.test(message)) {
+    fieldErrors.projectCountry = "Country code must be exactly 3 characters.";
   }
 
   if (/issuer_name\s+have to be between\s+5\s+and\s+40\s+characters/i.test(message) || /issuer\.en-US\.name\s+must be between\s+5\s+and\s+40\s+characters/i.test(message)) {

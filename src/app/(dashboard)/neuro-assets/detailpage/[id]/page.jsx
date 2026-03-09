@@ -14,6 +14,7 @@ import { updateProject as updateProjectFlow } from '@/lib/projectWizard';
 import { listIssuers, listIssuerLocalizations, uploadIssuerProfilePhoto } from '@/lib/projectAdmin';
 import { MEDIA_RULES, validateFileSize, validateImageFile } from '@/lib/mediaValidation';
 import { mapBackendValidationError } from '@/lib/backendValidation';
+import { ISO_COUNTRY_ALPHA3 } from '@/data/isoCountryAlpha3';
 
 // Hooks & Data
 import { useLanguage, content as translations } from '../../../../../../context/LanguageContext';
@@ -159,6 +160,7 @@ const DetailPageAssets = () => {
     token_premium: 0,
     min_investment: 0,
     max_investment: 0,
+    project_country_code: '',
   });
   const [projectContent, setProjectContent] = useState({
     'en-US': {
@@ -197,6 +199,11 @@ const DetailPageAssets = () => {
   }, [id]);
 
   const backendHost = process.env.NEXT_PUBLIC_AGENT_HOST || process.env.AGENT_HOST || 'mateo.lab.tagroot.io';
+  const countryOptions = ISO_COUNTRY_ALPHA3;
+  const countryNameByCode = useMemo(
+    () => new Map(countryOptions.map((item) => [item.code, item.name])),
+    [countryOptions]
+  );
   const resolveBackendAssetUrl = useCallback((rawUrl) => {
     const value = String(rawUrl || '').trim();
     if (!value) return '';
@@ -316,6 +323,7 @@ const DetailPageAssets = () => {
         token_premium: Number(coreProject?.token_premium || 0),
         min_investment: Number(coreProject?.min_investment || 0),
         max_investment: Number(coreProject?.max_investment || 0),
+        project_country_code: String(coreProject?.token?.project_country_code || coreProject?.token?.project_country || '').toUpperCase(),
       });
 
       const [enResponse, ptResponse] = await Promise.all([
@@ -548,8 +556,8 @@ const DetailPageAssets = () => {
     const { name } = event.target;
     let { value } = event.target;
 
-    if (name === 'project_country') {
-      value = String(value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
+    if (name === 'project_country_code') {
+      value = String(value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
       setFieldErrors((prev) => ({ ...prev, projectCountry: '' }));
       setProjectFinancials((prev) => ({ ...prev, [name]: value }));
       return;
@@ -804,6 +812,7 @@ const DetailPageAssets = () => {
           token_premium: Number(projectFinancials.token_premium || 0),
           min_investment: Number(projectFinancials.min_investment || 0),
           max_investment: Number(projectFinancials.max_investment || 0),
+          project_country_code: String(projectFinancials.project_country_code || '').toUpperCase(),
         },
         projectContent: {
           'en-US': {
@@ -832,6 +841,7 @@ const DetailPageAssets = () => {
         token: {
           ...(prev?.token || {}),
           issuer_name: issuer['en-US']?.name || prev?.token?.issuer_name,
+          project_country_code: String(projectFinancials.project_country_code || '').toUpperCase(),
         },
       }));
 
@@ -931,7 +941,7 @@ const DetailPageAssets = () => {
     projectId: project?.project_id,
     label: localizedContent?.title || project?.token?.project_label,
     type: localizedContent?.asset_type || project?.token?.project_type,
-    country: project?.token?.project_country,
+    country: project?.token?.project_country_code || project?.token?.project_country,
     currency: (project?.currency || 'BRL').toUpperCase(),
     localization: activeLocalization,
   }), [project, localizedContent, activeLocalization]);
@@ -1153,6 +1163,27 @@ const DetailPageAssets = () => {
             </Field>
             <Field label='Token Premium'>
               <input type='number' min='0' step='any' name='token_premium' value={projectFinancials.token_premium} onChange={onFinancialChange} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' placeholder='Token premium' />
+            </Field>
+            <Field label='Country Code (ISO alpha-3)'>
+              <input
+                type='text'
+                name='project_country_code'
+                list='country-alpha3-list-update'
+                maxLength={3}
+                value={projectFinancials.project_country_code}
+                onChange={onFinancialChange}
+                placeholder='Type code or search country'
+                className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 uppercase'
+              />
+              <datalist id='country-alpha3-list-update'>
+                {countryOptions.map((country) => (
+                  <option key={country.code} value={country.code}>{`${country.code} — ${country.name}`}</option>
+                ))}
+              </datalist>
+              {projectFinancials.project_country_code && countryNameByCode.has(projectFinancials.project_country_code) ? (
+                <span className='text-xs text-[var(--brand-text-secondary)]'>{countryNameByCode.get(projectFinancials.project_country_code)}</span>
+              ) : null}
+              {fieldErrors.projectCountry ? <span className='text-xs text-[var(--status-error,#ef4444)]'>{fieldErrors.projectCountry}</span> : null}
             </Field>
             <div className='md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]'>
               Investment limits are managed automatically: minimum `1` and maximum `1,000,000`.

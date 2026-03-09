@@ -5,6 +5,7 @@ import { createInitialProjectWizardState, submitWizard } from "@/lib/projectWiza
 import { listIssuers, listIssuerLocalizations } from "@/lib/projectAdmin";
 import { MEDIA_RULES, validateFileSize, validateImageFile } from "@/lib/mediaValidation";
 import { mapBackendValidationError } from "@/lib/backendValidation";
+import { ISO_COUNTRY_ALPHA3 } from "@/data/isoCountryAlpha3";
 
 const Field = ({ label, required = false, children, hint }) => (
   <label className="flex flex-col gap-1">
@@ -124,6 +125,11 @@ export default function CreateProjectWizard() {
   });
 
   const backendHost = process.env.NEXT_PUBLIC_AGENT_HOST || process.env.AGENT_HOST || "mateo.lab.tagroot.io";
+  const countryOptions = ISO_COUNTRY_ALPHA3;
+  const countryNameByCode = useMemo(
+    () => new Map(countryOptions.map((item) => [item.code, item.name])),
+    [countryOptions]
+  );
 
   const resolveBackendAssetUrl = useCallback((rawUrl) => {
     const value = String(rawUrl || "").trim();
@@ -195,9 +201,13 @@ export default function CreateProjectWizard() {
     if (!String(financials.token_friendly_name ?? "").trim()) steps[1].issues.push("Token friendly name is required.");
     if (!String(financials.project_label ?? "").trim()) steps[1].issues.push("Project label is required.");
     if (!String(financials.project_type ?? "").trim()) steps[1].issues.push("Project type is required.");
-    if (!String(financials.project_country ?? "").trim()) steps[1].issues.push("Project country is required.");
-    if (String(financials.project_country ?? "").trim() && String(financials.project_country ?? "").trim().length !== 2) {
-      steps[1].issues.push("Country code must be exactly 2 characters.");
+    const countryCode = String(financials.project_country_code ?? "").trim().toUpperCase();
+    if (!countryCode) steps[1].issues.push("Project country code is required.");
+    if (countryCode && countryCode.length !== 3) {
+      steps[1].issues.push("Country code must be exactly 3 characters.");
+    }
+    if (countryCode && !countryNameByCode.has(countryCode)) {
+      steps[1].issues.push("Select a valid ISO 3166-1 alpha-3 country code.");
     }
 
     const descriptionLength = String(financials.token_description || "").trim().length;
@@ -245,7 +255,7 @@ export default function CreateProjectWizard() {
       allComplete: [1, 2, 3, 4].every((step) => stepStatus[step].complete),
       firstIncompleteStep,
     };
-  }, [wizardState, issuerMode, selectedIssuerId]);
+  }, [wizardState, issuerMode, selectedIssuerId, countryNameByCode]);
 
   const completedSteps = useMemo(
     () => [1, 2, 3, 4].filter((step) => wizardValidation.steps[step].complete).length,
@@ -405,8 +415,8 @@ export default function CreateProjectWizard() {
     const { name } = event.target;
     let { value } = event.target;
 
-    if (name === "project_country") {
-      value = String(value || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 2);
+    if (name === "project_country_code") {
+      value = String(value || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3);
     }
 
     if (name === "currency") {
@@ -421,7 +431,7 @@ export default function CreateProjectWizard() {
       },
     }));
 
-    if (name === "project_country") {
+    if (name === "project_country_code") {
       setFieldErrors((prev) => ({ ...prev, projectCountry: "" }));
     }
   };
@@ -810,8 +820,24 @@ export default function CreateProjectWizard() {
             <Field label="Project Type" required>
               <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="project_type" value={wizardState.projectFinancials.project_type} onChange={onFinancialChange} />
             </Field>
-            <Field label="Country Code" required hint="2-letter code, e.g. BR, US, SE">
-              <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 uppercase" name="project_country" maxLength={2} value={wizardState.projectFinancials.project_country} onChange={onFinancialChange} />
+            <Field label="Country Code" required hint="Search by country name or type alpha-3 code (e.g. BRA, USA, DEU)">
+              <input
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 uppercase"
+                name="project_country_code"
+                list="country-alpha3-list"
+                maxLength={3}
+                value={wizardState.projectFinancials.project_country_code}
+                onChange={onFinancialChange}
+                placeholder="Type code or search country"
+              />
+              <datalist id="country-alpha3-list">
+                {countryOptions.map((country) => (
+                  <option key={country.code} value={country.code}>{`${country.code} — ${country.name}`}</option>
+                ))}
+              </datalist>
+              {wizardState.projectFinancials.project_country_code && countryNameByCode.has(wizardState.projectFinancials.project_country_code) ? (
+                <span className="text-xs text-[var(--brand-text-secondary)]">{countryNameByCode.get(wizardState.projectFinancials.project_country_code)}</span>
+              ) : null}
               {fieldErrors.projectCountry ? <span className="text-xs text-[var(--status-error,#ef4444)]">{fieldErrors.projectCountry}</span> : null}
             </Field>
           </>

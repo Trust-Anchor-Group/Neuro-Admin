@@ -27,7 +27,7 @@
  *   token_description: string,
  *   project_label: string,
  *   project_type: string,
- *   project_country: string
+ *   project_country_code: string
  * }} projectFinancials
  * @property {{"en-US": LocalizedContent, "pt-PT": LocalizedContent}} projectContent
  * @property {{thumbnail: File | null, galleryImages: File[], resources: {file: File, title: string}[]}} media
@@ -76,7 +76,7 @@ export function createInitialProjectWizardState() {
       token_description: "",
       project_label: "",
       project_type: "",
-      project_country: "",
+      project_country_code: "",
     },
     projectContent: {
       "en-US": {
@@ -235,7 +235,7 @@ function assertRequired(state) {
     "token_description",
     "project_label",
     "project_type",
-    "project_country",
+    "project_country_code",
   ];
 
   for (const key of requiredFinancials) {
@@ -245,8 +245,8 @@ function assertRequired(state) {
     }
   }
 
-  if (String(financials.project_country || "").trim().length !== 2) {
-    throw new Error("Country code must be exactly 2 characters.");
+  if (String(financials.project_country_code || "").trim().length !== 3) {
+    throw new Error("Country code must be exactly 3 characters.");
   }
 
   if (!state.media.thumbnail) {
@@ -322,7 +322,7 @@ export async function submitWizard(state) {
         description: state.projectFinancials.token_description.trim(),
         project_label: state.projectFinancials.project_label.trim(),
         project_type: state.projectFinancials.project_type.trim(),
-        project_country: state.projectFinancials.project_country.trim().toUpperCase(),
+        project_country_code: state.projectFinancials.project_country_code.trim().toUpperCase(),
         issuer_name: resolveIssuerPayload(state.issuer, "en-US").name,
         issuer_id: issuerId,
       },
@@ -507,6 +507,8 @@ async function uploadNewResourcesForProject(projectId, newMedia) {
 export async function updateProject(state) {
   assertRequiredUpdateState(state);
 
+  const projectCountryCode = String(state?.projectFinancials?.project_country_code || "").trim().toUpperCase();
+
   await Promise.all(
     LOCALIZATIONS.map(async (localization) => {
       const issuerPayload = resolveIssuerPayload(state.issuer, localization);
@@ -532,6 +534,13 @@ export async function updateProject(state) {
       token_premium: Number(state.projectFinancials.token_premium),
       min_investment: 1,
       max_investment: 1000000,
+      ...(projectCountryCode.length === 3
+        ? {
+            token: {
+              project_country_code: projectCountryCode,
+            },
+          }
+        : {}),
     }),
   });
 
