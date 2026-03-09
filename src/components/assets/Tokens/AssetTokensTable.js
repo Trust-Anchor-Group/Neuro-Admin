@@ -82,85 +82,116 @@ const muiTheme = createTheme({
 export default function AssetTokensTable({ orders = [], isLoading = false, onRowClick }) {
   const columns = useMemo(
     () => [
-      // 1. Mapped to 'projectShortTitle'
       {
-        accessorKey: "projectShortTitle",
-        header: "Project Name",
-        size: 250,
-        Cell: ({ cell, row }) => (
+        id: "project",
+        accessorFn: (row) => row?.token?.project_label || row?.token?.friendly_name || row?.project_id || "-",
+        header: "Project",
+        size: 300,
+        Cell: ({ row }) => (
           <Box>
-            <div className="font-bold text-[var(--brand-text)]">{cell.getValue()}</div>
+            <div className="font-bold text-[var(--brand-text)]">
+              {row.original?.token?.project_label || row.original?.token?.friendly_name || "-"}
+            </div>
             <div className="text-xs text-[var(--brand-text-secondary)]">
-              {row.original.organizationName}
+              {row.original?.token?.project_type || row.original?.project_id}
             </div>
           </Box>
         )
       },
-      // 2. Mapped to 'categories' array
       {
-        accessorKey: "categories",
-        header: "Category",
+        id: "issuer",
+        accessorFn: (row) => row?.token?.issuer_name || "-",
+        header: "Issuer",
         size: 150,
-        Cell: ({ cell }) => {
-          const cats = cell.getValue();
-          return (
-            <div className="flex gap-1">
-              {cats?.map((c, i) => (
-                <span key={i} className="px-2 py-1 text-xs rounded-full bg-[var(--brand-navbar)] border border-[var(--brand-border)]">
-                  {c}
-                </span>
-              ))}
-            </div>
-          )
-        }
+        Cell: ({ cell }) => <span>{cell.getValue()}</span>
       },
-      // 3. Mapped to 'series[0].quantity'
       {
-        accessorKey: "series.0.quantity",
-        header: "Volume (Bags)",
+        id: "country",
+        accessorFn: (row) => row?.token?.project_country || "-",
+        header: "Country",
         size: 150,
         Cell: ({ cell }) => (
           <Box display="flex" alignItems="center" gap={1}>
-            <FaBoxOpen style={{ color: "var(--brand-accent)" }} />
-            <span>{cell.getValue()?.toLocaleString()}</span>
-          </Box>
-        )
-      },
-      // 4. Mapped to 'series[0].price'
-      {
-        accessorKey: "series.0.price",
-        header: "Price (BRL)",
-        size: 150,
-        Cell: ({ cell }) => (
-          <span className="font-mono text-[var(--brand-text)]">
-            R$ {cell.getValue()?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-          </span>
-        )
-      },
-      // 5. Mapped to 'series[0].tokenContent.Coffee_HarvestSeason'
-      {
-        accessorKey: "series.0.tokenContent.Coffee_HarvestSeason",
-        header: "Harvest",
-        size: 150,
-        Cell: ({ cell }) => (
-          <Box display="flex" alignItems="center" gap={1}>
-            <FaLeaf className="text-emerald-500" />
+            <FaLeaf style={{ color: "var(--brand-accent)" }} />
             <span>{cell.getValue()}</span>
           </Box>
         )
       },
-      // 6. Custom Status Column
+      {
+        id: "tokenQuantity",
+        accessorFn: (row) => row?.token?.token_quantity ?? 0,
+        header: "Total Tokens",
+        size: 150,
+        Cell: ({ cell }) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            <FaBoxOpen style={{ color: "var(--brand-accent)" }} />
+            <span>{Number(cell.getValue() || 0).toLocaleString()}</span>
+          </Box>
+        )
+      },
+      {
+        id: "tokensLeft",
+        accessorFn: (row) => row?.token?.tokens_left ?? 0,
+        header: "Tokens Left",
+        size: 150,
+        Cell: ({ cell }) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            <FaCheckCircle className="text-emerald-500" />
+            <span>{Number(cell.getValue() || 0).toLocaleString()}</span>
+          </Box>
+        )
+      },
+      {
+        id: "tokenPrice",
+        accessorFn: (row) => row?.token_price ?? 0,
+        header: "Token Price",
+        size: 150,
+        Cell: ({ cell, row }) => {
+          const currency = (row.original?.currency || "BRL").toUpperCase();
+          const value = Number(cell.getValue() || 0);
+
+          try {
+            return (
+              <span className="font-mono text-[var(--brand-text)]">
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency,
+                  minimumFractionDigits: 2,
+                }).format(value)}
+              </span>
+            );
+          } catch {
+            return (
+              <span className="font-mono text-[var(--brand-text)]">
+                {currency} {value.toFixed(2)}
+              </span>
+            );
+          }
+        },
+      },
       {
         id: "status",
         header: "Status",
         size: 150,
-        accessorFn: () => "Live",
-        Cell: () => {
+        accessorFn: (row) => {
+          const tokensLeft = row?.token?.tokens_left;
+          const now = new Date();
+          const startDate = row?.start_date ? new Date(row.start_date) : null;
+          const endDate = row?.end_date ? new Date(row.end_date) : null;
+
+          if (Number(tokensLeft) === 0) return "Sold Out";
+          if (endDate && endDate < now) return "Closed";
+          if (startDate && startDate > now) return "Upcoming";
+          return "Live";
+        },
+        Cell: ({ cell }) => {
+          const status = cell.getValue();
+          const isLive = status === "Live";
           return (
             <Box display="flex" alignItems="center" gap={1}>
-              <FaCheckCircle style={{ color: "var(--status-success,#16a34a)" }} />
-              <span style={{ fontWeight: 700, color: "var(--status-success,#16a34a)" }}>
-                Live
+              <FaCheckCircle style={{ color: isLive ? "var(--status-success,#16a34a)" : "var(--brand-text-secondary)" }} />
+              <span style={{ fontWeight: 700, color: isLive ? "var(--status-success,#16a34a)" : "var(--brand-text-secondary)" }}>
+                {status}
               </span>
             </Box>
           );
@@ -310,7 +341,10 @@ export default function AssetTokensTable({ orders = [], isLoading = false, onRow
           const handleClick = onRowClick
             ? () => onRowClick(row.original)
             : () => {
-                window.location.href = `/neuro-assets/detailpage/${row.original.id}`;
+                const fallbackId = row.original.project_id || row.original.id;
+                if (fallbackId) {
+                  window.location.href = `/neuro-assets/detailpage/${fallbackId}`;
+                }
               };
 
           return {
