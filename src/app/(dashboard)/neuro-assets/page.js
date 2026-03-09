@@ -335,7 +335,7 @@ const AdminPage = () => {
                   const token = project?.token || {};
                   const localization = project?.localization || {};
                   const title = localization?.title || token?.project_label || token?.friendly_name || "Untitled Project";
-                  const location = token?.project_country || uiText.notAvailable;
+                  const location = token?.project_country_code || token?.project_country || uiText.notAvailable;
                   const issuerName = token?.issuer_name || project?.issuer?.localization?.name || uiText.notAvailable;
                   const category = localization?.asset_type || token?.project_type || "-";
                   const totalQuantity = Number(token?.token_quantity || 0);
