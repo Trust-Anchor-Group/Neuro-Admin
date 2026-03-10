@@ -14,7 +14,6 @@ import { updateProject as updateProjectFlow } from '@/lib/projectWizard';
 import { listIssuers, listIssuerLocalizations, uploadIssuerProfilePhoto } from '@/lib/projectAdmin';
 import { MEDIA_RULES, validateFileSize, validateImageFile } from '@/lib/mediaValidation';
 import { mapBackendValidationError } from '@/lib/backendValidation';
-import { ISO_COUNTRY_ALPHA3 } from '@/data/isoCountryAlpha3';
 
 // Hooks & Data
 import { useLanguage, content as translations } from '../../../../../../context/LanguageContext';
@@ -28,8 +27,6 @@ const Field = ({ label, children }) => (
 
 const MAX_TAGS = 12;
 const MAX_TAG_LENGTH = 30;
-const SHORT_DESCRIPTION_MAX = 280;
-const LONG_DESCRIPTION_MAX = 2000;
 const READING_WORDS_PER_MINUTE = 180;
 
 const sanitizeTags = (rawValue) => {
@@ -93,7 +90,7 @@ const getDescriptionStats = (value) => {
   };
 };
 
-const DescriptionInsights = ({ value, max, mode }) => {
+const DescriptionInsights = ({ value, mode }) => {
   const stats = getDescriptionStats(value);
   const isShort = mode === 'short';
   const qualityText = isShort
@@ -103,7 +100,7 @@ const DescriptionInsights = ({ value, max, mode }) => {
   return (
     <div className='rounded-md border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-xs text-[var(--brand-text-secondary)]'>
       <div className='flex flex-wrap gap-3'>
-        <span>{stats.characters}/{max} chars</span>
+        <span>{stats.characters} chars</span>
         <span>{stats.words} words</span>
         {!isShort ? <span>{stats.paragraphs} paragraphs</span> : null}
         {!isShort ? <span>~{stats.readMinutes} min read</span> : null}
@@ -161,6 +158,8 @@ const DetailPageAssets = () => {
     min_investment: 0,
     max_investment: 0,
     project_country_code: '',
+    start_date: '',
+    end_date: '',
   });
   const [projectContent, setProjectContent] = useState({
     'en-US': {
@@ -208,11 +207,6 @@ const DetailPageAssets = () => {
 
     return process.env.NEXT_PUBLIC_AGENT_HOST || process.env.AGENT_HOST || 'mateo.lab.tagroot.io';
   }, []);
-  const countryOptions = ISO_COUNTRY_ALPHA3;
-  const countryNameByCode = useMemo(
-    () => new Map(countryOptions.map((item) => [item.code, item.name])),
-    [countryOptions]
-  );
   const resolveBackendAssetUrl = useCallback((rawUrl) => {
     const value = String(rawUrl || '').trim();
     if (!value) return '';
@@ -253,6 +247,26 @@ const DetailPageAssets = () => {
     long_description: localization?.long_description || fallbackProjectData?.token?.description || '',
     tags: Array.isArray(localization?.tags) ? localization.tags : [],
   });
+
+  const toDateInputValue = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+
+    if (typeof value === 'number' || /^\d+$/.test(String(value))) {
+      const seconds = Number(value);
+      if (!Number.isFinite(seconds) || seconds <= 0) return '';
+      return new Date(seconds * 1000).toISOString().slice(0, 10);
+    }
+
+    const parsed = new Date(String(value));
+    if (Number.isNaN(parsed.getTime())) return '';
+    return parsed.toISOString().slice(0, 10);
+  };
+
+  const formatDateForDisplay = (value) => {
+    const normalized = toDateInputValue(value);
+    if (!normalized) return 'N/A';
+    return new Date(`${normalized}T00:00:00Z`).toLocaleDateString();
+  };
 
   const toMediaList = (localization) => {
     const media = [];
@@ -333,6 +347,8 @@ const DetailPageAssets = () => {
         min_investment: Number(coreProject?.min_investment || 0),
         max_investment: Number(coreProject?.max_investment || 0),
         project_country_code: String(coreProject?.token?.project_country_code || coreProject?.token?.project_country || '').toUpperCase(),
+        start_date: toDateInputValue(coreProject?.start_date),
+        end_date: toDateInputValue(coreProject?.end_date),
       });
 
       const [enResponse, ptResponse] = await Promise.all([
@@ -465,11 +481,6 @@ const DetailPageAssets = () => {
     };
   }, []);
 
-  const parseCsvIds = (value) => value
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
-
   const hasUploadErrors = useMemo(
     () => Object.values(uploadFeedback.errors || {}).some((message) => String(message || '').trim()),
     [uploadFeedback.errors]
@@ -565,16 +576,15 @@ const DetailPageAssets = () => {
     const { name } = event.target;
     let { value } = event.target;
 
-    if (name === 'project_country_code') {
+    if (name === 'currency') {
       value = String(value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
-      setFieldErrors((prev) => ({ ...prev, projectCountry: '' }));
       setProjectFinancials((prev) => ({ ...prev, [name]: value }));
       return;
     }
 
-    if (name === 'currency') {
-      value = String(value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
-      setProjectFinancials((prev) => ({ ...prev, [name]: value }));
+    if (name === 'start_date' || name === 'end_date') {
+      setFieldErrors((prev) => ({ ...prev, startDate: '', endDate: '' }));
+      setProjectFinancials((prev) => ({ ...prev, [name]: String(value || '') }));
       return;
     }
 
@@ -803,6 +813,12 @@ const DetailPageAssets = () => {
         throw new Error('Please fix upload issues first. Large files must be compressed before upload.');
       }
 
+      const startDate = String(projectFinancials.start_date || '').trim();
+      const endDate = String(projectFinancials.end_date || '').trim();
+      if (startDate && endDate && new Date(`${startDate}T00:00:00Z`) > new Date(`${endDate}T00:00:00Z`)) {
+        throw new Error('End date must be on or after start date.');
+      }
+
       if (issuerLogoFile && issuerId) {
         await Promise.all(['en-US', 'pt-PT'].map((localization) => uploadIssuerProfilePhoto(issuerId, {
           file: issuerLogoFile,
@@ -821,7 +837,8 @@ const DetailPageAssets = () => {
           token_premium: Number(projectFinancials.token_premium || 0),
           min_investment: Number(projectFinancials.min_investment || 0),
           max_investment: Number(projectFinancials.max_investment || 0),
-          project_country_code: String(projectFinancials.project_country_code || '').toUpperCase(),
+          start_date: String(projectFinancials.start_date || '').trim(),
+          end_date: String(projectFinancials.end_date || '').trim(),
         },
         projectContent: {
           'en-US': {
@@ -847,10 +864,11 @@ const DetailPageAssets = () => {
         token_premium: Number(projectFinancials.token_premium),
         min_investment: Number(projectFinancials.min_investment),
         max_investment: Number(projectFinancials.max_investment),
+        start_date: String(projectFinancials.start_date || '').trim() || null,
+        end_date: String(projectFinancials.end_date || '').trim() || null,
         token: {
           ...(prev?.token || {}),
           issuer_name: issuer['en-US']?.name || prev?.token?.issuer_name,
-          project_country_code: String(projectFinancials.project_country_code || '').toUpperCase(),
         },
       }));
 
@@ -989,8 +1007,8 @@ const DetailPageAssets = () => {
     tokenPremium: formatCurrency(project?.token_premium, project?.currency),
     minInvestment: formatCurrency(project?.min_investment, project?.currency),
     maxInvestment: formatCurrency(project?.max_investment, project?.currency),
-    startDate: project?.start_date ? new Date(project.start_date).toLocaleDateString() : 'N/A',
-    endDate: project?.end_date ? new Date(project.end_date).toLocaleDateString() : 'N/A',
+    startDate: formatDateForDisplay(project?.start_date),
+    endDate: formatDateForDisplay(project?.end_date),
   }), [project, formatCurrency]);
 
   const pricingFields = useMemo(() => [
@@ -1124,7 +1142,7 @@ const DetailPageAssets = () => {
                     {uploadFeedback.errors.issuerName ? <span className='text-xs text-[var(--status-error,#ef4444)]'>{uploadFeedback.errors.issuerName}</span> : null}
                   </Field>
                   <Field label='Issuer About (EN)'>
-                    <input type='text' maxLength={180} name='about' value={issuer['en-US']?.about || ''} onChange={(event) => onIssuerChange('en-US', event)} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
+                    <textarea rows={5} name='about' value={issuer['en-US']?.about || ''} onChange={(event) => onIssuerChange('en-US', event)} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
                   </Field>
                   <Field label='Issuer Location (EN)'>
                     <input type='text' maxLength={80} name='location' value={issuer['en-US']?.location || ''} onChange={(event) => onIssuerChange('en-US', event)} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
@@ -1141,7 +1159,7 @@ const DetailPageAssets = () => {
                     <input type='text' maxLength={40} name='name' value={issuer['pt-PT']?.name || ''} onChange={(event) => onIssuerChange('pt-PT', event)} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
                   </Field>
                   <Field label='Issuer About (PT)'>
-                    <input type='text' maxLength={180} name='about' value={issuer['pt-PT']?.about || ''} onChange={(event) => onIssuerChange('pt-PT', event)} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
+                    <textarea rows={5} name='about' value={issuer['pt-PT']?.about || ''} onChange={(event) => onIssuerChange('pt-PT', event)} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
                   </Field>
                   <Field label='Issuer Location (PT)'>
                     <input type='text' maxLength={80} name='location' value={issuer['pt-PT']?.location || ''} onChange={(event) => onIssuerChange('pt-PT', event)} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
@@ -1173,26 +1191,23 @@ const DetailPageAssets = () => {
             <Field label='Token Premium'>
               <input type='number' min='0' step='any' name='token_premium' value={projectFinancials.token_premium} onChange={onFinancialChange} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' placeholder='Token premium' />
             </Field>
-            <Field label='Country Code (ISO alpha-3)'>
+            <Field label='Start Date'>
               <input
-                type='text'
-                name='project_country_code'
-                list='country-alpha3-list-update'
-                maxLength={3}
-                value={projectFinancials.project_country_code}
+                type='date'
+                name='start_date'
+                value={projectFinancials.start_date}
                 onChange={onFinancialChange}
-                placeholder='Type code or search country'
-                className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 uppercase'
+                className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2'
               />
-              <datalist id='country-alpha3-list-update'>
-                {countryOptions.map((country) => (
-                  <option key={country.code} value={country.code}>{`${country.code} — ${country.name}`}</option>
-                ))}
-              </datalist>
-              {projectFinancials.project_country_code && countryNameByCode.has(projectFinancials.project_country_code) ? (
-                <span className='text-xs text-[var(--brand-text-secondary)]'>{countryNameByCode.get(projectFinancials.project_country_code)}</span>
-              ) : null}
-              {fieldErrors.projectCountry ? <span className='text-xs text-[var(--status-error,#ef4444)]'>{fieldErrors.projectCountry}</span> : null}
+            </Field>
+            <Field label='End Date'>
+              <input
+                type='date'
+                name='end_date'
+                value={projectFinancials.end_date}
+                onChange={onFinancialChange}
+                className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2'
+              />
             </Field>
             <div className='md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]'>
               Investment limits are managed automatically: minimum `1` and maximum `1,000,000`.
@@ -1225,20 +1240,20 @@ const DetailPageAssets = () => {
                   <input type='text' value={projectContent['pt-PT'].asset_type} onChange={(event) => onContentChange('pt-PT', 'asset_type', event.target.value)} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
                 </Field>
                 <Field label='EN Short Description'>
-                  <textarea rows={3} maxLength={SHORT_DESCRIPTION_MAX} value={projectContent['en-US'].short_description} onChange={(event) => onContentChange('en-US', 'short_description', event.target.value)} onBlur={() => onDescriptionBlur('en-US', 'short_description')} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
-                  <DescriptionInsights value={projectContent['en-US'].short_description} max={SHORT_DESCRIPTION_MAX} mode='short' />
+                  <textarea rows={3} value={projectContent['en-US'].short_description} onChange={(event) => onContentChange('en-US', 'short_description', event.target.value)} onBlur={() => onDescriptionBlur('en-US', 'short_description')} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
+                  <DescriptionInsights value={projectContent['en-US'].short_description} mode='short' />
                 </Field>
                 <Field label='PT Short Description'>
-                  <textarea rows={3} maxLength={SHORT_DESCRIPTION_MAX} value={projectContent['pt-PT'].short_description} onChange={(event) => onContentChange('pt-PT', 'short_description', event.target.value)} onBlur={() => onDescriptionBlur('pt-PT', 'short_description')} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
-                  <DescriptionInsights value={projectContent['pt-PT'].short_description} max={SHORT_DESCRIPTION_MAX} mode='short' />
+                  <textarea rows={3} value={projectContent['pt-PT'].short_description} onChange={(event) => onContentChange('pt-PT', 'short_description', event.target.value)} onBlur={() => onDescriptionBlur('pt-PT', 'short_description')} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
+                  <DescriptionInsights value={projectContent['pt-PT'].short_description} mode='short' />
                 </Field>
                 <Field label='EN Long Description'>
-                  <textarea rows={8} maxLength={LONG_DESCRIPTION_MAX} value={projectContent['en-US'].long_description} onChange={(event) => onContentChange('en-US', 'long_description', event.target.value)} onBlur={() => onDescriptionBlur('en-US', 'long_description')} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 leading-relaxed' />
-                  <DescriptionInsights value={projectContent['en-US'].long_description} max={LONG_DESCRIPTION_MAX} mode='long' />
+                  <textarea rows={8} value={projectContent['en-US'].long_description} onChange={(event) => onContentChange('en-US', 'long_description', event.target.value)} onBlur={() => onDescriptionBlur('en-US', 'long_description')} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 leading-relaxed' />
+                  <DescriptionInsights value={projectContent['en-US'].long_description} mode='long' />
                 </Field>
                 <Field label='PT Long Description'>
-                  <textarea rows={8} maxLength={LONG_DESCRIPTION_MAX} value={projectContent['pt-PT'].long_description} onChange={(event) => onContentChange('pt-PT', 'long_description', event.target.value)} onBlur={() => onDescriptionBlur('pt-PT', 'long_description')} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 leading-relaxed' />
-                  <DescriptionInsights value={projectContent['pt-PT'].long_description} max={LONG_DESCRIPTION_MAX} mode='long' />
+                  <textarea rows={8} value={projectContent['pt-PT'].long_description} onChange={(event) => onContentChange('pt-PT', 'long_description', event.target.value)} onBlur={() => onDescriptionBlur('pt-PT', 'long_description')} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 leading-relaxed' />
+                  <DescriptionInsights value={projectContent['pt-PT'].long_description} mode='long' />
                 </Field>
                 <Field label='EN Tags (comma-separated)'>
                   <input type='text' value={tagDrafts['en-US']} onChange={(event) => onTagInputChange('en-US', event.target.value)} onBlur={() => onTagInputBlur('en-US')} placeholder='solar, green-energy, verified' className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
@@ -1255,21 +1270,42 @@ const DetailPageAssets = () => {
 
             <div className='md:col-span-2 rounded-lg border border-[var(--brand-border)] p-3'>
               <h3 className='mb-2 text-sm font-semibold text-[var(--brand-text)]'>Existing Media</h3>
-              <p className='mb-3 text-xs text-[var(--brand-text-secondary)]'>Select media here to auto-fill removal fields below.</p>
+              <p className='mb-3 text-xs text-[var(--brand-text-secondary)]'>Select files to remove. IDs are auto-managed for you.</p>
+              <div className='mb-3 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-xs text-[var(--brand-text-secondary)]'>
+                Selected for removal: {mediaToRemove.imageIds.length} image(s), {mediaToRemove.resourceIds.length} resource(s), thumbnail {mediaToRemove.deleteThumbnail ? 'selected' : 'not selected'}.
+              </div>
               <div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
                 <div className='rounded-lg border border-[var(--brand-border)] p-3'>
                   <h4 className='mb-2 text-xs font-semibold text-[var(--brand-text-secondary)]'>EN-US</h4>
                   <div className='space-y-1 text-xs text-[var(--brand-text)]'>
                     {existingMedia['en-US'].length === 0 && <p>No media found.</p>}
                     {existingMedia['en-US'].map((item, index) => (
-                      <label key={`existing-en-${item.id || index}`} className='flex items-center gap-2 rounded border border-[var(--brand-border)] px-2 py-1'>
+                      <label key={`existing-en-${item.id || index}`} className={`flex items-center gap-2 rounded border px-2 py-1 ${isMediaMarkedForRemoval(item) ? 'border-amber-400 bg-amber-50' : 'border-[var(--brand-border)]'}`}>
                         <input
                           type='checkbox'
                           checked={isMediaMarkedForRemoval(item)}
                           onChange={(event) => onExistingMediaToggle(item, event.target.checked)}
                           disabled={item.type !== 'thumbnail' && !item.id}
                         />
-                        <span>{item.type} · {item.title || item.id || 'untitled'}</span>
+                        {(item.type === 'image' || item.type === 'thumbnail') && item.url ? (
+                          <img
+                            src={resolveBackendAssetUrl(item.url)}
+                            alt={item.title || item.type}
+                            className='h-8 w-8 rounded border border-[var(--brand-border)] object-cover'
+                          />
+                        ) : null}
+                        <span className='truncate'>{item.type} · {item.title || item.id || 'untitled'}</span>
+                        {item.type === 'resource' && item.url ? (
+                          <a
+                            href={resolveBackendAssetUrl(item.url)}
+                            target='_blank'
+                            rel='noreferrer'
+                            className='ml-1 text-[10px] font-semibold text-[var(--brand-accent)] underline'
+                          >
+                            Preview PDF
+                          </a>
+                        ) : null}
+                        {isMediaMarkedForRemoval(item) ? <span className='ml-auto text-[10px] font-semibold text-amber-700'>Selected</span> : null}
                       </label>
                     ))}
                   </div>
@@ -1279,14 +1315,32 @@ const DetailPageAssets = () => {
                   <div className='space-y-1 text-xs text-[var(--brand-text)]'>
                     {existingMedia['pt-PT'].length === 0 && <p>No media found.</p>}
                     {existingMedia['pt-PT'].map((item, index) => (
-                      <label key={`existing-pt-${item.id || index}`} className='flex items-center gap-2 rounded border border-[var(--brand-border)] px-2 py-1'>
+                      <label key={`existing-pt-${item.id || index}`} className={`flex items-center gap-2 rounded border px-2 py-1 ${isMediaMarkedForRemoval(item) ? 'border-amber-400 bg-amber-50' : 'border-[var(--brand-border)]'}`}>
                         <input
                           type='checkbox'
                           checked={isMediaMarkedForRemoval(item)}
                           onChange={(event) => onExistingMediaToggle(item, event.target.checked)}
                           disabled={item.type !== 'thumbnail' && !item.id}
                         />
-                        <span>{item.type} · {item.title || item.id || 'untitled'}</span>
+                        {(item.type === 'image' || item.type === 'thumbnail') && item.url ? (
+                          <img
+                            src={resolveBackendAssetUrl(item.url)}
+                            alt={item.title || item.type}
+                            className='h-8 w-8 rounded border border-[var(--brand-border)] object-cover'
+                          />
+                        ) : null}
+                        <span className='truncate'>{item.type} · {item.title || item.id || 'untitled'}</span>
+                        {item.type === 'resource' && item.url ? (
+                          <a
+                            href={resolveBackendAssetUrl(item.url)}
+                            target='_blank'
+                            rel='noreferrer'
+                            className='ml-1 text-[10px] font-semibold text-[var(--brand-accent)] underline'
+                          >
+                            Preview PDF
+                          </a>
+                        ) : null}
+                        {isMediaMarkedForRemoval(item) ? <span className='ml-auto text-[10px] font-semibold text-amber-700'>Selected</span> : null}
                       </label>
                     ))}
                   </div>
@@ -1303,12 +1357,21 @@ const DetailPageAssets = () => {
                     Remove current thumbnail in EN/PT
                   </label>
                 </Field>
-                <Field label='Image IDs to delete (comma-separated)'>
-                  <input type='text' value={mediaToRemove.imageIds.join(', ')} onChange={(event) => onMediaRemoveChange('imageIds', parseCsvIds(event.target.value))} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' placeholder='img-1, img-2' />
+                <Field label='Image IDs selected (auto)'>
+                  <input type='text' readOnly value={mediaToRemove.imageIds.join(', ')} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' placeholder='Use checkboxes above' />
                 </Field>
-                <Field label='Resource IDs to delete (comma-separated)'>
-                  <input type='text' value={mediaToRemove.resourceIds.join(', ')} onChange={(event) => onMediaRemoveChange('resourceIds', parseCsvIds(event.target.value))} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' placeholder='res-1, res-2' />
+                <Field label='Resource IDs selected (auto)'>
+                  <input type='text' readOnly value={mediaToRemove.resourceIds.join(', ')} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' placeholder='Use checkboxes above' />
                 </Field>
+                <div className='flex items-end'>
+                  <button
+                    type='button'
+                    onClick={() => setMediaToRemove({ imageIds: [], deleteThumbnail: false, resourceIds: [] })}
+                    className='rounded-md border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)]'
+                  >
+                    Clear Selections
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1317,11 +1380,15 @@ const DetailPageAssets = () => {
               <div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
                 <Field label='New Thumbnail'>
                   <input type='file' accept='image/*' onChange={onNewThumbnailChange} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
+                  {newMedia.thumbnail ? <span className='text-xs text-[var(--brand-text-secondary)]'>Selected: {newMedia.thumbnail.name}</span> : null}
                   {uploadFeedback.errors.thumbnail ? <span className='text-xs text-[var(--status-error,#ef4444)]'>{uploadFeedback.errors.thumbnail}</span> : null}
                   {uploadFeedback.warnings.thumbnail ? <span className='text-xs text-amber-600'>{uploadFeedback.warnings.thumbnail}</span> : null}
                 </Field>
                 <Field label='New Gallery Images'>
                   <input type='file' accept='image/*' multiple onChange={onNewGalleryChange} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' />
+                  {newMedia.newGalleryImages.length > 0 ? (
+                    <span className='text-xs text-[var(--brand-text-secondary)]'>Selected: {newMedia.newGalleryImages.length} file(s)</span>
+                  ) : null}
                   {uploadFeedback.errors.gallery ? <span className='text-xs text-[var(--status-error,#ef4444)]'>{uploadFeedback.errors.gallery}</span> : null}
                   {uploadFeedback.warnings.gallery ? <span className='text-xs text-amber-600'>{uploadFeedback.warnings.gallery}</span> : null}
                 </Field>
