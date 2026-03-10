@@ -19,8 +19,6 @@ const Field = ({ label, required = false, children, hint }) => (
 
 const MAX_TAGS = 12;
 const MAX_TAG_LENGTH = 30;
-const SHORT_DESCRIPTION_MAX = 280;
-const LONG_DESCRIPTION_MAX = 2000;
 const READING_WORDS_PER_MINUTE = 180;
 
 const sanitizeTags = (rawValue) => {
@@ -84,7 +82,7 @@ const getDescriptionStats = (value) => {
   };
 };
 
-const DescriptionInsights = ({ value, max, mode }) => {
+const DescriptionInsights = ({ value, mode }) => {
   const stats = getDescriptionStats(value);
   const isShort = mode === "short";
   const qualityText = isShort
@@ -94,7 +92,7 @@ const DescriptionInsights = ({ value, max, mode }) => {
   return (
     <div className="rounded-md border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-xs text-[var(--brand-text-secondary)]">
       <div className="flex flex-wrap gap-3">
-        <span>{stats.characters}/{max} chars</span>
+        <span>{stats.characters} chars</span>
         <span>{stats.words} words</span>
         {!isShort ? <span>{stats.paragraphs} paragraphs</span> : null}
         {!isShort ? <span>~{stats.readMinutes} min read</span> : null}
@@ -232,15 +230,34 @@ export default function CreateProjectWizard() {
       steps[1].issues.push("Maximum investment must be greater than or equal to minimum investment.");
     }
 
+    const startDate = String(financials.start_date || "").trim();
+    const endDate = String(financials.end_date || "").trim();
+    const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+    if (startDate && !isoDate.test(startDate)) {
+      const msg = "Start date must use YYYY-MM-DD format.";
+      steps[1].issues.push(msg);
+      steps[1].fieldErrors.startDate = msg;
+    }
+    if (endDate && !isoDate.test(endDate)) {
+      const msg = "End date must use YYYY-MM-DD format.";
+      steps[1].issues.push(msg);
+      steps[1].fieldErrors.endDate = msg;
+    }
+    if (startDate && endDate && isoDate.test(startDate) && isoDate.test(endDate) && new Date(`${startDate}T00:00:00Z`) > new Date(`${endDate}T00:00:00Z`)) {
+      const msg = "End date must be on or after start date.";
+      steps[1].issues.push(msg);
+      steps[1].fieldErrors.endDate = msg;
+    }
+
     if (!en.title.trim()) steps[2].issues.push("EN title is required.");
     if (!en.asset_type.trim()) steps[2].issues.push("EN asset type is required.");
     if (!en.short_description.trim()) steps[2].issues.push("EN short description is required.");
     if (!en.long_description.trim()) steps[2].issues.push("EN long description is required.");
 
-    if (!pt.title.trim()) steps[3].issues.push("PT title is required.");
-    if (!pt.asset_type.trim()) steps[3].issues.push("PT asset type is required.");
-    if (!pt.short_description.trim()) steps[3].issues.push("PT short description is required.");
-    if (!pt.long_description.trim()) steps[3].issues.push("PT long description is required.");
+    if (!pt.title.trim()) steps[2].issues.push("PT title is required.");
+    if (!pt.asset_type.trim()) steps[2].issues.push("PT asset type is required.");
+    if (!pt.short_description.trim()) steps[2].issues.push("PT short description is required.");
+    if (!pt.long_description.trim()) steps[2].issues.push("PT long description is required.");
 
     if (!media.thumbnail) steps[4].issues.push("Thumbnail is required.");
     media.resources.forEach((resource, index) => {
@@ -442,6 +459,10 @@ export default function CreateProjectWizard() {
 
     if (name === "project_country_code") {
       setFieldErrors((prev) => ({ ...prev, projectCountry: "" }));
+    }
+
+    if (name === "start_date" || name === "end_date") {
+      setFieldErrors((prev) => ({ ...prev, startDate: "", endDate: "" }));
     }
   };
 
@@ -649,7 +670,7 @@ export default function CreateProjectWizard() {
     setFieldErrors({});
 
     if (hasUploadErrors) {
-      setCreateError("Please fix upload issues first. Large files must be compressed before upload.");
+      setCreateError("Please fix upload issues first. Images above 2 MB should be compressed for clearer admin review before upload.");
       setWizardStep(4);
       return;
     }
@@ -759,7 +780,7 @@ export default function CreateProjectWizard() {
                   {fieldErrors.issuerName ? <span className="text-xs text-[var(--status-error,#ef4444)]">{fieldErrors.issuerName}</span> : null}
                 </Field>
                 <Field label="Issuer About (EN)" required>
-                  <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={180} name="about" value={wizardState.issuer["en-US"].about} onChange={(event) => onIssuerChange("en-US", event)} placeholder="Issuer about in English" />
+                  <textarea rows={5} className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="about" value={wizardState.issuer["en-US"].about} onChange={(event) => onIssuerChange("en-US", event)} placeholder="Issuer about in English" />
                 </Field>
                 <Field label="Issuer Location (EN)" required>
                   <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={80} name="location" value={wizardState.issuer["en-US"].location} onChange={(event) => onIssuerChange("en-US", event)} placeholder="Issuer location in English" />
@@ -778,7 +799,7 @@ export default function CreateProjectWizard() {
                   <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={40} name="name" value={wizardState.issuer["pt-PT"].name} onChange={(event) => onIssuerChange("pt-PT", event)} placeholder="Issuer name in Portuguese" />
                 </Field>
                 <Field label="Issuer About (PT)">
-                  <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={180} name="about" value={wizardState.issuer["pt-PT"].about} onChange={(event) => onIssuerChange("pt-PT", event)} placeholder="Issuer about in Portuguese" />
+                  <textarea rows={5} className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="about" value={wizardState.issuer["pt-PT"].about} onChange={(event) => onIssuerChange("pt-PT", event)} placeholder="Issuer about in Portuguese" />
                 </Field>
                 <Field label="Issuer Location (PT)">
                   <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={80} name="location" value={wizardState.issuer["pt-PT"].location} onChange={(event) => onIssuerChange("pt-PT", event)} placeholder="Issuer location in Portuguese" />
@@ -810,6 +831,14 @@ export default function CreateProjectWizard() {
             </Field>
             <Field label="Token Premium" required>
               <input type="number" min="0" step="any" className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="token_premium" value={wizardState.projectFinancials.token_premium} onChange={onFinancialChange} />
+            </Field>
+            <Field label="Start Date" hint="Optional. Format: YYYY-MM-DD">
+              <input type="date" className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="start_date" value={wizardState.projectFinancials.start_date} onChange={onFinancialChange} />
+              {wizardValidation.steps[1].fieldErrors.startDate ? <span className="text-xs text-[var(--status-error,#ef4444)]">{wizardValidation.steps[1].fieldErrors.startDate}</span> : null}
+            </Field>
+            <Field label="End Date" hint="Optional. Must be on/after start date.">
+              <input type="date" className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="end_date" value={wizardState.projectFinancials.end_date} onChange={onFinancialChange} />
+              {wizardValidation.steps[1].fieldErrors.endDate ? <span className="text-xs text-[var(--status-error,#ef4444)]">{wizardValidation.steps[1].fieldErrors.endDate}</span> : null}
             </Field>
             <div className="md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]">
               Investment limits are set automatically: minimum `1` and maximum `1,000,000`.
@@ -854,58 +883,82 @@ export default function CreateProjectWizard() {
 
         {wizardStep === 2 && (
           <>
-            <div className="md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]">
-              These descriptions are shown in the marketplace. Keep short description concise and make long description scannable with clear paragraphs.
+            <div className="md:col-span-2 flex items-center justify-between rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2">
+              <span className="text-xs text-[var(--brand-text-secondary)]">EN and PT are edited side-by-side for a smoother project creation flow.</span>
+              <button type="button" onClick={copyEnContentToPt} className="rounded-md border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-3 py-1 text-xs font-medium text-[var(--brand-text)]">
+                Copy EN content to PT
+              </button>
             </div>
-            <Field label="EN Title" required>
-              <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={wizardState.projectContent["en-US"].title} onChange={(e) => onContentChange("en-US", "title", e.target.value)} />
-            </Field>
-            <Field label="EN Asset Type" required>
-              <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={wizardState.projectContent["en-US"].asset_type} onChange={(e) => onContentChange("en-US", "asset_type", e.target.value)} />
-            </Field>
-            <Field label="EN Short Description" required>
-              <textarea maxLength={SHORT_DESCRIPTION_MAX} className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" rows={3} value={wizardState.projectContent["en-US"].short_description} onChange={(e) => onContentChange("en-US", "short_description", e.target.value)} onBlur={() => onDescriptionBlur("en-US", "short_description")} />
-              <DescriptionInsights value={wizardState.projectContent["en-US"].short_description} max={SHORT_DESCRIPTION_MAX} mode="short" />
-            </Field>
-            <Field label="EN Long Description" required>
-              <textarea maxLength={LONG_DESCRIPTION_MAX} className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 leading-relaxed" rows={8} value={wizardState.projectContent["en-US"].long_description} onChange={(e) => onContentChange("en-US", "long_description", e.target.value)} onBlur={() => onDescriptionBlur("en-US", "long_description")} />
-              <DescriptionInsights value={wizardState.projectContent["en-US"].long_description} max={LONG_DESCRIPTION_MAX} mode="long" />
-            </Field>
-            <Field label="EN Tags" hint={`Comma separated, up to ${MAX_TAGS} tags`}>
-              <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={tagDrafts["en-US"]} onChange={(e) => onTagInputChange("en-US", e.target.value)} onBlur={() => onTagInputBlur("en-US")} placeholder="solar, green-energy, verified" />
-              <span className="text-xs text-[var(--brand-text-secondary)]">{wizardState.projectContent["en-US"].tags.length}/{MAX_TAGS} tags</span>
-              <TagPreview tags={wizardState.projectContent["en-US"].tags} />
-            </Field>
+            <div className="md:col-span-2 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div className="rounded-lg border border-[var(--brand-border)] p-3">
+                <h3 className="mb-2 text-sm font-semibold text-[var(--brand-text)]">English (EN-US)</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  <Field label="EN Title" required>
+                    <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={wizardState.projectContent["en-US"].title} onChange={(e) => onContentChange("en-US", "title", e.target.value)} />
+                  </Field>
+                  <Field label="EN Asset Type" required>
+                    <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={wizardState.projectContent["en-US"].asset_type} onChange={(e) => onContentChange("en-US", "asset_type", e.target.value)} />
+                  </Field>
+                  <Field label="EN Short Description" required>
+                    <textarea className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" rows={3} value={wizardState.projectContent["en-US"].short_description} onChange={(e) => onContentChange("en-US", "short_description", e.target.value)} onBlur={() => onDescriptionBlur("en-US", "short_description")} />
+                    <DescriptionInsights value={wizardState.projectContent["en-US"].short_description} mode="short" />
+                  </Field>
+                  <Field label="EN Long Description" required>
+                    <textarea className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 leading-relaxed" rows={8} value={wizardState.projectContent["en-US"].long_description} onChange={(e) => onContentChange("en-US", "long_description", e.target.value)} onBlur={() => onDescriptionBlur("en-US", "long_description")} />
+                    <DescriptionInsights value={wizardState.projectContent["en-US"].long_description} mode="long" />
+                  </Field>
+                  <Field label="EN Tags" hint={`Comma separated, up to ${MAX_TAGS} tags`}>
+                    <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={tagDrafts["en-US"]} onChange={(e) => onTagInputChange("en-US", e.target.value)} onBlur={() => onTagInputBlur("en-US")} placeholder="solar, green-energy, verified" />
+                    <span className="text-xs text-[var(--brand-text-secondary)]">{wizardState.projectContent["en-US"].tags.length}/{MAX_TAGS} tags</span>
+                    <TagPreview tags={wizardState.projectContent["en-US"].tags} />
+                  </Field>
+                </div>
+              </div>
+              <div className="rounded-lg border border-[var(--brand-border)] p-3">
+                <h3 className="mb-2 text-sm font-semibold text-[var(--brand-text)]">Português (PT-PT)</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  <Field label="PT Title" required>
+                    <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={wizardState.projectContent["pt-PT"].title} onChange={(e) => onContentChange("pt-PT", "title", e.target.value)} />
+                  </Field>
+                  <Field label="PT Asset Type" required>
+                    <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={wizardState.projectContent["pt-PT"].asset_type} onChange={(e) => onContentChange("pt-PT", "asset_type", e.target.value)} />
+                  </Field>
+                  <Field label="PT Short Description" required>
+                    <textarea className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" rows={3} value={wizardState.projectContent["pt-PT"].short_description} onChange={(e) => onContentChange("pt-PT", "short_description", e.target.value)} onBlur={() => onDescriptionBlur("pt-PT", "short_description")} />
+                    <DescriptionInsights value={wizardState.projectContent["pt-PT"].short_description} mode="short" />
+                  </Field>
+                  <Field label="PT Long Description" required>
+                    <textarea className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 leading-relaxed" rows={8} value={wizardState.projectContent["pt-PT"].long_description} onChange={(e) => onContentChange("pt-PT", "long_description", e.target.value)} onBlur={() => onDescriptionBlur("pt-PT", "long_description")} />
+                    <DescriptionInsights value={wizardState.projectContent["pt-PT"].long_description} mode="long" />
+                  </Field>
+                  <Field label="PT Tags" hint={`Separadas por vírgula, máximo ${MAX_TAGS}`}>
+                    <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={tagDrafts["pt-PT"]} onChange={(e) => onTagInputChange("pt-PT", e.target.value)} onBlur={() => onTagInputBlur("pt-PT")} placeholder="solar, energia-verde, verificado" />
+                    <span className="text-xs text-[var(--brand-text-secondary)]">{wizardState.projectContent["pt-PT"].tags.length}/{MAX_TAGS} tags</span>
+                    <TagPreview tags={wizardState.projectContent["pt-PT"].tags} />
+                  </Field>
+                </div>
+              </div>
+            </div>
           </>
         )}
 
         {wizardStep === 3 && (
           <>
-            <div className="md:col-span-2 flex items-center justify-between rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2">
-              <span className="text-xs text-[var(--brand-text-secondary)]">Speed up translation workflow by starting from EN content.</span>
-              <button type="button" onClick={copyEnContentToPt} className="rounded-md border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-3 py-1 text-xs font-medium text-[var(--brand-text)]">
-                Copy EN content to PT
-              </button>
+            <div className="md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-sm text-[var(--brand-text-secondary)]">
+              Localization text is finalized in Step 2. Use this step for a quick review before managing media and resources.
             </div>
-            <Field label="PT Title" required>
-              <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={wizardState.projectContent["pt-PT"].title} onChange={(e) => onContentChange("pt-PT", "title", e.target.value)} />
-            </Field>
-            <Field label="PT Asset Type" required>
-              <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={wizardState.projectContent["pt-PT"].asset_type} onChange={(e) => onContentChange("pt-PT", "asset_type", e.target.value)} />
-            </Field>
-            <Field label="PT Short Description" required>
-              <textarea maxLength={SHORT_DESCRIPTION_MAX} className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" rows={3} value={wizardState.projectContent["pt-PT"].short_description} onChange={(e) => onContentChange("pt-PT", "short_description", e.target.value)} onBlur={() => onDescriptionBlur("pt-PT", "short_description")} />
-              <DescriptionInsights value={wizardState.projectContent["pt-PT"].short_description} max={SHORT_DESCRIPTION_MAX} mode="short" />
-            </Field>
-            <Field label="PT Long Description" required>
-              <textarea maxLength={LONG_DESCRIPTION_MAX} className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 leading-relaxed" rows={8} value={wizardState.projectContent["pt-PT"].long_description} onChange={(e) => onContentChange("pt-PT", "long_description", e.target.value)} onBlur={() => onDescriptionBlur("pt-PT", "long_description")} />
-              <DescriptionInsights value={wizardState.projectContent["pt-PT"].long_description} max={LONG_DESCRIPTION_MAX} mode="long" />
-            </Field>
-            <Field label="PT Tags" hint={`Separadas por vírgula, máximo ${MAX_TAGS}`}>
-              <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" value={tagDrafts["pt-PT"]} onChange={(e) => onTagInputChange("pt-PT", e.target.value)} onBlur={() => onTagInputBlur("pt-PT")} placeholder="solar, energia-verde, verificado" />
-              <span className="text-xs text-[var(--brand-text-secondary)]">{wizardState.projectContent["pt-PT"].tags.length}/{MAX_TAGS} tags</span>
-              <TagPreview tags={wizardState.projectContent["pt-PT"].tags} />
-            </Field>
+            <div className="md:col-span-2 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div className="rounded-lg border border-[var(--brand-border)] p-3">
+                <h3 className="text-sm font-semibold text-[var(--brand-text)]">EN Summary</h3>
+                <p className="mt-2 text-xs text-[var(--brand-text-secondary)]">Title: {wizardState.projectContent["en-US"].title || "—"}</p>
+                <p className="mt-1 text-xs text-[var(--brand-text-secondary)]">Tags: {wizardState.projectContent["en-US"].tags.length}</p>
+              </div>
+              <div className="rounded-lg border border-[var(--brand-border)] p-3">
+                <h3 className="text-sm font-semibold text-[var(--brand-text)]">PT Summary</h3>
+                <p className="mt-2 text-xs text-[var(--brand-text-secondary)]">Title: {wizardState.projectContent["pt-PT"].title || "—"}</p>
+                <p className="mt-1 text-xs text-[var(--brand-text-secondary)]">Tags: {wizardState.projectContent["pt-PT"].tags.length}</p>
+              </div>
+            </div>
           </>
         )}
 

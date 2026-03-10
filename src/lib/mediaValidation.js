@@ -1,5 +1,5 @@
 export const MEDIA_RULES = {
-  imageMaxBytes: 5 * 1024 * 1024,
+  imageMaxBytes: 2 * 1024 * 1024,
   resourceMaxBytes: 20 * 1024 * 1024,
   logoMinWidth: 300,
   logoMinHeight: 300,
@@ -34,7 +34,7 @@ export async function validateImageFile(file, options = {}) {
 
   if (Number(file.size || 0) > maxBytes) {
     return {
-      error: `${label} is too large (${formatFileSize(file.size)}). Please compress it below ${formatFileSize(maxBytes)} and upload again.`,
+      error: `${label} is too large (${formatFileSize(file.size)}). Please compress it below ${formatFileSize(maxBytes)} for clearer admin review and upload again.`,
       warning: "",
     };
   }
