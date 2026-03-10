@@ -27,7 +27,9 @@
  *   token_description: string,
  *   project_label: string,
  *   project_type: string,
- *   project_country_code: string
+ *   project_country_code: string,
+ *   start_date: string,
+ *   end_date: string
  * }} projectFinancials
  * @property {{"en-US": LocalizedContent, "pt-PT": LocalizedContent}} projectContent
  * @property {{thumbnail: File | null, galleryImages: File[], resources: {file: File, title: string}[]}} media
@@ -38,7 +40,7 @@
  * @property {string} projectId
  * @property {string} issuerId
  * @property {{"en-US": {name: string, about: string, location: string, industry: string}, "pt-PT": {name: string, about: string, location: string, industry: string}}} issuer
- * @property {{token_price: number, token_premium: number, min_investment: number, max_investment: number}} projectFinancials
+ * @property {{token_price: number, token_premium: number, min_investment: number, max_investment: number, project_country_code?: string, start_date?: string, end_date?: string}} projectFinancials
  * @property {{"en-US": LocalizedContent, "pt-PT": LocalizedContent}} projectContent
  * @property {{imageIds: string[], deleteThumbnail: boolean, resourceIds: string[]}} mediaToRemove
  * @property {{thumbnail: File | null, newGalleryImages: File[], newResources: {file: File, title: string}[]}} newMedia
@@ -77,6 +79,8 @@ export function createInitialProjectWizardState() {
       project_label: "",
       project_type: "",
       project_country_code: "",
+      start_date: "",
+      end_date: "",
     },
     projectContent: {
       "en-US": {
@@ -249,6 +253,8 @@ function assertRequired(state) {
     throw new Error("Country code must be exactly 3 characters.");
   }
 
+  assertDateRange(financials.start_date, financials.end_date);
+
   if (!state.media.thumbnail) {
     throw new Error("Thumbnail is required.");
   }
@@ -260,6 +266,30 @@ function assertRequired(state) {
     if (!content.short_description.trim()) throw new Error(`Missing ${localization} short description.`);
     if (!content.long_description.trim()) throw new Error(`Missing ${localization} long description.`);
   }
+}
+
+function assertDateRange(startDate, endDate) {
+  const start = String(startDate || "").trim();
+  const end = String(endDate || "").trim();
+  const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+
+  if (start && !isoDate.test(start)) {
+    throw new Error("Start date must use YYYY-MM-DD format.");
+  }
+
+  if (end && !isoDate.test(end)) {
+    throw new Error("End date must use YYYY-MM-DD format.");
+  }
+
+  if (start && end && new Date(`${start}T00:00:00Z`) > new Date(`${end}T00:00:00Z`)) {
+    throw new Error("End date must be on or after start date.");
+  }
+}
+
+function toIsoDateTime(dateValue) {
+  const normalized = String(dateValue || "").trim();
+  if (!normalized) return null;
+  return new Date(`${normalized}T00:00:00Z`).toISOString();
 }
 
 /** @param {ProjectWizardState} state */
@@ -316,6 +346,8 @@ export async function submitWizard(state) {
       currency: state.projectFinancials.currency.trim().toLowerCase(),
       min_investment: 1,
       max_investment: 1000000,
+      start_date: toIsoDateTime(state?.projectFinancials?.start_date),
+      end_date: toIsoDateTime(state?.projectFinancials?.end_date),
       token: {
         quantity: Number(state.projectFinancials.token_quantity),
         friendly_name: state.projectFinancials.token_friendly_name.trim(),
@@ -429,6 +461,8 @@ function assertRequiredUpdateState(state) {
   if (!String(state?.issuer?.["en-US"]?.industry || "").trim()) throw new Error("issuer.en-US.industry is required.");
 
   const pf = state?.projectFinancials || {};
+  assertDateRange(pf.start_date, pf.end_date);
+
   const requiredFinancialKeys = ["token_price", "token_premium", "min_investment", "max_investment"];
   for (const key of requiredFinancialKeys) {
     if (String(pf[key] ?? "").trim() === "") {
@@ -503,11 +537,67 @@ async function uploadNewResourcesForProject(projectId, newMedia) {
   );
 }
 
-/** @param {UpdateProjectState} state */
-export async function updateProject(state) {
-  assertRequiredUpdateState(state);
+async function parseDeleteResult(response) {
+  const contentType = response.headers.get("content-type") || "";
+  const payload = contentType.includes("application/json") ? await response.json() : await response.text();
+  const message = typeof payload === "string"
+    ? payload
+    : payload?.message || payload?.error || "";
 
-  const projectCountryCode = String(state?.projectFinancials?.project_country_code || "").trim().toUpperCase();
+  return {
+    ok: response.ok,
+    status: response.status,
+    message: String(message || "").trim(),
+  };
+}
+
+function isDeleteNotFound(result) {
+  if (!result || result.ok) return false;
+  if (result.status === 404) return true;
+  return /no\s+(image|resource)|not\s+found|already\s+deleted/i.test(String(result.message || ""));
+}
+
+async function deleteWithLocalizationFallback(endpoint, bodyFactory, fallbackMessage) {
+  let lastError = "";
+  let sawNotFound = false;
+
+  for (const localization of LOCALIZATIONS) {
+    const response = await fetch(endpoint, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(bodyFactory(localization)),
+    });
+
+    const result = await parseDeleteResult(response);
+    if (result.ok) return;
+
+    if (isDeleteNotFound(result)) {
+      sawNotFound = true;
+      continue;
+    }
+
+    lastError = result.message || fallbackMessage;
+  }
+
+  if (sawNotFound && !lastError) return;
+  throw new Error(lastError || fallbackMessage);
+}
+
+function toDeleteProgressKey(type, id) {
+  if (type === "thumbnail") return "thumbnail";
+  return `${type}:${String(id || "")}`;
+}
+
+/** @param {UpdateProjectState} state */
+export async function updateProject(state, options = {}) {
+  assertRequiredUpdateState(state);
+  const onDeleteProgress = typeof options?.onDeleteProgress === "function"
+    ? options.onDeleteProgress
+    : null;
 
   await Promise.all(
     LOCALIZATIONS.map(async (localization) => {
@@ -534,13 +624,8 @@ export async function updateProject(state) {
       token_premium: Number(state.projectFinancials.token_premium),
       min_investment: 1,
       max_investment: 1000000,
-      ...(projectCountryCode.length === 3
-        ? {
-            token: {
-              project_country_code: projectCountryCode,
-            },
-          }
-        : {}),
+      start_date: toIsoDateTime(state?.projectFinancials?.start_date),
+      end_date: toIsoDateTime(state?.projectFinancials?.end_date),
     }),
   });
 
@@ -572,62 +657,46 @@ export async function updateProject(state) {
 
   const imageIds = state.mediaToRemove?.imageIds || [];
   const deleteThumbnail = Boolean(state.mediaToRemove?.deleteThumbnail);
-  const imageDeleteRequests = [];
+  const imageEndpoint = `/api/projects/${encodeURIComponent(state.projectId)}/localization/image`;
 
   if (deleteThumbnail) {
-    imageDeleteRequests.push(
-      ...LOCALIZATIONS.map((localization) =>
-        fetch(`/api/projects/${encodeURIComponent(state.projectId)}/localization/image`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ localization, is_thumbnail: true }),
-        }),
-      ),
+    const progressKey = toDeleteProgressKey("thumbnail", null);
+    onDeleteProgress?.({ phase: "start", type: "thumbnail", id: null, key: progressKey });
+    await deleteWithLocalizationFallback(
+      imageEndpoint,
+      (localization) => ({ localization, is_thumbnail: true }),
+      "Failed to delete thumbnail",
     );
+    onDeleteProgress?.({ phase: "end", type: "thumbnail", id: null, key: progressKey });
   }
 
-  imageIds.forEach((imageId) => {
-    imageDeleteRequests.push(
-      ...LOCALIZATIONS.map((localization) =>
-        fetch(`/api/projects/${encodeURIComponent(state.projectId)}/localization/image`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ localization, is_thumbnail: false, image_id: imageId }),
-        }),
-      ),
-    );
-  });
-
-  await Promise.all(imageDeleteRequests.map((promise) => promise.then((res) => parseResponse(res, "Failed to delete image"))));
+  await Promise.all(
+    imageIds.map(async (imageId) => {
+      const progressKey = toDeleteProgressKey("image", imageId);
+      onDeleteProgress?.({ phase: "start", type: "image", id: imageId, key: progressKey });
+      await deleteWithLocalizationFallback(
+        imageEndpoint,
+        (localization) => ({ localization, is_thumbnail: false, image_id: imageId }),
+        "Failed to delete image",
+      );
+      onDeleteProgress?.({ phase: "end", type: "image", id: imageId, key: progressKey });
+    }),
+  );
 
   const resourceIds = state.mediaToRemove?.resourceIds || [];
-  const resourceDeleteRequests = [];
-
-  resourceIds.forEach((resourceId) => {
-    resourceDeleteRequests.push(
-      ...LOCALIZATIONS.map((localization) =>
-        fetch(`/api/projects/${encodeURIComponent(state.projectId)}/localization/resource`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ localization, resource_id: resourceId }),
-        }),
-      ),
-    );
-  });
-
-  await Promise.all(resourceDeleteRequests.map((promise) => promise.then((res) => parseResponse(res, "Failed to delete resource"))));
+  const resourceEndpoint = `/api/projects/${encodeURIComponent(state.projectId)}/localization/resource`;
+  await Promise.all(
+    resourceIds.map(async (resourceId) => {
+      const progressKey = toDeleteProgressKey("resource", resourceId);
+      onDeleteProgress?.({ phase: "start", type: "resource", id: resourceId, key: progressKey });
+      await deleteWithLocalizationFallback(
+        resourceEndpoint,
+        (localization) => ({ localization, resource_id: resourceId }),
+        "Failed to delete resource",
+      );
+      onDeleteProgress?.({ phase: "end", type: "resource", id: resourceId, key: progressKey });
+    }),
+  );
 
   await Promise.all([
     uploadNewImagesForProject(state.projectId, state.newMedia || {}),
