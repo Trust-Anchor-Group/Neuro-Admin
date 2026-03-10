@@ -124,6 +124,7 @@ const DetailPageAssets = () => {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [updateError, setUpdateError] = useState('');
   const [updateMessage, setUpdateMessage] = useState('');
+  const [deletingMediaKeys, setDeletingMediaKeys] = useState(() => new Set());
   const [fieldErrors, setFieldErrors] = useState({});
   const [isEditPanelOpen, setIsEditPanelOpen] = useState(false);
   const [uploadFeedback, setUploadFeedback] = useState({ errors: {}, warnings: {} });
@@ -659,6 +660,14 @@ const DetailPageAssets = () => {
     return false;
   };
 
+  const getMediaProgressKey = (item) => {
+    if (!item) return '';
+    if (item.type === 'thumbnail') return 'thumbnail';
+    return `${item.type}:${String(item.id || '')}`;
+  };
+
+  const isDeletingMediaItem = (item) => deletingMediaKeys.has(getMediaProgressKey(item));
+
   const onExistingMediaToggle = (item, checked) => {
     if (!item) return;
 
@@ -810,7 +819,7 @@ const DetailPageAssets = () => {
       }
 
       if (hasUploadErrors) {
-        throw new Error('Please fix upload issues first. Large files must be compressed before upload.');
+        throw new Error('Please fix upload issues first. Images above 2 MB should be compressed for clearer admin review before upload.');
       }
 
       const startDate = String(projectFinancials.start_date || '').trim();
@@ -827,6 +836,8 @@ const DetailPageAssets = () => {
           imageName: issuerLogoFile?.name || 'issuer-profile-photo',
         })));
       }
+
+      setDeletingMediaKeys(new Set());
 
       await updateProjectFlow({
         projectId: editProjectId || projectId,
@@ -856,6 +867,19 @@ const DetailPageAssets = () => {
           newGalleryImages: newMedia.newGalleryImages || [],
           newResources: (newMedia.newResources || []).filter((resource) => resource.file),
         },
+      }, {
+        onDeleteProgress: ({ phase, key }) => {
+          if (!key) return;
+          setDeletingMediaKeys((prev) => {
+            const next = new Set(prev);
+            if (phase === 'start') {
+              next.add(key);
+            } else {
+              next.delete(key);
+            }
+            return next;
+          });
+        },
       });
 
       setProject((prev) => ({
@@ -878,12 +902,12 @@ const DetailPageAssets = () => {
       await loadProjectData(editProjectId || projectId);
 
       setUpdateMessage('Project updated successfully. Changes are now live.');
-      setIsEditPanelOpen(false);
     } catch (error) {
       const mapped = mapBackendValidationError(error);
       setFieldErrors(mapped.fieldErrors || {});
       setUpdateError(mapped.formError || mapped.backendMessage || error?.message || 'Failed to update project.');
     } finally {
+      setDeletingMediaKeys(new Set());
       setUpdateLoading(false);
     }
   };
@@ -1305,7 +1329,8 @@ const DetailPageAssets = () => {
                             Preview PDF
                           </a>
                         ) : null}
-                        {isMediaMarkedForRemoval(item) ? <span className='ml-auto text-[10px] font-semibold text-amber-700'>Selected</span> : null}
+                        {isDeletingMediaItem(item) ? <span className='ml-auto text-[10px] font-semibold text-blue-700'>Deleting...</span> : null}
+                        {!isDeletingMediaItem(item) && isMediaMarkedForRemoval(item) ? <span className='ml-auto text-[10px] font-semibold text-amber-700'>Selected</span> : null}
                       </label>
                     ))}
                   </div>
@@ -1340,7 +1365,8 @@ const DetailPageAssets = () => {
                             Preview PDF
                           </a>
                         ) : null}
-                        {isMediaMarkedForRemoval(item) ? <span className='ml-auto text-[10px] font-semibold text-amber-700'>Selected</span> : null}
+                        {isDeletingMediaItem(item) ? <span className='ml-auto text-[10px] font-semibold text-blue-700'>Deleting...</span> : null}
+                        {!isDeletingMediaItem(item) && isMediaMarkedForRemoval(item) ? <span className='ml-auto text-[10px] font-semibold text-amber-700'>Selected</span> : null}
                       </label>
                     ))}
                   </div>
