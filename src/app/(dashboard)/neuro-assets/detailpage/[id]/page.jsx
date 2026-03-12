@@ -249,24 +249,29 @@ const DetailPageAssets = () => {
     tags: Array.isArray(localization?.tags) ? localization.tags : [],
   });
 
-  const toDateInputValue = (value) => {
+  const toDateTimeInputValue = (value) => {
     if (value === null || value === undefined || value === '') return '';
+
+    const formatLocalDateTime = (dateObject) => {
+      const pad = (part) => String(part).padStart(2, '0');
+      return `${dateObject.getFullYear()}-${pad(dateObject.getMonth() + 1)}-${pad(dateObject.getDate())}T${pad(dateObject.getHours())}:${pad(dateObject.getMinutes())}:${pad(dateObject.getSeconds())}`;
+    };
 
     if (typeof value === 'number' || /^\d+$/.test(String(value))) {
       const seconds = Number(value);
       if (!Number.isFinite(seconds) || seconds <= 0) return '';
-      return new Date(seconds * 1000).toISOString().slice(0, 10);
+      return formatLocalDateTime(new Date(seconds * 1000));
     }
 
     const parsed = new Date(String(value));
     if (Number.isNaN(parsed.getTime())) return '';
-    return parsed.toISOString().slice(0, 10);
+    return formatLocalDateTime(parsed);
   };
 
   const formatDateForDisplay = (value) => {
-    const normalized = toDateInputValue(value);
+    const normalized = toDateTimeInputValue(value);
     if (!normalized) return 'N/A';
-    return new Date(`${normalized}T00:00:00Z`).toLocaleDateString();
+    return new Date(normalized).toLocaleString();
   };
 
   const toMediaList = (localization) => {
@@ -348,8 +353,8 @@ const DetailPageAssets = () => {
         min_investment: Number(coreProject?.min_investment || 0),
         max_investment: Number(coreProject?.max_investment || 0),
         project_country_code: String(coreProject?.token?.project_country_code || coreProject?.token?.project_country || '').toUpperCase(),
-        start_date: toDateInputValue(coreProject?.start_date),
-        end_date: toDateInputValue(coreProject?.end_date),
+        start_date: toDateTimeInputValue(coreProject?.start_date),
+        end_date: toDateTimeInputValue(coreProject?.end_date),
       });
 
       const [enResponse, ptResponse] = await Promise.all([
@@ -824,7 +829,7 @@ const DetailPageAssets = () => {
 
       const startDate = String(projectFinancials.start_date || '').trim();
       const endDate = String(projectFinancials.end_date || '').trim();
-      if (startDate && endDate && new Date(`${startDate}T00:00:00Z`) > new Date(`${endDate}T00:00:00Z`)) {
+      if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
         throw new Error('End date must be on or after start date.');
       }
 
@@ -1215,18 +1220,20 @@ const DetailPageAssets = () => {
             <Field label='Token Premium'>
               <input type='number' min='0' step='any' name='token_premium' value={projectFinancials.token_premium} onChange={onFinancialChange} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' placeholder='Token premium' />
             </Field>
-            <Field label='Start Date'>
+            <Field label='Start Date & Time'>
               <input
-                type='date'
+                type='datetime-local'
+                step='1'
                 name='start_date'
                 value={projectFinancials.start_date}
                 onChange={onFinancialChange}
                 className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2'
               />
             </Field>
-            <Field label='End Date'>
+            <Field label='End Date & Time'>
               <input
-                type='date'
+                type='datetime-local'
+                step='1'
                 name='end_date'
                 value={projectFinancials.end_date}
                 onChange={onFinancialChange}

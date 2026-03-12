@@ -271,17 +271,18 @@ function assertRequired(state) {
 function assertDateRange(startDate, endDate) {
   const start = String(startDate || "").trim();
   const end = String(endDate || "").trim();
-  const isoDate = /^\d{4}-\d{2}-\d{2}$/;
+  const startValue = start ? new Date(start) : null;
+  const endValue = end ? new Date(end) : null;
 
-  if (start && !isoDate.test(start)) {
-    throw new Error("Start date must use YYYY-MM-DD format.");
+  if (start && (!startValue || Number.isNaN(startValue.getTime()))) {
+    throw new Error("Start date must use a valid date-time format.");
   }
 
-  if (end && !isoDate.test(end)) {
-    throw new Error("End date must use YYYY-MM-DD format.");
+  if (end && (!endValue || Number.isNaN(endValue.getTime()))) {
+    throw new Error("End date must use a valid date-time format.");
   }
 
-  if (start && end && new Date(`${start}T00:00:00Z`) > new Date(`${end}T00:00:00Z`)) {
+  if (startValue && endValue && startValue > endValue) {
     throw new Error("End date must be on or after start date.");
   }
 }
@@ -289,7 +290,7 @@ function assertDateRange(startDate, endDate) {
 function toIsoDateTime(dateValue) {
   const normalized = String(dateValue || "").trim();
   if (!normalized) return null;
-  return new Date(`${normalized}T00:00:00Z`).toISOString();
+  return new Date(normalized).toISOString();
 }
 
 /** @param {ProjectWizardState} state */
