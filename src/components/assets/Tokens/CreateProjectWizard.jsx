@@ -20,6 +20,7 @@ const Field = ({ label, required = false, children, hint }) => (
 const MAX_TAGS = 12;
 const MAX_TAG_LENGTH = 30;
 const READING_WORDS_PER_MINUTE = 180;
+const VISIBILITY_OPTIONS = ["Private", "Unlisted", "Public"];
 
 const sanitizeTags = (rawValue) => {
   const values = Array.isArray(rawValue)
@@ -217,6 +218,15 @@ export default function CreateProjectWizard() {
       steps[1].issues.push("Select a valid ISO 3166-1 alpha-3 country code.");
     }
 
+    const visibility = String(financials.visibility || "").trim();
+    if (!visibility) {
+      steps[1].issues.push("Visibility is required.");
+      steps[1].fieldErrors.visibility = "Please select a visibility option.";
+    } else if (!VISIBILITY_OPTIONS.includes(visibility)) {
+      steps[1].issues.push("Visibility must be one of: Private, Unlisted, Public.");
+      steps[1].fieldErrors.visibility = "Invalid visibility value.";
+    }
+
     const descriptionLength = String(financials.token_description || "").trim().length;
     if (descriptionLength < 50 || descriptionLength > 200) {
       const msg = "description have to be between 50 and 200 characters.";
@@ -232,18 +242,19 @@ export default function CreateProjectWizard() {
 
     const startDate = String(financials.start_date || "").trim();
     const endDate = String(financials.end_date || "").trim();
-    const isoDate = /^\d{4}-\d{2}-\d{2}$/;
-    if (startDate && !isoDate.test(startDate)) {
-      const msg = "Start date must use YYYY-MM-DD format.";
+    const startValue = startDate ? new Date(startDate) : null;
+    const endValue = endDate ? new Date(endDate) : null;
+    if (startDate && (!startValue || Number.isNaN(startValue.getTime()))) {
+      const msg = "Start date must be a valid date and time.";
       steps[1].issues.push(msg);
       steps[1].fieldErrors.startDate = msg;
     }
-    if (endDate && !isoDate.test(endDate)) {
-      const msg = "End date must use YYYY-MM-DD format.";
+    if (endDate && (!endValue || Number.isNaN(endValue.getTime()))) {
+      const msg = "End date must be a valid date and time.";
       steps[1].issues.push(msg);
       steps[1].fieldErrors.endDate = msg;
     }
-    if (startDate && endDate && isoDate.test(startDate) && isoDate.test(endDate) && new Date(`${startDate}T00:00:00Z`) > new Date(`${endDate}T00:00:00Z`)) {
+    if (startValue && endValue && startValue > endValue) {
       const msg = "End date must be on or after start date.";
       steps[1].issues.push(msg);
       steps[1].fieldErrors.endDate = msg;
@@ -832,12 +843,12 @@ export default function CreateProjectWizard() {
             <Field label="Token Premium" required>
               <input type="number" min="0" step="any" className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="token_premium" value={wizardState.projectFinancials.token_premium} onChange={onFinancialChange} />
             </Field>
-            <Field label="Start Date" hint="Optional. Format: YYYY-MM-DD">
-              <input type="date" className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="start_date" value={wizardState.projectFinancials.start_date} onChange={onFinancialChange} />
+            <Field label="Start Date & Time" hint="Optional. Includes minutes and seconds.">
+              <input type="datetime-local" step="1" className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="start_date" value={wizardState.projectFinancials.start_date} onChange={onFinancialChange} />
               {wizardValidation.steps[1].fieldErrors.startDate ? <span className="text-xs text-[var(--status-error,#ef4444)]">{wizardValidation.steps[1].fieldErrors.startDate}</span> : null}
             </Field>
-            <Field label="End Date" hint="Optional. Must be on/after start date.">
-              <input type="date" className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="end_date" value={wizardState.projectFinancials.end_date} onChange={onFinancialChange} />
+            <Field label="End Date & Time" hint="Optional. Must be on/after start date & time.">
+              <input type="datetime-local" step="1" className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="end_date" value={wizardState.projectFinancials.end_date} onChange={onFinancialChange} />
               {wizardValidation.steps[1].fieldErrors.endDate ? <span className="text-xs text-[var(--status-error,#ef4444)]">{wizardValidation.steps[1].fieldErrors.endDate}</span> : null}
             </Field>
             <div className="md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]">
@@ -877,6 +888,20 @@ export default function CreateProjectWizard() {
                 <span className="text-xs text-[var(--brand-text-secondary)]">{countryNameByCode.get(wizardState.projectFinancials.project_country_code)}</span>
               ) : null}
               {fieldErrors.projectCountry ? <span className="text-xs text-[var(--status-error,#ef4444)]">{fieldErrors.projectCountry}</span> : null}
+            </Field>
+            <Field label="Visibility" required hint="Private: admin-only dashboard. Unlisted: marketplace link-only. Public: marketplace visible and navigable.">
+              <select
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2"
+                name="visibility"
+                value={wizardState.projectFinancials.visibility}
+                onChange={onFinancialChange}
+              >
+                <option value="">Select visibility</option>
+                {VISIBILITY_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+              {wizardValidation.steps[1].fieldErrors.visibility ? <span className="text-xs text-[var(--status-error,#ef4444)]">{wizardValidation.steps[1].fieldErrors.visibility}</span> : null}
             </Field>
           </>
         )}
