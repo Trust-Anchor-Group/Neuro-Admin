@@ -39,7 +39,6 @@ const getLast3Months = (locale) => {
 // --- Components ---
 const statusClasses = {
   live: "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20",
-  soldOut: "bg-rose-500/10 text-rose-500 border border-rose-500/20",
   upcoming: "bg-amber-500/10 text-amber-600 border border-amber-500/20",
   closed: "bg-slate-500/10 text-slate-500 border border-slate-500/20",
 };
@@ -115,6 +114,7 @@ const AdminPage = () => {
       supply: tDash.projects?.columns?.supply || (isPt ? 'Oferta' : isFr ? 'Offre' : 'Supply'),
       price: tDash.projects?.columns?.price || (isPt ? 'Preço do Token' : isFr ? 'Prix du token' : 'Token Price'),
       media: tDash.projects?.columns?.media || (isPt ? 'Mídia' : isFr ? 'Médias' : 'Media'),
+      visibility: tDash.projects?.columns?.visibility || (isPt ? 'Visibilidade' : isFr ? 'Visibilité' : 'Visibility'),
       status: tDash.projects?.columns?.status || (isPt ? 'Status' : isFr ? 'Statut' : 'Status'),
     },
     labels: {
@@ -127,11 +127,17 @@ const AdminPage = () => {
     },
     status: {
       live: isPt ? 'Ao vivo' : isFr ? 'Actif' : 'Live',
-      soldOut: isPt ? 'Esgotado' : isFr ? 'Épuisé' : 'Sold Out',
       upcoming: isPt ? 'Em breve' : isFr ? 'À venir' : 'Upcoming',
       closed: isPt ? 'Encerrado' : isFr ? 'Clôturé' : 'Closed',
       paid: isPt ? 'Pago' : isFr ? 'Payé' : 'Paid',
     },
+    visibility: {
+      deleted: isPt ? 'Excluído' : isFr ? 'Supprimé' : 'Deleted',
+      public: isPt ? 'Público' : isFr ? 'Public' : 'Public',
+      private: isPt ? 'Privado' : isFr ? 'Privé' : 'Private',
+      unlisted: isPt ? 'Não listado' : isFr ? 'Non listé' : 'Unlisted',
+    },
+    schedule: isPt ? 'Período' : isFr ? 'Période' : 'Schedule',
     monthlyValue: isPt ? 'Valor' : isFr ? 'Valeur' : 'Value',
     noRecentTransactions: isPt ? 'Nenhuma transação recente.' : isFr ? 'Aucune transaction récente.' : 'No recent transactions.',
     noProjects: isPt ? 'Nenhum projeto encontrado.' : isFr ? 'Aucun projet trouvé.' : 'No projects found.',
@@ -142,19 +148,36 @@ const AdminPage = () => {
     notAvailable: isPt ? 'N/D' : isFr ? 'N/D' : 'N/A',
   }), [tDash, isPt, isFr]);
 
+  const toProjectDate = useCallback((value) => {
+    if (value === null || value === undefined || value === '') return null;
+
+    if (typeof value === 'number' || /^\d+$/.test(String(value))) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric) || numeric <= 0) return null;
+      const millis = numeric < 1e12 ? numeric * 1000 : numeric;
+      const date = new Date(millis);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    const parsed = new Date(String(value));
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }, []);
+
+  const formatProjectDate = useCallback((value) => {
+    const date = toProjectDate(value);
+    if (!date) return uiText.notAvailable;
+    return date.toLocaleString(locale);
+  }, [locale, toProjectDate, uiText.notAvailable]);
+
   const getProjectStatus = useCallback((project) => {
     const now = new Date();
-    const token = project?.token || {};
-    const total = Number(token?.token_quantity || 0);
-    const left = Number(token?.tokens_left || 0);
-    const startDate = project?.start_date ? new Date(project.start_date) : null;
-    const endDate = project?.end_date ? new Date(project.end_date) : null;
+    const startDate = toProjectDate(project?.start_date);
+    const endDate = toProjectDate(project?.end_date);
 
-    if (total > 0 && left <= 0) return 'soldOut';
     if (startDate && startDate > now) return 'upcoming';
     if (endDate && endDate < now) return 'closed';
     return 'live';
-  }, []);
+  }, [toProjectDate]);
 
   // -- 1. Fetch Real Data --
   useEffect(() => {
@@ -321,13 +344,14 @@ const AdminPage = () => {
                   <th className="py-3">{uiText.columns.supply}</th>
                   <th className="py-3">{uiText.columns.price}</th>
                   <th className="py-3">{uiText.columns.media}</th>
+                  <th className="py-3">{uiText.columns.visibility}</th>
                   <th className="py-3">{uiText.columns.status}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--brand-border)]/60">
                 {projectsData.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="py-6 text-center text-sm text-[var(--brand-text-secondary)]">{uiText.noProjects}</td>
+                    <td colSpan={8} className="py-6 text-center text-sm text-[var(--brand-text-secondary)]">{uiText.noProjects}</td>
                   </tr>
                 )}
                 {projectsData.map((project) => {
@@ -346,6 +370,20 @@ const AdminPage = () => {
                   const imagesCount = Array.isArray(localization?.images) ? localization.images.length : 0;
                   const resourcesCount = Array.isArray(localization?.resources) ? localization.resources.length : 0;
                   const statusKey = getProjectStatus(project);
+                  const visibilityRaw = String(project?.visibility || '').toLowerCase();
+                  const visibilityKey = ['deleted', 'private', 'unlisted', 'public'].includes(visibilityRaw)
+                    ? visibilityRaw
+                    : 'private';
+                  const visibilityLabel = uiText.visibility[visibilityKey] || uiText.visibility.private;
+                  const visibilityClass = visibilityKey === 'public'
+                    ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                    : visibilityKey === 'private'
+                      ? 'bg-slate-500/10 text-slate-500 border border-slate-500/20'
+                      : visibilityKey === 'unlisted'
+                        ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
+                        : 'bg-rose-500/10 text-rose-600 border border-rose-500/20';
+                  const startDateLabel = formatProjectDate(project?.start_date);
+                  const endDateLabel = formatProjectDate(project?.end_date);
 
                   return (
                     <tr key={projectId} className="hover:bg-[var(--brand-hover)]/60 transition-colors">
@@ -371,14 +409,22 @@ const AdminPage = () => {
                       <td className="py-4 text-xs text-[var(--brand-text-secondary)]">
                         {imagesCount} {uiText.labels.imgs} · {resourcesCount} {uiText.labels.resources}
                       </td>
+                      <td className="py-4 text-xs text-[var(--brand-text-secondary)] font-semibold">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${visibilityClass}`}>
+                          {visibilityLabel}
+                        </span>
+                      </td>
                       <td className="py-4">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClasses[statusKey]}`}>
                           <span className="relative flex h-2 w-2">
                             {statusKey === 'live' ? <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span> : null}
-                            <span className={`relative inline-flex rounded-full h-2 w-2 ${statusKey === 'live' ? 'bg-emerald-500' : statusKey === 'soldOut' ? 'bg-rose-500' : statusKey === 'upcoming' ? 'bg-amber-500' : 'bg-slate-500'}`}></span>
+                            <span className={`relative inline-flex rounded-full h-2 w-2 ${statusKey === 'live' ? 'bg-emerald-500' : statusKey === 'upcoming' ? 'bg-amber-500' : 'bg-slate-500'}`}></span>
                           </span>
                           {uiText.status[statusKey]}
                         </span>
+                        <p className="mt-1 text-[10px] text-[var(--brand-text-secondary)]">
+                          {uiText.schedule}: {startDateLabel} → {endDateLabel}
+                        </p>
                       </td>
                     </tr>
                   )

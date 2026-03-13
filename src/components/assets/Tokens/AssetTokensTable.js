@@ -79,6 +79,27 @@ const muiTheme = createTheme({
   },
 });
 
+const toProjectDate = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+
+  if (typeof value === "number" || /^\d+$/.test(String(value))) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric <= 0) return null;
+    const millis = numeric < 1e12 ? numeric * 1000 : numeric;
+    const parsed = new Date(millis);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  const parsed = new Date(String(value));
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const formatProjectDate = (value) => {
+  const parsed = toProjectDate(value);
+  if (!parsed) return "N/A";
+  return parsed.toLocaleString();
+};
+
 export default function AssetTokensTable({ orders = [], isLoading = false, onRowClick }) {
   const columns = useMemo(
     () => [
@@ -170,28 +191,64 @@ export default function AssetTokensTable({ orders = [], isLoading = false, onRow
         },
       },
       {
+        id: "visibility",
+        accessorFn: (row) => String(row?.visibility || "Private"),
+        header: "Visibility",
+        size: 140,
+        Cell: ({ cell }) => {
+          const raw = String(cell.getValue() || "").toLowerCase();
+          const visibilityKey = ["deleted", "private", "unlisted", "public"].includes(raw)
+            ? raw
+            : "private";
+          const label = visibilityKey === "deleted"
+            ? "Deleted"
+            : visibilityKey === "unlisted"
+              ? "Unlisted"
+              : visibilityKey === "public"
+                ? "Public"
+                : "Private";
+          const className = visibilityKey === "public"
+            ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
+            : visibilityKey === "private"
+              ? "bg-slate-500/10 text-slate-500 border border-slate-500/20"
+              : visibilityKey === "unlisted"
+                ? "bg-amber-500/10 text-amber-600 border border-amber-500/20"
+                : "bg-rose-500/10 text-rose-600 border border-rose-500/20";
+          return (
+            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${className}`}>
+              {label}
+            </span>
+          );
+        },
+      },
+      {
         id: "status",
         header: "Status",
         size: 150,
         accessorFn: (row) => {
-          const tokensLeft = row?.token?.tokens_left;
           const now = new Date();
-          const startDate = row?.start_date ? new Date(row.start_date) : null;
-          const endDate = row?.end_date ? new Date(row.end_date) : null;
+          const startDate = toProjectDate(row?.start_date);
+          const endDate = toProjectDate(row?.end_date);
 
-          if (Number(tokensLeft) === 0) return "Sold Out";
-          if (endDate && endDate < now) return "Closed";
           if (startDate && startDate > now) return "Upcoming";
+          if (endDate && endDate < now) return "Closed";
           return "Live";
         },
-        Cell: ({ cell }) => {
+        Cell: ({ cell, row }) => {
           const status = cell.getValue();
           const isLive = status === "Live";
+          const isUpcoming = status === "Upcoming";
+          const iconColor = isLive ? "var(--status-success,#16a34a)" : isUpcoming ? "#d97706" : "var(--brand-text-secondary)";
           return (
-            <Box display="flex" alignItems="center" gap={1}>
-              <FaCheckCircle style={{ color: isLive ? "var(--status-success,#16a34a)" : "var(--brand-text-secondary)" }} />
-              <span style={{ fontWeight: 700, color: isLive ? "var(--status-success,#16a34a)" : "var(--brand-text-secondary)" }}>
-                {status}
+            <Box display="flex" flexDirection="column" gap={0.5}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <FaCheckCircle style={{ color: iconColor }} />
+                <span style={{ fontWeight: 700, color: iconColor }}>
+                  {status}
+                </span>
+              </Box>
+              <span className="text-[10px] text-[var(--brand-text-secondary)]">
+                {`Schedule: ${formatProjectDate(row.original?.start_date)} → ${formatProjectDate(row.original?.end_date)}`}
               </span>
             </Box>
           );

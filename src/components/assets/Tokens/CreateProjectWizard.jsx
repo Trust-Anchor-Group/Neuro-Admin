@@ -20,6 +20,7 @@ const Field = ({ label, required = false, children, hint }) => (
 const MAX_TAGS = 12;
 const MAX_TAG_LENGTH = 30;
 const READING_WORDS_PER_MINUTE = 180;
+const VISIBILITY_OPTIONS = ["Private", "Unlisted", "Public"];
 
 const sanitizeTags = (rawValue) => {
   const values = Array.isArray(rawValue)
@@ -215,6 +216,15 @@ export default function CreateProjectWizard() {
     }
     if (countryCode && !countryNameByCode.has(countryCode)) {
       steps[1].issues.push("Select a valid ISO 3166-1 alpha-3 country code.");
+    }
+
+    const visibility = String(financials.visibility || "").trim();
+    if (!visibility) {
+      steps[1].issues.push("Visibility is required.");
+      steps[1].fieldErrors.visibility = "Please select a visibility option.";
+    } else if (!VISIBILITY_OPTIONS.includes(visibility)) {
+      steps[1].issues.push("Visibility must be one of: Private, Unlisted, Public.");
+      steps[1].fieldErrors.visibility = "Invalid visibility value.";
     }
 
     const descriptionLength = String(financials.token_description || "").trim().length;
@@ -878,6 +888,20 @@ export default function CreateProjectWizard() {
                 <span className="text-xs text-[var(--brand-text-secondary)]">{countryNameByCode.get(wizardState.projectFinancials.project_country_code)}</span>
               ) : null}
               {fieldErrors.projectCountry ? <span className="text-xs text-[var(--status-error,#ef4444)]">{fieldErrors.projectCountry}</span> : null}
+            </Field>
+            <Field label="Visibility" required hint="Private: admin-only dashboard. Unlisted: marketplace link-only. Public: marketplace visible and navigable.">
+              <select
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2"
+                name="visibility"
+                value={wizardState.projectFinancials.visibility}
+                onChange={onFinancialChange}
+              >
+                <option value="">Select visibility</option>
+                {VISIBILITY_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+              {wizardValidation.steps[1].fieldErrors.visibility ? <span className="text-xs text-[var(--status-error,#ef4444)]">{wizardValidation.steps[1].fieldErrors.visibility}</span> : null}
             </Field>
           </>
         )}

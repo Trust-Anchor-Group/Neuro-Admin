@@ -28,6 +28,7 @@ const Field = ({ label, children }) => (
 const MAX_TAGS = 12;
 const MAX_TAG_LENGTH = 30;
 const READING_WORDS_PER_MINUTE = 180;
+const VISIBILITY_OPTIONS = ["Private", "Unlisted", "Public"];
 
 const sanitizeTags = (rawValue) => {
   const values = Array.isArray(rawValue)
@@ -159,6 +160,7 @@ const DetailPageAssets = () => {
     min_investment: 0,
     max_investment: 0,
     project_country_code: '',
+    visibility: 'Private',
     start_date: '',
     end_date: '',
   });
@@ -353,6 +355,12 @@ const DetailPageAssets = () => {
         min_investment: Number(coreProject?.min_investment || 0),
         max_investment: Number(coreProject?.max_investment || 0),
         project_country_code: String(coreProject?.token?.project_country_code || coreProject?.token?.project_country || '').toUpperCase(),
+        visibility: (() => {
+          const raw = String(coreProject?.visibility || '').trim().toLowerCase();
+          if (raw === 'public') return 'Public';
+          if (raw === 'unlisted') return 'Unlisted';
+          return 'Private';
+        })(),
         start_date: toDateTimeInputValue(coreProject?.start_date),
         end_date: toDateTimeInputValue(coreProject?.end_date),
       });
@@ -591,6 +599,11 @@ const DetailPageAssets = () => {
     if (name === 'start_date' || name === 'end_date') {
       setFieldErrors((prev) => ({ ...prev, startDate: '', endDate: '' }));
       setProjectFinancials((prev) => ({ ...prev, [name]: String(value || '') }));
+      return;
+    }
+
+    if (name === 'visibility') {
+      setProjectFinancials((prev) => ({ ...prev, visibility: String(value || '') }));
       return;
     }
 
@@ -853,6 +866,7 @@ const DetailPageAssets = () => {
           token_premium: Number(projectFinancials.token_premium || 0),
           min_investment: Number(projectFinancials.min_investment || 0),
           max_investment: Number(projectFinancials.max_investment || 0),
+          visibility: String(projectFinancials.visibility || '').trim(),
           start_date: String(projectFinancials.start_date || '').trim(),
           end_date: String(projectFinancials.end_date || '').trim(),
         },
@@ -893,6 +907,7 @@ const DetailPageAssets = () => {
         token_premium: Number(projectFinancials.token_premium),
         min_investment: Number(projectFinancials.min_investment),
         max_investment: Number(projectFinancials.max_investment),
+        visibility: String(projectFinancials.visibility || '').trim() || 'Private',
         start_date: String(projectFinancials.start_date || '').trim() || null,
         end_date: String(projectFinancials.end_date || '').trim() || null,
         token: {
@@ -1220,6 +1235,18 @@ const DetailPageAssets = () => {
             <Field label='Token Premium'>
               <input type='number' min='0' step='any' name='token_premium' value={projectFinancials.token_premium} onChange={onFinancialChange} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' placeholder='Token premium' />
             </Field>
+            <Field label='Visibility'>
+              <select
+                name='visibility'
+                value={projectFinancials.visibility}
+                onChange={onFinancialChange}
+                className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2'
+              >
+                {VISIBILITY_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </Field>
             <Field label='Start Date & Time'>
               <input
                 type='datetime-local'
@@ -1242,6 +1269,9 @@ const DetailPageAssets = () => {
             </Field>
             <div className='md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]'>
               Investment limits are managed automatically: minimum `1` and maximum `1,000,000`.
+            </div>
+            <div className='md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]'>
+              Visibility guide: Private = admin-only dashboard; Unlisted = marketplace link-only; Public = marketplace visible and navigable.
             </div>
               </div>
             </div>
