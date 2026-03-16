@@ -698,6 +698,7 @@ export default function CreateProjectWizard() {
     try {
       const result = await submitWizard({
         ...wizardState,
+        visibility: String(wizardState?.projectFinancials?.visibility || "").trim(),
         existingIssuerId: issuerMode === "existing" ? selectedIssuerId : "",
       });
       setCreateMessage("Project published successfully.");
