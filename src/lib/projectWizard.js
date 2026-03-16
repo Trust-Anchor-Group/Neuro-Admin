@@ -28,10 +28,10 @@
  *   project_label: string,
  *   project_type: string,
  *   project_country_code: string,
- *   visibility: string,
  *   start_date: string,
  *   end_date: string
  * }} projectFinancials
+ * @property {string} [visibility]
  * @property {{"en-US": LocalizedContent, "pt-PT": LocalizedContent}} projectContent
  * @property {{thumbnail: File | null, galleryImages: File[], resources: {file: File, title: string}[]}} media
  */
@@ -40,6 +40,7 @@
  * @typedef {Object} UpdateProjectState
  * @property {string} projectId
  * @property {string} issuerId
+ * @property {string} [visibility]
  * @property {{"en-US": {name: string, about: string, location: string, industry: string}, "pt-PT": {name: string, about: string, location: string, industry: string}}} issuer
  * @property {{token_price: number, token_premium: number, min_investment: number, max_investment: number, project_country_code?: string, visibility?: string, start_date?: string, end_date?: string}} projectFinancials
  * @property {{"en-US": LocalizedContent, "pt-PT": LocalizedContent}} projectContent
@@ -255,7 +256,7 @@ function assertRequired(state) {
     throw new Error("Country code must be exactly 3 characters.");
   }
 
-  const visibility = String(financials.visibility || "").trim().toLowerCase();
+  const visibility = String(state?.visibility ?? financials.visibility ?? "").trim().toLowerCase();
   if (!visibility) {
     throw new Error("Project visibility is required.");
   }
@@ -358,7 +359,7 @@ export async function submitWizard(state) {
       currency: state.projectFinancials.currency.trim().toLowerCase(),
       min_investment: 1,
       max_investment: 1000000,
-      Visibility: String(state?.projectFinancials?.visibility || "").trim() || null,
+      visibility: String((state?.visibility ?? state?.projectFinancials?.visibility) || "").trim() || null,
       start_date: toIsoDateTime(state?.projectFinancials?.start_date),
       end_date: toIsoDateTime(state?.projectFinancials?.end_date),
       token: {
@@ -476,7 +477,7 @@ function assertRequiredUpdateState(state) {
   const pf = state?.projectFinancials || {};
   assertDateRange(pf.start_date, pf.end_date);
 
-  const visibility = String(pf.visibility || "").trim().toLowerCase();
+  const visibility = String(state?.visibility ?? pf.visibility ?? "").trim().toLowerCase();
   if (visibility && !["private", "unlisted", "public"].includes(visibility)) {
     throw new Error("Project visibility must be one of: Private, Unlisted, Public.");
   }
@@ -642,7 +643,7 @@ export async function updateProject(state, options = {}) {
       token_premium: Number(state.projectFinancials.token_premium),
       min_investment: 1,
       max_investment: 1000000,
-      Visibility: String(state?.projectFinancials?.visibility || "").trim() || null,
+      visibility: String((state?.visibility ?? state?.projectFinancials?.visibility) || "").trim() || null,
       start_date: toIsoDateTime(state?.projectFinancials?.start_date),
       end_date: toIsoDateTime(state?.projectFinancials?.end_date),
     }),
