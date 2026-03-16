@@ -1,5 +1,8 @@
 import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { IMAGE_PROFILES, mapOptimizationError, optimizeImageFormData } from "@/lib/server/imageOptimization";
+
+export const runtime = "nodejs";
 
 function buildUrl(base, route) {
   return `${base.replace(/\/$/, "")}${route}`;
@@ -29,7 +32,17 @@ export async function POST(request, context) {
     const baseUrl = `https://${host}`;
     const url = buildUrl(baseUrl, adminPath(`/issuer/${issuerId}/localization/profilePhoto`));
 
-    const formData = await request.formData();
+    const incomingFormData = await request.formData();
+    let formData;
+    try {
+      formData = await optimizeImageFormData(incomingFormData, IMAGE_PROFILES.issuerLogo);
+    } catch (optimizationError) {
+      const mapped = mapOptimizationError(optimizationError);
+      return new Response(JSON.stringify(new ResponseModel(mapped.statusCode, mapped.message)), {
+        status: mapped.statusCode,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
     const headers = {

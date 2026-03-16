@@ -860,13 +860,13 @@ const DetailPageAssets = () => {
       await updateProjectFlow({
         projectId: editProjectId || projectId,
         issuerId,
+        visibility: String(projectFinancials.visibility || '').trim(),
         issuer,
         projectFinancials: {
           token_price: Number(projectFinancials.token_price || 0),
           token_premium: Number(projectFinancials.token_premium || 0),
           min_investment: Number(projectFinancials.min_investment || 0),
           max_investment: Number(projectFinancials.max_investment || 0),
-          visibility: String(projectFinancials.visibility || '').trim(),
           start_date: String(projectFinancials.start_date || '').trim(),
           end_date: String(projectFinancials.end_date || '').trim(),
         },

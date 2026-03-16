@@ -1,5 +1,8 @@
 import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { IMAGE_PROFILES, mapOptimizationError, optimizeImageFormData } from "@/lib/server/imageOptimization";
+
+export const runtime = "nodejs";
 
 function buildUrl(base, route) {
   return `${base.replace(/\/$/, "")}${route}`;
@@ -60,11 +63,15 @@ async function handleImageRequest(request, context, method) {
       body = JSON.stringify(jsonBody || {});
     } else {
       const incomingFormData = await request.formData();
-      const forwardFormData = new FormData();
-      for (const [key, value] of incomingFormData.entries()) {
-        forwardFormData.append(key, value);
+      try {
+        body = await optimizeImageFormData(incomingFormData, IMAGE_PROFILES.projectMedia);
+      } catch (optimizationError) {
+        const mapped = mapOptimizationError(optimizationError);
+        return new Response(JSON.stringify(new ResponseModel(mapped.statusCode, mapped.message)), {
+          status: mapped.statusCode,
+          headers: { "Content-Type": "application/json" },
+        });
       }
-      body = forwardFormData;
     }
 
     const response = await fetch(url, {
