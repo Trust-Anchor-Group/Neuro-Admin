@@ -43,6 +43,7 @@
     "react-world-flags": "^1.6.0",
     "recharts": "^2.15.0",
     "set-cookie-parser": "^2.7.1",
+    "sharp": "^0.34.5",
     "use-debounce": "^10.0.4",
     "uuid": "^11.0.5"
   },
