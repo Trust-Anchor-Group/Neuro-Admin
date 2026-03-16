@@ -28,6 +28,7 @@ const Field = ({ label, children }) => (
 const MAX_TAGS = 12;
 const MAX_TAG_LENGTH = 30;
 const READING_WORDS_PER_MINUTE = 180;
+const VISIBILITY_OPTIONS = ["Private", "Unlisted", "Public"];
 
 const sanitizeTags = (rawValue) => {
   const values = Array.isArray(rawValue)
@@ -159,6 +160,7 @@ const DetailPageAssets = () => {
     min_investment: 0,
     max_investment: 0,
     project_country_code: '',
+    visibility: 'Private',
     start_date: '',
     end_date: '',
   });
@@ -249,24 +251,29 @@ const DetailPageAssets = () => {
     tags: Array.isArray(localization?.tags) ? localization.tags : [],
   });
 
-  const toDateInputValue = (value) => {
+  const toDateTimeInputValue = (value) => {
     if (value === null || value === undefined || value === '') return '';
+
+    const formatLocalDateTime = (dateObject) => {
+      const pad = (part) => String(part).padStart(2, '0');
+      return `${dateObject.getFullYear()}-${pad(dateObject.getMonth() + 1)}-${pad(dateObject.getDate())}T${pad(dateObject.getHours())}:${pad(dateObject.getMinutes())}:${pad(dateObject.getSeconds())}`;
+    };
 
     if (typeof value === 'number' || /^\d+$/.test(String(value))) {
       const seconds = Number(value);
       if (!Number.isFinite(seconds) || seconds <= 0) return '';
-      return new Date(seconds * 1000).toISOString().slice(0, 10);
+      return formatLocalDateTime(new Date(seconds * 1000));
     }
 
     const parsed = new Date(String(value));
     if (Number.isNaN(parsed.getTime())) return '';
-    return parsed.toISOString().slice(0, 10);
+    return formatLocalDateTime(parsed);
   };
 
   const formatDateForDisplay = (value) => {
-    const normalized = toDateInputValue(value);
+    const normalized = toDateTimeInputValue(value);
     if (!normalized) return 'N/A';
-    return new Date(`${normalized}T00:00:00Z`).toLocaleDateString();
+    return new Date(normalized).toLocaleString();
   };
 
   const toMediaList = (localization) => {
@@ -348,8 +355,14 @@ const DetailPageAssets = () => {
         min_investment: Number(coreProject?.min_investment || 0),
         max_investment: Number(coreProject?.max_investment || 0),
         project_country_code: String(coreProject?.token?.project_country_code || coreProject?.token?.project_country || '').toUpperCase(),
-        start_date: toDateInputValue(coreProject?.start_date),
-        end_date: toDateInputValue(coreProject?.end_date),
+        visibility: (() => {
+          const raw = String(coreProject?.visibility || '').trim().toLowerCase();
+          if (raw === 'public') return 'Public';
+          if (raw === 'unlisted') return 'Unlisted';
+          return 'Private';
+        })(),
+        start_date: toDateTimeInputValue(coreProject?.start_date),
+        end_date: toDateTimeInputValue(coreProject?.end_date),
       });
 
       const [enResponse, ptResponse] = await Promise.all([
@@ -589,6 +602,11 @@ const DetailPageAssets = () => {
       return;
     }
 
+    if (name === 'visibility') {
+      setProjectFinancials((prev) => ({ ...prev, visibility: String(value || '') }));
+      return;
+    }
+
     setProjectFinancials((prev) => ({ ...prev, [name]: Number(value) }));
   };
 
@@ -824,7 +842,7 @@ const DetailPageAssets = () => {
 
       const startDate = String(projectFinancials.start_date || '').trim();
       const endDate = String(projectFinancials.end_date || '').trim();
-      if (startDate && endDate && new Date(`${startDate}T00:00:00Z`) > new Date(`${endDate}T00:00:00Z`)) {
+      if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
         throw new Error('End date must be on or after start date.');
       }
 
@@ -848,6 +866,7 @@ const DetailPageAssets = () => {
           token_premium: Number(projectFinancials.token_premium || 0),
           min_investment: Number(projectFinancials.min_investment || 0),
           max_investment: Number(projectFinancials.max_investment || 0),
+          visibility: String(projectFinancials.visibility || '').trim(),
           start_date: String(projectFinancials.start_date || '').trim(),
           end_date: String(projectFinancials.end_date || '').trim(),
         },
@@ -888,6 +907,7 @@ const DetailPageAssets = () => {
         token_premium: Number(projectFinancials.token_premium),
         min_investment: Number(projectFinancials.min_investment),
         max_investment: Number(projectFinancials.max_investment),
+        visibility: String(projectFinancials.visibility || '').trim() || 'Private',
         start_date: String(projectFinancials.start_date || '').trim() || null,
         end_date: String(projectFinancials.end_date || '').trim() || null,
         token: {
@@ -1215,18 +1235,32 @@ const DetailPageAssets = () => {
             <Field label='Token Premium'>
               <input type='number' min='0' step='any' name='token_premium' value={projectFinancials.token_premium} onChange={onFinancialChange} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' placeholder='Token premium' />
             </Field>
-            <Field label='Start Date'>
+            <Field label='Visibility'>
+              <select
+                name='visibility'
+                value={projectFinancials.visibility}
+                onChange={onFinancialChange}
+                className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2'
+              >
+                {VISIBILITY_OPTIONS.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </Field>
+            <Field label='Start Date & Time'>
               <input
-                type='date'
+                type='datetime-local'
+                step='1'
                 name='start_date'
                 value={projectFinancials.start_date}
                 onChange={onFinancialChange}
                 className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2'
               />
             </Field>
-            <Field label='End Date'>
+            <Field label='End Date & Time'>
               <input
-                type='date'
+                type='datetime-local'
+                step='1'
                 name='end_date'
                 value={projectFinancials.end_date}
                 onChange={onFinancialChange}
@@ -1235,6 +1269,9 @@ const DetailPageAssets = () => {
             </Field>
             <div className='md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]'>
               Investment limits are managed automatically: minimum `1` and maximum `1,000,000`.
+            </div>
+            <div className='md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]'>
+              Visibility guide: Private = admin-only dashboard; Unlisted = marketplace link-only; Public = marketplace visible and navigable.
             </div>
               </div>
             </div>
