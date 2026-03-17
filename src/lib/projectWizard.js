@@ -28,10 +28,12 @@
  *   project_label: string,
  *   project_type: string,
  *   project_country_code: string,
+ *   public_investment_progress: boolean,
  *   start_date: string,
  *   end_date: string
  * }} projectFinancials
  * @property {string} [visibility]
+ * @property {boolean} [public_investment_progress]
  * @property {{"en-US": LocalizedContent, "pt-PT": LocalizedContent}} projectContent
  * @property {{thumbnail: File | null, galleryImages: File[], resources: {file: File, title: string}[]}} media
  */
@@ -41,8 +43,9 @@
  * @property {string} projectId
  * @property {string} issuerId
  * @property {string} [visibility]
+ * @property {boolean} [public_investment_progress]
  * @property {{"en-US": {name: string, about: string, location: string, industry: string}, "pt-PT": {name: string, about: string, location: string, industry: string}}} issuer
- * @property {{token_price: number, token_premium: number, min_investment: number, max_investment: number, project_country_code?: string, visibility?: string, start_date?: string, end_date?: string}} projectFinancials
+ * @property {{token_price: number, token_premium: number, min_investment: number, max_investment: number, project_country_code?: string, visibility?: string, public_investment_progress?: boolean, start_date?: string, end_date?: string}} projectFinancials
  * @property {{"en-US": LocalizedContent, "pt-PT": LocalizedContent}} projectContent
  * @property {{imageIds: string[], deleteThumbnail: boolean, resourceIds: string[]}} mediaToRemove
  * @property {{thumbnail: File | null, newGalleryImages: File[], newResources: {file: File, title: string}[]}} newMedia
@@ -82,6 +85,7 @@ export function createInitialProjectWizardState() {
       project_type: "",
       project_country_code: "",
       visibility: "",
+      public_investment_progress: true,
       start_date: "",
       end_date: "",
     },
@@ -265,6 +269,8 @@ function assertRequired(state) {
     throw new Error("Project visibility must be one of: Private, Unlisted, Public.");
   }
 
+  coerceBoolean(state?.public_investment_progress ?? financials.public_investment_progress, "public_investment_progress", true);
+
   assertDateRange(financials.start_date, financials.end_date);
 
   if (!state.media.thumbnail) {
@@ -303,6 +309,17 @@ function toIsoDateTime(dateValue) {
   const normalized = String(dateValue || "").trim();
   if (!normalized) return null;
   return new Date(normalized).toISOString();
+}
+
+function coerceBoolean(value, fieldName, defaultValue = true) {
+  if (value === undefined || value === null || value === "") return defaultValue;
+  if (typeof value === "boolean") return value;
+
+  const normalized = String(value).trim().toLowerCase();
+  if (["true", "1", "yes", "on"].includes(normalized)) return true;
+  if (["false", "0", "no", "off"].includes(normalized)) return false;
+
+  throw new Error(`${fieldName} must be a boolean.`);
 }
 
 /** @param {ProjectWizardState} state */
@@ -360,6 +377,11 @@ export async function submitWizard(state) {
       min_investment: 1,
       max_investment: 1000000,
       visibility: String((state?.visibility ?? state?.projectFinancials?.visibility) || "").trim() || null,
+      public_investment_progress: coerceBoolean(
+        state?.public_investment_progress ?? state?.projectFinancials?.public_investment_progress,
+        "public_investment_progress",
+        true,
+      ),
       start_date: toIsoDateTime(state?.projectFinancials?.start_date),
       end_date: toIsoDateTime(state?.projectFinancials?.end_date),
       token: {
@@ -481,6 +503,8 @@ function assertRequiredUpdateState(state) {
   if (visibility && !["private", "unlisted", "public"].includes(visibility)) {
     throw new Error("Project visibility must be one of: Private, Unlisted, Public.");
   }
+
+  coerceBoolean(state?.public_investment_progress ?? pf.public_investment_progress, "public_investment_progress", true);
 
   const requiredFinancialKeys = ["token_price", "token_premium", "min_investment", "max_investment"];
   for (const key of requiredFinancialKeys) {
@@ -644,6 +668,11 @@ export async function updateProject(state, options = {}) {
       min_investment: 1,
       max_investment: 1000000,
       visibility: String((state?.visibility ?? state?.projectFinancials?.visibility) || "").trim() || null,
+      public_investment_progress: coerceBoolean(
+        state?.public_investment_progress ?? state?.projectFinancials?.public_investment_progress,
+        "public_investment_progress",
+        true,
+      ),
       start_date: toIsoDateTime(state?.projectFinancials?.start_date),
       end_date: toIsoDateTime(state?.projectFinancials?.end_date),
     }),
