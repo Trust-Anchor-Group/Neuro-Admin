@@ -449,8 +449,12 @@ export default function CreateProjectWizard() {
   };
 
   const onFinancialChange = (event) => {
-    const { name } = event.target;
+    const { name, type, checked } = event.target;
     let { value } = event.target;
+
+    if (type === "checkbox") {
+      value = Boolean(checked);
+    }
 
     if (name === "project_country_code") {
       value = String(value || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3);
@@ -699,6 +703,7 @@ export default function CreateProjectWizard() {
       const result = await submitWizard({
         ...wizardState,
         visibility: String(wizardState?.projectFinancials?.visibility || "").trim(),
+        public_investment_progress: Boolean(wizardState?.projectFinancials?.public_investment_progress ?? true),
         existingIssuerId: issuerMode === "existing" ? selectedIssuerId : "",
       });
       setCreateMessage("Project published successfully.");
@@ -903,6 +908,17 @@ export default function CreateProjectWizard() {
                 ))}
               </select>
               {wizardValidation.steps[1].fieldErrors.visibility ? <span className="text-xs text-[var(--status-error,#ef4444)]">{wizardValidation.steps[1].fieldErrors.visibility}</span> : null}
+            </Field>
+            <Field label="Public Investment Progress" hint="Controls whether the project's public progress bar is visible.">
+              <label className="inline-flex items-center gap-2 text-sm text-[var(--brand-text)]">
+                <input
+                  type="checkbox"
+                  name="public_investment_progress"
+                  checked={Boolean(wizardState.projectFinancials.public_investment_progress ?? true)}
+                  onChange={onFinancialChange}
+                />
+                Show progress bar publicly
+              </label>
             </Field>
           </>
         )}

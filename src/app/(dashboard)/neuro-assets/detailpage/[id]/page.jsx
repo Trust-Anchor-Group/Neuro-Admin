@@ -161,6 +161,7 @@ const DetailPageAssets = () => {
     max_investment: 0,
     project_country_code: '',
     visibility: 'Private',
+    public_investment_progress: true,
     start_date: '',
     end_date: '',
   });
@@ -360,6 +361,12 @@ const DetailPageAssets = () => {
           if (raw === 'public') return 'Public';
           if (raw === 'unlisted') return 'Unlisted';
           return 'Private';
+        })(),
+        public_investment_progress: (() => {
+          const raw = coreProject?.public_investment_progress ?? coreProject?.publicInvestmentProgress;
+          if (typeof raw === 'boolean') return raw;
+          if (raw === undefined || raw === null || raw === '') return true;
+          return !['false', '0', 'no', 'off'].includes(String(raw).trim().toLowerCase());
         })(),
         start_date: toDateTimeInputValue(coreProject?.start_date),
         end_date: toDateTimeInputValue(coreProject?.end_date),
@@ -587,8 +594,12 @@ const DetailPageAssets = () => {
   };
 
   const onFinancialChange = (event) => {
-    const { name } = event.target;
+    const { name, type, checked } = event.target;
     let { value } = event.target;
+
+    if (type === 'checkbox') {
+      value = Boolean(checked);
+    }
 
     if (name === 'currency') {
       value = String(value || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
@@ -604,6 +615,11 @@ const DetailPageAssets = () => {
 
     if (name === 'visibility') {
       setProjectFinancials((prev) => ({ ...prev, visibility: String(value || '') }));
+      return;
+    }
+
+    if (name === 'public_investment_progress') {
+      setProjectFinancials((prev) => ({ ...prev, public_investment_progress: Boolean(value) }));
       return;
     }
 
@@ -861,6 +877,7 @@ const DetailPageAssets = () => {
         projectId: editProjectId || projectId,
         issuerId,
         visibility: String(projectFinancials.visibility || '').trim(),
+        public_investment_progress: Boolean(projectFinancials.public_investment_progress),
         issuer,
         projectFinancials: {
           token_price: Number(projectFinancials.token_price || 0),
@@ -908,6 +925,7 @@ const DetailPageAssets = () => {
         min_investment: Number(projectFinancials.min_investment),
         max_investment: Number(projectFinancials.max_investment),
         visibility: String(projectFinancials.visibility || '').trim() || 'Private',
+        public_investment_progress: Boolean(projectFinancials.public_investment_progress),
         start_date: String(projectFinancials.start_date || '').trim() || null,
         end_date: String(projectFinancials.end_date || '').trim() || null,
         token: {
@@ -1247,6 +1265,17 @@ const DetailPageAssets = () => {
                 ))}
               </select>
             </Field>
+            <Field label='Public Investment Progress'>
+              <label className='inline-flex items-center gap-2 text-sm text-[var(--brand-text)]'>
+                <input
+                  type='checkbox'
+                  name='public_investment_progress'
+                  checked={Boolean(projectFinancials.public_investment_progress)}
+                  onChange={onFinancialChange}
+                />
+                Show progress bar publicly
+              </label>
+            </Field>
             <Field label='Start Date & Time'>
               <input
                 type='datetime-local'
@@ -1272,6 +1301,9 @@ const DetailPageAssets = () => {
             </div>
             <div className='md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]'>
               Visibility guide: Private = admin-only dashboard; Unlisted = marketplace link-only; Public = marketplace visible and navigable.
+            </div>
+            <div className='md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]'>
+              Public investment progress guide: enabled shows the project progress bar publicly; disabled hides it.
             </div>
               </div>
             </div>
