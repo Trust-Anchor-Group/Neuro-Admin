@@ -71,9 +71,6 @@ jobs:
           - name: 'kikkin-neuro-admin'
             slot: 'dev'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_KIKKIN_DEV'
-          - name: 'clientx-neuro-admin'
-            slot: 'dev'
-            publishProfileSecret: 'AZURE_CLIENTX_NEURO_ADMIN_DEV'
 
     steps:
       - name: Download artifact
@@ -124,7 +121,7 @@ jobs:
           - name: 'Innova'
             slot: ''
             publishProfileSecret: 'AZURE_NEURO_ADMIN_INNOVA_PROD'
-          - name: 'clientx-neuro-admin'
+          - name: 'athletsandyou-neuro-admin'
             slot: ''
             publishProfileSecret: 'AZURE_NEURO_ADMIN_ATHLETSANDYOU_PROD'
 
