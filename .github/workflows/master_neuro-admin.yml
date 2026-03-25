@@ -124,6 +124,9 @@ jobs:
           - name: 'athletsandyou-neuro-admin'
             slot: ''
             publishProfileSecret: 'AZURE_NEURO_ADMIN_ATHLETSANDYOU_PROD'
+          - name: 'w-neuro-admin'
+            slot: ''
+            publishProfileSecret: 'AZURE_NEURO_ADMIN_W_PROD'
 
     steps:
       - name: Download artifact
