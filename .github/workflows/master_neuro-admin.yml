@@ -71,6 +71,9 @@ jobs:
           - name: 'kikkin-neuro-admin'
             slot: 'dev'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_KIKKIN_DEV'
+          - name: 'w-neuro-admin'
+            slot: 'dev'
+            publishProfileSecret: 'AZURE_NEURO_ADMIN_W_DEV'
 
     steps:
       - name: Download artifact
@@ -125,7 +128,7 @@ jobs:
             slot: ''
             publishProfileSecret: 'AZURE_NEURO_ADMIN_ATHLETSANDYOU_PROD'
           - name: 'w-neuro-admin'
-            slot: ''
+            slot: 'Production'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_W_PROD'
 
     steps:
