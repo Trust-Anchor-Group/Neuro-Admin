@@ -45,7 +45,7 @@
  * @property {string} [visibility]
  * @property {boolean} [public_investment_progress]
  * @property {{"en-US": {name: string, about: string, location: string, industry: string}, "pt-PT": {name: string, about: string, location: string, industry: string}}} issuer
- * @property {{token_price: number, token_premium: number, min_investment: number, max_investment: number, project_country_code?: string, visibility?: string, public_investment_progress?: boolean, start_date?: string, end_date?: string}} projectFinancials
+ * @property {{token_price: number, token_premium: number, currency: string, min_investment: number, max_investment: number, project_country_code?: string, visibility?: string, public_investment_progress?: boolean, start_date?: string, end_date?: string}} projectFinancials
  * @property {{"en-US": LocalizedContent, "pt-PT": LocalizedContent}} projectContent
  * @property {{imageIds: string[], deleteThumbnail: boolean, resourceIds: string[]}} mediaToRemove
  * @property {{thumbnail: File | null, newGalleryImages: File[], newResources: {file: File, title: string}[]}} newMedia
@@ -506,7 +506,7 @@ function assertRequiredUpdateState(state) {
 
   coerceBoolean(state?.public_investment_progress ?? pf.public_investment_progress, "public_investment_progress", true);
 
-  const requiredFinancialKeys = ["token_price", "token_premium", "min_investment", "max_investment"];
+  const requiredFinancialKeys = ["token_price", "token_premium", "currency", "min_investment", "max_investment"];
   for (const key of requiredFinancialKeys) {
     if (String(pf[key] ?? "").trim() === "") {
       throw new Error(`projectFinancials.${key} is required.`);
@@ -665,6 +665,7 @@ export async function updateProject(state, options = {}) {
     body: JSON.stringify({
       token_price: Number(state.projectFinancials.token_price),
       token_premium: Number(state.projectFinancials.token_premium),
+      currency: String(state?.projectFinancials?.currency || "").trim().toLowerCase(),
       min_investment: 1,
       max_investment: 1000000,
       visibility: String((state?.visibility ?? state?.projectFinancials?.visibility) || "").trim() || null,

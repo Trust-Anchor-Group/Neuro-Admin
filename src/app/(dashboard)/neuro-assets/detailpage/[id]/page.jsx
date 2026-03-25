@@ -157,6 +157,7 @@ const DetailPageAssets = () => {
   const [projectFinancials, setProjectFinancials] = useState({
     token_price: 0,
     token_premium: 0,
+    currency: 'BRL',
     min_investment: 0,
     max_investment: 0,
     project_country_code: '',
@@ -353,6 +354,7 @@ const DetailPageAssets = () => {
       setProjectFinancials({
         token_price: Number(coreProject?.token_price || 0),
         token_premium: Number(coreProject?.token_premium || 0),
+        currency: String(coreProject?.currency || 'BRL').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'BRL',
         min_investment: Number(coreProject?.min_investment || 0),
         max_investment: Number(coreProject?.max_investment || 0),
         project_country_code: String(coreProject?.token?.project_country_code || coreProject?.token?.project_country || '').toUpperCase(),
@@ -882,6 +884,7 @@ const DetailPageAssets = () => {
         projectFinancials: {
           token_price: Number(projectFinancials.token_price || 0),
           token_premium: Number(projectFinancials.token_premium || 0),
+          currency: String(projectFinancials.currency || '').trim(),
           min_investment: Number(projectFinancials.min_investment || 0),
           max_investment: Number(projectFinancials.max_investment || 0),
           start_date: String(projectFinancials.start_date || '').trim(),
@@ -922,6 +925,7 @@ const DetailPageAssets = () => {
         ...(prev || {}),
         token_price: Number(projectFinancials.token_price),
         token_premium: Number(projectFinancials.token_premium),
+        currency: String(projectFinancials.currency || '').trim().toUpperCase() || 'BRL',
         min_investment: Number(projectFinancials.min_investment),
         max_investment: Number(projectFinancials.max_investment),
         visibility: String(projectFinancials.visibility || '').trim() || 'Private',
@@ -1252,6 +1256,17 @@ const DetailPageAssets = () => {
             </Field>
             <Field label='Token Premium'>
               <input type='number' min='0' step='any' name='token_premium' value={projectFinancials.token_premium} onChange={onFinancialChange} className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2' placeholder='Token premium' />
+            </Field>
+            <Field label='Currency (ISO 4217)'>
+              <input
+                type='text'
+                name='currency'
+                value={projectFinancials.currency}
+                onChange={onFinancialChange}
+                maxLength={3}
+                className='rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2 uppercase'
+                placeholder='BRL'
+              />
             </Field>
             <Field label='Visibility'>
               <select
