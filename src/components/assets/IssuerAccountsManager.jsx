@@ -294,7 +294,7 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
               type="button"
               onClick={handleAddUser}
               disabled={!issuerId || !isValidUsername(newUsername) || isSubmitting}
-              className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-[var(--brand-primary)] px-4 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-[var(--brand-button)] px-4 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? <FiLoader className="animate-spin" /> : <FiUserPlus />}
               Add User
