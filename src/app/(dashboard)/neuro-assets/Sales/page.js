@@ -33,6 +33,15 @@ function formatDate(value) {
   return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
 }
 
+function formatAmountWithCurrency(value, currency, displayValue) {
+  if (displayValue) return String(displayValue);
+
+  if (value === null || value === undefined || value === "") return "-";
+
+  const normalizedCurrency = String(currency || "").trim().toUpperCase();
+  return normalizedCurrency ? `${value} ${normalizedCurrency}` : String(value);
+}
+
 export default function SalesPage() {
   const [scope, setScope] = useState("global");
   const [issuerId, setIssuerId] = useState("");
@@ -446,7 +455,6 @@ export default function SalesPage() {
                 <th className="px-3 py-2">token_count</th>
                 <th className="px-3 py-2">paying_price</th>
                 <th className="px-3 py-2">token_valuation</th>
-                <th className="px-3 py-2">currency</th>
                 <th className="px-3 py-2">created_contract_id</th>
                 <th className="px-3 py-2">created</th>
                 <th className="px-3 py-2">buyer_legal_id</th>
@@ -455,13 +463,13 @@ export default function SalesPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td className="px-3 py-8 text-center text-[var(--brand-text-secondary)]" colSpan={10}>
+                  <td className="px-3 py-8 text-center text-[var(--brand-text-secondary)]" colSpan={9}>
                     <span className="inline-flex items-center gap-2"><FiLoader className="animate-spin" /> Loading sales...</span>
                   </td>
                 </tr>
               ) : displayedRows.length === 0 ? (
                 <tr>
-                  <td className="px-3 py-8 text-center text-[var(--brand-text-secondary)]" colSpan={10}>No paid sales found for this view.</td>
+                  <td className="px-3 py-8 text-center text-[var(--brand-text-secondary)]" colSpan={9}>No paid sales found for this view.</td>
                 </tr>
               ) : (
                 displayedRows.map((row, index) => (
@@ -472,9 +480,8 @@ export default function SalesPage() {
                     </td>
                     <td className="px-3 py-2 text-xs">{row?.extra?.issuer_name || "Unknown issuer"}</td>
                     <td className="px-3 py-2">{row.token_count}</td>
-                    <td className="px-3 py-2">{row.paying_price}</td>
-                    <td className="px-3 py-2">{row.token_valuation}</td>
-                    <td className="px-3 py-2">{String(row.currency || "").toUpperCase()}</td>
+                    <td className="px-3 py-2">{formatAmountWithCurrency(row.paying_price, row.currency, row.paying_price_display)}</td>
+                    <td className="px-3 py-2">{formatAmountWithCurrency(row.token_valuation, row.token_valuation_currency, row.token_valuation_display)}</td>
                     <td className="px-3 py-2 font-mono text-xs">{row.created_contract_id || "-"}</td>
                     <td className="px-3 py-2">{formatDate(row.created)}</td>
                     <td className="px-3 py-2 text-xs">{row.buyer_legal_id}</td>
