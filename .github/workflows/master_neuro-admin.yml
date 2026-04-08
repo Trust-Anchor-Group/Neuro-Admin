@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - dev
+      - staging
   workflow_dispatch:
 
 jobs:
@@ -27,11 +28,29 @@ jobs:
       - name: Build app
         env:
           NEXT_PUBLIC_PROTOCOL: ${{ secrets.NEXT_PUBLIC_PROTOCOL }}
-          NEXT_PUBLIC_ORIGIN: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_ORIGIN || secrets.NEXT_PUBLIC_ORIGIN_DEV }}
-          NEXT_PUBLIC_AGENT_HOST: ${{ github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_AGENT_HOST || secrets.NEXT_PUBLIC_AGENT_HOST_DEV }}
+
+          NEXT_PUBLIC_ORIGIN: ${{ 
+            github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_ORIGIN ||
+            github.ref == 'refs/heads/staging' && secrets.NEXT_PUBLIC_ORIGIN_STAGING ||
+            secrets.NEXT_PUBLIC_ORIGIN_DEV
+          }}
+
+          NEXT_PUBLIC_AGENT_HOST: ${{ 
+            github.ref == 'refs/heads/master' && secrets.NEXT_PUBLIC_AGENT_HOST ||
+            github.ref == 'refs/heads/staging' && secrets.NEXT_PUBLIC_AGENT_HOST_STAGING ||
+            secrets.NEXT_PUBLIC_AGENT_HOST_DEV
+          }}
+
           NEXT_PUBLIC_HOTJAR_ID: ${{ secrets.NEXT_PUBLIC_HOTJAR_ID }}
-          NEXT_PUBLIC_HOTJAR_ENABLE_DEV: ${{ github.ref == 'refs/heads/master' && 'false' || 'true' }}
+
+          NEXT_PUBLIC_HOTJAR_ENABLE_DEV: ${{ 
+            github.ref == 'refs/heads/master' && 'false' ||
+            github.ref == 'refs/heads/staging' && 'false' ||
+            'true'
+          }}
+
           NEXT_PUBLIC_HOTJAR_BYPASS_CONSENT: ${{ secrets.NEXT_PUBLIC_HOTJAR_BYPASS_CONSENT }}
+
         run: npm run build
 
       - name: Prepare deployment package
@@ -97,6 +116,50 @@ jobs:
           publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
 
       - name: Deploy to Azure Web App (DEV) without slot
+        if: ${{ matrix.app.slot == '' }}
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ matrix.app.name }}
+          package: ./deploy
+          publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/staging'
+    environment:
+      name: Staging
+
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - name: 'Neuro-Admin'
+            slot: 'staging'
+            publishProfileSecret: 'AZURE_NEURO_ADMIN_STAGING'
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: node-app
+
+      - name: Unzip artifact
+        run: unzip release.zip -d deploy
+
+      - name: Debug deployed files
+        run: ls -la ./deploy
+
+      - name: Deploy to Azure Web App (STAGING) with slot
+        if: ${{ matrix.app.slot != '' }}
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ matrix.app.name }}
+          slot-name: ${{ matrix.app.slot }}
+          package: ./deploy
+          publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
+
+      - name: Deploy to Azure Web App (STAGING) without slot
         if: ${{ matrix.app.slot == '' }}
         uses: azure/webapps-deploy@v3
         with:
