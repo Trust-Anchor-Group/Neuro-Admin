@@ -457,7 +457,7 @@ export default function SalesPage() {
                 <th className="px-3 py-2">token_valuation</th>
                 <th className="px-3 py-2">created_contract_id</th>
                 <th className="px-3 py-2">created</th>
-                <th className="px-3 py-2">buyer_legal_id</th>
+                <th className="px-3 py-2">buyer</th>
               </tr>
             </thead>
             <tbody>
@@ -484,7 +484,13 @@ export default function SalesPage() {
                     <td className="px-3 py-2">{formatAmountWithCurrency(row.token_valuation, row.token_valuation_currency, row.token_valuation_display)}</td>
                     <td className="px-3 py-2 font-mono text-xs">{row.created_contract_id || "-"}</td>
                     <td className="px-3 py-2">{formatDate(row.created)}</td>
-                    <td className="px-3 py-2 text-xs">{row.buyer_legal_id}</td>
+                    <td className="px-3 py-2">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs font-semibold">{row.full_name || "Unknown buyer"}</span>
+                        <span className="text-xs text-[var(--brand-text-secondary)]">{row.email || "-"}</span>
+                        <span className="font-mono text-[11px] text-[var(--brand-text-secondary)]">{row.buyer_legal_id || "-"}</span>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
