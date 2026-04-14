@@ -9,6 +9,12 @@ function adminPath(route) {
   return `/nex-api-admin${route}`;
 }
 
+function getIdFromParams(params) {
+  const id = params?.id;
+  const raw = Array.isArray(id) ? id[0] : id;
+  return raw ? decodeURIComponent(raw) : "";
+}
+
 async function parseUpstreamResponse(response) {
   const contentType = response.headers.get("content-type") || "";
   return contentType.includes("application/json")
@@ -16,14 +22,19 @@ async function parseUpstreamResponse(response) {
     : await response.text();
 }
 
-export async function GET(request) {
+export async function GET(request, context) {
   try {
+    const issuerId = getIdFromParams(await context.params);
+    if (!issuerId) {
+      return new Response(JSON.stringify(new ResponseModel(400, "issuer_id is required")), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const { host } = config.api.agent;
     const baseUrl = `https://${host}`;
-    const requestUrl = new URL(request.url);
-    const upstreamBaseUrl = buildUrl(baseUrl, adminPath("/issuer"));
-    const search = requestUrl.searchParams.toString();
-    const url = search ? `${upstreamBaseUrl}?${search}` : upstreamBaseUrl;
+    const url = buildUrl(baseUrl, adminPath(`/issuer/${issuerId}/user`));
 
     const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
     const headers = {
@@ -47,7 +58,7 @@ export async function GET(request) {
         {
           status: response.status,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     }
 
@@ -65,11 +76,19 @@ export async function GET(request) {
   }
 }
 
-export async function POST(request) {
+export async function POST(request, context) {
   try {
+    const issuerId = getIdFromParams(await context.params);
+    if (!issuerId) {
+      return new Response(JSON.stringify(new ResponseModel(400, "issuer_id is required")), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const { host } = config.api.agent;
     const baseUrl = `https://${host}`;
-    const url = buildUrl(baseUrl, adminPath("/issuer"));
+    const url = buildUrl(baseUrl, adminPath(`/issuer/${issuerId}/user`));
 
     let body = {};
     try {
@@ -102,7 +121,7 @@ export async function POST(request) {
         {
           status: response.status,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     }
 

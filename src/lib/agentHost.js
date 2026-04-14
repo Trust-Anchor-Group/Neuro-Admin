@@ -8,6 +8,12 @@ export function validateHost(host) {
 
 export function resolveAgentHost(headersLike) {
   try {
+    const headerHost = typeof headersLike?.get === 'function' ? headersLike.get('x-agent-host') : headersLike?.['x-agent-host'];
+    if (headerHost) {
+      const h = decodeURIComponent(headerHost);
+      if (validateHost(h)) return h;
+    }
+
     const cookieHeader = typeof headersLike?.get === 'function' ? headersLike.get('cookie') : headersLike?.cookie || '';
     if (cookieHeader) {
       const m = cookieHeader.match(/(?:^|; )agent-host=([^;]+)/);

@@ -317,7 +317,8 @@ export default function CreateProjectWizard() {
 
         const options = (Array.isArray(data) ? data : []).map((item) => {
           const id = item?.issuer_id || item?.id || "";
-          const label = item?.issuer_name || item?.name || id;
+          const localizedName = item?.localization?.name || item?.issuer_name || item?.name || "";
+          const label = localizedName || id;
           return {
             id,
             label,

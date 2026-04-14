@@ -7,7 +7,8 @@ export async function POST(req) {
   if (!validateHost(host)) return new Response(JSON.stringify({ error: 'Invalid host'}), { status: 400 });
 
   const headers = new Headers({ 'Content-Type': 'application/json' });
-  headers.append('Set-Cookie', `agent-host=${encodeURIComponent(host)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400; Secure`);
+  const secureFlag = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+  headers.append('Set-Cookie', `agent-host=${encodeURIComponent(host)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400${secureFlag}`);
   return new Response(JSON.stringify({ host }), { status: 200, headers });
 }
 

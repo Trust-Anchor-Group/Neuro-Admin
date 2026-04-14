@@ -1,6 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
-import { FiTrendingUp, FiArrowUpRight, FiCheckCircle, FiActivity, FiLoader } from "react-icons/fi";
+import { FiTrendingUp, FiCheckCircle, FiActivity, FiLoader } from "react-icons/fi";
+import Link from "next/link";
 import UserCard from "@/components/ui/UserCard";
 import { useLanguage, content as i18nContent } from "../../../../context/LanguageContext";
 
@@ -319,7 +320,15 @@ const AdminPage = () => {
             value={loading ? "..." : userCardStats.formattedCount}
           />
         </div>
-        <h1 className="text-3xl font-bold">{tDash.heading || "Assets Dashboard"}</h1>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-3xl font-bold">{tDash.heading || "Assets Dashboard"}</h1>
+          <Link
+            href="/neuro-assets/issuer"
+            className="inline-flex items-center justify-center rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-4 py-2 text-sm font-semibold text-[var(--brand-text)] shadow-sm transition hover:bg-[var(--brand-hover)]"
+          >
+            Go to Issuer Admin
+          </Link>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
