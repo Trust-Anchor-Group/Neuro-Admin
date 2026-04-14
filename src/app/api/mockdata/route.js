@@ -29,13 +29,10 @@ export async function GET(req) {
 
         // ---------- 1) TOTAL request: NO maxCount ----------
         // Send only filters/search if present; otherwise empty body.
-        const totalBody =
-            typeof fullId === 'boolean' || query
-                ? {
-                    ...(typeof fullId === 'boolean' ? { fullId } : {}),
-                    ...(query ? { strictSearch: false, fullTextSearch: query } : { filter: {} }),
-                }
-                : '';
+        const totalBody = {
+            ...(typeof fullId === 'boolean' ? { fullId } : {}),
+            ...(query ? { strictSearch: false, fullTextSearch: query } : { filter: {} }),
+        };
 
         const totalRes = await fetch(url, {
             method: 'POST',
@@ -59,12 +56,17 @@ export async function GET(req) {
 
         const dataResponseTotalItems = await totalRes.json();
         console.log("dataResponseTotalItems:", dataResponseTotalItems);
-        // Robust total: supports API returning array OR number
-        const totalItems = Array.isArray(dataResponseTotalItems)
-            ? dataResponseTotalItems.length
-            : typeof dataResponseTotalItems === 'number'
-                ? dataResponseTotalItems
-                : 0;
+        // Robust total: supports API returning array, number, or object with counts/data.
+        const totalCandidates = [
+            Array.isArray(dataResponseTotalItems) ? dataResponseTotalItems.length : null,
+            Array.isArray(dataResponseTotalItems?.data) ? dataResponseTotalItems.data.length : null,
+            Array.isArray(dataResponseTotalItems?.items) ? dataResponseTotalItems.items.length : null,
+            Number.isFinite(Number(dataResponseTotalItems?.totalItems)) ? Number(dataResponseTotalItems.totalItems) : null,
+            Number.isFinite(Number(dataResponseTotalItems?.total)) ? Number(dataResponseTotalItems.total) : null,
+            Number.isFinite(Number(dataResponseTotalItems?.count)) ? Number(dataResponseTotalItems.count) : null,
+            typeof dataResponseTotalItems === 'number' ? dataResponseTotalItems : null,
+        ];
+        const totalItems = totalCandidates.find((value) => Number.isFinite(value) && value >= 0) ?? 0;
 
         // ---------- 2) DATA request (paged or ALL) ----------
         const isAll = rawLimit === 'all';
@@ -94,8 +96,13 @@ export async function GET(req) {
         }
 
         const data = await res.json();
+        const dataRows = Array.isArray(data)
+            ? data
+            : Array.isArray(data?.data)
+                ? data.data
+                : [];
 
-        const filteredData = data.map((item) => ({
+        const filteredData = dataRows.map((item) => ({
             country: item.country,
             created: item.created,
             email: item.eMail,

@@ -20,7 +20,10 @@ export async function GET(request) {
   try {
     const { host } = config.api.agent;
     const baseUrl = `https://${host}`;
-    const url = buildUrl(baseUrl, adminPath("/issuer"));
+    const requestUrl = new URL(request.url);
+    const upstreamBaseUrl = buildUrl(baseUrl, adminPath("/issuer"));
+    const search = requestUrl.searchParams.toString();
+    const url = search ? `${upstreamBaseUrl}?${search}` : upstreamBaseUrl;
 
     const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
     const headers = {

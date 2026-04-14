@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiLoader, FiRefreshCw, FiTrash2, FiUserPlus, FiUsers } from "react-icons/fi";
 
 const parseApiArray = (payload) => {
@@ -8,11 +8,22 @@ const parseApiArray = (payload) => {
     payload,
     payload?.data,
     payload?.data?.data,
+    payload?.data?.items,
+    payload?.data?.results,
     payload?.results,
     payload?.items,
   ];
   const found = candidates.find((item) => Array.isArray(item));
-  return Array.isArray(found) ? found : [];
+
+  if (Array.isArray(found)) return found;
+
+  const objectData = payload?.data;
+  if (objectData && typeof objectData === "object" && !Array.isArray(objectData)) {
+    const objectValues = Object.values(objectData).filter((value) => value && typeof value === "object");
+    if (objectValues.length > 0) return objectValues;
+  }
+
+  return [];
 };
 
 const extractErrorCode = (payload) => {
@@ -28,15 +39,23 @@ const extractErrorCode = (payload) => {
 };
 
 const isValidUsername = (value) => /^[^@\s]+$/.test(String(value || "").trim());
+const USERNAME_PAGE_SIZE = 10;
 
 export default function IssuerAccountsManager({ initialIssuerId = "" }) {
   const [issuerId, setIssuerId] = useState(String(initialIssuerId || ""));
   const [newUsername, setNewUsername] = useState("");
+  const [selectedAccountUsername, setSelectedAccountUsername] = useState("");
   const [assignedUsers, setAssignedUsers] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const accountUsernamesRequestRef = useRef(0);
 
   const [issuerOptions, setIssuerOptions] = useState([]);
+  const [accountUsernames, setAccountUsernames] = useState([]);
+  const [accountUsernamesPage, setAccountUsernamesPage] = useState(0);
+  const [hasMoreAccountUsernames, setHasMoreAccountUsernames] = useState(true);
   const [isLoadingIssuers, setIsLoadingIssuers] = useState(true);
+  const [isLoadingAccountUsernames, setIsLoadingAccountUsernames] = useState(true);
+  const [isLoadingMoreAccountUsernames, setIsLoadingMoreAccountUsernames] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [feedback, setFeedback] = useState({ type: "", message: "" });
   const [agentHost, setAgentHost] = useState("AGENT_HOST");
@@ -53,10 +72,22 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
     return cleanUsername ? `${cleanUsername}${subjectSuffix}` : "";
   }, [newUsername, subjectSuffix]);
 
+  const assignedUsernameSet = useMemo(() => {
+    return new Set(
+      assignedUsers
+        .map((subject) => String(subject || "").trim().split("@")[0])
+        .filter(Boolean)
+    );
+  }, [assignedUsers]);
+
+  const availableAccountUsernames = useMemo(() => {
+    return accountUsernames.filter((username) => !assignedUsernameSet.has(username));
+  }, [accountUsernames, assignedUsernameSet]);
+
   const fetchIssuers = useCallback(async () => {
     setIsLoadingIssuers(true);
     try {
-      const response = await fetch("/api/issuers", {
+      const response = await fetch("/api/issuers?maxCount=1000&offset=0", {
         method: "GET",
         headers: { Accept: "application/json" },
         credentials: "include",
@@ -123,9 +154,87 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
     }
   }, []);
 
+  const fetchAccountUsernamesPage = useCallback(async ({ page, replace }) => {
+    const requestId = accountUsernamesRequestRef.current + 1;
+    accountUsernamesRequestRef.current = requestId;
+
+    const mapUsernames = (rows) => rows
+      .map((item) => String(item?.userName || "").trim())
+      .filter(Boolean);
+
+    if (replace) {
+      setIsLoadingAccountUsernames(true);
+      setIsLoadingMoreAccountUsernames(false);
+    } else {
+      setIsLoadingMoreAccountUsernames(true);
+    }
+
+    try {
+      const response = await fetch(`/api/mockdata?page=${page}&limit=${USERNAME_PAGE_SIZE}&query=&filter=all`, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        credentials: "include",
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load account usernames (${response.status})`);
+      }
+
+      const payload = await response.json();
+      const pageRows = parseApiArray(payload);
+      const pageUsernames = mapUsernames(pageRows);
+
+      if (accountUsernamesRequestRef.current !== requestId) return;
+
+      setAccountUsernames((prev) => {
+        const merged = replace ? pageUsernames : [...prev, ...pageUsernames];
+        return Array.from(new Set(merged)).sort((a, b) => a.localeCompare(b));
+      });
+      setHasMoreAccountUsernames(pageRows.length === USERNAME_PAGE_SIZE);
+      setAccountUsernamesPage(page);
+    } catch (error) {
+      if (accountUsernamesRequestRef.current !== requestId) return;
+
+      setFeedback((prev) => {
+        if (prev.type === "error" && prev.message) return prev;
+        return { type: "error", message: error?.message || "Unable to load account usernames." };
+      });
+    } finally {
+      if (accountUsernamesRequestRef.current === requestId) {
+        setIsLoadingAccountUsernames(false);
+        setIsLoadingMoreAccountUsernames(false);
+      }
+    }
+  }, []);
+
+  const loadInitialAccountUsernames = useCallback(async () => {
+    setAccountUsernames([]);
+    setAccountUsernamesPage(0);
+    setHasMoreAccountUsernames(true);
+    await fetchAccountUsernamesPage({ page: 1, replace: true });
+  }, [fetchAccountUsernamesPage]);
+
+  const loadMoreAccountUsernames = useCallback(async () => {
+    if (isLoadingAccountUsernames || isLoadingMoreAccountUsernames || !hasMoreAccountUsernames) {
+      return;
+    }
+    await fetchAccountUsernamesPage({ page: accountUsernamesPage + 1, replace: false });
+  }, [accountUsernamesPage, hasMoreAccountUsernames, isLoadingAccountUsernames, isLoadingMoreAccountUsernames, fetchAccountUsernamesPage]);
+
+  useEffect(() => {
+    return () => {
+      accountUsernamesRequestRef.current += 1;
+    };
+  }, []);
+
   useEffect(() => {
     fetchIssuers();
   }, [fetchIssuers]);
+
+  useEffect(() => {
+    loadInitialAccountUsernames();
+  }, [loadInitialAccountUsernames]);
 
   useEffect(() => {
     fetchIssuerUsers(issuerId);
@@ -138,6 +247,11 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
     }
     if (!isValidUsername(newUsername)) {
       setFeedback({ type: "error", message: "Enter a valid username without spaces or @." });
+      return;
+    }
+
+    if (assignedUsernameSet.has(String(newUsername || "").trim())) {
+      setFeedback({ type: "error", message: "This username is already assigned to the selected issuer." });
       return;
     }
 
@@ -180,6 +294,7 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
 
       setAssignedUsers((prev) => (prev.includes(subject) ? prev : [...prev, subject]));
       setNewUsername("");
+      setSelectedAccountUsername("");
       setFeedback({ type: "success", message: "User added to issuer successfully." });
     } catch (error) {
       setFeedback({ type: "error", message: error?.message || "Unable to add user to issuer." });
@@ -234,6 +349,7 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
           type="button"
           onClick={() => {
             fetchIssuers();
+            loadInitialAccountUsernames();
             fetchIssuerUsers(issuerId);
           }}
           disabled={isLoadingIssuers || isLoadingUsers || isSubmitting}
@@ -275,13 +391,64 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
           <label htmlFor="username-input" className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]">
             Add User
           </label>
+          <label htmlFor="existing-username-select" className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]">
+            Existing Usernames
+          </label>
+          <select
+            id="existing-username-select"
+            value={selectedAccountUsername}
+            onChange={(event) => {
+              const pickedUsername = event.target.value;
+              setSelectedAccountUsername(pickedUsername);
+              setNewUsername(pickedUsername);
+              setFeedback({ type: "", message: "" });
+            }}
+            disabled={!issuerId || isSubmitting || (isLoadingAccountUsernames && accountUsernames.length === 0)}
+            className="mb-3 w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-3 py-2 text-sm text-[var(--brand-text)] focus:border-[var(--brand-primary)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <option value="">
+              {(isLoadingAccountUsernames && accountUsernames.length === 0)
+                ? "Loading usernames..."
+                : availableAccountUsernames.length > 0
+                  ? "Select an existing username"
+                  : "No available usernames"}
+            </option>
+            {availableAccountUsernames.map((username) => (
+              <option key={username} value={username}>
+                {username}
+              </option>
+            ))}
+          </select>
+          <div className="-mt-1 mb-2 flex items-center justify-between gap-2">
+            {isLoadingMoreAccountUsernames ? (
+              <p className="text-xs text-[var(--brand-text-secondary)] inline-flex items-center gap-1"><FiLoader className="animate-spin" /> Loading 10 more...</p>
+            ) : (
+              <span className="text-xs text-[var(--brand-text-secondary)]">
+                {accountUsernames.length > 0 ? `${accountUsernames.length} username(s) loaded` : ""}
+              </span>
+            )}
+            {hasMoreAccountUsernames ? (
+              <button
+                type="button"
+                onClick={loadMoreAccountUsernames}
+                disabled={!issuerId || isSubmitting || isLoadingAccountUsernames || isLoadingMoreAccountUsernames}
+                className="rounded-lg border border-[var(--brand-border)] px-3 py-1 text-xs font-semibold text-[var(--brand-text)] hover:bg-[var(--brand-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Load 10 More
+              </button>
+            ) : null}
+          </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="flex w-full overflow-hidden rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)]">
               <input
                 id="username-input"
                 type="text"
                 value={newUsername}
-                onChange={(event) => setNewUsername(event.target.value)}
+                onChange={(event) => {
+                  setNewUsername(event.target.value);
+                  setSelectedAccountUsername("");
+                  setFeedback({ type: "", message: "" });
+                }}
                 placeholder="username"
                 disabled={!issuerId || isSubmitting}
                 className="w-full border-none bg-transparent px-3 py-2 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-text-secondary)] focus:outline-none"
@@ -293,7 +460,7 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
             <button
               type="button"
               onClick={handleAddUser}
-              disabled={!issuerId || !isValidUsername(newUsername) || isSubmitting}
+              disabled={!issuerId || !isValidUsername(newUsername) || assignedUsernameSet.has(String(newUsername || "").trim()) || isSubmitting}
               className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-[var(--brand-button)] px-4 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? <FiLoader className="animate-spin" /> : <FiUserPlus />}
