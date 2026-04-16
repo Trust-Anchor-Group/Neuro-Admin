@@ -123,7 +123,7 @@ export async function POST(request) {
     const secret = getCredential(requestData?.secret ?? requestData?.Secret, process.env.AGENT_CREATE_SECRET ?? process.env.AGENT_API_SECRET);
     const seconds = getSeconds(requestData?.seconds ?? requestData?.Seconds);
     const nonce = getOptionalString(requestData?.nonce ?? requestData?.Nonce) || randomBytes(32).toString('hex');
-    const host = resolveAgentHost(request.headers);
+    const host = process.env.NEX_FRONTEND_DOMAIN;
 
     if (!userName || !eMail || !password) {
         return NextResponse.json(
