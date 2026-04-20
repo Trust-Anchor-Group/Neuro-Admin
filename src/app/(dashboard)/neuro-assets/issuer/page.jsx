@@ -9,7 +9,7 @@ export default function IssuerAdminPage() {
       <header>
         <h1 className="text-3xl font-bold">Issuer Administration</h1>
         <p className="mt-2 text-sm text-[var(--brand-text-secondary)]">
-          Manage issuer-user account assignments in a dedicated workspace.
+          Create issuers, update issuer localizations/logo, and manage issuer-user account assignments in a dedicated workspace.
         </p>
       </header>
 

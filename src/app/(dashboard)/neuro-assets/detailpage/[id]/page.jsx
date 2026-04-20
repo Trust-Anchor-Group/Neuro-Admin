@@ -864,15 +864,6 @@ const DetailPageAssets = () => {
         throw new Error('End date must be on or after start date.');
       }
 
-      if (issuerLogoFile && issuerId) {
-        await Promise.all(['en-US', 'pt-PT'].map((localization) => uploadIssuerProfilePhoto(issuerId, {
-          file: issuerLogoFile,
-          localization,
-          description: 'Issuer profile photo',
-          imageName: issuerLogoFile?.name || 'issuer-profile-photo',
-        })));
-      }
-
       setDeletingMediaKeys(new Set());
 
       await updateProjectFlow({
@@ -920,6 +911,15 @@ const DetailPageAssets = () => {
           });
         },
       });
+
+      if (issuerLogoFile && issuerId) {
+        await Promise.all(['en-US', 'pt-PT'].map((localization) => uploadIssuerProfilePhoto(issuerId, {
+          file: issuerLogoFile,
+          localization,
+          description: 'Issuer profile photo',
+          imageName: issuerLogoFile?.name || 'issuer-profile-photo',
+        })));
+      }
 
       setProject((prev) => ({
         ...(prev || {}),
