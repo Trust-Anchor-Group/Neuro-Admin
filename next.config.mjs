@@ -1,3 +1,5 @@
+import { withSentryConfig } from "@sentry/nextjs";
+
 /** @type {import('next').NextConfig} */
 const backendHost =
   process.env.NEXT_PUBLIC_AGENT_HOST ||
@@ -30,4 +32,15 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+const sentryOptions = {
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  ...(process.env.SENTRY_ORG ? { org: process.env.SENTRY_ORG } : {}),
+  ...(process.env.SENTRY_PROJECT ? { project: process.env.SENTRY_PROJECT } : {}),
+  ...(process.env.SENTRY_AUTH_TOKEN
+    ? { authToken: process.env.SENTRY_AUTH_TOKEN }
+    : {}),
+};
+
+export default withSentryConfig(nextConfig, sentryOptions);
