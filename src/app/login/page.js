@@ -97,6 +97,9 @@ export default function LoginPage() {
             alt="Neuro logo"
             width={150}
             height={42}
+            loading="eager"
+            priority
+            style={{ width: 'auto', height: 'auto' }}
             unoptimized
           />
         </div>
@@ -125,6 +128,7 @@ export default function LoginPage() {
                 width={350}
                 height={620}
                 className="mb-6 md:mb-0"
+                style={{ width: 'auto', height: 'auto' }}
                 unoptimized
               />
 
@@ -143,6 +147,7 @@ export default function LoginPage() {
                       alt="Get it on Google Play"
                       width={190}
                       height={100}
+                      style={{ width: 'auto', height: 'auto' }}
                       unoptimized
                     />
                   </a>
@@ -156,6 +161,7 @@ export default function LoginPage() {
                       alt="Download on the App Store"
                       width={190}
                       height={100}
+                      style={{ width: 'auto', height: 'auto' }}
                       unoptimized
                     />
                   </a>
@@ -172,6 +178,9 @@ export default function LoginPage() {
               width={250}
               height={42}
               className="hidden md:block mb-10"
+              loading="eager"
+              priority
+              style={{ width: 'auto', height: 'auto' }}
               unoptimized
             />
 
@@ -213,6 +222,9 @@ export default function LoginPage() {
                     width={280}
                     height={280}
                     className="opacity-20"
+                    loading="eager"
+                    priority
+                    style={{ width: 'auto', height: 'auto' }}
                     unoptimized
                   />
                 </div>

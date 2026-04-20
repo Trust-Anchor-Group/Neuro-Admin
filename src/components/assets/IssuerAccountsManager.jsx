@@ -2,6 +2,13 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiLoader, FiRefreshCw, FiTrash2, FiUserPlus, FiUsers } from "react-icons/fi";
+import {
+  createIssuer,
+  createIssuerLocalization,
+  listIssuerLocalizations,
+  updateIssuerLocalization,
+  uploadIssuerProfilePhoto,
+} from "@/lib/projectAdmin";
 
 const parseApiArray = (payload) => {
   const candidates = [
@@ -40,6 +47,16 @@ const extractErrorCode = (payload) => {
 
 const isValidUsername = (value) => /^[^@\s]+$/.test(String(value || "").trim());
 const USERNAME_PAGE_SIZE = 10;
+const EMPTY_ISSUER_LOCALIZATION = {
+  name: "",
+  about: "",
+  location: "",
+  industry: "",
+};
+const EMPTY_ISSUER_FORM = {
+  "en-US": { ...EMPTY_ISSUER_LOCALIZATION },
+  "pt-PT": { ...EMPTY_ISSUER_LOCALIZATION },
+};
 
 export default function IssuerAccountsManager({ initialIssuerId = "" }) {
   const [issuerId, setIssuerId] = useState(String(initialIssuerId || ""));
@@ -57,6 +74,13 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
   const [isLoadingAccountUsernames, setIsLoadingAccountUsernames] = useState(true);
   const [isLoadingMoreAccountUsernames, setIsLoadingMoreAccountUsernames] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [isLoadingIssuerProfile, setIsLoadingIssuerProfile] = useState(false);
+  const [isSavingIssuerProfile, setIsSavingIssuerProfile] = useState(false);
+  const [isCreatingIssuer, setIsCreatingIssuer] = useState(false);
+  const [issuerDraft, setIssuerDraft] = useState(EMPTY_ISSUER_FORM);
+  const [issuerLogoUrl, setIssuerLogoUrl] = useState("");
+  const [issuerLogoFile, setIssuerLogoFile] = useState(null);
+  const [issuerValidationError, setIssuerValidationError] = useState("");
   const [feedback, setFeedback] = useState({ type: "", message: "" });
   const [agentHost, setAgentHost] = useState("AGENT_HOST");
 
@@ -83,6 +107,165 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
   const availableAccountUsernames = useMemo(() => {
     return accountUsernames.filter((username) => !assignedUsernameSet.has(username));
   }, [accountUsernames, assignedUsernameSet]);
+
+  const isIssuerActionBusy = isLoadingIssuerProfile || isSavingIssuerProfile || isCreatingIssuer;
+
+  const resolveIssuerAssetUrl = useCallback((rawUrl) => {
+    const value = String(rawUrl || "").trim();
+    if (!value) return "";
+    if (/^https?:\/\//i.test(value)) return value;
+
+    const normalizedAgentHost = String(agentHost || "").replace(/^https?:\/\//i, "").replace(/\/+$/, "");
+    const fallbackHost = process.env.NEXT_PUBLIC_AGENT_HOST || process.env.AGENT_HOST || "mateo.lab.tagroot.io";
+    const host = normalizedAgentHost && normalizedAgentHost !== "AGENT_HOST"
+      ? normalizedAgentHost
+      : fallbackHost;
+
+    if (value.startsWith("/nex-resources/")) {
+      return `https://${host}${value}`;
+    }
+
+    return value.startsWith("/") ? value : `/${value}`;
+  }, [agentHost]);
+
+  const resolveIssuerLogoFromLocalization = useCallback((localization) => {
+    const candidates = [
+      localization?.profile_photo?.url,
+      localization?.profilePhoto?.url,
+      localization?.issuer_profile_photo?.url,
+      localization?.issuerProfilePhoto?.url,
+      localization?.image?.url,
+      localization?.photo?.url,
+      localization?.logo?.url,
+      localization?.logo_url,
+      localization?.image_url,
+      localization?.photo_url,
+    ];
+
+    const found = candidates.find((value) => typeof value === "string" && value.trim()) || "";
+    return resolveIssuerAssetUrl(found);
+  }, [resolveIssuerAssetUrl]);
+
+  const normalizeIssuerDraftForSave = useCallback((draft) => {
+    const en = draft?.["en-US"] || EMPTY_ISSUER_LOCALIZATION;
+    const pt = draft?.["pt-PT"] || EMPTY_ISSUER_LOCALIZATION;
+
+    const normalizedEn = {
+      name: String(en.name || "").trim(),
+      about: String(en.about || "").trim(),
+      location: String(en.location || "").trim(),
+      industry: String(en.industry || "").trim(),
+    };
+
+    const pickPt = (key) => {
+      const ptValue = String(pt[key] || "").trim();
+      return ptValue || normalizedEn[key];
+    };
+
+    const normalizedPt = {
+      name: pickPt("name"),
+      about: pickPt("about"),
+      location: pickPt("location"),
+      industry: pickPt("industry"),
+    };
+
+    return {
+      "en-US": normalizedEn,
+      "pt-PT": normalizedPt,
+    };
+  }, []);
+
+  const validateIssuerDraft = useCallback((draft) => {
+    const enName = String(draft?.["en-US"]?.name || "").trim();
+    const enAbout = String(draft?.["en-US"]?.about || "").trim();
+    const enLocation = String(draft?.["en-US"]?.location || "").trim();
+    const enIndustry = String(draft?.["en-US"]?.industry || "").trim();
+
+    if (!enName) {
+      return "Issuer name (EN) is required.";
+    }
+    if (enName.length < 5 || enName.length > 40) {
+      return "Issuer name (EN) must be between 5 and 40 characters.";
+    }
+    if (!enAbout) {
+      return "Issuer about (EN) is required.";
+    }
+    if (!enLocation) {
+      return "Issuer location (EN) is required.";
+    }
+    if (!enIndustry) {
+      return "Issuer industry (EN) is required.";
+    }
+    return "";
+  }, []);
+
+  const upsertIssuerLocalizations = useCallback(async (targetIssuerId, draft) => {
+    const normalized = normalizeIssuerDraftForSave(draft);
+    const existingLocalizations = await listIssuerLocalizations(targetIssuerId);
+    const existingSet = new Set(
+      (Array.isArray(existingLocalizations) ? existingLocalizations : [])
+        .map((item) => String(item?.localization || "").trim())
+        .filter(Boolean),
+    );
+
+    const saveLocalization = async (localization) => {
+      const payload = {
+        localization,
+        ...normalized[localization],
+      };
+
+      if (existingSet.has(localization)) {
+        await updateIssuerLocalization(targetIssuerId, payload);
+      } else {
+        await createIssuerLocalization(targetIssuerId, payload);
+      }
+    };
+
+    await Promise.all([saveLocalization("en-US"), saveLocalization("pt-PT")]);
+  }, [normalizeIssuerDraftForSave]);
+
+  const loadIssuerProfile = useCallback(async (nextIssuerId) => {
+    const resolvedIssuerId = String(nextIssuerId || "").trim();
+    if (!resolvedIssuerId) {
+      setIssuerDraft(EMPTY_ISSUER_FORM);
+      setIssuerLogoUrl("");
+      setIssuerLogoFile(null);
+      setIssuerValidationError("");
+      return;
+    }
+
+    setIsLoadingIssuerProfile(true);
+    try {
+      const localizations = await listIssuerLocalizations(resolvedIssuerId);
+      const rows = Array.isArray(localizations) ? localizations : [];
+      const en = rows.find((item) => item?.localization === "en-US") || rows[0] || {};
+      const pt = rows.find((item) => item?.localization === "pt-PT") || {};
+
+      const nextDraft = {
+        "en-US": {
+          name: String(en?.name || "").trim(),
+          about: String(en?.about || "").trim(),
+          location: String(en?.location || "").trim(),
+          industry: String(en?.industry || "").trim(),
+        },
+        "pt-PT": {
+          name: String(pt?.name || "").trim(),
+          about: String(pt?.about || "").trim(),
+          location: String(pt?.location || "").trim(),
+          industry: String(pt?.industry || "").trim(),
+        },
+      };
+
+      setIssuerDraft(nextDraft);
+      setIssuerValidationError("");
+      setIssuerLogoFile(null);
+      setIssuerLogoUrl(resolveIssuerLogoFromLocalization(en) || resolveIssuerLogoFromLocalization(pt));
+    } catch (error) {
+      setFeedback({ type: "error", message: error?.message || "Unable to load issuer details." });
+    } finally {
+      setIsLoadingIssuerProfile(false);
+    }
+  }, [resolveIssuerLogoFromLocalization]);
 
   const fetchIssuers = useCallback(async () => {
     setIsLoadingIssuers(true);
@@ -240,6 +423,121 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
     fetchIssuerUsers(issuerId);
   }, [issuerId, fetchIssuerUsers]);
 
+  useEffect(() => {
+    loadIssuerProfile(issuerId);
+  }, [issuerId, loadIssuerProfile]);
+
+  const handleIssuerDraftChange = (localization, field, value) => {
+    setIssuerDraft((prev) => ({
+      ...prev,
+      [localization]: {
+        ...prev[localization],
+        [field]: value,
+      },
+    }));
+
+    if (localization === "en-US" && field === "name") {
+      setIssuerValidationError("");
+    }
+    setFeedback({ type: "", message: "" });
+  };
+
+  const handleIssuerLogoFileChange = (event) => {
+    const file = event.target.files?.[0] || null;
+    setIssuerLogoFile(file);
+    setFeedback({ type: "", message: "" });
+
+    if (!file) {
+      if (issuerId) {
+        loadIssuerProfile(issuerId);
+      }
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setIssuerLogoUrl(previewUrl);
+  };
+
+  const uploadLogoForAllLocalizations = useCallback(async (targetIssuerId, file) => {
+    if (!file) return;
+
+    await Promise.all([
+      uploadIssuerProfilePhoto(targetIssuerId, {
+        file,
+        localization: "en-US",
+        description: "Issuer profile photo",
+        imageName: file?.name || "issuer-profile-photo",
+      }),
+      uploadIssuerProfilePhoto(targetIssuerId, {
+        file,
+        localization: "pt-PT",
+        description: "Issuer profile photo",
+        imageName: file?.name || "issuer-profile-photo",
+      }),
+    ]);
+  }, []);
+
+  const handleCreateIssuer = async () => {
+    const validationError = validateIssuerDraft(issuerDraft);
+    if (validationError) {
+      setIssuerValidationError(validationError);
+      setFeedback({ type: "error", message: validationError });
+      return;
+    }
+
+    setIssuerValidationError("");
+    setIsCreatingIssuer(true);
+    try {
+      const createdIssuer = await createIssuer();
+      const createdIssuerId = String(createdIssuer?.issuer_id || createdIssuer?.id || "").trim();
+
+      if (!createdIssuerId) {
+        throw new Error("Issuer was created but no issuer_id was returned.");
+      }
+
+      await upsertIssuerLocalizations(createdIssuerId, issuerDraft);
+      await uploadLogoForAllLocalizations(createdIssuerId, issuerLogoFile);
+
+      await fetchIssuers();
+      setIssuerId(createdIssuerId);
+      setFeedback({ type: "success", message: "Issuer created successfully." });
+    } catch (error) {
+      setFeedback({ type: "error", message: error?.message || "Unable to create issuer." });
+    } finally {
+      setIsCreatingIssuer(false);
+    }
+  };
+
+  const handleSaveIssuerProfile = async () => {
+    const resolvedIssuerId = String(issuerId || "").trim();
+    if (!resolvedIssuerId) {
+      setFeedback({ type: "error", message: "Select an issuer first." });
+      return;
+    }
+
+    const validationError = validateIssuerDraft(issuerDraft);
+    if (validationError) {
+      setIssuerValidationError(validationError);
+      setFeedback({ type: "error", message: validationError });
+      return;
+    }
+
+    setIssuerValidationError("");
+    setIsSavingIssuerProfile(true);
+    try {
+      await upsertIssuerLocalizations(resolvedIssuerId, issuerDraft);
+      await uploadLogoForAllLocalizations(resolvedIssuerId, issuerLogoFile);
+
+      await fetchIssuers();
+      await loadIssuerProfile(resolvedIssuerId);
+      setFeedback({ type: "success", message: "Issuer details saved successfully." });
+    } catch (error) {
+      setFeedback({ type: "error", message: error?.message || "Unable to save issuer details." });
+    } finally {
+      setIsSavingIssuerProfile(false);
+    }
+  };
+
   const handleAddUser = async () => {
     if (!issuerId) {
       setFeedback({ type: "error", message: "Select an issuer first." });
@@ -351,11 +649,12 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
             fetchIssuers();
             loadInitialAccountUsernames();
             fetchIssuerUsers(issuerId);
+            loadIssuerProfile(issuerId);
           }}
-          disabled={isLoadingIssuers || isLoadingUsers || isSubmitting}
+          disabled={isLoadingIssuers || isLoadingUsers || isSubmitting || isIssuerActionBusy}
           className="inline-flex items-center gap-2 rounded-full border border-[var(--brand-border)] px-4 py-2 text-sm font-semibold text-[var(--brand-text)] hover:bg-[var(--brand-hover)] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <FiRefreshCw className={`${isLoadingIssuers || isLoadingUsers ? "animate-spin" : ""}`} />
+          <FiRefreshCw className={`${isLoadingIssuers || isLoadingUsers || isIssuerActionBusy ? "animate-spin" : ""}`} />
           Refresh
         </button>
       </div>
@@ -370,9 +669,10 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
             value={issuerId}
             onChange={(event) => {
               setIssuerId(event.target.value);
+              setIssuerValidationError("");
               setFeedback({ type: "", message: "" });
             }}
-            disabled={isLoadingIssuers || isSubmitting}
+            disabled={isLoadingIssuers || isSubmitting || isIssuerActionBusy}
             className="w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-3 py-2 text-sm text-[var(--brand-text)] focus:border-[var(--brand-primary)] focus:outline-none"
           >
             <option value="">Select an issuer</option>
@@ -403,7 +703,7 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
               setNewUsername(pickedUsername);
               setFeedback({ type: "", message: "" });
             }}
-            disabled={!issuerId || isSubmitting || (isLoadingAccountUsernames && accountUsernames.length === 0)}
+            disabled={!issuerId || isSubmitting || isIssuerActionBusy || (isLoadingAccountUsernames && accountUsernames.length === 0)}
             className="mb-3 w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-3 py-2 text-sm text-[var(--brand-text)] focus:border-[var(--brand-primary)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
           >
             <option value="">
@@ -431,7 +731,7 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
               <button
                 type="button"
                 onClick={loadMoreAccountUsernames}
-                disabled={!issuerId || isSubmitting || isLoadingAccountUsernames || isLoadingMoreAccountUsernames}
+                disabled={!issuerId || isSubmitting || isIssuerActionBusy || isLoadingAccountUsernames || isLoadingMoreAccountUsernames}
                 className="rounded-lg border border-[var(--brand-border)] px-3 py-1 text-xs font-semibold text-[var(--brand-text)] hover:bg-[var(--brand-hover)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Load 10 More
@@ -450,7 +750,7 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
                   setFeedback({ type: "", message: "" });
                 }}
                 placeholder="username"
-                disabled={!issuerId || isSubmitting}
+                disabled={!issuerId || isSubmitting || isIssuerActionBusy}
                 className="w-full border-none bg-transparent px-3 py-2 text-sm text-[var(--brand-text)] placeholder:text-[var(--brand-text-secondary)] focus:outline-none"
               />
               <span className="inline-flex items-center border-l border-[var(--brand-border)] px-3 py-2 text-xs text-[var(--brand-text-secondary)]">
@@ -460,7 +760,7 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
             <button
               type="button"
               onClick={handleAddUser}
-              disabled={!issuerId || !isValidUsername(newUsername) || assignedUsernameSet.has(String(newUsername || "").trim()) || isSubmitting}
+              disabled={!issuerId || !isValidUsername(newUsername) || assignedUsernameSet.has(String(newUsername || "").trim()) || isSubmitting || isIssuerActionBusy}
               className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-[var(--brand-button)] px-4 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? <FiLoader className="animate-spin" /> : <FiUserPlus />}
@@ -474,6 +774,151 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
               {feedback.message}
             </p>
           ) : null}
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-background)] p-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--brand-text)]">Issuer Profile</h3>
+            <p className="text-xs text-[var(--brand-text-secondary)]">
+              Create a new issuer or update the selected issuer details. User linking stays below.
+            </p>
+          </div>
+          {isLoadingIssuerProfile ? (
+            <span className="inline-flex items-center gap-1 text-xs text-[var(--brand-text-secondary)]"><FiLoader className="animate-spin" /> Loading profile...</span>
+          ) : null}
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]">Issuer Localization (EN)</p>
+            <div className="grid grid-cols-1 gap-2">
+              <label className="text-xs text-[var(--brand-text-secondary)]">Name (EN)</label>
+              <input
+                type="text"
+                maxLength={40}
+                value={issuerDraft["en-US"].name}
+                onChange={(event) => handleIssuerDraftChange("en-US", "name", event.target.value)}
+                disabled={isIssuerActionBusy}
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)]"
+              />
+
+              <label className="text-xs text-[var(--brand-text-secondary)]">About (EN)</label>
+              <textarea
+                rows={4}
+                value={issuerDraft["en-US"].about}
+                onChange={(event) => handleIssuerDraftChange("en-US", "about", event.target.value)}
+                disabled={isIssuerActionBusy}
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)]"
+              />
+
+              <label className="text-xs text-[var(--brand-text-secondary)]">Location (EN)</label>
+              <input
+                type="text"
+                maxLength={80}
+                value={issuerDraft["en-US"].location}
+                onChange={(event) => handleIssuerDraftChange("en-US", "location", event.target.value)}
+                disabled={isIssuerActionBusy}
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)]"
+              />
+
+              <label className="text-xs text-[var(--brand-text-secondary)]">Industry (EN)</label>
+              <input
+                type="text"
+                maxLength={80}
+                value={issuerDraft["en-US"].industry}
+                onChange={(event) => handleIssuerDraftChange("en-US", "industry", event.target.value)}
+                disabled={isIssuerActionBusy}
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)]"
+              />
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]">Issuer Localization (PT)</p>
+            <div className="grid grid-cols-1 gap-2">
+              <label className="text-xs text-[var(--brand-text-secondary)]">Name (PT)</label>
+              <input
+                type="text"
+                maxLength={40}
+                value={issuerDraft["pt-PT"].name}
+                onChange={(event) => handleIssuerDraftChange("pt-PT", "name", event.target.value)}
+                disabled={isIssuerActionBusy}
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)]"
+              />
+
+              <label className="text-xs text-[var(--brand-text-secondary)]">About (PT)</label>
+              <textarea
+                rows={4}
+                value={issuerDraft["pt-PT"].about}
+                onChange={(event) => handleIssuerDraftChange("pt-PT", "about", event.target.value)}
+                disabled={isIssuerActionBusy}
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)]"
+              />
+
+              <label className="text-xs text-[var(--brand-text-secondary)]">Location (PT)</label>
+              <input
+                type="text"
+                maxLength={80}
+                value={issuerDraft["pt-PT"].location}
+                onChange={(event) => handleIssuerDraftChange("pt-PT", "location", event.target.value)}
+                disabled={isIssuerActionBusy}
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)]"
+              />
+
+              <label className="text-xs text-[var(--brand-text-secondary)]">Industry (PT)</label>
+              <input
+                type="text"
+                maxLength={80}
+                value={issuerDraft["pt-PT"].industry}
+                onChange={(event) => handleIssuerDraftChange("pt-PT", "industry", event.target.value)}
+                disabled={isIssuerActionBusy}
+                className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)]"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto] md:items-end">
+          <div>
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]">Issuer Logo</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleIssuerLogoFileChange}
+              disabled={isIssuerActionBusy}
+              className="w-full rounded-lg border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-3 py-2 text-sm text-[var(--brand-text)]"
+            />
+            {issuerLogoUrl ? (
+              <div className="mt-2 flex items-center gap-2">
+                <img src={issuerLogoUrl} alt="Issuer logo preview" className="h-12 w-12 rounded-full border border-[var(--brand-border)] object-cover" />
+                <span className="text-xs text-[var(--brand-text-secondary)]">Logo preview</span>
+              </div>
+            ) : null}
+            {issuerValidationError ? <p className="mt-2 text-xs text-rose-500">{issuerValidationError}</p> : null}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 md:justify-end">
+            <button
+              type="button"
+              onClick={handleCreateIssuer}
+              disabled={isIssuerActionBusy || isSubmitting || isLoadingIssuers || isLoadingUsers}
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-4 py-2 text-sm font-semibold text-[var(--brand-text)] hover:bg-[var(--brand-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isCreatingIssuer ? <FiLoader className="animate-spin" /> : <FiUserPlus />}
+              Create New Issuer
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveIssuerProfile}
+              disabled={!issuerId || isIssuerActionBusy || isSubmitting || isLoadingIssuers || isLoadingUsers}
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--brand-button)] px-4 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSavingIssuerProfile ? <FiLoader className="animate-spin" /> : <FiRefreshCw />}
+              Save Issuer Changes
+            </button>
+          </div>
         </div>
       </div>
 
@@ -497,7 +942,7 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
                 <button
                   type="button"
                   onClick={() => handleRemoveUser(subject)}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isIssuerActionBusy}
                   className="inline-flex items-center gap-1 rounded-lg border border-rose-400/30 px-2 py-1 text-xs font-semibold text-rose-500 hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <FiTrash2 /> Remove
