@@ -18,6 +18,37 @@ function getIdFromParams(params) {
   return raw ? decodeURIComponent(raw) : "";
 }
 
+function getUpstreamErrorMessage(data, status) {
+  if (typeof data === "string") {
+    const normalized = data.trim();
+    if (normalized) return normalized;
+  }
+
+  if (data && typeof data === "object") {
+    const candidates = [
+      data?.message,
+      data?.error,
+      data?.error_description,
+      data?.description,
+      data?.reason,
+      data?.data?.message,
+      data?.data?.error,
+    ];
+
+    const message = candidates.find((value) => typeof value === "string" && value.trim());
+    if (message) return message;
+
+    try {
+      const serialized = JSON.stringify(data);
+      if (serialized && serialized !== "{}") return serialized;
+    } catch {
+      // Fall through to default.
+    }
+  }
+
+  return `Upstream request failed (${status})`;
+}
+
 export async function POST(request, context) {
   try {
     const issuerId = getIdFromParams(await context.params);
@@ -65,8 +96,9 @@ export async function POST(request, context) {
       : await response.text();
 
     if (!response.ok) {
+      const upstreamMessage = getUpstreamErrorMessage(data, response.status);
       return new Response(
-        JSON.stringify(new ResponseModel(response.status, `Error: ${typeof data === "string" ? data : JSON.stringify(data)}`)),
+        JSON.stringify(new ResponseModel(response.status, `Error: ${upstreamMessage}`)),
         {
           status: response.status,
           headers: { "Content-Type": "application/json" },

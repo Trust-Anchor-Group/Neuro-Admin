@@ -57,6 +57,7 @@ const LOCALIZATIONS = ["en-US", "pt-PT"];
 /** @returns {ProjectWizardState} */
 export function createInitialProjectWizardState() {
   return {
+    existingIssuerId: "",
     issuerLogo: null,
     issuer: {
       "en-US": {
@@ -202,40 +203,11 @@ function hasLocalization(list, localization) {
   return (Array.isArray(list) ? list : []).some((item) => item?.localization === key);
 }
 
-async function uploadIssuerLogo(issuerId, logoFile) {
-  if (!logoFile) return;
-
-  await Promise.all(
-    LOCALIZATIONS.map(async (localization) => {
-      const formData = new FormData();
-      formData.append("upload_image", logoFile);
-      formData.append("localization", localization);
-      formData.append("image_description", "Issuer profile photo");
-      formData.append("image_name", String(logoFile?.name || "issuer-logo"));
-      formData.append("name", String(logoFile?.name || "issuer-logo"));
-
-      const response = await fetch(`/api/issuers/${encodeURIComponent(issuerId)}/localization/profilePhoto`, {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      });
-
-      await parseResponse(response, `Failed to upload issuer profile photo (${localization})`);
-    }),
-  );
-}
-
 function assertRequired(state) {
-  const issuerEn = state?.issuer?.["en-US"] || {};
+  const issuerId = String(state?.existingIssuerId || "").trim();
   const financials = state.projectFinancials;
 
-  if (!String(issuerEn.name || "").trim()) throw new Error("EN issuer name is required.");
-  if (String(issuerEn.name || "").trim().length < 5 || String(issuerEn.name || "").trim().length > 40) {
-    throw new Error("EN issuer name must be between 5 and 40 characters.");
-  }
-  if (!String(issuerEn.about || "").trim()) throw new Error("EN issuer about is required.");
-  if (!String(issuerEn.location || "").trim()) throw new Error("EN issuer location is required.");
-  if (!String(issuerEn.industry || "").trim()) throw new Error("EN issuer industry is required.");
+  if (!issuerId) throw new Error("Issuer is required. Select an existing issuer before publishing.");
 
   const requiredFinancials = [
     "token_price",
@@ -325,43 +297,7 @@ function coerceBoolean(value, fieldName, defaultValue = true) {
 /** @param {ProjectWizardState} state */
 export async function submitWizard(state) {
   assertRequired(state);
-
-  let issuerId = String(state?.existingIssuerId || "").trim();
-
-  if (!issuerId) {
-    const issuerBaseRes = await fetch("/api/issuers", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({}),
-    });
-
-    const issuerBasePayload = await parseResponse(issuerBaseRes, "Failed to create issuer");
-    const issuerBaseData = extractData(issuerBasePayload);
-    issuerId = issuerBaseData?.issuer_id || issuerBaseData?.id || "";
-  }
-
-  if (!issuerId) {
-    throw new Error("Issuer was not resolved.");
-  }
-
-  await Promise.all(
-    LOCALIZATIONS.map(async (localization) => {
-      const issuerPayload = resolveIssuerPayload(state.issuer, localization);
-      await upsertIssuerLocalization(issuerId, {
-        localization,
-        name: issuerPayload.name,
-        about: issuerPayload.about,
-        location: issuerPayload.location,
-        industry: issuerPayload.industry,
-      });
-    }),
-  );
-
-  await uploadIssuerLogo(issuerId, state?.issuerLogo || null);
+  const issuerId = String(state?.existingIssuerId || "").trim();
 
   const projectRes = await fetch("/api/projects", {
     method: "POST",
@@ -391,7 +327,7 @@ export async function submitWizard(state) {
         project_label: state.projectFinancials.project_label.trim(),
         project_type: state.projectFinancials.project_type.trim(),
         project_country_code: state.projectFinancials.project_country_code.trim().toUpperCase(),
-        issuer_name: resolveIssuerPayload(state.issuer, "en-US").name,
+        issuer_name: String(state?.issuer?.["en-US"]?.name || "").trim(),
         issuer_id: issuerId,
       },
     }),

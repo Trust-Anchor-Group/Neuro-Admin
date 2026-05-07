@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { createInitialProjectWizardState, submitWizard } from "@/lib/projectWizard";
-import { listIssuers, listIssuerLocalizations } from "@/lib/projectAdmin";
+import { listIssuers } from "@/lib/projectAdmin";
 import { MEDIA_RULES, validateFileSize, validateImageFile } from "@/lib/mediaValidation";
 import { mapBackendValidationError } from "@/lib/backendValidation";
 import { ISO_COUNTRY_ALPHA3 } from "@/data/isoCountryAlpha3";
@@ -105,7 +106,6 @@ const DescriptionInsights = ({ value, mode }) => {
 
 export default function CreateProjectWizard() {
   const [wizardState, setWizardState] = useState(createInitialProjectWizardState);
-  const [issuerMode, setIssuerMode] = useState("new");
   const [selectedIssuerId, setSelectedIssuerId] = useState("");
   const [issuerOptions, setIssuerOptions] = useState([]);
   const [issuersLoading, setIssuersLoading] = useState(false);
@@ -116,54 +116,16 @@ export default function CreateProjectWizard() {
   const [createdProjectId, setCreatedProjectId] = useState("");
   const [createError, setCreateError] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
-  const [issuerLogoPreviewUrl, setIssuerLogoPreviewUrl] = useState("");
   const [uploadFeedback, setUploadFeedback] = useState({ errors: {}, warnings: {} });
   const [tagDrafts, setTagDrafts] = useState({
     "en-US": "",
     "pt-PT": "",
   });
-
-  const backendHost = useMemo(() => {
-    const storedHost = typeof window !== "undefined"
-      ? String(sessionStorage.getItem("AgentAPI.Host") || "").trim()
-      : "";
-
-    const sanitizedStoredHost = storedHost.replace(/^https?:\/\//i, "").replace(/\/+$/, "");
-    if (sanitizedStoredHost) return sanitizedStoredHost;
-
-    return process.env.NEXT_PUBLIC_AGENT_HOST || process.env.AGENT_HOST || "mateo.lab.tagroot.io";
-  }, []);
   const countryOptions = ISO_COUNTRY_ALPHA3;
   const countryNameByCode = useMemo(
     () => new Map(countryOptions.map((item) => [item.code, item.name])),
     [countryOptions]
   );
-
-  const resolveBackendAssetUrl = useCallback((rawUrl) => {
-    const value = String(rawUrl || "").trim();
-    if (!value) return "";
-    if (/^https?:\/\//i.test(value)) return value;
-    if (value.startsWith('/nex-resources/')) return `https://${backendHost}${value}`;
-    return value.startsWith('/') ? value : `/${value}`;
-  }, [backendHost]);
-
-  const getIssuerLogoUrl = useCallback((localizationEntry) => {
-    const candidates = [
-      localizationEntry?.profile_photo?.url,
-      localizationEntry?.profilePhoto?.url,
-      localizationEntry?.issuer_profile_photo?.url,
-      localizationEntry?.issuerProfilePhoto?.url,
-      localizationEntry?.image?.url,
-      localizationEntry?.photo?.url,
-      localizationEntry?.logo?.url,
-      localizationEntry?.logo_url,
-      localizationEntry?.image_url,
-      localizationEntry?.photo_url,
-    ];
-
-    const found = candidates.find((candidate) => typeof candidate === 'string' && candidate.trim()) || '';
-    return resolveBackendAssetUrl(found);
-  }, [resolveBackendAssetUrl]);
 
   const wizardValidation = useMemo(() => {
     const steps = {
@@ -173,23 +135,15 @@ export default function CreateProjectWizard() {
       4: { issues: [], fieldErrors: {} },
     };
 
-    const issuerEn = wizardState.issuer["en-US"];
     const financials = wizardState.projectFinancials;
     const en = wizardState.projectContent["en-US"];
     const pt = wizardState.projectContent["pt-PT"];
     const media = wizardState.media;
 
-    if (issuerMode === "existing" && !String(selectedIssuerId || "").trim()) {
-      steps[1].issues.push("Please select an existing issuer.");
+    if (!String(selectedIssuerId || "").trim()) {
+      steps[1].issues.push("Please select an issuer.");
+      steps[1].fieldErrors.issuerId = "Select an issuer to continue.";
     }
-
-    if (!issuerEn.name.trim()) steps[1].issues.push("EN issuer name is required.");
-    if (issuerEn.name.trim() && (issuerEn.name.trim().length < 5 || issuerEn.name.trim().length > 40)) {
-      steps[1].issues.push("EN issuer name must be between 5 and 40 characters.");
-    }
-    if (!issuerEn.about.trim()) steps[1].issues.push("EN issuer about is required.");
-    if (!issuerEn.location.trim()) steps[1].issues.push("EN issuer location is required.");
-    if (!issuerEn.industry.trim()) steps[1].issues.push("EN issuer industry is required.");
 
     if (!String(financials.currency ?? "").trim()) steps[1].issues.push("Currency is required.");
 
@@ -292,7 +246,7 @@ export default function CreateProjectWizard() {
       allComplete: [1, 2, 3, 4].every((step) => stepStatus[step].complete),
       firstIncompleteStep,
     };
-  }, [wizardState, issuerMode, selectedIssuerId, countryNameByCode]);
+  }, [wizardState, selectedIssuerId, countryNameByCode]);
 
   const completedSteps = useMemo(
     () => [1, 2, 3, 4].filter((step) => wizardValidation.steps[step].complete).length,
@@ -343,110 +297,23 @@ export default function CreateProjectWizard() {
     };
   }, []);
 
-  const handleIssuerModeChange = (event) => {
-    const mode = event.target.value;
-    setIssuerMode(mode);
-    if (mode === "new") {
-      setSelectedIssuerId("");
-      if (!wizardState?.issuerLogo) {
-        setIssuerLogoPreviewUrl("");
-      }
-    }
-  };
-
-  const handleIssuerSelectionChange = async (event) => {
+  const handleIssuerSelectionChange = (event) => {
     const nextIssuerId = event.target.value;
+    const selectedOption = issuerOptions.find((option) => option.id === nextIssuerId);
+    const selectedIssuerName = String(selectedOption?.label || "").trim();
+
     setSelectedIssuerId(nextIssuerId);
-
-    if (!nextIssuerId) {
-      return;
-    }
-
-    try {
-      const localizations = await listIssuerLocalizations(nextIssuerId);
-      const list = Array.isArray(localizations) ? localizations : [];
-      const en = list.find((item) => item?.localization === "en-US") || list[0] || {};
-      const pt = list.find((item) => item?.localization === "pt-PT") || {};
-
-      setWizardState((prev) => ({
-        ...prev,
-        issuer: {
-          "en-US": {
-            name: en?.name || prev.issuer["en-US"].name || "",
-            about: en?.about || prev.issuer["en-US"].about || "",
-            location: en?.location || prev.issuer["en-US"].location || "",
-            industry: en?.industry || prev.issuer["en-US"].industry || "",
-          },
-          "pt-PT": {
-            name: pt?.name || prev.issuer["pt-PT"].name || en?.name || prev.issuer["en-US"].name || "",
-            about: pt?.about || prev.issuer["pt-PT"].about || en?.about || prev.issuer["en-US"].about || "",
-            location: pt?.location || prev.issuer["pt-PT"].location || en?.location || prev.issuer["en-US"].location || "",
-            industry: pt?.industry || prev.issuer["pt-PT"].industry || en?.industry || prev.issuer["en-US"].industry || "",
-          },
-        },
-      }));
-      setIssuerLogoPreviewUrl(getIssuerLogoUrl(en));
-    } catch {
-    }
-  };
-
-  const onIssuerChange = (localization, event) => {
-    const { name, value } = event.target;
     setWizardState((prev) => ({
       ...prev,
+      existingIssuerId: nextIssuerId || "",
       issuer: {
         ...prev.issuer,
-        [localization]: {
-          ...prev.issuer[localization],
-          [name]: value,
+        "en-US": {
+          ...prev.issuer["en-US"],
+          name: selectedIssuerName || prev.issuer["en-US"].name,
         },
       },
     }));
-
-    if (localization === "en-US" && name === "name") {
-      setFieldErrors((prev) => ({ ...prev, issuerName: "" }));
-    }
-  };
-
-  const onIssuerLogoChange = (event) => {
-    const file = event.target.files?.[0] || null;
-
-    if (!file) {
-      setUploadFeedback((prev) => ({
-        ...prev,
-        errors: { ...prev.errors, issuerLogo: "" },
-        warnings: { ...prev.warnings, issuerLogo: "" },
-      }));
-    }
-
-    if (file) {
-      validateImageFile(file, {
-        label: "Issuer logo",
-        maxBytes: MEDIA_RULES.imageMaxBytes,
-        minWidth: MEDIA_RULES.logoMinWidth,
-        minHeight: MEDIA_RULES.logoMinHeight,
-      }).then((result) => {
-        setUploadFeedback((prev) => ({
-          ...prev,
-          errors: { ...prev.errors, issuerLogo: result.error || "" },
-          warnings: { ...prev.warnings, issuerLogo: result.warning || "" },
-        }));
-
-        if (result.error) {
-          setWizardState((prev) => ({ ...prev, issuerLogo: null }));
-          setIssuerLogoPreviewUrl("");
-          return;
-        }
-
-        const objectUrl = URL.createObjectURL(file);
-        setIssuerLogoPreviewUrl(objectUrl);
-        setWizardState((prev) => ({ ...prev, issuerLogo: file }));
-      });
-      return;
-    }
-
-    setIssuerLogoPreviewUrl("");
-    setWizardState((prev) => ({ ...prev, issuerLogo: null }));
   };
 
   const onFinancialChange = (event) => {
@@ -705,14 +572,12 @@ export default function CreateProjectWizard() {
         ...wizardState,
         visibility: String(wizardState?.projectFinancials?.visibility || "").trim(),
         public_investment_progress: Boolean(wizardState?.projectFinancials?.public_investment_progress ?? true),
-        existingIssuerId: issuerMode === "existing" ? selectedIssuerId : "",
+        existingIssuerId: String(selectedIssuerId || "").trim(),
       });
       setCreateMessage("Project published successfully.");
       setCreatedProjectId(result.projectId || "");
       setWizardState(createInitialProjectWizardState());
-      setIssuerMode("new");
       setSelectedIssuerId("");
-      setIssuerLogoPreviewUrl("");
       setTagDrafts({ "en-US": "", "pt-PT": "" });
       setWizardStep(1);
     } catch (error) {
@@ -760,84 +625,32 @@ export default function CreateProjectWizard() {
       <form className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2" onSubmit={handlePublish}>
         {wizardStep === 1 && (
           <>
-            <Field label="Issuer Source" required>
+            <Field label="Issuer" required>
               <select
                 className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2"
-                value={issuerMode}
-                onChange={handleIssuerModeChange}
+                value={selectedIssuerId}
+                onChange={handleIssuerSelectionChange}
+                disabled={issuersLoading}
               >
-                <option value="new">Create new issuer</option>
-                <option value="existing">Use existing issuer</option>
+                <option value="">Select issuer</option>
+                {issuerOptions.map((issuerOption) => (
+                  <option key={issuerOption.id} value={issuerOption.id}>
+                    {issuerOption.label}
+                  </option>
+                ))}
               </select>
-            </Field>
-
-            {issuerMode === "existing" && (
-              <Field label="Existing Issuer" required>
-                <select
-                  className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2"
-                  value={selectedIssuerId}
-                  onChange={handleIssuerSelectionChange}
-                  disabled={issuersLoading}
-                >
-                  <option value="">Select issuer</option>
-                  {issuerOptions.map((issuerOption) => (
-                    <option key={issuerOption.id} value={issuerOption.id}>
-                      {issuerOption.label}
-                    </option>
-                  ))}
-                </select>
-                {issuersError ? <span className="text-xs text-[var(--status-error,#ef4444)]">{issuersError}</span> : null}
-              </Field>
-            )}
-
-            <div className="md:col-span-2 rounded-lg border border-[var(--brand-border)] p-3">
-              <h3 className="mb-2 text-sm font-semibold text-[var(--brand-text)]">Issuer Localization (EN)</h3>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <Field label="Issuer Name (EN)" required>
-                  <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={40} name="name" value={wizardState.issuer["en-US"].name} onChange={(event) => onIssuerChange("en-US", event)} placeholder="Issuer name in English" />
-                  {fieldErrors.issuerName ? <span className="text-xs text-[var(--status-error,#ef4444)]">{fieldErrors.issuerName}</span> : null}
-                </Field>
-                <Field label="Issuer About (EN)" required>
-                  <textarea rows={5} className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="about" value={wizardState.issuer["en-US"].about} onChange={(event) => onIssuerChange("en-US", event)} placeholder="Issuer about in English" />
-                </Field>
-                <Field label="Issuer Location (EN)" required>
-                  <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={80} name="location" value={wizardState.issuer["en-US"].location} onChange={(event) => onIssuerChange("en-US", event)} placeholder="Issuer location in English" />
-                </Field>
-                <Field label="Issuer Industry (EN)" required>
-                  <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={80} name="industry" value={wizardState.issuer["en-US"].industry} onChange={(event) => onIssuerChange("en-US", event)} placeholder="Issuer industry in English" />
-                </Field>
-              </div>
-            </div>
-
-            <div className="md:col-span-2 rounded-lg border border-[var(--brand-border)] p-3">
-              <h3 className="mb-2 text-sm font-semibold text-[var(--brand-text)]">Issuer Localization (PT)</h3>
-              <p className="mb-2 text-xs text-[var(--brand-text-secondary)]">If a PT field is empty, EN value will be used automatically.</p>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <Field label="Issuer Name (PT)">
-                  <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={40} name="name" value={wizardState.issuer["pt-PT"].name} onChange={(event) => onIssuerChange("pt-PT", event)} placeholder="Issuer name in Portuguese" />
-                </Field>
-                <Field label="Issuer About (PT)">
-                  <textarea rows={5} className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" name="about" value={wizardState.issuer["pt-PT"].about} onChange={(event) => onIssuerChange("pt-PT", event)} placeholder="Issuer about in Portuguese" />
-                </Field>
-                <Field label="Issuer Location (PT)">
-                  <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={80} name="location" value={wizardState.issuer["pt-PT"].location} onChange={(event) => onIssuerChange("pt-PT", event)} placeholder="Issuer location in Portuguese" />
-                </Field>
-                <Field label="Issuer Industry (PT)">
-                  <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={80} name="industry" value={wizardState.issuer["pt-PT"].industry} onChange={(event) => onIssuerChange("pt-PT", event)} placeholder="Issuer industry in Portuguese" />
-                </Field>
-              </div>
-            </div>
-            <Field label="Issuer Logo (Company)">
-              <input type="file" accept="image/*" className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" onChange={onIssuerLogoChange} />
-              {issuerLogoPreviewUrl ? (
-                <div className="mt-2 flex items-center gap-2">
-                  <img src={issuerLogoPreviewUrl} alt="Issuer logo preview" className="h-12 w-12 rounded-full border border-[var(--brand-border)] object-cover" />
-                  <span className="text-xs text-[var(--brand-text-secondary)]">Current logo preview</span>
-                </div>
+              {wizardValidation.steps[1].fieldErrors.issuerId ? (
+                <span className="text-xs text-[var(--status-error,#ef4444)]">{wizardValidation.steps[1].fieldErrors.issuerId}</span>
               ) : null}
-              {uploadFeedback.errors.issuerLogo ? <span className="text-xs text-[var(--status-error,#ef4444)]">{uploadFeedback.errors.issuerLogo}</span> : null}
-              {uploadFeedback.warnings.issuerLogo ? <span className="text-xs text-amber-600">{uploadFeedback.warnings.issuerLogo}</span> : null}
+              {issuersError ? <span className="text-xs text-[var(--status-error,#ef4444)]">{issuersError}</span> : null}
             </Field>
+            <div className="md:col-span-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-xs text-[var(--brand-text-secondary)]">
+              Issuer creation and updates are managed in Issuer Administration.
+              <Link href="/neuro-assets/issuer" className="ml-1 font-semibold underline text-[var(--brand-text)]">
+                Open issuer admin
+              </Link>
+              .
+            </div>
             <Field label="Currency" required>
               <input className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-background)] p-2" maxLength={3} name="currency" value={wizardState.projectFinancials.currency} onChange={onFinancialChange} placeholder="USD / BRL / EUR" />
             </Field>

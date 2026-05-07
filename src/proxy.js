@@ -31,7 +31,7 @@ function applyCorsHeaders(response, corsHeaders) {
   return response;
 }
 
-export function middleware(request) {
+export function proxy(request) {
   const { pathname } = request.nextUrl;
   const corsHeaders = getCorsHeaders(request);
 
@@ -60,8 +60,11 @@ export function middleware(request) {
     return NextResponse.next();
   }
 
-
-  if (pathname.startsWith('/login') || pathname.startsWith('/api')) {
+  if (
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/sentry-example-page')
+  ) {
     return NextResponse.next();
   }
 
