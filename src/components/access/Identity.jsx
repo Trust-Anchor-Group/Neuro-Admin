@@ -9,6 +9,7 @@ import { MapOutInput } from '../shared/MapOutInput';
 import { PopUpButton } from './Buttons/PopUpButton';
 import { ImageComponent } from './ImageComponent';
 import { ProfileEditModal } from './ProfileEditModal';
+import { getIdentityDisplayName } from '@/lib/identityFields';
 
 
 export const Identity = ({
@@ -24,6 +25,7 @@ export const Identity = ({
   const hasIdentityData = Boolean(
     user?.properties && Object.values(user.properties).some((value) => String(value ?? '').trim() !== '')
   );
+  const displayName = getIdentityDisplayName(user);
 
   const adminActions = [
     { actionTitle: 'Rejected', bgColor: 'bg-neuroRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: t?.Identity?.actionTitles?.rejected || 'Deny ID application' },
@@ -55,8 +57,8 @@ export const Identity = ({
               <div className="flex flex-col pl-2 gap-2 max-md:text-center">
                 <DetailpageStatus user={user} adminActions={adminActions} />
                 <div>
-                  <h1 id="identity-heading" className="text-3xl font-semibold">
-                    {user.properties.FIRST + ' ' + user.properties.LAST || 'N/A'}
+                  <h1 id="identity-heading" className="text-3xl font-semibold break-words [overflow-wrap:anywhere]">
+                    {displayName}
                   </h1>
                   <p
                     className="text-text16 text-[var(--brand-text-secondary)] break-words whitespace-normal w-full"
@@ -73,7 +75,7 @@ export const Identity = ({
             </header>
 
             <section
-              className="bg-[var(--brand-navbar)]/70 rounded-xl p-4 overflow-auto"
+              className="bg-[var(--brand-navbar)]/70 rounded-2xl border border-[var(--brand-border)] p-4 md:p-5"
               aria-labelledby="identity-info-heading"
             >
               <h2 id="identity-info-heading" className="sr-only text-[var(--brand-text-secondary)]">{t?.Identity?.sections?.identityInformation || 'Identity Information'}</h2>
@@ -82,11 +84,18 @@ export const Identity = ({
                 setIntoToggle={setIntoToggle}
                 title={t?.Identity?.sections?.identityInformation || 'Identity Information'}
               />
-              {infoToggle && <MapOutInput fieldsToShow={fieldsToShow} user={user} />}
+              {infoToggle && (
+                <MapOutInput
+                  fieldsToShow={fieldsToShow}
+                  user={user}
+                  variant="identity-grid"
+                  hideEmpty={true}
+                />
+              )}
             </section>
 
             <section
-              className="bg-[var(--brand-navbar)]/70 rounded-xl p-4 mt-5 overflow-auto"
+              className="bg-[var(--brand-navbar)]/70 rounded-2xl border border-[var(--brand-border)] p-4 md:p-5 mt-5"
               aria-labelledby="identity-meta-heading"
             >
               <h2 id="identity-meta-heading" className="sr-only">{t?.Identity?.sections?.identityMetadata || 'Identity Metadata'}</h2>
@@ -96,7 +105,11 @@ export const Identity = ({
                 title={t?.Identity?.sections?.identityMetadata || 'Identity Metadata'}
               />
               {infoToggleMetaData && 
-                <MapOutInput fieldsToShow={fieldsToShowMetaData} user={user} />
+                <MapOutInput
+                  fieldsToShow={fieldsToShowMetaData}
+                  user={user}
+                  variant="identity-grid"
+                />
               }
             </section>
 

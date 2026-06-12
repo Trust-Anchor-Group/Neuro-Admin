@@ -7,6 +7,7 @@ import { InputField } from '@/components/access/InputField'
 import { ProfileEditModal } from '@/components/access/ProfileEditModal'
 import { useLanguage } from '../../../context/LanguageContext'
 import { fetchUserImage } from '@/utils/fetchUserImage'
+import { buildIdentityFields } from '@/lib/identityFields'
 
 const ProfileContent = () => {
   const [user, setUser] = useState(null)
@@ -50,16 +51,11 @@ const ProfileContent = () => {
   }, [])
 
   // Dynamically generate fields to show for identity from user.properties
-  const fieldsToShowIdentity = user?.properties
-    ? Object.keys(user.properties).map(key => ({
-        label: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        key: `properties.${key}`,
-      }))
-    : [];
+  const fieldsToShowIdentity = buildIdentityFields(user?.properties, { includeEmpty: false })
 
   const fieldsToShowMetadata = [
-    { label: ti.idStatus || 'ID status', key: 'state' },
-    { label: ti.idCreated || 'ID created', key: 'created' },
+    { label: t.idStatus || 'ID status', key: 'state' },
+    { label: t.idCreated || 'ID created', key: 'created' },
   ]
 
   return (
