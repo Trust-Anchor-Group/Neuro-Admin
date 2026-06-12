@@ -1,5 +1,5 @@
 const DEV_NEURON_HOST = 'dev.athletesandyou.tagroot.io';
-const DEV_LOGIN_URL = 'https://brave-rock-04a1ad803-dev.westeurope.4.azurestaticapps.net/';
+const DEV_LOGIN_URL = 'https://brave-rock-04a1ad803-dev.westeurope.4.azurestaticapps.net/auth/login/athlete';
 
 export const VALID_IDENTITY_ACTIONS = new Set([
   'Approved',
