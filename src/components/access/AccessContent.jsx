@@ -110,7 +110,7 @@ export const AccessContent = () => {
 
         const notification = changeState.data?.data?.notification
         if (notification && notification.success === false) {
-          console.error('Failed to send email:', notification.error, notification.details)
+          console.error('Identity state changed, but notification failed:', notification.error, notification.details)
         }
 
         getData()

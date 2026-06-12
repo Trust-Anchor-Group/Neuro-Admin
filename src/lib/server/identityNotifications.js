@@ -12,6 +12,10 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function readPath(source, path) {
+  return path.reduce((current, key) => current && current[key], source);
+}
+
 function hasValue(value) {
   return normalizeString(value).length > 0;
 }
@@ -66,6 +70,20 @@ function normalizeHost(value) {
   }
 
   return input.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+}
+
+function maskEmail(value) {
+  const email = normalizeString(value);
+  if (!email.includes('@')) return email || 'missing';
+
+  const [localPart, domain] = email.split('@');
+  if (!localPart || !domain) return email;
+
+  if (localPart.length <= 2) {
+    return `${localPart[0] || '*'}*@${domain}`;
+  }
+
+  return `${localPart.slice(0, 2)}***@${domain}`;
 }
 
 function buildParagraphs(message) {
@@ -139,10 +157,32 @@ export function hasSessionCookie(cookieHeader = '') {
   return /(?:^|;\s*)HttpSessionID=/.test(cookieHeader);
 }
 
+export function resolveNotificationRecipientEmail(user) {
+  const candidates = [
+    ['properties', 'EMAIL'],
+    ['other', 'EMAIL'],
+    ['email'],
+    ['EMAIL'],
+    ['data', 'eMail'],
+    ['data', 'EMAIL'],
+  ];
+
+  for (const path of candidates) {
+    const value = normalizeString(readPath(user, path));
+    if (value) return value;
+  }
+
+  return '';
+}
+
+export function hasNotificationRecipient(user) {
+  return hasValue(resolveNotificationRecipientEmail(user));
+}
+
 export function generateIdentityEmailTemplate({ action, user, reason, neuronHost }) {
   const firstName = normalizeString(user?.properties?.FIRST);
   const organizationName = normalizeString(user?.properties?.ORGNAME);
-  const email = normalizeString(user?.properties?.EMAIL);
+  const email = resolveNotificationRecipientEmail(user);
   const displayName = firstName || organizationName;
   const safeReason = stripRichText(reason);
   const { subject, message, cta } = buildActionContent(action, safeReason, neuronHost);
@@ -181,7 +221,7 @@ export async function sendIdentityNotificationEmail({ action, user, reason, neur
     return { success: false, status: 400, error: 'Invalid notification action' };
   }
 
-  const email = normalizeString(user?.properties?.EMAIL);
+  const email = resolveNotificationRecipientEmail(user);
   if (!email) {
     return { success: false, status: 400, error: 'Missing recipient email' };
   }
@@ -194,6 +234,11 @@ export async function sendIdentityNotificationEmail({ action, user, reason, neur
   }
 
   const { to, subject, text, html } = generateIdentityEmailTemplate({ action, user, reason, neuronHost });
+  console.info('[identity-notification] sending email', {
+    action,
+    host: normalizeHost(neuronHost) || 'default',
+    recipient: maskEmail(to),
+  });
 
   try {
     const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
@@ -214,16 +259,36 @@ export async function sendIdentityNotificationEmail({ action, user, reason, neur
     });
 
     if (!response.ok) {
+      const details = await response.text();
+      console.error('[identity-notification] sendgrid rejected email', {
+        action,
+        host: normalizeHost(neuronHost) || 'default',
+        recipient: maskEmail(to),
+        status: response.status,
+        details,
+      });
       return {
         success: false,
         status: response.status,
         error: 'SendGrid error',
-        details: await response.text(),
+        details,
       };
     }
 
+    console.info('[identity-notification] sendgrid accepted email', {
+      action,
+      host: normalizeHost(neuronHost) || 'default',
+      recipient: maskEmail(to),
+      status: response.status || 202,
+    });
     return { success: true, status: response.status || 202 };
   } catch (error) {
+    console.error('[identity-notification] email send failed', {
+      action,
+      host: normalizeHost(neuronHost) || 'default',
+      recipient: maskEmail(to),
+      error: error.message || 'Unknown error',
+    });
     return {
       success: false,
       status: 500,

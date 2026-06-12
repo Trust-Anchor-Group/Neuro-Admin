@@ -1,13 +1,13 @@
 'use client'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import config from '@/config/config';
 import { FaArrowLeft, FaShieldAlt, FaSpinner, FaUser} from 'react-icons/fa'
 import { AccountDetails, DisplayDetails } from '@/components/access/Buttons/DisplayDetails';
 import { Identity } from '@/components/access/Identity';
 import { ActivityDetailspage } from './ActivityDetailspage';
 import { TabNavigation } from '../shared/TabNavigation';
 import { useLanguage, content } from '../../../context/LanguageContext';
+import { buildIdentityFields } from '@/lib/identityFields';
 
 
 export default function DetailPageContent() {
@@ -150,12 +150,7 @@ export default function DetailPageContent() {
             ];
 
       // Dynamic identity fields: show all user.properties keys
-      const fieldsToShowIdentity = user?.properties
-        ? Object.keys(user.properties).map(key => ({
-            label: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-            key: `properties.${key}`,
-          }))
-        : [];
+      const fieldsToShowIdentity = buildIdentityFields(user?.properties, { includeEmpty: false });
     
             const fieldsToShowWithNoID = [
                 { label: t?.Identity?.labels?.account || "Account", key: "data.userName" },

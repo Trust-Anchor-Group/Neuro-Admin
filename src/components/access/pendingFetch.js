@@ -1,9 +1,15 @@
 export async function pendingAction(userId, clickedState, options = {}) {
   try {
+    const dynamicHost =
+      typeof window !== 'undefined'
+        ? sessionStorage.getItem('AgentAPI.Host')
+        : null
+
     const res = await fetch('/api/legalIdStatus', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(dynamicHost ? { 'x-agent-host': dynamicHost } : {}),
       },
       credentials: 'include',
       body: JSON.stringify({
