@@ -4,7 +4,6 @@ import { Modal } from '@/components/shared/Modal'
 import { pendingAction } from '../pendingFetch'
 import { getModalText } from '@/utils/getModalText'
 import { useLanguage, content } from '../../../../context/LanguageContext'
-import { messageEmail } from '@/utils/messageEmail'
 import { FaExclamationTriangle, FaTimes } from 'react-icons/fa'
 
 export const ActionButtons = ({ user, adminActions, id, getData }) => {
@@ -24,73 +23,48 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
   const [hiddenActions, setHiddenActions] = useState([]) // persisted hide (sessionStorage)
   const [visibleActions, setVisibleActions] = useState([]) // actions currently rendered
   const [hidingActions, setHidingActions] = useState(new Set()) // animating out
-  const [showingActions, setShowingActions] = useState(new Set()) // animating in
 
   const storageKey = id ? `hiddenActions_${id}` : null
   const ANIM_MS = 200
 
   useEffect(() => {
-    // load persisted hidden actions
     if (!storageKey) return
     try {
       const stored = sessionStorage.getItem(storageKey)
       if (stored) setHiddenActions(JSON.parse(stored))
-    } catch (e) {
-      console.error('Failed to read hidden actions from sessionStorage', e)
+    } catch (error) {
+      console.error('Failed to read hidden actions from sessionStorage', error)
     }
   }, [storageKey])
 
   useEffect(() => {
-    // initialise visibleActions from adminActions and persisted hiddenActions
-    const all = (adminActions || []).map(a => a.actionTitle)
-    const visible = all.filter(name => !hiddenActions.includes(name))
+    const all = (adminActions || []).map((action) => action.actionTitle)
+    const visible = all.filter((name) => !hiddenActions.includes(name))
     setVisibleActions(visible)
   }, [adminActions, hiddenActions])
 
-  const persistHiddenActions = (arr) => {
+  const persistHiddenActions = (value) => {
     if (!storageKey) return
     try {
-      sessionStorage.setItem(storageKey, JSON.stringify(arr))
-    } catch (e) {
-      console.error('Failed to persist hidden actions to sessionStorage', e)
+      sessionStorage.setItem(storageKey, JSON.stringify(value))
+    } catch (error) {
+      console.error('Failed to persist hidden actions to sessionStorage', error)
     }
   }
 
   const animateHide = (action) => {
-    // add to hiding set -> apply CSS hide transition -> remove from visible and persist after delay
-    setHidingActions(prev => new Set(prev).add(action))
+    setHidingActions((prev) => new Set(prev).add(action))
     setTimeout(() => {
-      setHidingActions(prev => {
-        const s = new Set(prev)
-        s.delete(action)
-        return s
+      setHidingActions((prev) => {
+        const next = new Set(prev)
+        next.delete(action)
+        return next
       })
-      setVisibleActions(prev => prev.filter(a => a !== action))
+      setVisibleActions((prev) => prev.filter((item) => item !== action))
       const nextHidden = Array.from(new Set([...hiddenActions, action]))
       setHiddenActions(nextHidden)
       persistHiddenActions(nextHidden)
     }, ANIM_MS)
-  }
-
-  const animateShow = (action) => {
-    // remove from persisted hiddenActions, add to visibleActions and mark as showing for enter animation
-    const nextHidden = (hiddenActions || []).filter(a => a !== action)
-    setHiddenActions(nextHidden)
-    persistHiddenActions(nextHidden)
-
-    if (!visibleActions.includes(action)) {
-      setVisibleActions(prev => [...prev, action])
-      // mark as showing then remove mark to trigger CSS transition to visible
-      setShowingActions(prev => new Set(prev).add(action))
-      // small delay -> remove "showing" so transition applies
-      setTimeout(() => {
-        setShowingActions(prev => {
-          const s = new Set(prev)
-          s.delete(action)
-          return s
-        })
-      }, 20)
-    }
   }
 
   const handleReviewClick = () => {
@@ -105,67 +79,68 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
     setShowConfirmPopup(true)
   }
 
-  const handleConfirmQuickAction = async () => {
-    // optimistically animate hide for Compromised
-    if (confirmActionType === 'Compromised') {
-      animateHide('Compromised')
-    }
-
-    await onHandleModal(
-      confirmActionType,
-      confirmActionType === 'Compromised' ? 'Compromise Id' : 'Obsolete Id'
-    )
-    setShowConfirmPopup(false)
+  const restoreCompromisedAction = () => {
+    setVisibleActions((prev) => (prev.includes('Compromised') ? prev : [...prev, 'Compromised']))
+    const nextHidden = hiddenActions.filter((action) => action !== 'Compromised')
+    setHiddenActions(nextHidden)
+    persistHiddenActions(nextHidden)
   }
 
   async function onHandleModal(action = '', label = '', reason = '') {
-    if (!action) return
+    if (!action) return false
 
     setLoading(true)
     setActionButtonName(action)
     setButtonName(label)
 
     try {
-      const changeState = await pendingAction(id, action)
+      const changeState = await pendingAction(id, action, {
+        user,
+        reason,
+        sendNotification: true,
+      })
 
-      if (changeState.status === 200) {
-        // Send only minimal info to backend; backend handles all email formatting
-        const res = await fetch('/api/send-notification', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action,
-            user,
-            reason,
-          }),
-        })
-        const result = await res.json()
-        if (!result.success) {
-          console.error('❌ Failed to send email:', result.error, result.details)
-        }
+      if (!changeState.ok) {
+        throw new Error(changeState.data?.message || 'Failed to change identity state')
       }
 
-      // refresh backend data
+      const notification = changeState.data?.data?.notification
+      if (notification && notification.success === false) {
+        console.error('Failed to send email:', notification.error, notification.details)
+      }
+
       getData()
       setToggle(false)
+      return true
     } catch (error) {
-      console.error('❌ Error during action handling:', error)
-      // revert optimistic hide if needed
+      console.error('Error during action handling:', error)
       if (confirmActionType === 'Compromised') {
-        // if server failed and we optimistically hid, show it again
-        setVisibleActions(prev => (prev.includes('Compromised') ? prev : [...prev, 'Compromised']))
-        setHiddenActions(prev => prev.filter(a => a !== 'Compromised'))
-        persistHiddenActions(hiddenActions.filter(a => a !== 'Compromised'))
+        restoreCompromisedAction()
       }
+      return false
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleConfirmQuickAction = async () => {
+    if (confirmActionType === 'Compromised') {
+      animateHide('Compromised')
+    }
+
+    const success = await onHandleModal(
+      confirmActionType,
+      confirmActionType === 'Compromised' ? 'Compromise Id' : 'Obsolete Id'
+    )
+
+    if (success) {
+      setShowConfirmPopup(false)
     }
   }
 
   const handleApprove = () => onHandleModal('Approved', 'Approve ID application')
   const handleReject = (reason) => onHandleModal('Rejected', 'Deny ID application', reason)
 
-  // helper to build button classes with smooth transitions
   const buttonTransitionClass = (title) => {
     const base = 'w-full shadow-sm py-2 flex justify-center items-center font-semibold gap-2 rounded-lg cursor-pointer transition-all duration-200'
     const orange = 'bg-neuroDarkOrange/20 text-neuroDarkOrange hover:opacity-70'
@@ -173,9 +148,7 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
     const disabled = loading ? 'opacity-50 pointer-events-none' : ''
 
     const isHiding = hidingActions.has(title)
-    const isShowing = showingActions.has(title)
-
-    const anim = isHiding ? 'opacity-0 scale-95 h-0 overflow-hidden' : isShowing ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+    const anim = isHiding ? 'opacity-0 scale-95 h-0 overflow-hidden' : 'opacity-100 scale-100'
 
     return `${base} ${title === 'Compromised' ? orange : title === 'Obsoleted' ? red : ''} ${anim} ${disabled}`
   }
@@ -186,7 +159,6 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
         <Modal
           text={getModalText(actionButtonName, buttonName, t)}
           setToggle={setToggle}
-          onHandleModal={onHandleModal}
           loading={loading}
           user={user}
           handleApprove={handleApprove}
@@ -238,7 +210,6 @@ export const ActionButtons = ({ user, adminActions, id, getData }) => {
         </div>
       )}
 
-      {/* Obsoleted state: show Compromised button only if visibleActions contains it */}
       {user?.state === 'Obsoleted' && visibleActions.includes('Compromised') && (
         <div className="mb-4">
           <button

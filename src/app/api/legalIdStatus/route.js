@@ -1,24 +1,49 @@
 import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { hasSessionCookie, sendIdentityNotificationEmail, VALID_IDENTITY_ACTIONS } from "@/lib/server/identityNotifications";
+import { resolveAgentHost } from "@/lib/agentHost";
 
 export async function POST(request) {
-
-    const requestData = await request.json();
-    const { id, state } = requestData;
-    const clientCookie = request.headers.get('Cookie');
-    const decodedUserId = decodeURIComponent(id);
-    const { host } = config.api.agent;
-    const url = `https://${host}/LegalIdentityStateChanged`;
-
-    // state can be set to Created, Approved, Rejected, Obsoleted, or Compromised
-    const payload = {
-        id:decodedUserId,
-        state
-    };
-
-    console.log(payload)
-
     try {
+        const requestData = await request.json();
+        const { id, state, user, reason, sendNotification = false } = requestData;
+        const clientCookie = request.headers.get('Cookie') || '';
+
+        if (!hasSessionCookie(clientCookie)) {
+            return new Response(JSON.stringify(new ResponseModel(401, 'Authentication required')), {
+                status: 401,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        }
+
+        if (!id || !state) {
+            return new Response(JSON.stringify(new ResponseModel(400, 'Missing required fields: id and state')), {
+                status: 400,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        }
+
+        if (!VALID_IDENTITY_ACTIONS.has(state)) {
+            return new Response(JSON.stringify(new ResponseModel(400, `Invalid identity action: ${state}`)), {
+                status: 400,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        }
+
+        const decodedUserId = decodeURIComponent(id);
+        const dynamicHost = resolveAgentHost(request.headers) || config.api.agent.host;
+        const url = `https://${dynamicHost}/LegalIdentityStateChanged`;
+
+        const payload = {
+            id: decodedUserId,
+            state
+        };
 
         const response = await fetch(url, {
             method: 'POST',
@@ -31,7 +56,7 @@ export async function POST(request) {
             mode: 'cors'
         });
 
-        const contentType = response.headers.get('content-type');
+        const contentType = response.headers.get('content-type') || '';
         let data;
 
         if (contentType.includes('application/json')) {
@@ -49,7 +74,18 @@ export async function POST(request) {
             });
         }
 
-        return new Response(JSON.stringify(new ResponseModel(200, 'status of LegalID succerfully changed', data)), {
+        let notification = null;
+
+        if (sendNotification) {
+            notification = user?.properties?.EMAIL
+                ? await sendIdentityNotificationEmail({ action: state, user, reason, neuronHost: dynamicHost })
+                : { success: false, skipped: true, error: 'Missing recipient email' };
+        }
+
+        return new Response(JSON.stringify(new ResponseModel(200, 'status of LegalID successfully changed', {
+            stateChange: data,
+            notification,
+        })), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',

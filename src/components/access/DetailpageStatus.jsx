@@ -1,10 +1,12 @@
 import React from 'react';
-import { FaFileAlt } from 'react-icons/fa';
 import { useLanguage, content } from '../../../context/LanguageContext';
 
-export const DetailpageStatus = ({ user, adminActions }) => {
+export const DetailpageStatus = ({ user }) => {
   const { language } = useLanguage();
   const t = content[language];
+  const hasIdentityData = Boolean(
+    user?.properties && Object.values(user.properties).some((value) => String(value ?? '').trim() !== '')
+  );
   // Define a helper function to return the JSX
   const renderStatus = () => {
     if (user && user.state.includes('Created')) {
@@ -38,7 +40,7 @@ export const DetailpageStatus = ({ user, adminActions }) => {
       if (user && user.state.includes('Rejected')) {
         return (
           <div className={`text-obsoletedRed bg-neuroRed/20 font-semibold px-3 inline-block py-1 rounded-lg max-sm:mx-10 max-sm:mb-5`}>
-            <span>{t?.Identity?.statuses?.obsoleted || 'Obsoleted ID'}</span>
+            <span>{t?.Identity?.statuses?.rejected || 'Rejected ID'}</span>
           </div>
         );}
     return null;
@@ -46,7 +48,7 @@ export const DetailpageStatus = ({ user, adminActions }) => {
 
   return (
     <div className="">
-      {user && user.properties.FIRST ? renderStatus() : ''}
+      {user && hasIdentityData ? renderStatus() : ''}
     </div>
   );
 };
