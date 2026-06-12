@@ -187,13 +187,35 @@ export function generateIdentityEmailTemplate({ action, user, reason, neuronHost
   const safeReason = stripRichText(reason);
   const { subject, message, cta } = buildActionContent(action, safeReason, neuronHost);
   const greeting = `Hi${displayName ? ` ${displayName}` : ''},`;
-  const text = `Neuro Identity Notification\n\n${greeting}\n\n${message}${cta ? `\n\n${cta.label}: ${cta.url}` : ''}\n\nBest regards,\nNeuro KYC Digital Identity Team`;
+  
+  // Check if this is Athletes & You
+  const normalizedHost = normalizeHost(neuronHost);
+  const isAthletesAndYou = normalizedHost === DEV_NEURON_HOST;
+  
+  // Branding configuration
+  const brandConfig = isAthletesAndYou
+    ? {
+        backgroundColor: '#162126',
+        logoUrl: 'https://neuro.services/AUWhite.png',
+        logoAlt: 'Athletes & You Logo',
+        teamName: 'Athletes & You KYC Digital Identity Team',
+        linkColor: '#162126',
+      }
+    : {
+        backgroundColor: '#8F40D4',
+        logoUrl: 'https://neuro.services/neuroAdminLogo.svg',
+        logoAlt: 'Neuro KYC Logo',
+        teamName: 'Neuro KYC Digital Identity Team',
+        linkColor: '#8F40D4',
+      };
+  
+  const text = `Neuro Identity Notification\n\n${greeting}\n\n${message}${cta ? `\n\n${cta.label}: ${cta.url}` : ''}\n\nBest regards,\n${brandConfig.teamName}`;
   const html = `
     <div style="font-family:sans-serif; background:#f6f6fa; padding:0; margin:0;">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:40px auto;background:#fff;border-radius:12px;box-shadow:0 2px 12px #0001;overflow:hidden;">
         <tr>
-          <td style="background:#8F40D4;padding:24px 0;text-align:center;">
-            <img src="https://neuro.services/neuroAdminLogo.svg" alt="Neuro KYC Logo" style="height:48px;margin-bottom:8px;"/>
+          <td style="background:${brandConfig.backgroundColor};padding:24px 0;text-align:center;">
+            <img src="${brandConfig.logoUrl}" alt="${brandConfig.logoAlt}" style="height:48px;margin-bottom:8px;"/>
             <h1 style="color:#fff;font-size:24px;margin:0;letter-spacing:1px;">KYC Digital Identity Notification</h1>
           </td>
         </tr>
@@ -201,12 +223,12 @@ export function generateIdentityEmailTemplate({ action, user, reason, neuronHost
           <td style="padding:32px 32px 16px 32px;">
             <p style="font-size:17px;color:#222;margin:0 0 18px 0;">${escapeHtml(greeting)}</p>
             ${buildParagraphs(message)}
-            ${cta ? `<p style="font-size:16px;margin:0 0 18px 0;"><a href="${escapeHtml(cta.url)}" style="color:#8F40D4;text-decoration:none;font-weight:600;">${escapeHtml(cta.label)}</a></p>` : ''}
+            ${cta ? `<p style="font-size:16px;margin:0 0 18px 0;"><a href="${escapeHtml(cta.url)}" style="color:${brandConfig.linkColor};text-decoration:none;font-weight:600;">${escapeHtml(cta.label)}</a></p>` : ''}
           </td>
         </tr>
         <tr>
           <td style="padding:0 32px 32px 32px;">
-            <p style="font-size:15px;color:#888;margin:32px 0 0 0;">Best regards,<br/><b>Neuro KYC Digital Identity Team</b></p>
+            <p style="font-size:15px;color:#888;margin:32px 0 0 0;">Best regards,<br/><b>${brandConfig.teamName}</b></p>
           </td>
         </tr>
       </table>
