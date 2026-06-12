@@ -5,6 +5,7 @@ import { FaSpinner, FaTimes } from 'react-icons/fa'
 import { ImageViewerModal } from './ImageViewerModal'
 import { TiptapEditor } from './TiptapEditor'
 import { useLanguage, content } from '../../../context/LanguageContext'
+import { getModalText } from '@/utils/getModalText'
 
 export const Modal = ({ setToggle, loading, user, text, handleApprove, handleReject }) => {
   const { language } = useLanguage();
@@ -15,6 +16,11 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
   const [confirmAction, setConfirmAction] = useState(null)
   const [viewerOpen, setViewerOpen] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const confirmText = confirmAction === 'approve'
+    ? getModalText('Approved', 'Approve ID application', t)
+    : confirmAction === 'deny'
+      ? getModalText('Rejected', 'Deny ID application', t)
+      : text
 
   // Exclude ApplicationReview.xml from image list
   const imageList = user.attachments?.filter(a => a?.data && a.fileName !== 'ApplicationReview.xml') || [];
@@ -283,7 +289,7 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
         <div className="flex gap-4 mb-6">
           {[{att: idFront, label: 'ID Card Front'}, {att: idBack, label: 'ID Card Back'}, {att: passport, label: 'Passport'}, {att: driverFront, label: 'Driver License Front'}, {att: driverBack, label: 'Driver License Back'}]
             .filter(({att}) => att)
-            .map(({att, label}, idx) => (
+            .map(({att, label}) => (
               <div
                 key={att.fileName || label}
                 className="w-[194px] h-[144px] border-2 bg-gray-200 rounded-[8px] p-[8px] flex items-center justify-center overflow-hidden cursor-pointer"
@@ -418,10 +424,10 @@ export const Modal = ({ setToggle, loading, user, text, handleApprove, handleRej
                 <FaTimes size={20} />
               </button>
               <p className="text-lg font-semibold text-gray-800 mb-2">
-                {text?.textState}
+                {confirmText?.textState}
               </p>
               <p className="text-sm text-gray-500 mb-6">
-                {text?.textVerifiedEmail}
+                {confirmText?.textVerifiedEmail}
               </p>
               <div className="flex justify-center gap-4">
                 <button

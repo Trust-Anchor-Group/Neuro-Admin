@@ -21,6 +21,9 @@ export const Identity = ({
   const [infoToggle, setIntoToggle] = useState(true);
   const [infoToggleMetaData, setIntoToggleMetaData] = useState(false);
   const [previewAtt, setPreviewAtt] = useState(null);
+  const hasIdentityData = Boolean(
+    user?.properties && Object.values(user.properties).some((value) => String(value ?? '').trim() !== '')
+  );
 
   const adminActions = [
     { actionTitle: 'Rejected', bgColor: 'bg-neuroRed/20', icon: FaExclamationTriangle, textColor: 'text-obsoletedRed', name: t?.Identity?.actionTitles?.rejected || 'Deny ID application' },
@@ -45,7 +48,7 @@ export const Identity = ({
         className="bg-[var(--brand-navbar)] border-2 border-[var(--brand-border)] rounded-xl shadow-sm p-6 pt-8 text-[var(--brand-text-color)]"
         aria-labelledby="identity-heading"
       >
-        {user?.properties?.FIRST ? (
+        {hasIdentityData ? (
           <div className="grid grid-cols-1 gap-1 h-full max-sm:px-5">
             <header className="flex items-center gap-3 pb-4 max-sm:flex-col max-sm:mt-5">
               <ImageComponent user={user} />

@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test:send-notification": "node scripts/test-send-notification.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

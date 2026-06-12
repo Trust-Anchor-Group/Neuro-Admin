@@ -57,6 +57,9 @@ export async function POST(request) {
                     EMAIL: data.properties.EMAIL,
                     PHONE: data.properties.PHONE,
                     DOB: data.properties.DOB,
+                    SPORT: data.properties.SPORT,
+                    SPORTINGLICENSE: data.properties.SPORTINGLICENSE,
+                    SPORTASSOCIATION: data.properties.SPORTASSOCIATION,
 
                     // Företagsuppgifter
                     ORGNAME: data.properties.ORGNAME,

@@ -2,11 +2,8 @@
 import { PaginatedList } from '@/components/access/PaginatedList'
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
-import config from '@/config/config';
-import { userColoumnsAccount,customCellAcountTable,accountActions } from './accountTableList.js'
+import { userColoumnsAccount,customCellAcountTable } from './accountTableList.js'
 import {userColoumnsPending,customCellPendingTable,pendingActions} from './pendingTable.js'
-import { FaHourglassHalf, FaSpinner, FaUserFriends } from 'react-icons/fa';
-import Link from 'next/link.js';
 import { Modal } from '../shared/Modal.jsx';
 import { pendingAction } from './pendingFetch.js';
 import { getModalText } from '@/utils/getModalText.js';
@@ -99,13 +96,29 @@ export const AccessContent = () => {
       getData();
   }, [page, query,filterAccount,pathname,limit]);
     
-  async function onHandleModal(){
+  async function onHandleModal(action = actionButtonName, reason = ''){
     try {
-        await pendingAction(id,actionButtonName)
+        const changeState = await pendingAction(id, action, {
+          user: selectedUser,
+          reason,
+          sendNotification: true,
+        })
+
+        if (!changeState.ok) {
+          throw new Error(changeState.data?.message || 'Failed to change identity state')
+        }
+
+        const notification = changeState.data?.data?.notification
+        if (notification && notification.success === false) {
+          console.error('Failed to send email:', notification.error, notification.details)
+        }
+
         getData()
         setToggle(false)
+        return true
      } catch (error) {
-         console.log(error)
+         console.error(error)
+         return false
      }
 }
 
@@ -194,11 +207,10 @@ const filteredColumns = filterAccount === 'noID'
           <Modal
             text={getModalText(actionButtonName, buttonName, t)}
             setToggle={setToggle}
-            onHandleModal={onHandleModal}
             user={selectedUser}
             loading={false}
-            handleApprove={() => onHandleModal('approve')}
-            handleReject={(reason) => onHandleModal('deny', reason)}
+            handleApprove={() => onHandleModal('Approved')}
+            handleReject={(reason) => onHandleModal('Rejected', reason)}
           />
         )}
 
