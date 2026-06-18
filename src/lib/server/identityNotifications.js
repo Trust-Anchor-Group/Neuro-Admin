@@ -1,5 +1,16 @@
 const DEV_NEURON_HOST = 'dev.athletesandyou.tagroot.io';
 const DEV_LOGIN_URL = 'https://brave-rock-04a1ad803-dev.westeurope.4.azurestaticapps.net/auth/login/athlete';
+const PROD_NEURON_HOST = 'athletesandyou.tagroot.io';
+const PROD_LOGIN_URL = 'https://www.athyou.tech/auth/login/athlete';
+
+const ATHLETES_AND_YOU_HOST_CONFIG = {
+  [DEV_NEURON_HOST]: {
+    loginUrl: DEV_LOGIN_URL,
+  },
+  [PROD_NEURON_HOST]: {
+    loginUrl: PROD_LOGIN_URL,
+  },
+};
 
 export const VALID_IDENTITY_ACTIONS = new Set([
   'Approved',
@@ -99,12 +110,12 @@ function buildParagraphs(message) {
 }
 
 function buildDynamicLink(action, neuronHost) {
-  const normalizedHost = normalizeHost(neuronHost);
+  const hostConfig = ATHLETES_AND_YOU_HOST_CONFIG[normalizeHost(neuronHost)];
 
-  if (action === 'Approved' && normalizedHost === DEV_NEURON_HOST) {
+  if (action === 'Approved' && hostConfig?.loginUrl) {
     return {
       label: 'Log in to your account',
-      url: DEV_LOGIN_URL,
+      url: hostConfig.loginUrl,
     };
   }
 
@@ -190,7 +201,7 @@ export function generateIdentityEmailTemplate({ action, user, reason, neuronHost
   
   // Check if this is Athletes & You
   const normalizedHost = normalizeHost(neuronHost);
-  const isAthletesAndYou = normalizedHost === DEV_NEURON_HOST;
+  const isAthletesAndYou = Boolean(ATHLETES_AND_YOU_HOST_CONFIG[normalizedHost]);
   
   // Branding configuration
   const brandConfig = isAthletesAndYou

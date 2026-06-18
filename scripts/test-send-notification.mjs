@@ -30,6 +30,7 @@ Environment variable fallbacks:
 
 Examples:
   npm run test:send-notification -- --email you@example.com --secret your-test-secret --host dev.athletesandyou.tagroot.io
+  npm run test:send-notification -- --email you@example.com --secret your-test-secret --host athletesandyou.tagroot.io
   npm run test:send-notification -- --email you@example.com --action Rejected --reason "Photo was unreadable" --secret your-test-secret --host br.id.tagroot.io
 `);
 }
