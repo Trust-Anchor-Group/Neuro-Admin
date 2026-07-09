@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { applyBrandTheme, getInitialMode, toggleMode } from '../../utils/brandTheme';
+import { applyBrandTheme, getInitialMode } from '../../utils/brandTheme';
 import { useLanguage, content } from '../../../context/LanguageContext';
 
 const getBrandConfig = (host) => {
@@ -91,7 +90,7 @@ const Menu = ({ menuItems }) => {
   return (
     <aside
       ref={filterRef}
-      className={`h-screen shadow-md transition-all duration-300 flex flex-col justify-between ${open ? 'w-64' : 'w-16'} ${themeClass}`}
+      className={`h-screen shadow-md transition-all duration-300 flex flex-col justify-between ${open ? 'w-72' : 'w-[72px]'} ${themeClass}`}
       style={{
         background: 'var(--brand-sidebar-bg)',
         borderRight: '1px solid border-[var(--brand-border)]'
@@ -133,9 +132,16 @@ const Menu = ({ menuItems }) => {
             <button
               onClick={() => setOpen(false)}
               aria-label="Collapse sidebar"
-              className="absolute bottom-[-7%] right-0 bg-[var(--brand-third)] text-[var(--brand-primary)] rounded-l p-2 shadow z-20 hover:bg-brand-accent hover:text-[var(--brand-third)]"
+              className="absolute bottom-[-7%] right-0 z-20 transition-transform hover:scale-[1.02]"
             >
-              <FaChevronLeft size={16} />
+              <Image
+                src="/Sidebar toggle.svg"
+                alt=""
+                aria-hidden="true"
+                width={40}
+                height={40}
+                unoptimized
+              />
             </button>
           )}
         </div>
@@ -146,9 +152,17 @@ const Menu = ({ menuItems }) => {
             <button
               onClick={() => setOpen(true)}
               aria-label="Expand sidebar"
-              className="bg-[var(--brand-third)] absolute top-[-10%] right-[25%] text-[var(--brand-primary)] rounded p-2 shadow hover:bg-[var(--brand-primary)] hover:text-[var(--brand-third)]"
+              className="absolute top-[-10%] right-[25%] transition-transform hover:scale-[1.02]"
             >
-              <FaChevronRight size={16} />
+              <Image
+                src="/Sidebar toggle.svg"
+                alt=""
+                aria-hidden="true"
+                width={40}
+                height={40}
+                className="rotate-180"
+                unoptimized
+              />
             </button>
           )}
 
