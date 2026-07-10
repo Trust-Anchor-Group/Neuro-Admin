@@ -18,7 +18,7 @@ export default function KYCSettings() {
   const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(false);
   const [showCustomFieldsInfo, setShowCustomFieldsInfo] = useState(true);
   const [customFields, setCustomFields] = useState([
-    { id: 1, label: "", type: "", required: true, options: [{ id: 1, value: "" }] },
+    { id: 1, label: "", type: "", required: true, placeholder: "", options: [{ id: 1, value: "" }] },
   ]);
   const [openInputTypeFieldId, setOpenInputTypeFieldId] = useState(null);
   const dismissTimerRef = useRef(null);
@@ -139,7 +139,7 @@ export default function KYCSettings() {
   const addCustomField = () => {
     setCustomFields((prev) => [
       ...prev,
-      { id: Date.now(), label: "", type: "", required: false, options: [{ id: Date.now() + 1, value: "" }] },
+      { id: Date.now(), label: "", type: "", required: false, placeholder: "", options: [{ id: Date.now() + 1, value: "" }] },
     ]);
   };
 
@@ -474,6 +474,20 @@ export default function KYCSettings() {
 													</div>
 												)}
 												</div>
+												{field.type === "text" && (
+													<div>
+														<div className="mb-2 text-base font-semibold text-[#181f25]/60">Placeholder</div>
+														<label className="flex h-12 min-w-0 items-center rounded-md border border-[#d1d7e0] bg-white px-3.5 shadow-[inset_0_0_0_1px_rgba(24,31,37,0.06)] transition-colors focus-within:border-[var(--brand-primary)]">
+															<input
+																type="text"
+																value={field.placeholder || ""}
+																onChange={(event) => updateCustomField(field.id, { placeholder: event.target.value })}
+																placeholder="Edit placeholder"
+																className="min-w-0 flex-1 border-none bg-transparent text-[18px] text-[#181f25] outline-none placeholder:text-[#181f25]/60"
+															/>
+														</label>
+													</div>
+												)}
 													{(field.type === "checkboxes" || field.type === "radio") && (
 													<div>
 														<div className="mb-2 text-base font-semibold text-[#181f25]/60">Answer Options</div>
