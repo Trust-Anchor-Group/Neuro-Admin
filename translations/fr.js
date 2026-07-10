@@ -759,6 +759,7 @@ const fr = {
       REGION: 'Choisir la région / état'
     },
     nextField: 'Champ suivant',
+    downloadXml: 'Télécharger le XML',
     selectStep: 'Sélectionnez une étape dans la checklist pour voir les détails.'
   }
   ,

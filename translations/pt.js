@@ -773,6 +773,7 @@ const pt = {
       REGION: 'Escolher estado / região'
     },
     nextField: 'Próximo campo',
+    downloadXml: 'Baixar XML',
     selectStep: 'Selecione uma etapa na lista para ver os detalhes.'
   }
   ,

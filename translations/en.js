@@ -775,6 +775,7 @@ const en = {
       REGION: 'Choose state / region'
     },
     nextField: 'Next field',
+    downloadXml: 'Download XML',
     selectStep: 'Select a step from the checklist to inspect the preview.'
   }
   ,

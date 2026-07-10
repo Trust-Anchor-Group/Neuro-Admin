@@ -5,6 +5,40 @@ import { ChevronDown, GripVertical, Info, Plus, Trash2, X } from "lucide-react";
 import KYCSettingsPreview from './KYCSettingsPreview';
 import { useLanguage, content } from '../../../../context/LanguageContext';
 
+const CUSTOM_FIELDS_STORAGE_KEY = 'kycCustomFields';
+
+const createCustomField = () => ({
+  id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+  fieldId: '',
+  label: '',
+  type: '',
+  required: true,
+  placeholder: '',
+  options: [{ id: `option-${Date.now()}`, value: '' }],
+  custom: true,
+});
+
+const readCustomFields = () => {
+  try {
+    const stored = window.localStorage.getItem(CUSTOM_FIELDS_STORAGE_KEY);
+    const fields = stored ? JSON.parse(stored) : [];
+    return Array.isArray(fields) ? fields.filter((field) => field?.custom && field?.fieldId) : [];
+  } catch {
+    return [];
+  }
+};
+
+const customFieldId = (label, index, existingId) => {
+  if (existingId) return existingId;
+  const slug = String(label || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .toUpperCase();
+  return `CUSTOM_${slug || `FIELD_${index + 1}`}`;
+};
+
 export default function KYCSettings() {
   const { language } = useLanguage();
   const t = useMemo(() => {
@@ -18,7 +52,7 @@ export default function KYCSettings() {
   const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(false);
   const [showCustomFieldsInfo, setShowCustomFieldsInfo] = useState(true);
   const [customFields, setCustomFields] = useState([
-    { id: 1, label: "", type: "", required: true, placeholder: "", options: [{ id: 1, value: "" }] },
+    createCustomField(),
   ]);
   const [openInputTypeFieldId, setOpenInputTypeFieldId] = useState(null);
   const dismissTimerRef = useRef(null);
@@ -48,6 +82,7 @@ export default function KYCSettings() {
         const json = await res.json();
         const data = json?.data || {};
 
+        const savedCustomFields = readCustomFields();
         const formattedSettings = {
           peerReview: data.allowPeerReview ?? false,
           nrReviewers: parseInt(data.nrReviewersToApprove) || 2,
@@ -67,11 +102,13 @@ export default function KYCSettings() {
             { id: "COUNTRY", label: "Country", required: data.requireCountry },
             { id: "AREA", label: "Area", required: data.requireArea },
             { id: "REGION", label: "Region", required: data.requireRegion },
+            ...savedCustomFields.map((field) => ({ ...field, id: field.fieldId })),
           ],
         };
 
         setSettings(formattedSettings);
         setOriginalSettings(JSON.stringify(formattedSettings));
+        setCustomFields([createCustomField()]);
       } catch (error) {
         console.error("Failed to fetch peer review settings", error);
   setMessage({ type: "error", text: loadErrorMsg });
@@ -139,7 +176,7 @@ export default function KYCSettings() {
   const addCustomField = () => {
     setCustomFields((prev) => [
       ...prev,
-      { id: Date.now(), label: "", type: "", required: false, placeholder: "", options: [{ id: Date.now() + 1, value: "" }] },
+      createCustomField(),
     ]);
   };
 
@@ -160,7 +197,7 @@ export default function KYCSettings() {
         field.id === fieldId
           ? {
               ...field,
-              options: [...(field.options || []), { id: Date.now(), value: "" }],
+              options: [...(field.options || []), { id: `option-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, value: "" }],
             }
           : field
       )
@@ -199,6 +236,51 @@ export default function KYCSettings() {
     setCustomFields((prev) =>
       prev.length > 1 ? prev.filter((field) => field.id !== id) : prev
     );
+  };
+
+  const openCustomFields = () => {
+    setCustomFields([createCustomField()]);
+    setIsCustomFieldsOpen(true);
+  };
+
+  const saveCustomFields = () => {
+    const existingCustomFields = settings?.requiredFields?.filter((field) => field.custom) || [];
+    const usedIds = new Set(existingCustomFields.map((field) => field.fieldId || field.id));
+    const configuredFields = customFields.reduce((fields, field, index) => {
+      const label = String(field.label || '').trim();
+      if (!label || !field.type) return fields;
+
+      let fieldId = customFieldId(label, index, field.fieldId);
+      while (usedIds.has(fieldId)) fieldId = `${fieldId}_${index + 1}`;
+      usedIds.add(fieldId);
+
+      fields.push({
+        ...field,
+        fieldId,
+        label,
+        required: !!field.required,
+        custom: true,
+        options: (field.options || []).filter((option) => String(option.value || '').trim()),
+      });
+      return fields;
+    }, []);
+
+    if (!configuredFields.length) {
+      setMessage({ type: 'error', text: 'Add a label and input type before saving a custom field.' });
+      return;
+    }
+
+    const savedCustomFields = [...existingCustomFields, ...configuredFields];
+    window.localStorage.setItem(CUSTOM_FIELDS_STORAGE_KEY, JSON.stringify(savedCustomFields));
+    setCustomFields([createCustomField()]);
+    setSettings((previous) => ({
+      ...previous,
+      requiredFields: [
+        ...previous.requiredFields.filter((field) => !field.custom),
+        ...savedCustomFields.map((field) => ({ ...field, id: field.fieldId || field.id })),
+      ],
+    }));
+    setIsCustomFieldsOpen(false);
   };
 
   const saveSettings = useCallback(async () => {
@@ -248,6 +330,8 @@ export default function KYCSettings() {
         const errText = await res.text();
         throw new Error(errText || "Save failed");
       }
+      const savedCustomFields = settings.requiredFields.filter((field) => field.custom);
+      window.localStorage.setItem(CUSTOM_FIELDS_STORAGE_KEY, JSON.stringify(savedCustomFields));
       setMessage({ type: "success", text: t?.messages?.saveSuccess || "Settings updated successfully!" });
       setOriginalSettings(JSON.stringify(settings));
     } catch (error) {
@@ -322,7 +406,7 @@ export default function KYCSettings() {
 												idx % 2 === 0 ? "border-r border-[var(--brand-border)]" : ""
 											}`}
 										>
-											<Checkbox label={t?.labels?.[field.id] || field.id} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
+										<Checkbox label={field.label || t?.labels?.[field.id] || field.id} checked={field.required} onChange={() => toggleRequiredField(field.id)} />
 										</div>
 									))}
 								</div>
@@ -333,7 +417,7 @@ export default function KYCSettings() {
 							<div className="mt-6 flex shrink-0 flex-col gap-4 border-t border-[var(--brand-border)] pt-5 lg:flex-row lg:items-center lg:justify-between">
 								<button
 									type="button"
-									onClick={() => setIsCustomFieldsOpen(true)}
+									onClick={openCustomFields}
 									className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[var(--Button-Neuro-Secondary-bg,_#8F40D426)] px-5 text-base font-semibold text-[var(--Button-Neuro-Secondary-Content,_#722FAD)] shadow-sm transition-colors hover:brightness-95 lg:w-auto"
 								>
 									Create custom fields
@@ -498,10 +582,11 @@ export default function KYCSettings() {
 																				<input
 																					type={field.type === "radio" ? "radio" : "checkbox"}
 																					name={`answer-option-${field.id}`}
+																					disabled
 																					className="h-[22px] w-[22px] shrink-0 border-[#d9dee7] accent-[var(--brand-primary)]"
 																					aria-label="Answer option"
 																				/>
-																			<input
+																				<input
 																				type="text"
 																				value={option.value}
 																				onChange={(event) => updateAnswerOption(field.id, option.id, event.target.value)}
@@ -571,7 +656,7 @@ export default function KYCSettings() {
 							<div className="border-t border-[#e3e7ee] px-5 pb-6 pt-3">
 								<button
 								type="button"
-								onClick={() => setIsCustomFieldsOpen(false)}
+								onClick={saveCustomFields}
 								className="h-12 w-full rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] text-[18px] font-bold text-white shadow-sm transition-colors hover:brightness-95"
 							>
 								Save Configuration
