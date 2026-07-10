@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }) {
   const { language } = useLanguage();
   const t = content[language];
   const pathname = usePathname();
-  const isSettingsPage = pathname === '/neuro-access/settings';
+  const isSettingsPage = pathname?.startsWith('/neuro-access/settings');
 
   const menuItems = [
     {
@@ -25,6 +25,9 @@ export default function DashboardLayout({ children }) {
       title: t?.menu?.accessSettings || 'Access settings',
       icon: <MdOutlineSettings size={20} />,
       href: '/neuro-access/settings',
+      subItems: [
+        { label: 'My KYC', href: '/neuro-access/settings/my-kyc' },
+      ],
     },
   ];
 
