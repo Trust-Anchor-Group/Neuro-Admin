@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useLanguage, content } from '../../../../context/LanguageContext';
-import { ArrowLeft, ArrowRight, Check, Download, Square, SquareCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Download, Square, SquareCheck, Upload } from "lucide-react";
 import { buildKycProcessXml } from '../../../lib/kycXml';
 
 const stepFallbackText = {
@@ -53,6 +53,7 @@ export default function KYCSettingsPreview({
     const [activeIndex, setActiveIndex] = useState(0);
     const [values, setValues] = useState({});
     const [isComplete, setIsComplete] = useState(false);
+    const [uploadState, setUploadState] = useState({ loading: false, success: false, error: "", url: "", uploadedAt: "", verified: false });
 
     useEffect(() => {
         if (!steps.length) {
@@ -95,17 +96,69 @@ export default function KYCSettingsPreview({
         setActiveIndex((previous) => previous + 1);
     };
 
-    const downloadXml = () => {
-        const xml = buildKycProcessXml(requiredFields);
-        const blob = new Blob([xml], { type: 'application/xml;charset=utf-8' });
+    const downloadXml = (xml) => {
+        const blob = new Blob([xml], { type: "application/xml;charset=utf-8" });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        link.download = 'KYCProcess.xml';
+        link.download = "KYCProcess.xml";
         document.body.appendChild(link);
         link.click();
         link.remove();
         URL.revokeObjectURL(url);
+    };
+
+    const downloadAndUploadXml = async () => {
+        const xml = buildKycProcessXml(requiredFields);
+        downloadXml(xml);
+        setUploadState({ loading: true, success: false, error: "", url: "", uploadedAt: "", verified: false });
+        try {
+            let agentToken = "";
+            const agentHost = String(window.sessionStorage.getItem("AgentAPI.Host") || "")
+                .replace(/^https?:\/\//i, "")
+                .replace(/\/+$/, "")
+                .toLowerCase();
+            if (agentHost && agentHost !== "dev.athletesandyou.tagroot.io") {
+                throw new Error(`The current Agent API session belongs to ${agentHost}, not dev.athletesandyou.tagroot.io. Sign in to the dev Neuron and retry.`);
+            }
+
+            const tokenResponse = await fetch("/api/auth/quickLogin/token", {
+                method: "POST",
+                credentials: "include",
+            });
+            const tokenResult = await tokenResponse.json().catch(() => ({}));
+            if (tokenResponse.ok && tokenResult?.jwt) {
+                agentToken = tokenResult.jwt;
+                window.sessionStorage.setItem("AgentAPI.Token", agentToken);
+            } else {
+                agentToken = window.sessionStorage.getItem("AgentAPI.Token") || "";
+            }
+            if (!agentToken) {
+                throw new Error(tokenResult?.error || "Could not create an Agent API session on the dev Neuron. Run Quick Login again and retry.");
+            }
+
+            const response = await fetch("/api/settings/kyc-process", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${agentToken}`,
+                },
+                body: JSON.stringify({ xml }),
+            });
+            const result = await response.json();
+            if (!response.ok || !result?.success) throw new Error(result?.message || "Upload failed.");
+            setUploadState({
+                loading: false,
+                success: true,
+                error: "",
+                url: result?.data?.url || "",
+                uploadedAt: result?.data?.uploadedAt || new Date().toISOString(),
+                verified: Boolean(result?.data?.verified),
+            });
+        } catch (error) {
+            setUploadState({ loading: false, success: false, error: error.message || "Unable to upload the XML.", url: "", uploadedAt: "", verified: false });
+        }
     };
 
     const renderInput = () => {
@@ -214,7 +267,11 @@ export default function KYCSettingsPreview({
                     </div>
                 )}
 			</div>
-			<button type="button" onClick={downloadXml} className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-5 text-base font-semibold text-white shadow-sm transition-colors hover:brightness-95"><Download className="h-[18px] w-[18px]" aria-hidden="true" />{t?.kycPreview?.downloadXml || 'Download XML'}</button>
+			<button type="button" onClick={downloadAndUploadXml} disabled={uploadState.loading} className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-5 text-base font-semibold text-white shadow-sm transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"><Download className="h-[18px] w-[18px]" aria-hidden="true" /><Upload className="h-[18px] w-[18px]" aria-hidden="true" />{uploadState.loading ? 'Uploading XML…' : 'Download & upload XML'}</button>
+			{uploadState.success && <p role="status" className="mt-3 text-center text-sm font-medium text-green-700">Public XML upload confirmed by dev Neuron{uploadState.verified ? ' and the stored file was verified' : ''}. {uploadState.uploadedAt && `Uploaded ${new Date(uploadState.uploadedAt).toLocaleString()}.`}</p>}
+			{uploadState.url && <a href={uploadState.url} target="_blank" rel="noreferrer" className="mt-3 break-all text-center text-sm font-medium text-blue-600 underline hover:text-blue-700">Open uploaded XML</a>}
+			{uploadState.success && !uploadState.url && <p className="mt-2 text-center text-xs text-[var(--brand-text-secondary)]">The Neuron accepted KYCProcess.xml as public content but did not return a link.</p>}
+			{uploadState.error && <p role="alert" className="mt-3 text-center text-sm text-red-600">{uploadState.error}</p>}
 		</div>
 	);
 }
