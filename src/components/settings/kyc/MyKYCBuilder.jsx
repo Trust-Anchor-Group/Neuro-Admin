@@ -1169,10 +1169,15 @@ function CustomFieldModal({ mode = "fields", initialFields, onClose, onSave }) {
           kind: field.kind || "field",
           description: field.description || "",
           hint: field.hint || "",
+          placeholder: field.placeholder || "",
+          required: Boolean(field.required),
+          inputType: field.inputType || "",
           subfields: (field.subfields || []).map((subfield) => ({ ...subfield })),
           options: field.options?.length
             ? field.options.map((option) => ({ ...option }))
-            : [{ id: `option-${Date.now()}`, value: "" }],
+            : usesAnswerOptions(field)
+              ? [{ id: `option-${Date.now()}`, value: "" }]
+              : [],
         }))
       : [createEmptyCustomField()]
   );
@@ -1204,7 +1209,7 @@ function CustomFieldModal({ mode = "fields", initialFields, onClose, onSave }) {
         field.id === fieldId
           ? {
               ...field,
-              subfields: field.subfields.map((subfield) =>
+              subfields: (field.subfields || []).map((subfield) =>
                 subfield.id === subfieldId ? { ...subfield, ...updates } : subfield
               ),
             }
@@ -1220,7 +1225,7 @@ function CustomFieldModal({ mode = "fields", initialFields, onClose, onSave }) {
           ? {
               ...field,
               subfields: [
-                ...field.subfields,
+                ...(field.subfields || []),
                 {
                   id: `subfield-${Date.now()}-${Math.random().toString(36).slice(2)}`,
                   label: "",
@@ -1237,8 +1242,8 @@ function CustomFieldModal({ mode = "fields", initialFields, onClose, onSave }) {
   const removeSubfield = (fieldId, subfieldId) => {
     setFields((current) =>
       current.map((field) =>
-        field.id === fieldId && field.subfields.length > 1
-          ? { ...field, subfields: field.subfields.filter((subfield) => subfield.id !== subfieldId) }
+        field.id === fieldId && (field.subfields || []).length > 1
+          ? { ...field, subfields: (field.subfields || []).filter((subfield) => subfield.id !== subfieldId) }
           : field
       )
     );
@@ -1251,7 +1256,7 @@ function CustomFieldModal({ mode = "fields", initialFields, onClose, onSave }) {
           ? {
               ...field,
               options: [
-                ...field.options,
+                ...(field.options || []),
                 { id: `option-${Date.now()}-${Math.random().toString(36).slice(2)}`, value: "" },
               ],
             }
@@ -1266,7 +1271,7 @@ function CustomFieldModal({ mode = "fields", initialFields, onClose, onSave }) {
         field.id === fieldId
           ? {
               ...field,
-              options: field.options.map((option) =>
+              options: (field.options || []).map((option) =>
                 option.id === optionId ? { ...option, value } : option
               ),
             }
@@ -1278,8 +1283,8 @@ function CustomFieldModal({ mode = "fields", initialFields, onClose, onSave }) {
   const removeAnswerOption = (fieldId, optionId) => {
     setFields((current) =>
       current.map((field) =>
-        field.id === fieldId && field.options.length > 1
-          ? { ...field, options: field.options.filter((option) => option.id !== optionId) }
+        field.id === fieldId && (field.options || []).length > 1
+          ? { ...field, options: (field.options || []).filter((option) => option.id !== optionId) }
           : field
       )
     );
@@ -1287,12 +1292,14 @@ function CustomFieldModal({ mode = "fields", initialFields, onClose, onSave }) {
 
   const canSave = fields.every(
     (field) =>
-      field.label.trim() &&
+      field.label?.trim() &&
       (field.kind === "group"
-        ? field.subfields.length > 0 && field.subfields.every((subfield) => subfield.label.trim())
+        ? (field.subfields || []).length > 0 &&
+          (field.subfields || []).every((subfield) => subfield.label?.trim())
         : (field.inputType || field.type) &&
           (!usesAnswerOptions(field) ||
-            field.options.every((option) => option.value.trim())))
+            (field.options || []).length > 0 &&
+            (field.options || []).every((option) => option.value?.trim())))
   ) && (!isPageMode || pageTitle.trim());
 
   return (
