@@ -3,12 +3,60 @@
 import Link from "next/link";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { buildKycXmlFromBuilderGroups } from "@/lib/kycXml";
 
 const savedKycStorageKey = "neuro-admin-my-kycs";
 
 export default function MyKYCPage() {
   const [savedKycs, setSavedKycs] = useState([]);
   const [kycToDelete, setKycToDelete] = useState(null);
+  const [xmlStatus, setXmlStatus] = useState({});
+
+  const downloadAndUploadKycXml = async (kyc) => {
+    const fieldIds = kyc.groups.flatMap((group) => group.fields.map((field) => field.id));
+    if (!fieldIds.length) {
+      setXmlStatus((current) => ({ ...current, [kyc.id]: { type: "error", message: "This KYC has no fields to export." } }));
+      return;
+    }
+
+    const xml = buildKycXmlFromBuilderGroups({ groups: kyc.groups, selectedFieldIds: fieldIds, name: kyc.name });
+    const blob = new Blob([xml], { type: "application/xml" });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = "KYCProcess.xml";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(downloadUrl);
+
+    setXmlStatus((current) => ({ ...current, [kyc.id]: { type: "loading", message: "KYCProcess.xml downloaded. Uploading..." } }));
+    try {
+      const tokenResponse = await fetch("/api/auth/quickLogin/token", { method: "POST", credentials: "include" });
+      const tokenPayload = await tokenResponse.json().catch(() => ({}));
+      const token = tokenPayload?.jwt || window.sessionStorage.getItem("AgentAPI.Token");
+      if (!token) throw new Error("Sign in with Quick Login before uploading the KYC XML.");
+
+      const uploadResponse = await fetch("/api/settings/kyc-process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ xml }),
+      });
+      const uploadResult = await uploadResponse.json().catch(() => ({}));
+      if (!uploadResponse.ok || !uploadResult.confirmed) throw new Error(uploadResult?.error || "The XML download succeeded, but upload failed.");
+
+      setXmlStatus((current) => ({
+        ...current,
+        [kyc.id]: {
+          type: "success",
+          message: uploadResult.verified ? "Downloaded, uploaded, and publicly verified." : "Downloaded and uploaded; public verification is pending.",
+          url: uploadResult.url,
+        },
+      }));
+    } catch (error) {
+      setXmlStatus((current) => ({ ...current, [kyc.id]: { type: "error", message: error?.message || "KYC XML was downloaded, but could not be uploaded." } }));
+    }
+  };
 
   useEffect(() => {
     setSavedKycs(JSON.parse(window.localStorage.getItem(savedKycStorageKey) || "[]"));
@@ -58,6 +106,7 @@ export default function MyKYCPage() {
             <div className="grid gap-4 overflow-y-auto pr-2 lg:grid-cols-2 xl:grid-cols-3">
               {savedKycs.map((kyc) => {
                 const fieldCount = kyc.groups.reduce((count, group) => count + group.fields.length, 0);
+                const exportStatus = xmlStatus[kyc.id];
 
                 return (
                   <article
@@ -80,6 +129,14 @@ export default function MyKYCPage() {
                       <span>{new Date(kyc.createdAt).toLocaleDateString()}</span>
                     </div>
                     <div className="mt-5 flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => downloadAndUploadKycXml(kyc)}
+                        disabled={exportStatus?.type === "loading"}
+                        className="inline-flex h-10 items-center justify-center rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-55"
+                      >
+                        {exportStatus?.type === "loading" ? "Uploading..." : "Download XML"}
+                      </button>
                       <Link
                         href={`/neuro-access/settings/my-kyc/create?edit=${kyc.id}`}
                         className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--brand-border)] bg-white text-[var(--brand-text-secondary)] transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
@@ -98,6 +155,21 @@ export default function MyKYCPage() {
                         <Trash2 className="h-5 w-5" />
                       </button>
                     </div>
+                    {exportStatus?.message && (
+                      <p className={`mt-3 text-sm font-medium ${exportStatus.type === "error" ? "text-[#d11f3f]" : "text-[#047857]"}`}>
+                        {exportStatus.message}
+                      </p>
+                    )}
+                    {exportStatus?.url && (
+                      <a
+                        href={exportStatus.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-flex text-sm font-semibold text-[var(--Button-Neuro-Secondary-Content,_#722FAD)] underline decoration-2 underline-offset-4 transition-colors hover:brightness-75"
+                      >
+                        Open uploaded XML
+                      </a>
+                    )}
                   </article>
                 );
               })}

@@ -4,6 +4,17 @@ import { FaCheckCircle, FaExclamationCircle, FaExclamationTriangle } from "react
 import { ChevronDown, GripVertical, Info, Plus, Trash2, X } from "lucide-react";
 import KYCSettingsPreview from './KYCSettingsPreview';
 import { useLanguage, content } from '../../../../context/LanguageContext';
+import { buildKycXml } from '../../../lib/kycXml';
+
+const customFieldsStorageKey = "neuro-admin-kyc-custom-fields";
+const createCustomField = () => ({
+  id: `custom-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  label: "",
+  type: "",
+  required: true,
+  placeholder: "",
+  options: [{ id: `option-${Date.now()}-${Math.random().toString(36).slice(2)}`, value: "" }],
+});
 
 export default function KYCSettings() {
   const { language } = useLanguage();
@@ -17,10 +28,12 @@ export default function KYCSettings() {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(false);
   const [showCustomFieldsInfo, setShowCustomFieldsInfo] = useState(true);
-  const [customFields, setCustomFields] = useState([
-    { id: 1, label: "", type: "", required: true, placeholder: "", options: [{ id: 1, value: "" }] },
-  ]);
+  const [customFields, setCustomFields] = useState([createCustomField()]);
+  const [savedCustomFields, setSavedCustomFields] = useState([]);
   const [openInputTypeFieldId, setOpenInputTypeFieldId] = useState(null);
+  const [xmlStatus, setXmlStatus] = useState("idle");
+  const [xmlMessage, setXmlMessage] = useState("");
+  const [uploadedXmlUrl, setUploadedXmlUrl] = useState("");
   const dismissTimerRef = useRef(null);
   const inputTypeOptions = [
     { value: "radio", label: "Radio" },
@@ -90,6 +103,15 @@ export default function KYCSettings() {
     };
   }, [loadErrorMsg]);
 
+  useEffect(() => {
+    try {
+      const storedFields = JSON.parse(window.localStorage.getItem(customFieldsStorageKey) || "[]");
+      if (Array.isArray(storedFields)) setSavedCustomFields(storedFields);
+    } catch {
+      window.localStorage.removeItem(customFieldsStorageKey);
+    }
+  }, []);
+
   // auto-dismiss message after 2s
   useEffect(() => {
     if (!message?.text) return;
@@ -139,7 +161,7 @@ export default function KYCSettings() {
   const addCustomField = () => {
     setCustomFields((prev) => [
       ...prev,
-      { id: Date.now(), label: "", type: "", required: false, placeholder: "", options: [{ id: Date.now() + 1, value: "" }] },
+      { ...createCustomField(), required: false },
     ]);
   };
 
@@ -199,6 +221,78 @@ export default function KYCSettings() {
     setCustomFields((prev) =>
       prev.length > 1 ? prev.filter((field) => field.id !== id) : prev
     );
+  };
+
+  const saveCustomFields = () => {
+    const nextCustomFields = customFields
+      .filter((field) => field.label.trim() && field.type)
+      .map((field) => ({
+        ...field,
+        label: field.label.trim(),
+        placeholder: field.placeholder?.trim() || "",
+        options: (field.options || []).filter((option) => option.value?.trim()),
+      }));
+
+    setSavedCustomFields(nextCustomFields);
+    window.localStorage.setItem(customFieldsStorageKey, JSON.stringify(nextCustomFields));
+    setCustomFields([createCustomField()]);
+    setOpenInputTypeFieldId(null);
+    setIsCustomFieldsOpen(false);
+    setMessage({ type: "success", text: "Custom fields saved." });
+  };
+
+  const downloadAndUploadXml = async () => {
+    if (!settings) return;
+
+    const xml = buildKycXml({
+      requiredFields: settings.requiredFields,
+      customFields: savedCustomFields,
+      labels: t?.labels || {},
+      name: "KYC Process",
+    });
+    const blob = new Blob([xml], { type: "application/xml" });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = "KYCProcess.xml";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(downloadUrl);
+
+    setXmlStatus("loading");
+    setXmlMessage("KYCProcess.xml downloaded. Uploading to the Neuron...");
+    setUploadedXmlUrl("");
+    try {
+      const tokenResponse = await fetch("/api/auth/quickLogin/token", {
+        method: "POST",
+        credentials: "include",
+      });
+      const tokenPayload = await tokenResponse.json().catch(() => ({}));
+      const token = tokenPayload?.jwt || window.sessionStorage.getItem("AgentAPI.Token");
+      if (!token) throw new Error("Sign in with Quick Login before uploading the KYC XML.");
+
+      const uploadResponse = await fetch("/api/settings/kyc-process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ xml }),
+      });
+      const uploadResult = await uploadResponse.json().catch(() => ({}));
+      if (!uploadResponse.ok || !uploadResult.confirmed) {
+        throw new Error(uploadResult?.error || "The XML download succeeded, but upload failed.");
+      }
+
+      setXmlStatus("success");
+      setUploadedXmlUrl(uploadResult.url || "");
+      setXmlMessage(
+        uploadResult.verified
+          ? "KYC XML downloaded, uploaded, and publicly verified."
+          : "KYC XML downloaded and uploaded, but the public URL could not be verified yet."
+      );
+    } catch (error) {
+      setXmlStatus("error");
+      setXmlMessage(error?.message || "KYC XML was downloaded, but could not be uploaded.");
+    }
   };
 
   const saveSettings = useCallback(async () => {
@@ -380,9 +474,35 @@ export default function KYCSettings() {
 				{/* RIGHT: Preview component */}
 				<KYCSettingsPreview
 					requiredFields={settings?.requiredFields || []}
+					customFields={savedCustomFields}
 					labels={t?.labels || {}}
 					loading={loading}
 				/>
+				<div className="mt-6">
+					<button
+						type="button"
+						onClick={downloadAndUploadXml}
+						disabled={!settings || xmlStatus === "loading"}
+						className="inline-flex h-12 w-full items-center justify-center rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-6 text-base font-semibold text-white shadow-sm transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-55"
+					>
+						{xmlStatus === "loading" ? "Uploading KYC XML..." : "Download and upload KYC XML"}
+					</button>
+					{xmlMessage && (
+						<p className={`mt-3 text-sm font-medium ${xmlStatus === "error" ? "text-[#d11f3f]" : "text-[#047857]"}`}>
+							{xmlMessage}
+						</p>
+					)}
+					{uploadedXmlUrl && (
+						<a
+							href={uploadedXmlUrl}
+							target="_blank"
+							rel="noreferrer"
+							className="mt-3 inline-flex text-sm font-semibold text-[var(--Button-Neuro-Secondary-Content,_#722FAD)] underline decoration-2 underline-offset-4 transition-colors hover:brightness-75"
+						>
+							Open uploaded XML
+						</a>
+					)}
+				</div>
 			</div>
 		</div>
 
@@ -571,7 +691,7 @@ export default function KYCSettings() {
 							<div className="border-t border-[#e3e7ee] px-5 pb-6 pt-3">
 								<button
 								type="button"
-								onClick={() => setIsCustomFieldsOpen(false)}
+								onClick={saveCustomFields}
 								className="h-12 w-full rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] text-[18px] font-bold text-white shadow-sm transition-colors hover:brightness-95"
 							>
 								Save Configuration

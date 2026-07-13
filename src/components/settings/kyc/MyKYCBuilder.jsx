@@ -5,15 +5,23 @@ import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
+  BadgeCheck,
   Check,
   ChevronDown,
+  FileBadge2,
+  FileCheck2,
+  FileSearch,
   GripVertical,
+  House,
   Info,
+  Landmark,
+  Mail,
   Pencil,
   Plus,
   Search,
   SlidersHorizontal,
   Trash2,
+  UserRound,
   X,
 } from "lucide-react";
 
@@ -190,6 +198,19 @@ const normalizeCustomField = (field) => ({
   type: getCustomFieldType(field),
 });
 
+const groupIcons = {
+  "Personal Information": UserRound,
+  "Contact Information": Mail,
+  "Residential Address": House,
+  "Identification Document": FileBadge2,
+  "Identity Verification": BadgeCheck,
+  "Proof of Address": FileCheck2,
+  "Employment & Financial Information": Landmark,
+  "Tax Information": FileSearch,
+  "Compliance Questions": FileCheck2,
+  "Consent & Agreements": BadgeCheck,
+};
+
 export default function MyKYCBuilder() {
   const [kycName, setKycName] = useState("");
   const [kycDescription, setKycDescription] = useState("");
@@ -198,6 +219,7 @@ export default function MyKYCBuilder() {
   const [selectedFieldIds, setSelectedFieldIds] = useState([]);
   const [currentConfigGroupIndex, setCurrentConfigGroupIndex] = useState(0);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [isRemovingDragOver, setIsRemovingDragOver] = useState(false);
   const [draggedSelectedGroupTitle, setDraggedSelectedGroupTitle] = useState(null);
   const [customFields, setCustomFields] = useState([]);
   const [customFieldGroups, setCustomFieldGroups] = useState([]);
@@ -333,6 +355,17 @@ export default function MyKYCBuilder() {
     }
 
     addGroup(event.dataTransfer.getData("text/plain"));
+  };
+
+  const handleAvailableDrop = (event) => {
+    event.preventDefault();
+    setIsRemovingDragOver(false);
+
+    const selectedGroupTitle = event.dataTransfer.getData("application/x-kyc-selected-group");
+    if (!selectedGroupTitle) return;
+
+    removeGroup(selectedGroupTitle);
+    setDraggedSelectedGroupTitle(null);
   };
 
   const moveSelectedGroup = (groupTitle, beforeGroupTitle = null) => {
@@ -497,11 +530,17 @@ export default function MyKYCBuilder() {
           {editingKycId ? "Edit KYC" : "Create New KYC"}
         </h1>
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-lg leading-none text-gray-500">
-          <span>Home</span>
+          <Link href="/neuro-access" className="transition-colors hover:text-[var(--brand-text)]">
+            Home
+          </Link>
           <span aria-hidden="true">&gt;</span>
-          <span>Settings</span>
+          <Link href="/neuro-access/settings" className="transition-colors hover:text-[var(--brand-text)]">
+            Settings
+          </Link>
           <span aria-hidden="true">&gt;</span>
-          <span>My KYC</span>
+          <Link href="/neuro-access/settings/my-kyc" className="transition-colors hover:text-[var(--brand-text)]">
+            My KYC
+          </Link>
           <span aria-hidden="true">&gt;</span>
           <span className="font-medium text-gray-500">{editingKycId ? "Edit" : "Create"}</span>
         </nav>
@@ -543,8 +582,19 @@ export default function MyKYCBuilder() {
             </label>
           </div>
 
-          <div className="grid min-h-0 flex-1 grid-cols-1 gap-8 px-8 pb-6 lg:grid-cols-2">
-            <section className="flex min-h-0 flex-col overflow-hidden border-r border-[var(--brand-border)]">
+          <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 px-8 pb-6 lg:grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] lg:gap-5">
+            <section
+              onDragOver={(event) => {
+                if (!event.dataTransfer.types.includes("application/x-kyc-selected-group")) return;
+                event.preventDefault();
+                setIsRemovingDragOver(true);
+              }}
+              onDragLeave={() => setIsRemovingDragOver(false)}
+              onDrop={handleAvailableDrop}
+              className={`flex min-h-0 max-w-full flex-col overflow-hidden transition-colors lg:max-w-[1080px] ${
+                isRemovingDragOver ? "rounded-md bg-[var(--Button-Neuro-Secondary-bg,_#8F40D426)]/40" : ""
+              }`}
+            >
           <div className="shrink-0 pb-5 pr-2">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-2xl font-bold text-[var(--brand-text)]">Available pages</h2>
@@ -579,6 +629,7 @@ export default function MyKYCBuilder() {
             {visibleAvailableGroups.map((group) => {
               const isSelected = selectedGroups.includes(group.title);
               const isComingSoon = Boolean(group.comingSoon);
+              const GroupIcon = groupIcons[group.title] || FileBadge2;
 
               return (
                 <div
@@ -595,6 +646,9 @@ export default function MyKYCBuilder() {
                   <GripVertical className="h-7 w-7 shrink-0 text-[var(--brand-text-secondary)]" />
                   <div className="min-w-0 flex-1 text-left">
                     <div className="flex min-w-0 items-center gap-2">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--Button-Neuro-Secondary-bg,_#8F40D426)] text-[var(--Button-Neuro-Secondary-Content,_#722FAD)]">
+                        <GroupIcon className="h-4.5 w-4.5" />
+                      </span>
                       <div className="truncate text-xl font-semibold text-[var(--brand-text)]">{group.title}</div>
                       {isComingSoon && (
                         <span className="shrink-0 rounded-full bg-[#d7dde6] px-2.5 py-1 text-xs font-bold text-[#64748b]">
@@ -637,6 +691,12 @@ export default function MyKYCBuilder() {
             )}
           </div>
         </section>
+
+        <div className="relative hidden lg:flex min-h-0 items-center justify-center">
+          <div className="pointer-events-none flex h-20 w-20 items-center justify-center text-[var(--Button-Neuro-Secondary-Content,_#722FAD)] animate-[kycArrowJump_1.35s_ease-in-out_infinite]">
+            <ArrowRight className="h-12 w-12" />
+          </div>
+        </div>
 
         <section className="flex min-h-0 w-full max-w-full flex-col overflow-hidden">
           <div className="shrink-0 border-b border-[var(--brand-border)]">
@@ -790,6 +850,18 @@ export default function MyKYCBuilder() {
           key={fieldBeingEdited?.id || customFieldTargetGroupTitle || "global-custom-fields"}
         />
       )}
+
+      <style jsx>{`
+        @keyframes kycArrowJump {
+          0%,
+          100% {
+            transform: translateX(0);
+          }
+          50% {
+            transform: translateX(10px);
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -995,7 +1067,7 @@ function KYCFlowPreview({ group, selectedPreviewFields }) {
       </h2>
 
       <div className="min-h-0 flex-1 overflow-y-auto rounded-[20px] border border-[#c7d6f5] bg-[#e9effb] p-2.5 shadow-[inset_0_0_0_1px_rgba(143,64,212,0.08)]">
-        <div className="mx-auto min-h-full max-w-[960px] overflow-hidden rounded-[14px] bg-white shadow-[0_14px_30px_rgba(15,23,42,0.12)]">
+        <div className="relative mx-auto min-h-full max-w-[960px] overflow-hidden rounded-[14px] bg-white shadow-[0_14px_30px_rgba(15,23,42,0.12)]">
           <div className="flex h-11 items-center gap-3 border-b border-[#d7dde7] bg-[#e7ebf2] px-4">
             <div className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" />
@@ -1007,7 +1079,7 @@ function KYCFlowPreview({ group, selectedPreviewFields }) {
             </div>
           </div>
 
-          <div className="px-8 py-6">
+          <div className="relative px-8 py-6">
             <div className="mb-5 flex items-center justify-end gap-3">
               <span
                 aria-hidden="true"
@@ -1055,6 +1127,11 @@ function KYCFlowPreview({ group, selectedPreviewFields }) {
                 )}
               </div>
             </div>
+          </div>
+
+          <div className="pointer-events-none absolute bottom-4 left-8 inline-flex items-center gap-2 text-xs font-semibold text-[#64748b]">
+            <span>Powered by</span>
+            <img src="/NeuroLogo.svg" alt="Neuro logo" className="h-4 w-auto opacity-80" />
           </div>
         </div>
       </div>
