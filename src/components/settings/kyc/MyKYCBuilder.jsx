@@ -198,6 +198,9 @@ const normalizeCustomField = (field) => ({
   type: getCustomFieldType(field),
 });
 
+const getGroupKey = (group) => group.id || group.title;
+const defaultPageDescription = "Complete this page to continue your verification.";
+
 const groupIcons = {
   "Personal Information": UserRound,
   "Contact Information": Mail,
@@ -232,6 +235,11 @@ export default function MyKYCBuilder() {
   const [savedKyc, setSavedKyc] = useState(null);
   const [showKycNameError, setShowKycNameError] = useState(false);
   const [editingKycId, setEditingKycId] = useState(null);
+  const [pageTitles, setPageTitles] = useState({});
+  const [pageDescriptions, setPageDescriptions] = useState({});
+  const [fieldOrderByGroup, setFieldOrderByGroup] = useState({});
+  const [shouldSelectNewCustomPage, setShouldSelectNewCustomPage] = useState(false);
+  const [draggedFieldId, setDraggedFieldId] = useState(null);
 
   useEffect(() => {
     const editId = new URLSearchParams(window.location.search).get("edit");
@@ -244,7 +252,9 @@ export default function MyKYCBuilder() {
     const savedGroupCustomFields = kycToEdit.groups.reduce((groupFields, group) => {
       if (group.title === "Custom Fields") return groupFields;
 
-      const baseGroup = availableFieldGroups.find((availableGroup) => availableGroup.title === group.title);
+      const baseGroup = availableFieldGroups.find(
+        (availableGroup) => availableGroup.title === (group.sourceTitle || group.title)
+      );
       if (!baseGroup) return groupFields;
 
       const baseFieldIds = new Set(baseGroup.fields.map((field) => field.id));
@@ -253,7 +263,9 @@ export default function MyKYCBuilder() {
       return extraFields.length ? { ...groupFields, [group.title]: extraFields } : groupFields;
     }, {});
     const savedEditedFields = kycToEdit.groups.reduce((fieldOverrides, group) => {
-      const baseGroup = availableFieldGroups.find((availableGroup) => availableGroup.title === group.title);
+      const baseGroup = availableFieldGroups.find(
+        (availableGroup) => availableGroup.title === (group.sourceTitle || group.title)
+      );
       if (!baseGroup) return fieldOverrides;
 
       const baseFieldIds = new Set(baseGroup.fields.map((field) => field.id));
@@ -271,44 +283,97 @@ export default function MyKYCBuilder() {
       .filter(
         (group) =>
           group.title === "Custom Fields" ||
-          !availableFieldGroups.some((availableGroup) => availableGroup.title === group.title)
+          !availableFieldGroups.some(
+            (availableGroup) => availableGroup.title === (group.sourceTitle || group.title)
+          )
       )
       .map((group) => ({
-        id: `custom-kyc-group-${group.title}`,
-        title: group.title,
+        id: group.sourceKey || `custom-kyc-group-${group.title}`,
+        title: group.sourceTitle || group.title,
         description: group.description || "",
         fields: group.fields,
       }));
+    const savedPageTitles = kycToEdit.groups.reduce(
+      (titles, group) => ({
+        ...titles,
+        [group.sourceKey || group.sourceTitle || group.title]: group.title,
+      }),
+      {}
+    );
+    const savedPageDescriptions = kycToEdit.groups.reduce(
+      (descriptions, group) => ({
+        ...descriptions,
+        [group.sourceKey || group.sourceTitle || group.title]: group.description || "",
+      }),
+      {}
+    );
+    const savedFieldOrderByGroup = kycToEdit.groups.reduce(
+      (orders, group) => ({
+        ...orders,
+        [group.sourceKey || group.sourceTitle || group.title]: group.fields.map((field) => field.id),
+      }),
+      {}
+    );
 
     setEditingKycId(editId);
     setKycName(kycToEdit.name || "");
     setKycDescription(kycToEdit.description || "");
-    setSelectedGroups(kycToEdit.groups.map((group) => group.title));
+    setSelectedGroups(kycToEdit.groups.map((group) => group.sourceKey || group.sourceTitle || group.title));
     setSelectedFieldIds(kycToEdit.groups.flatMap((group) => group.fields.map((field) => field.id)));
     setCustomFields([]);
     setCustomFieldGroups(savedCustomFieldGroups);
     setGroupCustomFields(savedGroupCustomFields);
     setEditedFields(savedEditedFields);
+    setPageTitles(savedPageTitles);
+    setPageDescriptions(savedPageDescriptions);
+    setFieldOrderByGroup(savedFieldOrderByGroup);
     setShowKycNameError(false);
   }, []);
 
   const applyFieldEdits = (field) => ({ ...field, ...(editedFields[field.id] || {}) });
+  const getPageTitle = (group) => pageTitles[getGroupKey(group)]?.trim() || group.title;
+  const getPageDescription = (group) =>
+    pageDescriptions[getGroupKey(group)] !== undefined
+      ? pageDescriptions[getGroupKey(group)]
+      : group.description ?? defaultPageDescription;
+  const orderFieldsForGroup = (groupKey, fields) => {
+    const explicitOrder = fieldOrderByGroup[groupKey];
+    if (!explicitOrder?.length) return fields;
+
+    const fieldMap = new Map(fields.map((field) => [field.id, field]));
+    const orderedFields = explicitOrder.map((fieldId) => fieldMap.get(fieldId)).filter(Boolean);
+    const remainingFields = fields.filter((field) => !explicitOrder.includes(field.id));
+    return [...orderedFields, ...remainingFields];
+  };
 
   const availableGroupsWithCustomFields = [
     ...availableFieldGroups.map((group) => ({
       ...group,
-      fields: [...group.fields, ...(groupCustomFields[group.title] || []).map(normalizeCustomField)].map(applyFieldEdits),
+      groupKey: getGroupKey(group),
+      fields: orderFieldsForGroup(
+        getGroupKey(group),
+        [...group.fields, ...(groupCustomFields[group.title] || []).map(normalizeCustomField)].map(applyFieldEdits)
+      ),
     })),
     ...comingSoonFieldGroups,
     ...customFieldGroups.map((group) => ({
       ...group,
-      fields: [...group.fields, ...(groupCustomFields[group.title] || [])].map(normalizeCustomField).map(applyFieldEdits),
+      groupKey: getGroupKey(group),
+      fields: orderFieldsForGroup(
+        getGroupKey(group),
+        [...group.fields, ...(groupCustomFields[group.title] || [])].map(normalizeCustomField).map(applyFieldEdits)
+      ),
     })),
   ];
 
   const selectedGroupDetails = selectedGroups
-    .map((groupTitle) => availableGroupsWithCustomFields.find((group) => group.title === groupTitle))
-    .filter(Boolean);
+    .map((groupKey) => availableGroupsWithCustomFields.find((group) => group.groupKey === groupKey))
+    .filter(Boolean)
+    .map((group) => ({
+      ...group,
+      displayTitle: getPageTitle(group),
+      displayDescription: getPageDescription(group),
+    }));
   const currentConfigGroup =
     selectedGroupDetails[Math.min(currentConfigGroupIndex, Math.max(selectedGroupDetails.length - 1, 0))];
   const currentPreviewFields =
@@ -318,38 +383,38 @@ export default function MyKYCBuilder() {
     const searchValue = availableFieldSearch.trim().toLowerCase();
     if (!searchValue) return true;
     return (
-      group.title.toLowerCase().includes(searchValue) ||
+      getPageTitle(group).toLowerCase().includes(searchValue) ||
       group.fields.some((field) => `${field.label} ${field.type}`.toLowerCase().includes(searchValue))
     );
   });
 
-  const addGroup = (groupTitle) => {
-    const group = availableGroupsWithCustomFields.find((item) => item.title === groupTitle);
-    if (!group || group.comingSoon || selectedGroups.includes(group.title)) return;
-    setSelectedGroups((current) => [...current, group.title]);
+  const addGroup = (groupKey) => {
+    const group = availableGroupsWithCustomFields.find((item) => item.groupKey === groupKey);
+    if (!group || group.comingSoon || selectedGroups.includes(group.groupKey)) return;
+    setSelectedGroups((current) => [...current, group.groupKey]);
   };
 
-  const removeGroup = (groupTitle) => {
-    const group = availableGroupsWithCustomFields.find((item) => item.title === groupTitle);
-    setSelectedGroups((current) => current.filter((title) => title !== groupTitle));
+  const removeGroup = (groupKey) => {
+    const group = availableGroupsWithCustomFields.find((item) => item.groupKey === groupKey);
+    setSelectedGroups((current) => current.filter((selectedGroupKey) => selectedGroupKey !== groupKey));
     if (group) {
       setSelectedFieldIds((current) => current.filter((fieldId) => !group.fields.some((field) => field.id === fieldId)));
     }
     setCurrentConfigGroupIndex((current) => Math.max(0, Math.min(current, selectedGroups.length - 2)));
   };
 
-  const handleDragStart = (event, groupTitle) => {
-    event.dataTransfer.setData("text/plain", groupTitle);
+  const handleDragStart = (event, groupKey) => {
+    event.dataTransfer.setData("text/plain", groupKey);
     event.dataTransfer.effectAllowed = "copy";
   };
 
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDraggingOver(false);
-    const selectedGroupTitle = event.dataTransfer.getData("application/x-kyc-selected-group");
+    const selectedGroupKey = event.dataTransfer.getData("application/x-kyc-selected-group");
 
-    if (selectedGroupTitle) {
-      moveSelectedGroup(selectedGroupTitle);
+    if (selectedGroupKey) {
+      moveSelectedGroup(selectedGroupKey);
       setDraggedSelectedGroupTitle(null);
       return;
     }
@@ -361,35 +426,40 @@ export default function MyKYCBuilder() {
     event.preventDefault();
     setIsRemovingDragOver(false);
 
-    const selectedGroupTitle = event.dataTransfer.getData("application/x-kyc-selected-group");
-    if (!selectedGroupTitle) return;
+    const selectedGroupKey = event.dataTransfer.getData("application/x-kyc-selected-group");
+    if (!selectedGroupKey) return;
 
-    removeGroup(selectedGroupTitle);
+    removeGroup(selectedGroupKey);
     setDraggedSelectedGroupTitle(null);
   };
 
-  const moveSelectedGroup = (groupTitle, beforeGroupTitle = null) => {
+  const moveSelectedGroup = (groupKey, beforeGroupKey = null) => {
+    const activeGroupKey = currentConfigGroup?.groupKey;
+
     setSelectedGroups((current) => {
-      const currentIndex = current.findIndex((title) => title === groupTitle);
-      if (currentIndex === -1 || groupTitle === beforeGroupTitle) return current;
+      const currentIndex = current.findIndex((selectedGroupKey) => selectedGroupKey === groupKey);
+      if (currentIndex === -1 || groupKey === beforeGroupKey) return current;
 
       const next = [...current];
-      const [movedGroupTitle] = next.splice(currentIndex, 1);
+      const [movedGroupKey] = next.splice(currentIndex, 1);
 
-      if (!beforeGroupTitle) return [...next, movedGroupTitle];
+      if (!beforeGroupKey) return [...next, movedGroupKey];
 
-      const targetIndex = next.findIndex((title) => title === beforeGroupTitle);
+      const targetIndex = next.findIndex((selectedGroupKey) => selectedGroupKey === beforeGroupKey);
       if (targetIndex === -1) return current;
 
-      next.splice(targetIndex, 0, movedGroupTitle);
+      next.splice(targetIndex, 0, movedGroupKey);
+      if (activeGroupKey) {
+        setCurrentConfigGroupIndex(Math.max(0, next.findIndex((selectedGroupKey) => selectedGroupKey === activeGroupKey)));
+      }
       return next;
     });
   };
 
-  const handleSelectedDragStart = (event, groupTitle) => {
-    event.dataTransfer.setData("application/x-kyc-selected-group", groupTitle);
+  const handleSelectedDragStart = (event, groupKey) => {
+    event.dataTransfer.setData("application/x-kyc-selected-group", groupKey);
     event.dataTransfer.effectAllowed = "move";
-    setDraggedSelectedGroupTitle(groupTitle);
+    setDraggedSelectedGroupTitle(groupKey);
   };
 
   const startConfiguration = () => {
@@ -414,21 +484,107 @@ export default function MyKYCBuilder() {
     );
   };
 
+  const selectAllFieldsForGroup = (group) => {
+    if (!group) return;
+
+    setSelectedFieldIds((current) => [
+      ...current,
+      ...group.fields.map((field) => field.id).filter((fieldId) => !current.includes(fieldId)),
+    ]);
+  };
+
+  const unselectAllFieldsForGroup = (group) => {
+    if (!group) return;
+
+    const groupFieldIds = new Set(group.fields.map((field) => field.id));
+    setSelectedFieldIds((current) => current.filter((fieldId) => !groupFieldIds.has(fieldId)));
+  };
+
+  const confirmAndRemoveGroup = (group) => {
+    if (!group) return;
+
+    const shouldDelete = window.confirm(`Are you sure you want to delete the page "${group.displayTitle}"?`);
+    if (!shouldDelete) return;
+
+    removeGroup(group.groupKey);
+  };
+
+  const moveFieldWithinGroup = (group, fieldId, beforeFieldId = null) => {
+    if (!group) return;
+
+    const currentFieldIds = group.fields.map((field) => field.id);
+    setFieldOrderByGroup((current) => {
+      const activeOrder = current[group.groupKey]?.length
+        ? [...current[group.groupKey]].filter((id) => currentFieldIds.includes(id))
+        : [...currentFieldIds];
+      const missingIds = currentFieldIds.filter((id) => !activeOrder.includes(id));
+      const nextOrderBase = [...activeOrder, ...missingIds];
+      const currentIndex = nextOrderBase.findIndex((id) => id === fieldId);
+
+      if (currentIndex === -1 || fieldId === beforeFieldId) return current;
+
+      const nextOrder = [...nextOrderBase];
+      const [movedFieldId] = nextOrder.splice(currentIndex, 1);
+
+      if (!beforeFieldId) {
+        nextOrder.push(movedFieldId);
+      } else {
+        const targetIndex = nextOrder.findIndex((id) => id === beforeFieldId);
+        if (targetIndex === -1) return current;
+        nextOrder.splice(targetIndex, 0, movedFieldId);
+      }
+
+      return {
+        ...current,
+        [group.groupKey]: nextOrder,
+      };
+    });
+  };
+
+  const handleFieldDragStart = (event, group, fieldId) => {
+    if (!group) return;
+    event.dataTransfer.setData("application/x-kyc-field-id", fieldId);
+    event.dataTransfer.setData("application/x-kyc-field-group", group.groupKey);
+    event.dataTransfer.effectAllowed = "move";
+    setDraggedFieldId(fieldId);
+  };
+
   const saveCustomFieldGroup = (fields, pageTitle, pageDescription) => {
     const nextPageTitle = pageTitle.trim();
     const nextFields = fields.map(normalizeCustomField);
+    const nextGroupId = `custom-kyc-page-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
     setCustomFieldGroups((current) => [
       ...current,
       {
-        id: `custom-kyc-page-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        id: nextGroupId,
         title: nextPageTitle,
         description: pageDescription.trim(),
         fields: nextFields,
       },
     ]);
+    setPageTitles((current) => ({
+      ...current,
+      [nextGroupId]: nextPageTitle,
+    }));
+    setPageDescriptions((current) => ({
+      ...current,
+      [nextGroupId]: pageDescription.trim(),
+    }));
+    setFieldOrderByGroup((current) => ({
+      ...current,
+      [nextGroupId]: nextFields.map((field) => field.id),
+    }));
+    if (shouldSelectNewCustomPage) {
+      setSelectedGroups((current) => {
+        const next = [...current, nextGroupId];
+        setCurrentConfigGroupIndex(next.length - 1);
+        return next;
+      });
+    }
     setIsCustomFieldModalOpen(false);
     setCustomFieldTargetGroupTitle(null);
+    setShouldSelectNewCustomPage(false);
   };
 
   const saveFieldsToGroup = (fields, groupTitle) => {
@@ -437,6 +593,10 @@ export default function MyKYCBuilder() {
     setGroupCustomFields((current) => ({
       ...current,
       [groupTitle]: [...(current[groupTitle] || []), ...nextFields],
+    }));
+    setFieldOrderByGroup((current) => ({
+      ...current,
+      [groupTitle]: [...(current[groupTitle] || []), ...nextFields.map((field) => field.id)],
     }));
 
     setSelectedFieldIds((current) => [
@@ -457,6 +617,7 @@ export default function MyKYCBuilder() {
     setIsCustomFieldModalOpen(false);
     setCustomFieldTargetGroupTitle(null);
     setFieldBeingEdited(null);
+    setShouldSelectNewCustomPage(false);
   };
 
   const goToPreviousStep = () => {
@@ -493,8 +654,10 @@ export default function MyKYCBuilder() {
       createdAt: existingKyc?.createdAt || now,
       updatedAt: now,
       groups: selectedGroupDetails.map((group) => ({
-        title: group.title,
-        description: group.description || "",
+        title: group.displayTitle,
+        sourceKey: group.groupKey,
+        sourceTitle: group.title,
+        description: group.displayDescription || "",
         fields: group.fields.filter((field) => selectedFieldIds.includes(field.id)),
       })),
     };
@@ -517,6 +680,11 @@ export default function MyKYCBuilder() {
     setCustomFieldGroups([]);
     setGroupCustomFields({});
     setEditedFields({});
+    setPageTitles({});
+    setPageDescriptions({});
+    setFieldOrderByGroup({});
+    setShouldSelectNewCustomPage(false);
+    setDraggedFieldId(null);
     setCurrentConfigGroupIndex(0);
     setSavedKyc(null);
     setEditingKycId(null);
@@ -627,15 +795,15 @@ export default function MyKYCBuilder() {
           </div>
           <div className="min-h-0 w-full max-w-full flex-1 space-y-3 overflow-y-auto pr-2">
             {visibleAvailableGroups.map((group) => {
-              const isSelected = selectedGroups.includes(group.title);
+              const isSelected = selectedGroups.includes(group.groupKey);
               const isComingSoon = Boolean(group.comingSoon);
               const GroupIcon = groupIcons[group.title] || FileBadge2;
 
               return (
                 <div
-                  key={group.title}
+                  key={group.groupKey}
                   draggable={!isSelected && !isComingSoon}
-                  onDragStart={(event) => handleDragStart(event, group.title)}
+                  onDragStart={(event) => handleDragStart(event, group.groupKey)}
                   title={isComingSoon ? "Coming Soon" : undefined}
                   className={`group relative flex min-h-[104px] w-full max-w-full items-center gap-4 rounded-md border px-5 py-4 shadow-sm transition-colors ${
                     isSelected || isComingSoon
@@ -649,7 +817,7 @@ export default function MyKYCBuilder() {
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--Button-Neuro-Secondary-bg,_#8F40D426)] text-[var(--Button-Neuro-Secondary-Content,_#722FAD)]">
                         <GroupIcon className="h-4.5 w-4.5" />
                       </span>
-                      <div className="truncate text-xl font-semibold text-[var(--brand-text)]">{group.title}</div>
+                      <div className="truncate text-xl font-semibold text-[var(--brand-text)]">{getPageTitle(group)}</div>
                       {isComingSoon && (
                         <span className="shrink-0 rounded-full bg-[#d7dde6] px-2.5 py-1 text-xs font-bold text-[#64748b]">
                           Coming Soon
@@ -667,12 +835,12 @@ export default function MyKYCBuilder() {
                   <button
                     type="button"
                     draggable={false}
-                    onClick={() => addGroup(group.title)}
+                    onClick={() => addGroup(group.groupKey)}
                     onMouseDown={(event) => event.stopPropagation()}
                     disabled={isSelected || isComingSoon}
                     className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-[var(--brand-border)] text-[var(--Button-Neuro-Secondary-Content,_#722FAD)] transition-colors hover:border-[var(--brand-primary)] hover:bg-[var(--Button-Neuro-Secondary-bg,_#8F40D426)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-[var(--brand-border)] disabled:hover:bg-transparent"
-                    aria-label={isComingSoon ? `${group.title} coming soon` : `Add ${group.title}`}
-                    title={isComingSoon ? "Coming Soon" : `Add ${group.title}`}
+                    aria-label={isComingSoon ? `${getPageTitle(group)} coming soon` : `Add ${getPageTitle(group)}`}
+                    title={isComingSoon ? "Coming Soon" : `Add ${getPageTitle(group)}`}
                   >
                     <Plus className="h-5 w-5" />
                   </button>
@@ -726,9 +894,9 @@ export default function MyKYCBuilder() {
               <div className="space-y-4 overflow-y-auto pr-2">
                 {selectedGroupDetails.map((group, index) => (
                   <div
-                    key={group.title}
+                    key={group.groupKey}
                     draggable
-                    onDragStart={(event) => handleSelectedDragStart(event, group.title)}
+                    onDragStart={(event) => handleSelectedDragStart(event, group.groupKey)}
                     onDragEnd={() => setDraggedSelectedGroupTitle(null)}
                     onDragOver={(event) => {
                       event.preventDefault();
@@ -742,16 +910,16 @@ export default function MyKYCBuilder() {
                     onDrop={(event) => {
                       event.preventDefault();
                       event.stopPropagation();
-                      const movedGroupTitle = event.dataTransfer.getData("application/x-kyc-selected-group");
-                      if (movedGroupTitle) {
-                        moveSelectedGroup(movedGroupTitle, group.title);
+                      const movedGroupKey = event.dataTransfer.getData("application/x-kyc-selected-group");
+                      if (movedGroupKey) {
+                        moveSelectedGroup(movedGroupKey, group.groupKey);
                       } else {
                         addGroup(event.dataTransfer.getData("text/plain"));
                       }
                       setDraggedSelectedGroupTitle(null);
                     }}
                     className={`flex h-[76px] cursor-grab items-center gap-4 rounded-md border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-5 shadow-sm transition-opacity active:cursor-grabbing ${
-                      draggedSelectedGroupTitle === group.title ? "opacity-50" : "opacity-100"
+                      draggedSelectedGroupTitle === group.groupKey ? "opacity-50" : "opacity-100"
                     }`}
                   >
                     <GripVertical className="h-6 w-6 shrink-0 text-[var(--brand-text-secondary)]" />
@@ -759,16 +927,16 @@ export default function MyKYCBuilder() {
                       {index + 1}
                     </span>
                     <div className="min-w-0 flex-1 text-left">
-                      <div className="truncate text-lg font-semibold text-[var(--brand-text)]">{group.title}</div>
+                      <div className="truncate text-lg font-semibold text-[var(--brand-text)]">{group.displayTitle}</div>
                       <div className="truncate text-base text-[var(--brand-text-secondary)]">
                         {group.fields.length} fields
                       </div>
                     </div>
                     <button
                       type="button"
-                      onClick={() => removeGroup(group.title)}
+                      onClick={() => removeGroup(group.groupKey)}
                       className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-[var(--brand-border)] text-[#d11f3f] transition-colors hover:bg-[#fff1f3]"
-                      aria-label={`Remove ${group.title}`}
+                      aria-label={`Remove ${group.displayTitle}`}
                     >
                       <Trash2 className="h-6 w-6" />
                     </button>
@@ -788,7 +956,36 @@ export default function MyKYCBuilder() {
           selectedFieldIds={selectedFieldIds}
           selectedPreviewFields={currentPreviewFields}
           onToggleField={toggleField}
+          onSelectAllFields={() => selectAllFieldsForGroup(currentConfigGroup)}
+          onUnselectAllFields={() => unselectAllFieldsForGroup(currentConfigGroup)}
+          onDeletePage={() => confirmAndRemoveGroup(currentConfigGroup)}
+          onReorderField={(fieldId, beforeFieldId) => moveFieldWithinGroup(currentConfigGroup, fieldId, beforeFieldId)}
+          onFieldDragStart={(event, fieldId) => handleFieldDragStart(event, currentConfigGroup, fieldId)}
+          draggedFieldId={draggedFieldId}
+          onFieldDragEnd={() => setDraggedFieldId(null)}
           onSelectGroupStep={setCurrentConfigGroupIndex}
+          onReorderGroup={moveSelectedGroup}
+          onProgressDragStart={handleSelectedDragStart}
+          onAddCustomPage={() => {
+            setFieldBeingEdited(null);
+            setCustomFieldTargetGroupTitle(null);
+            setShouldSelectNewCustomPage(true);
+            setIsCustomFieldModalOpen(true);
+          }}
+          onPageTitleChange={(value) =>
+            currentConfigGroup &&
+            setPageTitles((current) => ({
+              ...current,
+              [currentConfigGroup.groupKey]: value,
+            }))
+          }
+          onPageDescriptionChange={(value) =>
+            currentConfigGroup &&
+            setPageDescriptions((current) => ({
+              ...current,
+              [currentConfigGroup.groupKey]: value,
+            }))
+          }
           onCreateField={() => {
             setCustomFieldTargetGroupTitle(currentConfigGroup.title);
             setFieldBeingEdited(null);
@@ -839,6 +1036,7 @@ export default function MyKYCBuilder() {
             setIsCustomFieldModalOpen(false);
             setCustomFieldTargetGroupTitle(null);
             setFieldBeingEdited(null);
+            setShouldSelectNewCustomPage(false);
           }}
           onSave={(fields, pageTitle, pageDescription) =>
             fieldBeingEdited
@@ -906,22 +1104,58 @@ function KYCFieldConfigurationPage({
   selectedFieldIds,
   selectedPreviewFields,
   onToggleField,
+  onSelectAllFields,
+  onUnselectAllFields,
+  onDeletePage,
+  onReorderField,
+  onFieldDragStart,
+  draggedFieldId,
+  onFieldDragEnd,
   onSelectGroupStep,
+  onReorderGroup,
+  onProgressDragStart,
+  onAddCustomPage,
+  onPageTitleChange,
+  onPageDescriptionChange,
   onCreateField,
   onEditField,
 }) {
+  const [fieldDropIndicator, setFieldDropIndicator] = useState(null);
+
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-8 pb-6 pt-5">
       <KYCGroupProgress
         groups={selectedGroups}
         currentGroupIndex={currentGroupIndex}
         onSelectGroupStep={onSelectGroupStep}
+        onReorderGroup={onReorderGroup}
+        onDragStartGroup={onProgressDragStart}
+        onAddCustomPage={onAddCustomPage}
       />
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-8 overflow-hidden lg:grid-cols-[minmax(300px,0.76fr)_minmax(560px,1.24fr)]">
         <section className="flex min-h-0 flex-col overflow-hidden">
           <div className="flex shrink-0 items-center justify-between gap-4 pb-5">
-            <h2 className="text-2xl font-bold text-[var(--brand-text)]">{currentGroup?.title}</h2>
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <input
+                type="text"
+                value={currentGroup?.displayTitle || ""}
+                onChange={(event) => onPageTitleChange(event.target.value)}
+                placeholder="Enter page name"
+                disabled={!currentGroup}
+                className="h-12 min-w-0 flex-1 rounded-md border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-4 text-2xl font-bold text-[var(--brand-text)] outline-none transition-colors placeholder:text-[var(--brand-text-secondary)] focus:border-[var(--brand-primary)] disabled:cursor-not-allowed disabled:opacity-45"
+              />
+              <button
+                type="button"
+                onClick={onDeletePage}
+                disabled={!currentGroup}
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-[var(--brand-border)] bg-white text-[#d11f3f] transition-colors hover:border-[#d11f3f] hover:bg-[#fff1f3] disabled:cursor-not-allowed disabled:opacity-45"
+                aria-label={`Delete ${currentGroup?.displayTitle || "page"}`}
+                title="Delete page"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+            </div>
             <button
               type="button"
               onClick={onCreateField}
@@ -933,54 +1167,122 @@ function KYCFieldConfigurationPage({
             </button>
           </div>
 
+          <div className="shrink-0 pb-5">
+            <textarea
+              value={currentGroup?.displayDescription || ""}
+              onChange={(event) => onPageDescriptionChange(event.target.value)}
+              placeholder="Add page description"
+              disabled={!currentGroup}
+              rows={3}
+              className="min-h-[92px] w-full resize-none rounded-md border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-4 py-3 text-base text-[var(--brand-text)] outline-none transition-colors placeholder:text-[var(--brand-text-secondary)] focus:border-[var(--brand-primary)] disabled:cursor-not-allowed disabled:opacity-45"
+            />
+          </div>
+
           <div className="min-h-0 flex-1 overflow-y-auto pr-2">
             {currentGroup && (
               <div className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-5 shadow-sm">
-                <div className="mb-4 flex items-start justify-between gap-4 border-b border-[var(--brand-border)] pb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--brand-text)]">{currentGroup.title}</h3>
-                    {currentGroup.description && (
-                      <p className="mt-1 text-sm leading-relaxed text-[var(--brand-text-secondary)]">
-                        {currentGroup.description}
-                      </p>
-                    )}
-                  </div>
-                  <span className="rounded-full bg-[var(--Button-Neuro-Secondary-bg,_#8F40D426)] px-3 py-1 text-sm font-bold text-[var(--Button-Neuro-Secondary-Content,_#722FAD)]">
-                    {currentGroupIndex + 1} / {selectedGroups.length}
-                  </span>
+                <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={onSelectAllFields}
+                    className="inline-flex h-9 items-center justify-center rounded-md border border-[#d11f3f] bg-[#fff1f3] px-3 text-sm font-semibold text-[#d11f3f] transition-colors hover:bg-[#ffe4e8]"
+                  >
+                    Select all
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onUnselectAllFields}
+                    className="inline-flex h-9 items-center justify-center rounded-md border border-[var(--brand-border)] bg-white px-3 text-sm font-semibold text-[var(--brand-text-secondary)] transition-colors hover:border-[#d11f3f] hover:text-[#d11f3f]"
+                  >
+                    Unselect all
+                  </button>
                 </div>
 
                 <div className="space-y-3">
                   {currentGroup.fields.map((field) => {
                     const isIncluded = selectedFieldIds.includes(field.id);
+                    const isDragged = draggedFieldId === field.id;
+                    const indicatorPosition =
+                      fieldDropIndicator?.fieldId === field.id ? fieldDropIndicator.position : null;
 
                     return (
                       <div
                         key={field.id}
-                        className="flex items-center gap-4 rounded-md border border-[var(--brand-border)] bg-white px-4 py-3 transition-colors hover:border-[var(--brand-primary)]"
+                        className={`rounded-md border border-[var(--brand-border)] bg-white transition-all ${
+                          isDragged ? "opacity-55" : "opacity-100"
+                        } ${
+                          indicatorPosition === "before"
+                            ? "border-t-[3px] border-t-[#8F40D4]"
+                            : indicatorPosition === "after"
+                              ? "border-b-[3px] border-b-[#8F40D4]"
+                              : ""
+                        }`}
+                        onDragOver={(event) => {
+                          event.preventDefault();
+                          event.dataTransfer.dropEffect = "move";
+                          const rect = event.currentTarget.getBoundingClientRect();
+                          const position = event.clientY < rect.top + rect.height / 2 ? "before" : "after";
+                          setFieldDropIndicator({ fieldId: field.id, position });
+                        }}
+                        onDragLeave={(event) => {
+                          if (!event.currentTarget.contains(event.relatedTarget)) {
+                            setFieldDropIndicator((current) => (current?.fieldId === field.id ? null : current));
+                          }
+                        }}
+                        onDrop={(event) => {
+                          event.preventDefault();
+                          const currentDraggedFieldId = event.dataTransfer.getData("application/x-kyc-field-id");
+                          const draggedGroupKey = event.dataTransfer.getData("application/x-kyc-field-group");
+                          if (currentDraggedFieldId && draggedGroupKey === currentGroup.groupKey) {
+                            const fieldIndex = currentGroup.fields.findIndex((item) => item.id === field.id);
+                            const nextFieldId =
+                              fieldDropIndicator?.position === "after"
+                                ? currentGroup.fields[fieldIndex + 1]?.id || null
+                                : field.id;
+                            onReorderField(currentDraggedFieldId, nextFieldId);
+                          }
+                          setFieldDropIndicator(null);
+                        }}
                       >
-                        <input
-                          type="checkbox"
-                          checked={isIncluded}
-                          onChange={() => onToggleField(field.id)}
-                          className="h-5 w-5 accent-[var(--brand-primary)]"
-                          aria-label={`Include ${field.label}`}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="truncate text-base font-semibold text-[var(--brand-text)]">
-                            {field.label}
-                          </div>
-                          <div className="truncate text-sm text-[var(--brand-text-secondary)]">{field.type}</div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => onEditField(field)}
-                          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-[var(--brand-border)] text-[var(--brand-text-secondary)] transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
-                          aria-label={`Edit ${field.label}`}
-                          title="Edit field"
+                        <div
+                          className="flex items-center gap-4 px-4 py-3"
                         >
-                          <Pencil className="h-5 w-5" />
-                        </button>
+                          <div
+                            draggable
+                            onDragStart={(event) => onFieldDragStart(event, field.id)}
+                            onDragEnd={() => {
+                              onFieldDragEnd();
+                              setFieldDropIndicator(null);
+                            }}
+                            className="flex shrink-0 cursor-grab items-center justify-center text-[var(--brand-text-secondary)] active:cursor-grabbing"
+                            aria-label={`Reorder ${field.label}`}
+                            title="Drag to reorder"
+                          >
+                            <GripVertical className="h-5 w-5" />
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={isIncluded}
+                            onChange={() => onToggleField(field.id)}
+                            className="h-5 w-5 accent-[#d11f3f]"
+                            aria-label={`Include ${field.label}`}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-base font-semibold text-[var(--brand-text)]">
+                              {field.label}
+                            </div>
+                            <div className="truncate text-sm text-[var(--brand-text-secondary)]">{field.type}</div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => onEditField(field)}
+                            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-[var(--brand-border)] text-[var(--brand-text-secondary)] transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+                            aria-label={`Edit ${field.label}`}
+                            title="Edit field"
+                          >
+                            <Pencil className="h-5 w-5" />
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
@@ -996,7 +1298,14 @@ function KYCFieldConfigurationPage({
   );
 }
 
-function KYCGroupProgress({ groups, currentGroupIndex, onSelectGroupStep }) {
+function KYCGroupProgress({
+  groups,
+  currentGroupIndex,
+  onSelectGroupStep,
+  onReorderGroup,
+  onDragStartGroup,
+  onAddCustomPage,
+}) {
   const progressWidth =
     groups.length > 1 ? `${(currentGroupIndex / (groups.length - 1)) * 100}%` : "100%";
 
@@ -1009,17 +1318,28 @@ function KYCGroupProgress({ groups, currentGroupIndex, onSelectGroupStep }) {
           style={{ width: `calc((100% - 32px) * ${parseFloat(progressWidth) / 100})` }}
         />
 
-        <div className="relative grid" style={{ gridTemplateColumns: `repeat(${groups.length}, minmax(0, 1fr))` }}>
+        <div className="relative grid gap-3" style={{ gridTemplateColumns: `repeat(${groups.length + 1}, minmax(0, 1fr))` }}>
         {groups.map((group, index) => {
           const isActive = index === currentGroupIndex;
           const isComplete = index < currentGroupIndex;
 
           return (
             <button
-              key={group.title}
+              key={group.groupKey}
               type="button"
+              draggable
+              onDragStart={(event) => onDragStartGroup(event, group.groupKey)}
+              onDragOver={(event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                const movedGroupKey = event.dataTransfer.getData("application/x-kyc-selected-group");
+                if (movedGroupKey) onReorderGroup(movedGroupKey, group.groupKey);
+              }}
               onClick={() => onSelectGroupStep(index)}
-              className="group min-w-0 text-left"
+              className="group min-w-0 cursor-grab text-left active:cursor-grabbing"
             >
               <div className="relative mb-2 flex h-10 items-center">
                 <span
@@ -1042,11 +1362,23 @@ function KYCGroupProgress({ groups, currentGroupIndex, onSelectGroupStep }) {
                   isActive ? "font-bold text-[#1f2a44]" : "font-medium text-[#344256]"
                 }`}
               >
-                {group.title}
+                {group.displayTitle || group.title}
               </div>
             </button>
           );
         })}
+          <button
+            type="button"
+            onClick={onAddCustomPage}
+            className="group min-w-0 text-left"
+          >
+            <div className="relative mb-2 flex h-10 items-center">
+              <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-[#8F40D4] bg-white text-[#8F40D4] shadow-sm transition-colors group-hover:bg-[#f4ebfc]">
+                <Plus className="h-4 w-4" />
+              </span>
+            </div>
+            <div className="truncate text-sm font-medium text-[#344256]">Add page</div>
+          </button>
         </div>
       </div>
     </div>
@@ -1057,7 +1389,7 @@ function KYCFlowPreview({ group, selectedPreviewFields }) {
   const visibleFields = group?.fields.filter((field) =>
     selectedPreviewFields.some((selectedField) => selectedField.id === field.id)
   ) || [];
-  const previewTitle = `${group?.title || "KYC"} preview`;
+  const previewTitle = `${group?.displayTitle || group?.title || "KYC"} preview`;
 
   return (
     <aside className="flex min-h-0 flex-col overflow-hidden bg-transparent">
@@ -1075,7 +1407,7 @@ function KYCFlowPreview({ group, selectedPreviewFields }) {
               <span className="h-2.5 w-2.5 rounded-full bg-[#22c55e]" />
             </div>
             <div className="flex h-7 min-w-0 flex-1 items-center rounded bg-white px-3 text-[11px] text-[#64748b]">
-              https://verify.example.com/session/{group?.title.toLowerCase().replaceAll(" ", "-") || "kyc"}
+              https://verify.example.com/session/{(group?.displayTitle || group?.title || "kyc").toLowerCase().replaceAll(" ", "-")}
             </div>
           </div>
 
@@ -1097,9 +1429,11 @@ function KYCFlowPreview({ group, selectedPreviewFields }) {
 
             <div className="mx-auto max-w-[760px]">
               <div className="mb-6 text-center">
-                <h3 className="text-[26px] font-bold leading-tight text-[#151b23]">{group?.title}</h3>
+                <h3 className="text-[26px] font-bold leading-tight text-[#151b23]">
+                  {group?.displayTitle || group?.title}
+                </h3>
                 <p className="mt-2 text-sm leading-relaxed text-[#64748b]">
-                  {group?.description || "Complete this page to continue your verification."}
+                  {group?.displayDescription || group?.description || defaultPageDescription}
                 </p>
               </div>
 
@@ -1118,7 +1452,7 @@ function KYCFlowPreview({ group, selectedPreviewFields }) {
                     <div className="mt-6 flex justify-end border-t border-[#e5e9f0] pt-4">
                       <span
                         aria-hidden="true"
-                        className="inline-flex h-11 items-center rounded-md bg-[#8F40D4] px-6 text-sm font-bold text-white shadow-sm"
+                        className="inline-flex h-11 items-center rounded-md bg-[#6b7280] px-6 text-sm font-bold text-white shadow-sm"
                       >
                         Continue
                       </span>
@@ -1378,6 +1712,13 @@ function CustomFieldModal({ mode = "fields", initialFields, onClose, onSave }) {
             (field.options || []).length > 0 &&
             (field.options || []).every((option) => option.value?.trim())))
   ) && (!isPageMode || pageTitle.trim());
+  const previewGroup = {
+    title: isPageMode ? pageTitle.trim() || "Page title" : "Page preview",
+    displayTitle: isPageMode ? pageTitle.trim() || "Page title" : "Page preview",
+    description: isPageMode ? pageDescription.trim() : "",
+    displayDescription: isPageMode ? pageDescription.trim() : "",
+    fields: fields.map(normalizeCustomField),
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-5 sm:p-8">
@@ -1716,30 +2057,8 @@ function CustomFieldModal({ mode = "fields", initialFields, onClose, onSave }) {
           )}
           </div>
 
-          <aside className="min-h-0 overflow-y-auto rounded-lg border border-[#d7dde6] bg-white p-5">
-            <div className="mb-5 border-b border-[#e3e7ee] pb-4">
-              <h3 className="text-xl font-bold text-[#181f25]">Live preview</h3>
-              <p className="mt-1 text-sm text-[#181f25]/60">
-                {isPageMode
-                  ? `How ${pageTitle.trim() || "this custom page"} will appear to the user.`
-                  : "How these fields will appear to the user."}
-              </p>
-            </div>
-
-            {isPageMode && (
-              <div className="mb-5 rounded-lg border border-[#d7dde6] bg-[#fbfcfd] p-4">
-                <h4 className="text-2xl font-bold text-[#181f25]">{pageTitle.trim() || "Page title"}</h4>
-                <p className="mt-2 text-sm leading-relaxed text-[#181f25]/65">
-                  {pageDescription.trim() || "Page description will appear here."}
-                </p>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              {fields.map((field) => (
-                <CustomFieldPreview key={field.id} field={field} />
-              ))}
-            </div>
+          <aside className="min-h-0 overflow-y-auto">
+            <KYCFlowPreview group={previewGroup} selectedPreviewFields={previewGroup.fields} />
           </aside>
         </div>
 

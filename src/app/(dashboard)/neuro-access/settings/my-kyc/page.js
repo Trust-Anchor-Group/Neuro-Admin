@@ -121,39 +121,41 @@ export default function MyKYCPage() {
                         </p>
                       </div>
                       <span className="shrink-0 rounded-full bg-[var(--Button-Neuro-Secondary-bg,_#8F40D426)] px-3 py-1 text-sm font-bold text-[var(--Button-Neuro-Secondary-Content,_#722FAD)]">
-                        {kyc.groups.length}
+                        {kyc.groups.length} pages
                       </span>
                     </div>
                     <div className="mt-5 flex items-center justify-between border-t border-[var(--brand-border)] pt-4 text-sm font-semibold text-[var(--brand-text-secondary)]">
                       <span>{fieldCount} fields</span>
                       <span>{new Date(kyc.createdAt).toLocaleDateString()}</span>
                     </div>
-                    <div className="mt-5 flex items-center justify-end gap-2">
+                    <div className="mt-5 flex items-center justify-between gap-3">
                       <button
                         type="button"
                         onClick={() => downloadAndUploadKycXml(kyc)}
                         disabled={exportStatus?.type === "loading"}
                         className="inline-flex h-10 items-center justify-center rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-55"
                       >
-                        {exportStatus?.type === "loading" ? "Uploading..." : "Download XML"}
+                        {exportStatus?.type === "loading" ? "Uploading..." : "Download KYC form"}
                       </button>
-                      <Link
-                        href={`/neuro-access/settings/my-kyc/create?edit=${kyc.id}`}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--brand-border)] bg-white text-[var(--brand-text-secondary)] transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
-                        aria-label={`Edit ${kyc.name}`}
-                        title="Edit KYC"
-                      >
-                        <Pencil className="h-5 w-5" />
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => setKycToDelete(kyc)}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--brand-border)] bg-white text-[#d11f3f] transition-colors hover:border-[#d11f3f] hover:bg-[#fff1f3]"
-                        aria-label={`Delete ${kyc.name}`}
-                        title="Delete KYC"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/neuro-access/settings/my-kyc/create?edit=${kyc.id}`}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--brand-border)] bg-white text-[var(--brand-text-secondary)] transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+                          aria-label={`Edit ${kyc.name}`}
+                          title="Edit KYC"
+                        >
+                          <Pencil className="h-5 w-5" />
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => setKycToDelete(kyc)}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--brand-border)] bg-white text-[#d11f3f] transition-colors hover:border-[#d11f3f] hover:bg-[#fff1f3]"
+                          aria-label={`Delete ${kyc.name}`}
+                          title="Delete KYC"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </div>
                     </div>
                     {exportStatus?.message && (
                       <p className={`mt-3 text-sm font-medium ${exportStatus.type === "error" ? "text-[#d11f3f]" : "text-[#047857]"}`}>
