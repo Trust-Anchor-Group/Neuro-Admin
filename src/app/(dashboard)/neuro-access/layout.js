@@ -3,10 +3,13 @@ import Menu from "@/components/shared/Menu";
 import Navbar from "@/components/shared/Navbar";
 import { MdOutlineDocumentScanner, MdOutlineSettings } from "react-icons/md";
 import { useLanguage, content } from '../../../../context/LanguageContext'
+import { usePathname } from "next/navigation";
 
 export default function DashboardLayout({ children }) {
   const { language } = useLanguage();
   const t = content[language];
+  const pathname = usePathname();
+  const isSettingsPage = pathname?.startsWith('/neuro-access/settings');
 
   const menuItems = [
     {
@@ -22,6 +25,9 @@ export default function DashboardLayout({ children }) {
       title: t?.menu?.accessSettings || 'Access settings',
       icon: <MdOutlineSettings size={20} />,
       href: '/neuro-access/settings',
+      subItems: [
+        { label: 'My KYC', href: '/neuro-access/settings/my-kyc' },
+      ],
     },
   ];
 
@@ -36,7 +42,7 @@ export default function DashboardLayout({ children }) {
       {/* Main Content */}
       <div className="flex-1 bg-[var(--brand-background)] overflow-y-auto flex flex-col">
         <Navbar />
-        <div className="flex-1 pb-6">{children}</div>
+        <div className={`flex-1 min-h-0 ${isSettingsPage ? 'pb-0' : 'pb-6'}`}>{children}</div>
 
       </div>
     </div>
