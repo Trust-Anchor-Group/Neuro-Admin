@@ -332,19 +332,13 @@ export default function SalesPage() {
   return (
     <div className="min-h-screen bg-[var(--brand-background)] p-6 text-[var(--brand-text)]">
       <section className="rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-6 shadow-sm">
+        <h1 className="text-3xl font-bold">Orders</h1>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Sales Command Center</h1>
-            <p className="mt-1 text-sm text-[var(--brand-text-secondary)]">
-              Professional super-admin sales workspace with smart drill-down and resilient pagination.
-            </p>
-          </div>
-
           <button
             type="button"
             onClick={() => runQuery({ resetPager: false })}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-xl border border-[var(--brand-border)] bg-[var(--brand-background)] px-4 py-2 text-sm font-semibold hover:bg-[var(--brand-hover)] disabled:opacity-60"
+            className="mt-4 inline-flex items-center gap-2 self-start rounded-xl border border-[var(--brand-border)] bg-[var(--brand-background)] px-4 py-2 text-sm font-semibold hover:bg-[var(--brand-hover)] disabled:opacity-60 lg:ml-auto"
           >
             {loading ? <FiLoader className="animate-spin" /> : <FiRefreshCw />}
             Refresh
@@ -352,13 +346,13 @@ export default function SalesPage() {
         </div>
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <button type="button" onClick={() => handleScopeChange("global")} className={`rounded-xl px-4 py-3 text-sm font-semibold ${scope === "global" ? "bg-[var(--brand-button)] text-white" : "border border-[var(--brand-border)]"}`}>
+          <button type="button" onClick={() => handleScopeChange("global")} className={`rounded-xl px-4 py-3 text-sm font-semibold ${scope === "global" ? "bg-blue-600 text-white hover:bg-blue-700" : "border border-[var(--brand-border)]"}`}>
             Sales Overview
           </button>
-          <button type="button" onClick={() => handleScopeChange("issuer")} className={`rounded-xl px-4 py-3 text-sm font-semibold ${scope === "issuer" ? "bg-[var(--brand-button)] text-white" : "border border-[var(--brand-border)]"}`}>
+          <button type="button" onClick={() => handleScopeChange("issuer")} className={`rounded-xl px-4 py-3 text-sm font-semibold ${scope === "issuer" ? "bg-blue-600 text-white hover:bg-blue-700" : "border border-[var(--brand-border)]"}`}>
             Issuer Sales Detail
           </button>
-          <button type="button" onClick={() => handleScopeChange("project")} className={`rounded-xl px-4 py-3 text-sm font-semibold ${scope === "project" ? "bg-[var(--brand-button)] text-white" : "border border-[var(--brand-border)]"}`}>
+          <button type="button" onClick={() => handleScopeChange("project")} className={`rounded-xl px-4 py-3 text-sm font-semibold ${scope === "project" ? "bg-blue-600 text-white hover:bg-blue-700" : "border border-[var(--brand-border)]"}`}>
             Project Sales Detail
           </button>
         </div>
@@ -377,7 +371,7 @@ export default function SalesPage() {
                 <option key={option.id} value={option.id}>{option.name}</option>
               ))}
             </select>
-            <button type="button" onClick={loadIssuerSales} className="rounded-lg bg-[var(--brand-button)] px-4 py-2 text-sm font-semibold text-white">Load Issuer Sales</button>
+            <button type="button" onClick={loadIssuerSales} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Load Issuer Sales</button>
           </div>
         ) : null}
 
@@ -395,7 +389,7 @@ export default function SalesPage() {
                 <option key={option.id} value={option.id}>{option.title} | {option.issuerName}</option>
               ))}
             </select>
-            <button type="button" onClick={loadProjectSales} className="rounded-lg bg-[var(--brand-button)] px-4 py-2 text-sm font-semibold text-white">Load Project Sales</button>
+            <button type="button" onClick={loadProjectSales} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Load Project Sales</button>
           </div>
         ) : null}
 
@@ -427,7 +421,7 @@ export default function SalesPage() {
           />
 
           <div className="flex gap-2">
-            <button type="button" onClick={handleApplyFilters} className="flex-1 rounded-lg bg-[var(--brand-button)] px-3 py-2 text-sm font-semibold text-white">Apply</button>
+            <button type="button" onClick={handleApplyFilters} className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700">Apply</button>
             <button type="button" onClick={handleClearFilters} className="flex-1 rounded-lg border border-[var(--brand-border)] px-3 py-2 text-sm font-semibold">Clear</button>
           </div>
         </div>
@@ -476,7 +470,7 @@ export default function SalesPage() {
                   <tr key={`${row.id || "sale"}-${row.project_id || "project"}-${row.created || index}-${index}`} className="border-t border-[var(--brand-border)] hover:bg-[var(--brand-hover)]/40">
                     <td className="px-3 py-2 font-mono text-xs">{row.id}</td>
                     <td className="px-3 py-2">
-                      <button type="button" onClick={() => openProjectDrilldown(row.project_id)} className="text-xs font-semibold text-[var(--brand-button)] underline">{row?.extra?.project_name || row.project_id || "Unknown project"}</button>
+                      <button type="button" onClick={() => openProjectDrilldown(row.project_id)} className="text-xs font-semibold text-blue-600 underline hover:text-blue-700">{row?.extra?.project_name || row.project_id || "Unknown project"}</button>
                     </td>
                     <td className="px-3 py-2 text-xs">{row?.extra?.issuer_name || "Unknown issuer"}</td>
                     <td className="px-3 py-2">{row.token_count}</td>
@@ -504,7 +498,7 @@ export default function SalesPage() {
           </p>
           <div className="flex gap-2">
             <button type="button" onClick={handlePrevPage} disabled={loading || currentPager.index <= 0} className="rounded-lg border border-[var(--brand-border)] px-4 py-2 text-sm font-semibold disabled:opacity-50">Previous</button>
-            <button type="button" onClick={handleNextPage} disabled={loading || !currentPager.nextToken} className="rounded-lg bg-[var(--brand-button)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Next</button>
+            <button type="button" onClick={handleNextPage} disabled={loading || !currentPager.nextToken} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50">Next</button>
           </div>
         </div>
       </section>
