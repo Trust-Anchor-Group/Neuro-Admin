@@ -69,6 +69,31 @@ body {
     color: var(--brand-text-color);
 }
 
+.login-page {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.login-qr-frame .quick-login-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-qr-frame .quick-login-container img {
+    width: 250px;
+    height: 250px;
+    object-fit: contain;
+    border-radius: 0;
+}
+
+.login-qr-frame .quick-login-text {
+    display: none;
+}
+
 /* The shared Neuro Admin scaffold. Feature pages keep their own components inside
    this frame, which lets the navigation evolve independently from their content. */
 .admin-shell { --sidebar-width: 300px; }
