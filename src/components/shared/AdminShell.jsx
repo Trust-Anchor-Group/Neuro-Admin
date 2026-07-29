@@ -31,9 +31,9 @@ const tabsBySection = {
   ],
   'trust-services': [
     { label: 'Overview', href: '/landingpage?section=trust-services' },
-    { label: 'Projects', href: '/neuro-assets/Tokens?section=trust-services' },
-    { label: 'Issuers', href: '/neuro-assets/Issuers?section=trust-services' },
-    { label: 'Orders', href: '/neuro-assets/Sales?section=trust-services' },
+    { label: 'Accounts', href: '/neuro-access/account?section=trust-services' },
+    { label: 'Organizations', href: '/landingpage?section=trust-services&tab=organizations' },
+    { label: 'Onboarding', href: '/neuro-access/id-application?section=trust-services' },
   ],
   'digital-assets': [
     { label: 'Overview', href: '/neuro-assets?section=digital-assets' },
@@ -43,7 +43,8 @@ const tabsBySection = {
   ],
   payments: [
     { label: 'Overview', href: '/landingpage?section=payments' },
-    { label: 'Invoices', href: '/landingpage?section=payments&tab=invoices' },
+    { label: 'Utskick', href: '/landingpage?section=payments&tab=utskick' },
+    { label: 'Invoice', href: '/landingpage?section=payments&tab=invoices' },
     { label: 'Subscriptions', href: '/landingpage?section=payments&tab=subscriptions' },
     { label: 'Integrations', href: '/landingpage?section=payments&tab=integrations' },
   ],
@@ -104,8 +105,8 @@ export default function AdminShell({ children }) {
           {navigation.slice(2).map((item) => <NavigationItem key={item.id} item={item} active={section === item.id} />)}
         </nav>
 
-        <div className="m-3 flex items-center gap-2 border-t border-white/10 pt-4 text-white">
-          <CircleUserRound size={32} className="text-slate-500" />
+        <div className="flex h-16 w-full items-center gap-2 px-4 text-white">
+          <CircleUserRound size={48} className="text-slate-500" />
           <div className="min-w-0 flex-1 leading-tight"><p className="truncate text-[13px] font-semibold">Admin</p><p className="truncate text-[11px] text-slate-400">se.id.tagroot.io</p></div>
           <span className="text-slate-400">⋮</span>
         </div>

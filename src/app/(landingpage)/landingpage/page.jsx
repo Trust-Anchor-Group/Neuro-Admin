@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { getInitialMode, applyBrandTheme } from '@/utils/brandTheme';
 import Link from 'next/link';
 import {
@@ -109,12 +110,15 @@ const getBrandConfig = (host) => {
 };
 
 export default function LandingPage() {
+  const searchParams = useSearchParams();
   const [host, setHost] = useState('');
   const [mode, setMode] = useState('light');
   const { language } = useLanguage();
   const t = i18nContent[language];
   const services = LandingServices(t);
   const [brand, setBrand] = useState({ logo: '/NeuroLogo.svg', name: 'Neuro Admin' });
+  const section = searchParams.get('section');
+  const tab = searchParams.get('tab') || 'overview';
 
   // Initial load: host + initial mode
   useEffect(() => {
@@ -146,6 +150,10 @@ export default function LandingPage() {
       window.removeEventListener('storage', handler);
     };
   }, []);
+
+  if (section === 'trust-services' || section === 'payments') {
+    return <SolutionWorkspace section={section} tab={tab} />;
+  }
 
   return (
     <>
@@ -272,5 +280,59 @@ export default function LandingPage() {
         </div>
       </div>
     </>
+  );
+}
+
+const solutionPages = {
+  'trust-services': {
+    overview: {
+      eyebrow: 'Trust Services',
+      title: 'Trust Services overview',
+      description: 'Manage the trusted identities, organizations, and onboarding flows for your service.',
+    },
+    organizations: {
+      eyebrow: 'Trust Services',
+      title: 'Organizations',
+      description: 'View and manage the organizations connected to your trust service.',
+    },
+  },
+  payments: {
+    overview: {
+      eyebrow: 'Payments',
+      title: 'Payments overview',
+      description: 'See the latest activity across your payment communications, invoices, and subscriptions.',
+    },
+    utskick: {
+      eyebrow: 'Payments',
+      title: 'Utskick',
+      description: 'Prepare and track outgoing payment communications from one place.',
+    },
+    invoices: {
+      eyebrow: 'Payments',
+      title: 'Invoice',
+      description: 'Review invoices and their current payment status.',
+    },
+    subscriptions: {
+      eyebrow: 'Payments',
+      title: 'Subscriptions',
+      description: 'Manage active subscriptions and billing schedules.',
+    },
+    integrations: {
+      eyebrow: 'Payments',
+      title: 'Integrations',
+      description: 'Connect the payment tools used by your organization.',
+    },
+  },
+};
+
+function SolutionWorkspace({ section, tab }) {
+  const page = solutionPages[section]?.[tab] || solutionPages[section].overview;
+
+  return (
+    <main className="min-h-screen bg-[#f3f4f6] px-8 py-10 text-[#182127]">
+      <p className="mb-2 text-sm font-semibold text-[#8f40d4]">{page.eyebrow}</p>
+      <h1 className="text-3xl font-bold">{page.title}</h1>
+      <p className="mt-3 max-w-2xl text-sm text-[#7a8085]">{page.description}</p>
+    </main>
   );
 }

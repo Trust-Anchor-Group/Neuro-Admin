@@ -127,7 +127,10 @@ body {
     padding: 0 22px;
     border-bottom: 3px solid transparent;
     color: #7a8085;
-    font-size: 11px;
+    /* 14px text with a 17px line box: "Overview" renders at the requested
+       62 × 17px design size, while labels of different lengths remain natural. */
+    font-size: 14px;
+    line-height: 17px;
     font-weight: 500;
     transition: color .16s ease, border-color .16s ease, background-color .16s ease;
 }
