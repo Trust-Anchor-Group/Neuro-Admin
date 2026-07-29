@@ -1,5 +1,10 @@
 import MyKYCBuilder from "@/components/settings/kyc/MyKYCBuilder";
+import { Suspense } from "react";
 
 export default function CreateMyKYCPage() {
-  return <MyKYCBuilder />;
+  return (
+    <Suspense fallback={null}>
+      <MyKYCBuilder />
+    </Suspense>
+  );
 }
