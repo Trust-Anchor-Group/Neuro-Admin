@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { FiTrendingUp, FiCheckCircle, FiActivity, FiLoader } from "react-icons/fi";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import UserCard from "@/components/ui/UserCard";
 import { useLanguage, content as i18nContent } from "../../../../context/LanguageContext";
 
@@ -91,7 +92,7 @@ const CertificateStat = ({ value, label, icon }) => (
   </div>
 );
 
-const AdminPage = () => {
+const DigitalAssetsPage = () => {
   const { language } = useLanguage();
   const tDash = useMemo(() => i18nContent[language]?.assetDashboard || {}, [language]);
   const locale = language === 'pt' ? 'pt-PT' : 'en-US';
@@ -565,4 +566,44 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage;
+function MyNeuroAssetsPage() {
+  return (
+    <main className="min-h-screen bg-[#e4e7e9] p-4 text-[#182127] sm:p-6 lg:h-[calc(100vh-63px)] lg:min-h-0 lg:overflow-hidden">
+      <div className="w-full lg:grid lg:h-full lg:grid-rows-[1fr_2.25fr_1.5fr] lg:gap-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-4">
+          <section className="min-h-44 rounded-lg bg-white p-5 shadow-[0_1px_2px_rgba(24,33,39,0.05)] sm:min-h-48 sm:p-6 lg:h-full lg:min-h-0">
+            <p className="text-xs font-bold">Credit Balance</p>
+            <p className="mt-4 text-3xl font-semibold leading-none">0 SEK</p>
+            <p className="mt-5 text-xs text-[#7a8085]">Last updated ...</p>
+            <button className="mt-3 flex h-8 w-full items-center justify-center gap-1.5 rounded-md bg-[#d3e9e6] text-xs font-semibold text-[#17635e] transition-colors hover:bg-[#c4e0dc]">
+              <span className="flex h-3 w-3 items-center justify-center rounded-full border border-current text-[10px] leading-none">+</span>
+              Add to balance
+            </button>
+          </section>
+          <section className="min-h-44 rounded-lg bg-white shadow-[0_1px_2px_rgba(24,33,39,0.05)] sm:min-h-48 lg:h-full lg:min-h-0" />
+        </div>
+
+        <section className="mt-4 min-h-[300px] rounded-lg bg-white p-5 shadow-[0_1px_2px_rgba(24,33,39,0.05)] sm:min-h-[360px] sm:p-6 lg:mt-0 lg:h-full lg:min-h-0">
+          <h1 className="text-xs font-bold">My Tokens</h1>
+        </section>
+
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:mt-0 lg:grid-cols-8">
+          <section className="min-h-52 rounded-lg bg-white shadow-[0_1px_2px_rgba(24,33,39,0.05)] lg:col-span-3 lg:h-full lg:min-h-0 sm:min-h-60" />
+          <section className="min-h-52 rounded-lg bg-white shadow-[0_1px_2px_rgba(24,33,39,0.05)] lg:col-span-3 lg:h-full lg:min-h-0 sm:min-h-60" />
+          <div className="grid gap-4 lg:col-span-2 lg:h-full lg:grid-rows-2">
+            <section className="min-h-32 rounded-lg bg-white shadow-[0_1px_2px_rgba(24,33,39,0.05)] lg:min-h-0" />
+            <section className="min-h-32 rounded-lg bg-white shadow-[0_1px_2px_rgba(24,33,39,0.05)] lg:min-h-0" />
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+export default function AdminPage() {
+  const searchParams = useSearchParams();
+
+  return searchParams.get('section') === 'my-neuro'
+    ? <MyNeuroAssetsPage />
+    : <DigitalAssetsPage />;
+}
