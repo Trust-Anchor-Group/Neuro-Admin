@@ -2,22 +2,19 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
-import { useRouter } from 'next/navigation'
 import { MaterialReactTable } from 'material-react-table'
-import { FaEye, FaEyeSlash, FaCopy } from 'react-icons/fa'
-import { FiSearch } from 'react-icons/fi'
+import { FaEye, FaEyeSlash, FaCopy, FaTimes } from 'react-icons/fa'
+import APIKeyDetailsPanel from './APIKeyDetailsPanel'
 
-export default function APIKeys() {
+export default function APIKeys({ detailsInModal = false }) {
   const { language } = useLanguage();
   const t = i18nContent?.[language]?.apiKeysList || {};
   const [apiKeys, setApiKeys] = useState([])
   const [visibleKeys, setVisibleKeys] = useState({})
   const [loading, setLoading] = useState(true)
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 })
-  const [rowCount, setRowCount] = useState(100)
-  const [search, setSearch] = useState('')
-
-  const router = useRouter()
+  const rowCount = 100
+  const [selectedApiKey, setSelectedApiKey] = useState(null)
 
   useEffect(() => {
     async function fetchAPIKeys() {
@@ -62,7 +59,11 @@ export default function APIKeys() {
     navigator.clipboard.writeText(key)
   }
   const handleRowClick = (key) => {
-    router.push(`/neuro-access/settings/api-key/${key}`);
+    if (detailsInModal) {
+      setSelectedApiKey(key)
+      return
+    }
+    window.location.assign(`/neuro-access/settings/api-key/${key}`)
   };
   const columns = useMemo(
     () => [
@@ -131,6 +132,7 @@ export default function APIKeys() {
   )
 
   return (
+    <>
     <div className="bg-[var(--brand-navbar)] rounded-2xl font-grotesk text-[var(--brand-text-color)] p-6">
       <h2 className="text-2xl font-bold text-[var(--brand-text-color)] mb-6">{t.title || 'API keys'}</h2>
 
@@ -287,6 +289,26 @@ export default function APIKeys() {
         />
       </div>
     </div>
+    {selectedApiKey && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-[#182127]/55 p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-label="API key details"
+        onMouseDown={() => setSelectedApiKey(null)}
+      >
+        <div className="max-h-[calc(100vh-2rem)] w-full max-w-6xl overflow-y-auto rounded-2xl bg-[var(--brand-background)] p-6 shadow-2xl" onMouseDown={(event) => event.stopPropagation()}>
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-[var(--brand-text)]">API key</h2>
+            <button type="button" onClick={() => setSelectedApiKey(null)} className="rounded-lg p-2 text-[var(--brand-text-secondary)] hover:bg-[var(--brand-hover)] hover:text-[var(--brand-text)]" aria-label="Close API key details">
+              <FaTimes />
+            </button>
+          </div>
+          <APIKeyDetailsPanel apiKey={selectedApiKey} />
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 

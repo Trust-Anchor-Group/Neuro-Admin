@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage, content } from "../../../../context/LanguageContext";
 
-export default function PendingApplications() {
+export default function PendingApplications({ compact = false }) {
   const { language } = useLanguage();
   const t = content[language];
   const statusMap = t?.pendingApplicationsStatuses || {};
@@ -88,8 +88,8 @@ export default function PendingApplications() {
   }, []); // load once
 
   return (
-    <div className="bg-[var(--brand-navbar)] backdrop-blur-lg shadow-xl rounded-xl p-6 border border-[var(--brand-border)]">
-      <h2 className="text-2xl font-bold text-[var(--brand-text)] mb-4">{t?.pendingApplications?.title}</h2>
+    <div className={`bg-[var(--brand-navbar)] backdrop-blur-lg rounded-xl border border-[var(--brand-border)] ${compact ? 'min-h-[294px] p-3 shadow-sm' : 'p-6 shadow-xl'}`}>
+      <h2 className={`${compact ? 'mb-5 text-lg' : 'mb-4 text-2xl'} font-bold text-[var(--brand-text)]`}>{t?.pendingApplications?.title || 'Pending applications'}</h2>
 
       {loading ? (
         <p className="text-[var(--brand-text-secondary)] text-center">{t?.pendingApplications?.loading}</p>
@@ -101,13 +101,13 @@ export default function PendingApplications() {
             <li
               onClick={() => handleNavigate(app.id)}
               key={app.id}
-              className="py-4 flex cursor-pointer justify-between items-center hover:bg-[var(--brand-hover)] p-3 rounded-lg transition-all"
+              className={`${compact ? 'py-3 px-2 text-base' : 'py-4 p-3'} flex cursor-pointer justify-between items-center hover:bg-[var(--brand-hover)] rounded-lg transition-all`}
             >
               <div>
                 <p className="text-[var(--brand-text-secondary)] font-semibold">{app.name}</p>
-                <p className="text-[var(--brand-text-tertiary)] text-sm">{app.submittedAt}</p>
+                <p className={`text-[var(--brand-text-tertiary)] ${compact ? 'text-sm' : 'text-sm'}`}>{app.submittedAt}</p>
               </div>
-              <span className="bg-yellow-500 text-white px-4 py-1 rounded-full text-sm shadow-md">
+              <span className={`bg-yellow-500 text-white rounded-full shadow-md ${compact ? 'px-3 py-1 text-sm' : 'px-4 py-1 text-sm'}`}>
                 {statusMap[app.status?.toLowerCase()] || app.status}
               </span>
             </li>
