@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { ChevronRight, CircleUserRound, Menu, X } from 'lucide-react';
 
@@ -59,13 +59,31 @@ const sectionForPath = (pathname) => {
 export default function AdminShell({ children }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isTenantOpen, setIsTenantOpen] = useState(false);
+  const [organizationMenu, setOrganizationMenu] = useState(null);
+  const tenantTriggerRef = useRef(null);
+  const tenantPanelRef = useRef(null);
   const searchParams = useSearchParams();
   const querySection = searchParams.get('section');
   const queryTab = searchParams.get('tab') || '';
 
   useEffect(() => {
     setIsOpen(false);
+    setIsTenantOpen(false);
+    setOrganizationMenu(null);
   }, [pathname, searchParams]);
+
+  useEffect(() => {
+    const closeOnOutsideClick = (event) => {
+      const target = event.target;
+      if (tenantPanelRef.current?.contains(target) || tenantTriggerRef.current?.contains(target)) return;
+      setIsTenantOpen(false);
+      setOrganizationMenu(null);
+    };
+
+    document.addEventListener('pointerdown', closeOnOutsideClick);
+    return () => document.removeEventListener('pointerdown', closeOnOutsideClick);
+  }, []);
 
   const section = querySection || sectionForPath(pathname) || 'my-neuro';
   const tabs = tabsBySection[section] || tabsBySection['my-neuro'];
@@ -78,7 +96,7 @@ export default function AdminShell({ children }) {
   }) || tabs[0];
 
   return (
-    <div className="admin-shell min-h-screen bg-[#f3f4f6] text-[#182127]">
+    <div className={`admin-shell min-h-screen bg-[#f3f4f6] text-[#182127] ${isTenantOpen ? 'admin-shell--tenant-open' : ''}`}>
       <button
         className="admin-mobile-menu fixed left-4 top-4 z-50 rounded-lg bg-[#182127] p-2 text-white md:hidden"
         onClick={() => setIsOpen(true)}
@@ -97,11 +115,18 @@ export default function AdminShell({ children }) {
 
         <nav className="flex flex-1 flex-col px-3 pt-5">
           {navigation.slice(0, 2).map((item) => <NavigationItem key={item.id} item={item} active={section === item.id} />)}
-          <Link href="/landingpage?section=organization" className="admin-tenant-card mb-3">
+          <button
+            ref={tenantTriggerRef}
+            type="button"
+            className="admin-tenant-card mb-3 text-left"
+            onClick={() => setIsTenantOpen((open) => !open)}
+            aria-expanded={isTenantOpen}
+            aria-controls="tenant-sidebar"
+          >
             <span className="text-[11px] text-slate-400">se.id.tagroot.io</span>
             <span className="mt-1 flex items-center justify-between text-[14px] font-semibold text-white">Trust Anchor Group <ChevronRight size={18} /></span>
             <span className="mt-1 text-[11px] text-slate-400">Platform owner</span>
-          </Link>
+          </button>
           {navigation.slice(2).map((item) => <NavigationItem key={item.id} item={item} active={section === item.id} />)}
         </nav>
 
@@ -110,6 +135,24 @@ export default function AdminShell({ children }) {
           <div className="min-w-0 flex-1 leading-tight"><p className="truncate text-[13px] font-semibold">Admin</p><p className="truncate text-[11px] text-slate-400">se.id.tagroot.io</p></div>
           <span className="text-slate-400">⋮</span>
         </div>
+      </aside>
+
+      <aside ref={tenantPanelRef} id="tenant-sidebar" className={`admin-sub-sidebar ${isTenantOpen ? 'admin-sub-sidebar--open' : ''}`} aria-label="Organization navigation" onClick={(event) => {
+        if (!event.target.closest('.admin-org-menu-trigger, .admin-org-context-menu')) setOrganizationMenu(null);
+      }}>
+        <div className="px-3">
+          <p className="text-[10px] text-slate-400">Platform owners</p>
+        </div>
+        <nav className="flex flex-col px-2">
+          <OrganizationItem name="Trust Anchor Group" role="Platform owner" host="se.id.tagroot.io" active menuOpen={organizationMenu === 'trust-anchor'} onMenu={() => setOrganizationMenu((menu) => menu === 'trust-anchor' ? null : 'trust-anchor')} />
+          <OrganizationItem name="Innova Digital Assets" role="Platform owner" host="innova.tagroot.io" menuOpen={organizationMenu === 'innova'} onMenu={() => setOrganizationMenu((menu) => menu === 'innova' ? null : 'innova')} />
+          <OrganizationItem name="W Identity" role="Platform owner" host="wid.tagroot.io" menuOpen={organizationMenu === 'w-identity'} onMenu={() => setOrganizationMenu((menu) => menu === 'w-identity' ? null : 'w-identity')} />
+          <OrganizationItem name="Parklet" role="Platform owner" host="parklet.tagroot.io" menuOpen={organizationMenu === 'parklet-owner'} onMenu={() => setOrganizationMenu((menu) => menu === 'parklet-owner' ? null : 'parklet-owner')} />
+          <p className="mt-2 border-t border-white/10 pt-3 text-[10px] text-slate-400">Clients</p>
+          <OrganizationItem name="Parklet" role="Client" host="se.exch.tagroot.io" menuOpen={organizationMenu === 'parklet-client'} onMenu={() => setOrganizationMenu((menu) => menu === 'parklet-client' ? null : 'parklet-client')} />
+          <OrganizationItem name="Green Penguin Energy" role="Client" host="innova.tagroot.io" menuOpen={organizationMenu === 'green-penguin'} onMenu={() => setOrganizationMenu((menu) => menu === 'green-penguin' ? null : 'green-penguin')} />
+        </nav>
+        <button className="mx-3 mt-0 text-left text-[10px] text-slate-400 hover:text-white">＋ Add new organization to manage</button>
       </aside>
 
       <main className="admin-main">
@@ -130,5 +173,15 @@ function NavigationItem({ item, active }) {
     <Link href={item.href} className={`admin-nav-item ${item.id === 'organization' ? 'admin-nav-item--organization' : ''} ${active ? 'admin-nav-item--active' : ''}`}>
       <span>{item.label}</span>
     </Link>
+  );
+}
+
+function OrganizationItem({ name, role, host, active = false, menuOpen, onMenu }) {
+  return (
+    <div className={`admin-org-item ${active ? 'admin-org-item--active' : ''}`}>
+      <Link href="/landingpage?section=organization" className="min-w-0 flex-1"><strong>{name}</strong><small>{role}<br />{host}</small></Link>
+      <button type="button" className="admin-org-menu-trigger" onClick={onMenu} aria-label={`Actions for ${name}`} aria-expanded={menuOpen}>⋮</button>
+      {menuOpen && <div className="admin-org-context-menu" role="menu"><button type="button" role="menuitem">Remove as default</button><button type="button" role="menuitem">View in client mode</button><button type="button" role="menuitem">View my access token</button></div>}
+    </div>
   );
 }
