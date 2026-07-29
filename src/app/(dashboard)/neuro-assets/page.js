@@ -1,7 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { FiTrendingUp, FiCheckCircle, FiActivity, FiLoader } from "react-icons/fi";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import UserCard from "@/components/ui/UserCard";
 import { useLanguage, content as i18nContent } from "../../../../context/LanguageContext";
@@ -320,15 +319,6 @@ const DigitalAssetsPage = () => {
             typeKey="totalTransactions"
             value={loading ? "..." : userCardStats.formattedCount}
           />
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-3xl font-bold">{tDash.heading || "Assets Dashboard"}</h1>
-          <Link
-            href="/neuro-assets/issuer"
-            className="inline-flex items-center justify-center rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-4 py-2 text-sm font-semibold text-[var(--brand-text)] shadow-sm transition hover:bg-[var(--brand-hover)]"
-          >
-            Go to Issuer Admin
-          </Link>
         </div>
       </header>
 
