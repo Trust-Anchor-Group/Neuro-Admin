@@ -451,7 +451,11 @@ export default function MyKYCBuilder() {
         [...group.fields, ...(groupCustomFields[group.title] || []).map(normalizeCustomField)].map(applyFieldEdits)
       ),
     })),
-    ...comingSoonFieldGroups,
+    ...comingSoonFieldGroups.map((group) => ({
+      ...group,
+      groupKey: getGroupKey(group),
+      fields: orderFieldsForGroup(getGroupKey(group), group.fields.map(applyFieldEdits)),
+    })),
     ...customFieldGroups.map((group) => ({
       ...group,
       groupKey: getGroupKey(group),
