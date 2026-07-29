@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
@@ -283,6 +284,12 @@ const groupIcons = {
 };
 
 export default function MyKYCBuilder() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const trustServicesContext = searchParams.get("section") === "trust-services";
+  const myKycPath = trustServicesContext
+    ? "/neuro-access/settings/my-kyc?section=trust-services"
+    : "/neuro-access/settings/my-kyc";
   const [kycName, setKycName] = useState("");
   const [kycDescription, setKycDescription] = useState("");
   const [activeStep, setActiveStep] = useState("groups");
@@ -308,6 +315,7 @@ export default function MyKYCBuilder() {
   const [fieldOrderByGroup, setFieldOrderByGroup] = useState({});
   const [shouldSelectNewCustomPage, setShouldSelectNewCustomPage] = useState(false);
   const [draggedFieldId, setDraggedFieldId] = useState(null);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   useEffect(() => {
     const editId = new URLSearchParams(window.location.search).get("edit");
@@ -316,6 +324,26 @@ export default function MyKYCBuilder() {
     const existingKycs = JSON.parse(window.localStorage.getItem(savedKycStorageKey) || "[]");
     const kycToEdit = existingKycs.find((kyc) => kyc.id === editId);
     if (!kycToEdit) return;
+
+    if (kycToEdit.draftState) {
+      const draft = kycToEdit.draftState;
+      setEditingKycId(editId);
+      setKycName(kycToEdit.name || "");
+      setKycDescription(kycToEdit.description || "");
+      setSelectedGroups(draft.selectedGroups || []);
+      setSelectedFieldIds(draft.selectedFieldIds || []);
+      setCustomFields(draft.customFields || []);
+      setCustomFieldGroups(draft.customFieldGroups || []);
+      setGroupCustomFields(draft.groupCustomFields || {});
+      setEditedFields(draft.editedFields || {});
+      setPageTitles(draft.pageTitles || {});
+      setPageDescriptions(draft.pageDescriptions || {});
+      setFieldOrderByGroup(draft.fieldOrderByGroup || {});
+      setCurrentConfigGroupIndex(draft.currentConfigGroupIndex || 0);
+      setActiveStep(draft.activeStep === "configure" ? "configure" : "groups");
+      setShowKycNameError(false);
+      return;
+    }
 
     const savedGroupCustomFields = kycToEdit.groups.reduce((groupFields, group) => {
       if (group.title === "Custom Fields") return groupFields;
@@ -721,6 +749,7 @@ export default function MyKYCBuilder() {
       description: kycDescription.trim(),
       createdAt: existingKyc?.createdAt || now,
       updatedAt: now,
+      isDraft: false,
       groups: selectedGroupDetails.map((group) => ({
         title: group.displayTitle,
         sourceKey: group.groupKey,
@@ -737,6 +766,57 @@ export default function MyKYCBuilder() {
     window.localStorage.setItem(savedKycStorageKey, JSON.stringify(nextKycs));
     setSavedKyc(kyc);
     setActiveStep("complete");
+  };
+
+  const saveDraftAndExit = () => {
+    const now = new Date().toISOString();
+    const existingKycs = JSON.parse(window.localStorage.getItem(savedKycStorageKey) || "[]");
+    const existingKyc = existingKycs.find((kyc) => kyc.id === editingKycId);
+    const kyc = {
+      id: editingKycId || `kyc-${Date.now()}`,
+      name: kycName.trim() || "Untitled KYC",
+      description: kycDescription.trim(),
+      createdAt: existingKyc?.createdAt || now,
+      updatedAt: now,
+      isDraft: true,
+      groups: selectedGroupDetails.map((group) => ({
+        title: group.displayTitle,
+        sourceKey: group.groupKey,
+        sourceTitle: group.title,
+        description: group.displayDescription || "",
+        fields: group.fields.filter((field) => selectedFieldIds.includes(field.id)),
+      })),
+      draftState: {
+        activeStep,
+        selectedGroups,
+        selectedFieldIds,
+        customFields,
+        customFieldGroups,
+        groupCustomFields,
+        editedFields,
+        pageTitles,
+        pageDescriptions,
+        fieldOrderByGroup,
+        currentConfigGroupIndex,
+      },
+    };
+    const nextKycs = editingKycId
+      ? existingKycs.map((savedKycItem) => (savedKycItem.id === editingKycId ? kyc : savedKycItem))
+      : [kyc, ...existingKycs];
+
+    window.localStorage.setItem(savedKycStorageKey, JSON.stringify(nextKycs));
+    router.push(myKycPath);
+  };
+
+  const cancelAndDeleteKyc = () => {
+    if (editingKycId) {
+      const existingKycs = JSON.parse(window.localStorage.getItem(savedKycStorageKey) || "[]");
+      window.localStorage.setItem(
+        savedKycStorageKey,
+        JSON.stringify(existingKycs.filter((kyc) => kyc.id !== editingKycId))
+      );
+    }
+    router.push(myKycPath);
   };
 
   const createAnotherKyc = () => {
@@ -760,30 +840,9 @@ export default function MyKYCBuilder() {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[var(--brand-background)]">
-      <div className="flex h-12 shrink-0 items-center justify-between border-b border-[var(--brand-border)] bg-[var(--brand-navbar)] px-4 sm:px-6 lg:px-8 min-[1800px]:h-16">
-        <h1 className="text-xl font-bold leading-none text-[var(--brand-text)] min-[1800px]:text-[25px]">
-          {editingKycId ? "Edit KYC" : "Create New KYC"}
-        </h1>
-        <nav aria-label="Breadcrumb" className="hidden items-center gap-2 text-sm leading-none text-gray-500 sm:flex lg:text-base min-[1800px]:text-lg">
-          <Link href="/neuro-access" className="transition-colors hover:text-[var(--brand-text)]">
-            Home
-          </Link>
-          <span aria-hidden="true">&gt;</span>
-          <Link href="/neuro-access/settings" className="transition-colors hover:text-[var(--brand-text)]">
-            Settings
-          </Link>
-          <span aria-hidden="true">&gt;</span>
-          <Link href="/neuro-access/settings/my-kyc" className="transition-colors hover:text-[var(--brand-text)]">
-            My KYC
-          </Link>
-          <span aria-hidden="true">&gt;</span>
-          <span className="font-medium text-gray-500">{editingKycId ? "Edit" : "Create"}</span>
-        </nav>
-      </div>
-
+    <div className="flex min-h-[calc(100vh-63px)] flex-col overflow-hidden">
       {activeStep === "complete" ? (
-        <KYCCompleteScreen savedKyc={savedKyc} onCreateAnother={createAnotherKyc} isEditing={Boolean(editingKycId)} />
+        <KYCCompleteScreen savedKyc={savedKyc} onCreateAnother={createAnotherKyc} isEditing={Boolean(editingKycId)} myKycPath={myKycPath} />
       ) : activeStep === "groups" ? (
         <>
           <div className="grid grid-cols-1 gap-3 px-4 pb-3 pt-3 sm:px-6 lg:grid-cols-2 lg:px-8 min-[1800px]:gap-6 min-[1800px]:pb-6 min-[1800px]:pt-5">
@@ -1068,7 +1127,14 @@ export default function MyKYCBuilder() {
       )}
 
       {activeStep !== "complete" && (
-        <footer className="flex h-16 shrink-0 items-center justify-end border-t border-[var(--brand-border)] bg-[var(--brand-navbar)] px-4 sm:px-6 lg:px-8 min-[1800px]:h-24">
+        <footer className="flex h-16 shrink-0 items-center justify-between border-t border-[var(--brand-border)] bg-[var(--brand-navbar)] px-4 sm:px-6 lg:px-8 min-[1800px]:h-24">
+          <button
+            type="button"
+            onClick={() => setIsCancelModalOpen(true)}
+            className="inline-flex h-10 items-center justify-center rounded-md border border-[var(--brand-border)] bg-transparent px-4 text-sm font-semibold text-[var(--brand-text)] transition-colors hover:bg-[var(--brand-background)] sm:px-5 sm:text-base min-[1800px]:h-14 min-[1800px]:px-8 min-[1800px]:text-xl"
+          >
+            Cancel
+          </button>
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -1117,6 +1183,26 @@ export default function MyKYCBuilder() {
         />
       )}
 
+      {isCancelModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 px-6 backdrop-blur-sm">
+          <section className="w-full max-w-lg rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="cancel-kyc-title">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 id="cancel-kyc-title" className="text-2xl font-bold text-[var(--brand-text)]">Cancel KYC creation?</h2>
+                <p className="mt-3 text-base leading-relaxed text-[var(--brand-text-secondary)]">Choose whether to discard this KYC or keep your progress as a draft.</p>
+              </div>
+              <button type="button" onClick={() => setIsCancelModalOpen(false)} className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-[var(--brand-border)] text-[var(--brand-text-secondary)] transition-colors hover:bg-[var(--brand-background)]" aria-label="Close cancel confirmation">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button type="button" onClick={cancelAndDeleteKyc} className="inline-flex h-11 items-center justify-center rounded-md border border-[#d11f3f] px-5 text-base font-semibold text-[#d11f3f] transition-colors hover:bg-[#fff1f3]">Cancel and delete KYC</button>
+              <button type="button" onClick={saveDraftAndExit} className="inline-flex h-11 items-center justify-center rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-5 text-base font-semibold text-white shadow-sm transition-colors hover:brightness-95">Cancel and save as draft</button>
+            </div>
+          </section>
+        </div>
+      )}
+
       <style jsx>{`
         @keyframes kycArrowJump {
           0%,
@@ -1132,7 +1218,7 @@ export default function MyKYCBuilder() {
   );
 }
 
-function KYCCompleteScreen({ savedKyc, onCreateAnother, isEditing }) {
+function KYCCompleteScreen({ savedKyc, onCreateAnother, isEditing, myKycPath }) {
   return (
     <div className="flex min-h-0 flex-1 items-center justify-center px-8 py-10">
       <section className="w-full max-w-2xl rounded-xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-8 text-center shadow-sm">
@@ -1147,7 +1233,7 @@ function KYCCompleteScreen({ savedKyc, onCreateAnother, isEditing }) {
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/neuro-access/settings/my-kyc"
+            href={myKycPath}
             className="inline-flex h-12 items-center justify-center rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-7 text-lg font-semibold text-white shadow-sm transition-colors hover:brightness-95"
           >
             View My KYC

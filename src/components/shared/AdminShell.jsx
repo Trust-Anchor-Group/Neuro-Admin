@@ -33,7 +33,7 @@ const tabsBySection = {
     { label: 'Overview', href: '/landingpage?section=trust-services' },
     { label: 'Accounts', href: '/neuro-access/account?section=trust-services' },
     { label: 'Organizations', href: '/landingpage?section=trust-services&tab=organizations' },
-    { label: 'Onboarding', href: '/neuro-access/id-application?section=trust-services' },
+    { label: 'My KYC', href: '/neuro-access/settings/my-kyc?section=trust-services' },
   ],
   'digital-assets': [
     { label: 'Overview', href: '/neuro-assets?section=digital-assets' },
@@ -75,7 +75,11 @@ export default function AdminShell({ children }) {
     if (pathname !== tabPath) return false;
     if (requestedTab) return queryTab === requestedTab;
     return !queryTab;
-  }) || tabs[0];
+  }) || (
+    section === 'trust-services' && pathname.startsWith('/neuro-access/settings/my-kyc')
+      ? tabs.find((tab) => tab.label === 'My KYC')
+      : tabs[0]
+  );
 
   return (
     <div className="admin-shell min-h-screen bg-[#f3f4f6] text-[#182127]">

@@ -2,15 +2,29 @@
 
 import Link from "next/link";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { buildKycXmlFromBuilderGroups } from "@/lib/kycXml";
 
 const savedKycStorageKey = "neuro-admin-my-kycs";
 
 export default function MyKYCPage() {
+  return (
+    <Suspense fallback={null}>
+      <MyKYCContent />
+    </Suspense>
+  );
+}
+
+function MyKYCContent() {
+  const searchParams = useSearchParams();
   const [savedKycs, setSavedKycs] = useState([]);
   const [kycToDelete, setKycToDelete] = useState(null);
   const [xmlStatus, setXmlStatus] = useState({});
+  const trustServicesContext = searchParams.get("section") === "trust-services";
+  const createKycPath = trustServicesContext
+    ? "/neuro-access/settings/my-kyc/create?section=trust-services"
+    : "/neuro-access/settings/my-kyc/create";
 
   const downloadAndUploadKycXml = async (kyc) => {
     const fieldIds = kyc.groups.flatMap((group) => group.fields.map((field) => field.id));
@@ -72,18 +86,7 @@ export default function MyKYCPage() {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[var(--brand-background)]">
-      <div className="flex h-16 shrink-0 items-center justify-between border-b border-[var(--brand-border)] bg-[var(--brand-navbar)] px-8">
-        <h1 className="text-[25px] font-bold leading-none text-[var(--brand-text)]">My KYC</h1>
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-lg leading-none text-gray-500">
-          <span>Home</span>
-          <span aria-hidden="true">&gt;</span>
-          <span>Settings</span>
-          <span aria-hidden="true">&gt;</span>
-          <span className="font-medium text-gray-500">My KYC</span>
-        </nav>
-      </div>
-
+    <div className="flex min-h-[calc(100vh-63px)] flex-col overflow-hidden">
       <div className="flex min-h-0 flex-1 flex-col px-8 pb-8 pt-5">
         {savedKycs.length > 0 ? (
           <section className="flex min-h-0 flex-1 flex-col">
@@ -95,7 +98,7 @@ export default function MyKYCPage() {
                 </p>
               </div>
               <Link
-                href="/neuro-access/settings/my-kyc/create"
+                href={createKycPath}
                 className="inline-flex h-[52px] shrink-0 items-center justify-center gap-3 rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-7 text-lg font-semibold text-white shadow-sm transition-colors hover:brightness-95"
               >
                 <Plus className="h-6 w-6" />
@@ -121,7 +124,7 @@ export default function MyKYCPage() {
                         </p>
                       </div>
                       <span className="shrink-0 rounded-full bg-[var(--Button-Neuro-Secondary-bg,_#8F40D426)] px-3 py-1 text-sm font-bold text-[var(--Button-Neuro-Secondary-Content,_#722FAD)]">
-                        {kyc.groups.length} pages
+                        {kyc.isDraft ? "Draft" : `${kyc.groups.length} pages`}
                       </span>
                     </div>
                     <div className="mt-5 flex items-center justify-between border-t border-[var(--brand-border)] pt-4 text-sm font-semibold text-[var(--brand-text-secondary)]">
@@ -129,23 +132,34 @@ export default function MyKYCPage() {
                       <span>{new Date(kyc.createdAt).toLocaleDateString()}</span>
                     </div>
                     <div className="mt-5 flex items-center justify-between gap-3">
-                      <button
-                        type="button"
-                        onClick={() => downloadAndUploadKycXml(kyc)}
-                        disabled={exportStatus?.type === "loading"}
-                        className="inline-flex h-10 items-center justify-center rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-55"
-                      >
-                        {exportStatus?.type === "loading" ? "Uploading..." : "Download KYC form"}
-                      </button>
-                      <div className="flex items-center gap-2">
+                      {kyc.isDraft ? (
                         <Link
-                          href={`/neuro-access/settings/my-kyc/create?edit=${kyc.id}`}
-                          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--brand-border)] bg-white text-[var(--brand-text-secondary)] transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
-                          aria-label={`Edit ${kyc.name}`}
-                          title="Edit KYC"
+                          href={`${createKycPath}${trustServicesContext ? "&" : "?"}edit=${kyc.id}`}
+                          className="inline-flex h-10 items-center justify-center rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:brightness-95"
                         >
-                          <Pencil className="h-5 w-5" />
+                          Continue creating
                         </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => downloadAndUploadKycXml(kyc)}
+                          disabled={exportStatus?.type === "loading"}
+                          className="inline-flex h-10 items-center justify-center rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-55"
+                        >
+                          {exportStatus?.type === "loading" ? "Uploading..." : "Download KYC form"}
+                        </button>
+                      )}
+                      <div className="flex items-center gap-2">
+                        {!kyc.isDraft && (
+                          <Link
+                            href={`${createKycPath}${trustServicesContext ? "&" : "?"}edit=${kyc.id}`}
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[var(--brand-border)] bg-white text-[var(--brand-text-secondary)] transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+                            aria-label={`Edit ${kyc.name}`}
+                            title="Edit KYC"
+                          >
+                            <Pencil className="h-5 w-5" />
+                          </Link>
+                        )}
                         <button
                           type="button"
                           onClick={() => setKycToDelete(kyc)}
@@ -179,7 +193,7 @@ export default function MyKYCPage() {
           </section>
         ) : (
           <section className="flex min-h-0 flex-1 flex-col items-center justify-center px-10 py-12 text-center">
-            <div className="max-w-3xl">
+            <div className="flex max-w-3xl flex-col items-center">
               <p className="mb-4 text-lg font-semibold text-[var(--brand-primary)]">Welcome</p>
               <h2 className="text-[42px] font-bold leading-tight text-[var(--brand-text)]">
                 Build your own KYC
@@ -188,7 +202,7 @@ export default function MyKYCPage() {
                 Welcome to My KYC. This is where you can start building and shaping your own KYC flow for the information you need to collect.
               </p>
               <Link
-                href="/neuro-access/settings/my-kyc/create"
+                href={createKycPath}
                 className="mt-10 inline-flex h-[52px] items-center justify-center gap-3 rounded-md bg-[var(--Button-Neuro-Primary-bg,_#8F40D4)] px-8 text-lg font-semibold text-white shadow-sm transition-colors hover:brightness-95"
               >
                 <Plus className="h-6 w-6" />
