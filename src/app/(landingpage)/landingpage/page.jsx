@@ -15,6 +15,7 @@ import {
   MdDescription
 } from 'react-icons/md';
 import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
+import PendingApplications from '@/components/access/dashboard/PendingApplications';
 
 // SERVICES LIST
 const LandingServices = (t) => ([
@@ -290,11 +291,6 @@ const solutionPages = {
       title: 'Trust Services overview',
       description: 'Manage the trusted identities, organizations, and onboarding flows for your service.',
     },
-    organizations: {
-      eyebrow: 'Trust Services',
-      title: 'Organizations',
-      description: 'View and manage the organizations connected to your trust service.',
-    },
   },
   payments: {
     overview: {
@@ -327,6 +323,16 @@ const solutionPages = {
 
 function SolutionWorkspace({ section, tab }) {
   const page = solutionPages[section]?.[tab] || solutionPages[section].overview;
+
+  if (section === 'trust-services' && tab === 'overview') {
+    return (
+      <main className="min-h-[calc(100vh-63px)] bg-[#dfe1e3] p-[10px] text-[#182127]">
+        <section className="w-full md:w-[49%]">
+          <PendingApplications compact />
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#f3f4f6] px-8 py-10 text-[#182127]">

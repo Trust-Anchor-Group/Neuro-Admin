@@ -32,7 +32,8 @@ const tabsBySection = {
   'trust-services': [
     { label: 'Overview', href: '/landingpage?section=trust-services' },
     { label: 'Accounts', href: '/neuro-access/account?section=trust-services' },
-    { label: 'Organizations', href: '/landingpage?section=trust-services&tab=organizations' },
+    { label: 'Applications', href: '/neuro-access/id-application?section=trust-services' },
+    { label: 'API Keys', href: '/neuro-access/settings/api-keys?section=trust-services' },
     { label: 'My KYC', href: '/neuro-access/settings/my-kyc?section=trust-services' },
   ],
   'digital-assets': [
