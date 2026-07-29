@@ -13,9 +13,7 @@ import {
   MdLockOutline,
   MdDescription
 } from 'react-icons/md';
-import Navbar from '@/components/shared/Navbar';
 import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
-import SessionPing from "@/components/SessionPing"
 
 // SERVICES LIST
 const LandingServices = (t) => ([
@@ -151,10 +149,7 @@ export default function LandingPage() {
 
   return (
     <>
-      <SessionPing />
       <div className="relative min-h-screen w-full bg-[var(--brand-background)] font-sans overflow-x-hidden">
-        <Navbar neuroLogo={true} />
-
         {/* Background Pattern */}
         <div className="absolute inset-0 z-0 bg-[url('/backgroundSvg.svg')] bg-no-repeat bg-cover bg-center opacity-100 filter contrast-[0.6] brightness-[1]" />
 
