@@ -2,89 +2,122 @@
 
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { FaQrcode } from 'react-icons/fa'
-import { applyBrandTheme, getInitialMode, toggleMode } from '@/utils/brandTheme'
-import { useLanguage } from '../../../context/LanguageContext'
 import { useRouter } from 'next/navigation'
-import { Sun, Moon } from 'lucide-react'
 
-const QuickLogin = dynamic(() => import('@/components/quickLogin/QuickLogin'), { ssr: false })
+const QuickLogin = dynamic(() => import('@/components/quickLogin/QuickLogin'), {
+  ssr: false,
+})
 
 export default function LoginPage() {
   const [showQR, setShowQR] = useState(false)
-  const [mode, setMode] = useState('light')
   const [neuronHost, setNeuronHost] = useState('')
-  const { language, content } = useLanguage()
-  const t = content?.[language] || {}
   const router = useRouter()
 
   const checkLogin = useCallback(async () => {
-    const dynamicHost = typeof window !== 'undefined' ? sessionStorage.getItem('AgentAPI.Host') : null
-    const res = await fetch('/api/accounts', {
+    const dynamicHost =
+      typeof window !== 'undefined'
+        ? sessionStorage.getItem('AgentAPI.Host')
+        : null
+
+    const response = await fetch('/api/accounts', {
       method: 'POST',
-      headers: { 'Content-type': 'application/json', ...(dynamicHost ? { 'x-agent-host': dynamicHost } : {}) },
+      headers: {
+        'Content-type': 'application/json',
+        ...(dynamicHost ? { 'x-agent-host': dynamicHost } : {}),
+      },
       credentials: 'include',
       body: '{}',
     })
-    router.push(res.status === 403 ? '/403' : '/landingpage')
+
+    router.push(response.status === 403 ? '/403' : '/landingpage')
   }, [router])
 
-  useEffect(() => { setMode(getInitialMode()) }, [])
   useEffect(() => {
-    const host = typeof window !== 'undefined' ? sessionStorage.getItem('AgentAPI.Host') || '' : ''
-    applyBrandTheme(host, mode)
-  }, [mode])
-  useEffect(() => {
-    const host = document.querySelector('meta[name="NEURON"]')?.content
-    if (host) setNeuronHost(host)
+    const host = document.querySelector('meta[name="NEURON"]')?.content || ''
+    setNeuronHost(host)
   }, [])
 
-  const isReady = Boolean(neuronHost)
-
   return (
-    <div className="relative min-h-screen font-grotesk overflow-hidden">
-      <div className="absolute inset-0 z-0 bg-[url('/backgroundSvg.svg')] bg-no-repeat bg-cover bg-center opacity-100 filter contrast-[0.6] brightness-[1]" />
-      <header className="relative z-10 h-20 px-8 flex items-center justify-between border-b border-[var(--brand-border)] bg-[var(--brand-navbar)]">
-        <Image src={mode === 'dark' ? '/NeuroLogoLight.svg' : '/NeuroLogo.svg'} alt="Neuro logo" width={150} height={42} loading="eager" priority style={{ width: 'auto', height: 'auto' }} unoptimized />
-        <button onClick={() => setMode(prev => toggleMode(prev))} className="p-2 rounded-full border border-[var(--brand-border)] transition">
-          {mode === 'dark' ? <Moon className="w-5 h-5 text-blue-400" /> : <Sun className="w-5 h-5 text-yellow-400" />}
-        </button>
-      </header>
-      <main className="relative z-10 flex justify-center items-center px-4 pt-20 pb-10">
-        <div className="bg-[var(--brand-navbar)] rounded-[1.5rem] shadow-[0px_4px_10px_rgba(24,31,37,0.05)] w-full max-w-6xl flex flex-col md:flex-row px-12 py-10 gap-16">
-          <div className="order-2 md:order-1 md:w-1/2 flex justify-end">
-            <div className="flex flex-col md:flex-row items-center md:items-start bg-[var(--brand-background)] p-10 rounded-2xl">
-              <Image src="/Neuro-Access-preview.png" alt="Phone preview" width={350} height={620} className="mb-6 md:mb-0" style={{ width: 'auto', height: 'auto' }} unoptimized />
-              <div className="flex flex-col items-center md:items-start md:-ml-16 md:mt-28">
-                <span className="text-base text-[var(--brand-text-secondary)] mb-0 md:ml-2">Get the app today</span>
-                <div className="flex flex-col gap-0">
-                  <a href="https://play.google.com/store/apps/details?id=com.tag.NeuroAccess" target="_blank" rel="noopener noreferrer"><Image src="/Google-play-button.png" alt="Get it on Google Play" width={190} height={100} style={{ width: 'auto', height: 'auto' }} unoptimized /></a>
-                  <a href="https://apps.apple.com/us/app/neuro-access/id6476126341" target="_blank" rel="noopener noreferrer"><Image src="/app-store-button.png" alt="Download on the App Store" width={190} height={100} style={{ width: 'auto', height: 'auto' }} unoptimized /></a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="order-1 md:order-2 md:w-1/2 flex flex-col items-center w-full max-w-md pt-10">
-            <Image src={mode === 'dark' ? '/NeuroLogoLight.svg' : '/NeuroLogo.svg'} alt="Neuro logo" width={250} height={42} className="hidden md:block mb-10" loading="eager" priority style={{ width: 'auto', height: 'auto' }} unoptimized />
+    <main
+      className="login-page flex min-h-screen items-center justify-center overflow-hidden bg-[#f5f6f7] p-4 font-grotesk"
+      style={{ backgroundImage: "url('/Login page background.svg')" }}
+    >
+      <section className="flex h-[710px] w-[450px] max-w-full flex-col overflow-hidden rounded-[16px] bg-white shadow-[0_12px_36px_rgba(24,31,37,0.12)]">
+        <header className="h-[132px] shrink-0 bg-[#181F25] px-[30px] pt-[28px]">
+          <Image
+            src="/Neuro W.svg"
+            alt="Neuro"
+            width={174}
+            height={46}
+            priority
+            unoptimized
+          />
+          <p className="mt-[5px] text-[20px] font-semibold leading-none text-[#F5F6F7]">
+            Dashboard
+          </p>
+        </header>
+
+        <div className="flex flex-1 flex-col items-center px-[36px] pt-[48px]">
+          <div className="login-qr-frame flex h-[300px] w-[300px] shrink-0 items-center justify-center overflow-hidden rounded-[12px] border border-[#D1D5D8] bg-[#FAFBFB]">
             {showQR ? (
-              <>
-                {!isReady ? <div className="py-20 text-gray-500">Loading host…</div> : <QuickLogin neuron={neuronHost} purpose="Login to Neuro-admin" active onLoginSuccess={checkLogin} />}
-                <button onClick={() => setShowQR(false)} className="mt-6 text-sm font-medium text-gray-600 hover:text-gray-800">Cancel login</button>
-              </>
+              neuronHost ? (
+                <QuickLogin
+                  neuron={neuronHost}
+                  purpose="Login to Neuro-admin"
+                  active
+                  onLoginSuccess={checkLogin}
+                />
+              ) : (
+                <p className="text-[13px] text-[#737A7F]">Loading secure login…</p>
+              )
             ) : (
-              <>
-                <div className="w-[300px] h-[300px] bg-[#F5F5F5] rounded-xl relative flex items-center justify-center mb-6">
-                  <div className="absolute z-10 flex flex-col items-center text-center px-4"><h3 className="text-2xl font-semibold text-gray-900">Welcome!</h3><p className="text-sm text-gray-500">Log in securely with the Neuro-Access app</p></div>
-                  <Image src="/simple-Qr.png" alt="QR Placeholder" width={280} height={280} className="opacity-20" loading="eager" priority style={{ width: 'auto', height: 'auto' }} unoptimized />
-                </div>
-                <button onClick={() => setShowQR(true)} className="flex items-center gap-4 bg-[var(--brand-button)] hover:bg-opacity-80 text-white px-20 py-3 rounded-lg text-sm font-semibold shadow"><FaQrcode className="text-xl" />Start Login</button>
-              </>
+              <Image
+                src="/simple-Qr.png"
+                alt="QR code placeholder"
+                width={250}
+                height={250}
+                className="opacity-[0.13]"
+                priority
+                unoptimized
+              />
             )}
-            <p className="text-sm text-[var(--brand-text-secondary)] mt-4 text-center">Don’t have the app? <a href="https://play.google.com/store/apps/details?id=com.tag.NeuroAccess" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline font-medium">Download it here</a></p>
           </div>
+
+          <p className="mt-[24px] text-center text-[12px] font-normal leading-[16px] text-[#737A7F]">
+            Scan the QR code with your Access app to log in
+          </p>
+
+          {showQR ? (
+            <button
+              type="button"
+              onClick={() => setShowQR(false)}
+              className="mt-[20px] h-[48px] w-[294px] rounded-[6px] border border-[#8F40D4] bg-white text-[14px] font-semibold text-[#722FAD] transition-colors hover:bg-[#F8F2FD]"
+            >
+              Cancel login
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowQR(true)}
+              className="mt-[20px] flex h-[48px] w-[294px] items-center justify-center gap-[10px] rounded-[6px] bg-[#8F40D4] text-[14px] font-semibold text-white shadow-[0_2px_4px_rgba(143,64,212,0.18)] transition-colors hover:bg-[#7D35BC]"
+            >
+              <FaQrcode className="text-[16px]" aria-hidden="true" />
+              Start login
+            </button>
+          )}
+
+          <a
+            href="https://play.google.com/store/apps/details?id=com.tag.NeuroAccess"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-[14px] flex h-[48px] w-[294px] items-center justify-center rounded-[6px] bg-[#D1E7E4] text-[14px] font-semibold text-[#075D56] transition-colors hover:bg-[#C3DDD9]"
+          >
+            Don’t have the app?
+          </a>
         </div>
-      </main>
-    </div>
+      </section>
+    </main>
   )
 }
