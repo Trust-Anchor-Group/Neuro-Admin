@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import AgentAPI from 'agent-api';
 import { CircularProgress, Typography } from '@mui/material';
 
@@ -54,69 +54,7 @@ export default function QuickLogin({
     setTabId(TabID);
   }, []);
 
-  let displayInterval = null;
-
-  const webSocketEventHandler = () => {
-    const protocol = 'https:';
-    const uri = `${protocol}//${neuron}/ClientEventsWS`;
-
-    let socket = new WebSocket(uri, ['ls']);
-    let pingTimer = null;
-    let closed = false;
-
-    socket.onopen = () => {
-      console.log('[WebSocket] Connected.');
-      socket.send(
-        JSON.stringify({
-          cmd: 'Register',
-          tabId: tabId,
-          location: window.location.href,
-        })
-      );
-
-      pingTimer = window.setInterval(() => {
-        if (socket.readyState === socket.OPEN) {
-          socket.send(JSON.stringify({ cmd: 'Ping' }));
-        } else {
-          if (pingTimer) clearInterval(pingTimer);
-          if (!closed) reconnect();
-        }
-      }, 10 * 1000);
-
-      window.onbeforeunload = () => {
-        if (socket.readyState === socket.OPEN) {
-          clearInterval(pingTimer);
-          socket.send(JSON.stringify({ cmd: 'Unregister' }));
-          socket.close();
-        }
-        closed = true;
-      };
-    };
-
-    socket.onmessage = (event) => {
-      if (!event.data) return;
-      try {
-        evaluateEvent(JSON.parse(event.data));
-      } catch (err) {
-        console.error('[WebSocket] Error parsing message:', event.data, err);
-      }
-    };
-
-    socket.onerror = () => {
-      console.error('[WebSocket] Error.');
-      if (pingTimer) clearInterval(pingTimer);
-      if (!closed) reconnect();
-    };
-
-    const reconnect = () => {
-      if (!closed) {
-        console.log('[WebSocket] Reconnecting...');
-        setTimeout(webSocketEventHandler, 5000);
-      }
-    };
-  };
-
-  const signatureReceived = (signatureData) => {
+  const signatureReceived = useCallback((signatureData) => {
     setSuccess(true);
     if (onLoginSuccess) onLoginSuccess();
      if (signatureData?.Properties && signatureData?.Attachments) {
@@ -129,9 +67,9 @@ export default function QuickLogin({
       sessionStorage.setItem("neuroUser", JSON.stringify(userData));
       sessionStorage.setItem('profile',JSON.stringify(signatureData))
     }
-  };
+  }, [onLoginSuccess]);
 
-  const evaluateEvent = async (event) => {
+  const evaluateEvent = useCallback(async (event) => {
     if (!event?.type) return;
 
     if (
@@ -163,9 +101,9 @@ export default function QuickLogin({
         console.error('[QuickLogin] Error performing Account/QuickLogin', err);
       }
     }
-  };
+  }, [neuron, signatureReceived]);
 
-  const displayQuickLogin = async () => {
+  const displayQuickLogin = useCallback(async () => {
 
     const xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = () => {
@@ -195,20 +133,83 @@ export default function QuickLogin({
     });
 
     xhttp.send(body);
-  };
+  }, [purpose]);
 
   useEffect(() => {
-    if (active) {
-      webSocketEventHandler();
-      displayInterval = setInterval(() => {
-        displayQuickLogin();
-      }, 2000);
-    }
+    if (!active || !neuron) return undefined;
+
+    // WebSocket accepts ws/wss schemes only. The Agent endpoint is HTTPS, so
+    // use its secure WebSocket equivalent.
+    const host = neuron.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const uri = `wss://${host}/ClientEventsWS`;
+    let socket;
+    let pingTimer;
+    let reconnectTimer;
+    let disposed = false;
+
+    const clearPingTimer = () => {
+      if (pingTimer) {
+        window.clearInterval(pingTimer);
+        pingTimer = undefined;
+      }
+    };
+
+    const connect = () => {
+      if (disposed) return;
+
+      socket = new WebSocket(uri, ['ls']);
+
+      socket.onopen = () => {
+        socket.send(JSON.stringify({ cmd: 'Register', tabId, location: window.location.href }));
+        clearPingTimer();
+        pingTimer = window.setInterval(() => {
+          if (socket?.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ cmd: 'Ping' }));
+          }
+        }, 10_000);
+      };
+
+      socket.onmessage = (event) => {
+        if (!event.data) return;
+        try {
+          evaluateEvent(JSON.parse(event.data));
+        } catch (err) {
+          console.error('[WebSocket] Error parsing message:', event.data, err);
+        }
+      };
+
+      socket.onerror = () => {
+        // Browsers do not expose useful error details here; onclose schedules
+        // a single reconnect attempt and avoids duplicate reconnects.
+        clearPingTimer();
+      };
+
+      socket.onclose = () => {
+        clearPingTimer();
+        if (!disposed && !reconnectTimer) {
+          reconnectTimer = window.setTimeout(() => {
+            reconnectTimer = undefined;
+            connect();
+          }, 5_000);
+        }
+      };
+    };
+
+    connect();
+    displayQuickLogin();
+    const displayInterval = window.setInterval(displayQuickLogin, 2_000);
 
     return () => {
-      if (displayInterval) clearInterval(displayInterval);
+      disposed = true;
+      window.clearInterval(displayInterval);
+      clearPingTimer();
+      if (reconnectTimer) window.clearTimeout(reconnectTimer);
+      if (socket?.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ cmd: 'Unregister' }));
+      }
+      socket?.close();
     };
-  }, [active]);
+  }, [active, displayQuickLogin, evaluateEvent, neuron, tabId]);
 
   return (
     <>
