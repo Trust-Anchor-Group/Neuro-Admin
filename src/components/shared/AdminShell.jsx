@@ -61,9 +61,12 @@ export default function AdminShell({ children }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isTenantOpen, setIsTenantOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [organizationMenu, setOrganizationMenu] = useState(null);
   const tenantTriggerRef = useRef(null);
   const tenantPanelRef = useRef(null);
+  const profileTriggerRef = useRef(null);
+  const profilePanelRef = useRef(null);
   const searchParams = useSearchParams();
   const querySection = searchParams.get('section');
   const queryTab = searchParams.get('tab') || '';
@@ -71,14 +74,21 @@ export default function AdminShell({ children }) {
   useEffect(() => {
     setIsOpen(false);
     setIsTenantOpen(false);
+    setIsProfileOpen(false);
     setOrganizationMenu(null);
   }, [pathname, searchParams]);
 
   useEffect(() => {
     const closeOnOutsideClick = (event) => {
       const target = event.target;
-      if (tenantPanelRef.current?.contains(target) || tenantTriggerRef.current?.contains(target)) return;
+      if (
+        tenantPanelRef.current?.contains(target) ||
+        tenantTriggerRef.current?.contains(target) ||
+        profilePanelRef.current?.contains(target) ||
+        profileTriggerRef.current?.contains(target)
+      ) return;
       setIsTenantOpen(false);
+      setIsProfileOpen(false);
       setOrganizationMenu(null);
     };
 
@@ -135,11 +145,30 @@ export default function AdminShell({ children }) {
           {navigation.slice(2).map((item) => <NavigationItem key={item.id} item={item} active={section === item.id} />)}
         </nav>
 
-        <div className="flex h-16 w-full items-center gap-2 px-4 text-white">
+        <div className="relative flex h-16 w-full items-center gap-2 px-4 text-white">
           <CircleUserRound size={48} className="text-slate-500" />
           <div className="min-w-0 flex-1 leading-tight"><p className="truncate text-[13px] font-semibold">Admin</p><p className="truncate text-[11px] text-slate-400">se.id.tagroot.io</p></div>
-          <span className="text-slate-400">⋮</span>
+          <button
+            ref={profileTriggerRef}
+            type="button"
+            className="admin-profile-menu-trigger"
+            onClick={() => setIsProfileOpen((open) => !open)}
+            aria-label="Open profile menu"
+            aria-expanded={isProfileOpen}
+            aria-controls="profile-menu"
+          >
+            ⋮
+          </button>
         </div>
+      </aside>
+
+      <aside id="profile-menu" ref={profilePanelRef} className={`admin-profile-panel ${isProfileOpen ? 'admin-profile-panel--open' : ''}`} aria-label="Profile menu">
+        <button type="button" className="admin-profile-menu-item" onClick={() => { window.location.assign('/api/auth/logout'); }}>
+          Log out
+        </button>
+        <Link href="/neuro-access/settings" className="admin-profile-menu-item" onClick={() => setIsProfileOpen(false)}>
+          Go to settings
+        </Link>
       </aside>
 
       <aside ref={tenantPanelRef} id="tenant-sidebar" className={`admin-sub-sidebar ${isTenantOpen ? 'admin-sub-sidebar--open' : ''}`} aria-label="Organization navigation" onClick={(event) => {

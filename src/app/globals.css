@@ -93,6 +93,18 @@ body {
 .login-qr-frame .quick-login-text {
     display: none;
 }
+.app-help-primary-button {
+    background: var(--Button-Access-Primary-bg-WL, #0A715F);
+}
+.app-help-primary-button:hover {
+    background: #07594C;
+}
+.app-help-secondary-button {
+    background: var(--Button-Access-Secondary-bg-WL, #0A715F33);
+}
+.app-help-secondary-button:hover {
+    background: #0A715F55;
+}
 
 /* The shared Neuro Admin scaffold. Feature pages keep their own components inside
    this frame, which lets the navigation evolve independently from their content. */
@@ -132,6 +144,42 @@ body {
     pointer-events: none;
 }
 .admin-sub-sidebar--open { transform: translateX(0); pointer-events: auto; }
+.admin-profile-panel {
+    position: fixed;
+    inset: auto auto 16px calc(var(--sidebar-width) + 8px);
+    z-index: 39;
+    display: flex;
+    width: 220px;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #344149;
+    border-radius: 8px;
+    background: #182127;
+    box-shadow: 0 10px 24px rgba(0,0,0,.3);
+    padding: 8px 0;
+    transform: translateX(calc(-100% - var(--sidebar-width) - 16px));
+    transition: transform .2s ease;
+    pointer-events: none;
+}
+.admin-profile-panel--open { transform: translateX(0); pointer-events: auto; }
+.admin-profile-menu-trigger {
+    flex: 0 0 auto;
+    padding: 8px 5px;
+    border-radius: 4px;
+    color: #a4acb1;
+    font-size: 18px;
+    line-height: 1;
+}
+.admin-profile-menu-trigger:hover, .admin-profile-menu-trigger[aria-expanded="true"] { background: #344149; color: #fff; }
+.admin-profile-menu-item {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    color: #f5f6f7;
+    font-size: 12px;
+    text-align: left;
+}
+.admin-profile-menu-item:hover { background: #253038; }
 .admin-tabs {
     position: sticky;
     top: 0;
@@ -224,6 +272,7 @@ body {
     .admin-sidebar--open { transform: translateX(0); }
     .admin-main { margin-left: 0; padding-top: 48px; }
     .admin-sub-sidebar { inset: 64px auto auto 8px; z-index: 55; width: min(300px, calc(100vw - 16px)); height: min(645px, calc(100vh - 80px)); }
+    .admin-profile-panel { inset: auto auto 16px 8px; z-index: 55; width: min(220px, calc(100vw - 16px)); }
     .admin-tabs { top: 48px; }
 }
 
