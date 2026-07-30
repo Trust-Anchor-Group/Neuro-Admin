@@ -21,7 +21,7 @@ const tabsBySection = {
     { label: 'Assets', href: '/neuro-assets?section=my-neuro' },
     { label: 'Digital Identity', href: '/neuro-access?section=my-neuro' },
     { label: 'Contracts', href: '/landingpage?section=my-neuro&tab=contracts' },
-    { label: 'Preferences', href: '/landingpage?section=my-neuro&tab=preferences' },
+    { label: 'Settings', href: '/landingpage?section=my-neuro&tab=settings' },
   ],
   notifications: [{ label: 'Overview', href: '/landingpage?section=notifications' }],
   organization: [

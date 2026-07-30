@@ -16,6 +16,8 @@ import {
 } from 'react-icons/md';
 import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
 import PendingApplications from '@/components/access/dashboard/PendingApplications';
+import { InputField } from '@/components/access/InputField';
+import { LocalizationSettings } from '@/components/access/LocalizationSettings';
 
 // SERVICES LIST
 const LandingServices = (t) => ([
@@ -156,6 +158,10 @@ export default function LandingPage() {
     return <SolutionWorkspace section={section} tab={tab} />;
   }
 
+  if (section === 'my-neuro' && tab === 'settings') {
+    return <MyNeuroSettings language={language} />;
+  }
+
   return (
     <>
       <div className="relative min-h-screen w-full bg-[var(--brand-background)] font-sans overflow-x-hidden">
@@ -282,6 +288,77 @@ export default function LandingPage() {
       </div>
     </>
   );
+}
+
+function MyNeuroSettings({ language }) {
+  const [profile, setProfile] = useState(null);
+  const [host, setHost] = useState('se.id.tagroot.io');
+  const [accountModalOpen, setAccountModalOpen] = useState(false);
+  const languageName = { en: 'English', sv: 'Svenska', br: 'Português', pt: 'Português', fr: 'Français' }[language] || 'English';
+
+  useEffect(() => {
+    try {
+      const storedProfile = sessionStorage.getItem('profile');
+      if (storedProfile) setProfile(JSON.parse(storedProfile));
+      setHost(sessionStorage.getItem('AgentAPI.Host') || 'se.id.tagroot.io');
+    } catch (error) {
+      console.error('Unable to load account settings', error);
+    }
+  }, []);
+
+  const accountName = profile?.Account || profile?.account || profile?.UserName || profile?.userName || profile?.Properties?.EMAIL || 'No account connected';
+
+  return (
+    <main className="min-h-[calc(100vh-64px)] bg-[#e4e7e9] p-4 text-[#182127] sm:p-6 lg:p-8 xl:p-10">
+      <section className="w-full rounded-xl bg-white p-6 shadow-[0_1px_2px_rgba(24,33,39,0.05)] lg:p-8">
+        <h1 className="text-base font-bold">My Account</h1>
+        <p className="mt-7 text-sm text-[#70777c]">Account name</p>
+        <p className="mt-1 break-words text-xl font-bold">{accountName}</p>
+        <div className="my-3 border-t border-[#e1e4e6]" />
+        <p className="text-sm text-[#70777c]">Registered at: <span className="font-medium">{host}</span></p>
+        <p className="mt-3 text-sm text-[#70777c]">Status: <span className="ml-1 inline-flex rounded-full bg-[#d8ebe8] px-2.5 py-1 text-xs font-semibold text-[#17635e]">Active</span></p>
+        <button type="button" onClick={() => setAccountModalOpen(true)} className="mt-7 flex h-10 w-full max-w-[230px] items-center justify-center gap-2 rounded-md bg-[#efe0f8] text-sm font-semibold text-[#803bb1] transition hover:bg-[#e8d2f4]"><MdOutlineSecurity size={16} />Manage Account</button>
+      </section>
+
+      <section className="mt-6 w-full rounded-xl bg-white p-6 shadow-[0_1px_2px_rgba(24,33,39,0.05)] lg:w-1/2 lg:p-8">
+        <h2 className="text-base font-bold">Preferences</h2>
+        <div className="mt-5">
+          <InputField labelText="Language" name={languageName} />
+          <LocalizationSettings />
+          <InputField labelText="Default theme" name="Timed" />
+        </div>
+      </section>
+      {accountModalOpen && <AccountDetailsModal profile={profile} host={host} accountName={accountName} onClose={() => setAccountModalOpen(false)} />}
+    </main>
+  );
+}
+
+function AccountDetailsModal({ profile, host, accountName, onClose }) {
+  const properties = profile?.Properties || profile?.properties || {};
+  const state = profile?.State || profile?.state || 'Active';
+  const created = profile?.Created || profile?.created;
+  const formattedCreated = created ? new Date(Number(created) > 0 && Number(created) < 100000000000 ? Number(created) * 1000 : created).toLocaleString('sv-SE') : '-';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#172126]/65 p-4" role="dialog" aria-modal="true" aria-labelledby="account-modal-title">
+      <section className="w-full max-w-xl rounded-xl bg-white p-7 text-[#182127] shadow-2xl sm:p-8">
+        <h2 id="account-modal-title" className="text-sm font-bold">My Account</h2>
+        <p className="mt-6 text-xs text-[#70777c]">Account name</p>
+        <p className="mt-1 break-words text-base font-bold">{accountName}</p>
+        <div className="my-3 border-t border-[#e1e4e6]" />
+        <p className="text-xs text-[#70777c]">Registered at: {host}</p>
+        <p className="mt-3 text-xs text-[#70777c]">Status: <span className="ml-1 inline-flex rounded-full bg-[#d8ebe8] px-2.5 py-1 text-xs font-semibold text-[#17635e]">{String(state).includes('Approved') ? 'Active' : state}</span></p>
+
+        <section className="mt-6 rounded-xl bg-[#f5f6f7] p-4"><h3 className="text-sm font-bold text-[#70777c]">Account information</h3><dl className="mt-4"><AccountRow label="Email" value={properties.EMAIL || properties.eMail} /><AccountRow label="Phone number" value={properties.PHONE || properties.phoneNr} /></dl></section>
+        <section className="mt-5 rounded-xl bg-[#f5f6f7] p-4"><h3 className="text-sm font-bold text-[#70777c]">Account metadata</h3><dl className="mt-4"><AccountRow label="Account status" value={state} /><AccountRow label="Account created" value={formattedCreated} /></dl></section>
+        <footer className="mt-7 flex justify-end"><button type="button" onClick={onClose} className="h-10 min-w-24 rounded-md bg-[#f5f6f7] px-5 text-xs font-semibold text-[#31393e] transition hover:bg-[#e9ecee]">Close</button></footer>
+      </section>
+    </div>
+  );
+}
+
+function AccountRow({ label, value }) {
+  return <div className="grid grid-cols-2 gap-4 border-t border-[#e1e4e6] py-3 text-xs"><dt className="text-[#70777c]">{label}</dt><dd className="break-words font-medium text-[#31393e]">{value || '-'}</dd></div>;
 }
 
 const solutionPages = {
