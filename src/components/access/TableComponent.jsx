@@ -15,7 +15,7 @@ import { useLanguage } from '../../../context/LanguageContext';
 
 
 const TableComponent = ({data = [], columns = [],enableSorting = false, enableRowActions, renderRowActionMenuItems,
-  customCellRenderers = {}, page, limit, totalItems,}) => {
+  customCellRenderers = {}, page, limit, totalItems, onRowClick}) => {
     
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -96,6 +96,10 @@ const TableComponent = ({data = [], columns = [],enableSorting = false, enableRo
     },
     muiTableBodyRowProps: ({ row }) => ({
       onClick: () => {
+        if (onRowClick) {
+          const handled = onRowClick(row.original);
+          if (handled !== false) return;
+        }
         if (!pathname.includes('id-application')) {
           const checkId = row.original.latestLegalId?.length
             ? row.original.latestLegalId
