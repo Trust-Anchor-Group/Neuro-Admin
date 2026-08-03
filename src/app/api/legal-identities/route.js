@@ -14,6 +14,7 @@ export async function POST(request) {
         const state = requestData.state;
         const createdFrom = requestData.createdFrom;
         const filter = requestData.filter;
+        const applicationType = requestData.applicationType;
 
         const clientCookie = request.headers.get("Cookie");
 
@@ -28,6 +29,7 @@ export async function POST(request) {
         };
         if (state) totalBody.state = state;
         if (createdFrom) totalBody.createdFrom = createdFrom;
+        if (applicationType) totalBody.applicationType = applicationType;
        clientCookie
         const totalRes = await fetch(url, {
             method: "POST",
@@ -77,6 +79,7 @@ export async function POST(request) {
         };
         if (state) payload.state = state;
         if (createdFrom) payload.createdFrom = createdFrom;
+        if (applicationType) payload.applicationType = applicationType;
 
         // Debug logs (optional)
          console.log("TOTAL items:", totalItems);

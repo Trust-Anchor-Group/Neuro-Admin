@@ -18,6 +18,8 @@ export const PaginatedList = ({ userList, page, prevPage, totalPages,
     pending,
     query,
     totalItems,
+    title,
+    onRowClick,
     }) => {
 
 const searchParams = useSearchParams()
@@ -67,7 +69,9 @@ const buildUrlWithParams = (key, value) => {
             <div className="absolute top-0 left-0 w-full p-5 bg-[var(--brand-navbar)] text-[var(--brand-text-color)] border-b border-[var(--brand-border)]">
                 <div className='flex justify-between'>
 
-                                {pending ? (
+                                {title ? (
+                                    <p className='text-text20 font-semibold pb-4 text-[var(--brand-text-color)]'>{title}</p>
+                                ) : pending ? (
                                     <p className='text-text20 font-semibold pb-4 text-[var(--brand-text-color)]'>
                                         {t?.PaginatedList?.titleIdApplications || 'ID applications'}
                                     </p>
@@ -125,6 +129,7 @@ const buildUrlWithParams = (key, value) => {
                 page={page}
                 limit={limit}
                 totalItems={totalPages}
+                onRowClick={onRowClick}
                 />
             }
             </ThemeProvider>
