@@ -27,67 +27,82 @@ const MOCK_RECOVERY_APPLICATION = {
 
 function MockRecoveryPanel({ onClose }) {
   const [selectedAttachment, setSelectedAttachment] = useState('Profile photo');
-  const [flow, setFlow] = useState(null);
+  const [isDenialFormOpen, setIsDenialFormOpen] = useState(false);
+  const [denialReason, setDenialReason] = useState('');
   const [checkedItems, setCheckedItems] = useState({ identity: false, selfie: false, differentPhotos: false, recovery: false });
   const attachments = [
-    { name: 'Profile photo', left: '5.24%', top: '5.08%' },
-    { name: 'Identity document, front', left: '26.21%', top: '5.08%' },
-    { name: 'Identity document, back', left: '47.18%', top: '5.08%' },
-    { name: 'Selfie', left: '68.15%', top: '5.08%' },
-    { name: 'Proof of address', left: '5.24%', top: '11.08%' },
-    { name: 'Recovery code', left: '26.21%', top: '11.08%' },
+    { name: 'Profile photo', left: '5.24%', top: '6.57%' },
+    { name: 'Identity document, front', left: '26.21%', top: '6.57%' },
+    { name: 'Identity document, back', left: '47.18%', top: '6.57%' },
+    { name: 'Selfie', left: '68.15%', top: '6.57%' },
+    { name: 'Proof of address', left: '5.24%', top: '14.33%' },
+    { name: 'Recovery code', left: '26.21%', top: '14.33%' },
   ];
   const toggleCheck = (key) => setCheckedItems((current) => ({ ...current, [key]: !current[key] }));
+  const hasVerification = Object.values(checkedItems).some(Boolean);
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#101418]/75 p-4" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="max-h-[calc(100vh-2rem)] w-full max-w-[496px] overflow-y-auto rounded-[8px] shadow-2xl" role="dialog" aria-modal="true" aria-label="Account recovery application">
-        {flow ? (
-          <div className="flex min-h-[420px] flex-col rounded-[8px] bg-white p-6 text-[#181f25]">
-            <button type="button" onClick={() => setFlow(null)} className="self-start text-sm font-semibold text-[#71787d] hover:text-[#181f25]">← Back to request</button>
-            <div className="my-auto">
-              <h2 className="text-2xl font-bold">{flow === 'deny' ? 'Deny application' : 'Find account'}</h2>
-              <p className="mt-3 text-sm text-[#71787d]">Add the information and actions for this flow here later.</p>
-            </div>
-          </div>
-        ) : (
-          <div className="relative aspect-[496/1733] w-full">
-            <img src="/account-recovery-panel.svg" alt="Account recovery application details" className="block h-full w-full" />
+        <div className="bg-white text-[#181f25]">
+          <div className="relative aspect-[496/1340] w-full overflow-hidden">
+            <img src="/account-recovery-panel.svg" alt="Account recovery application details" className="block h-auto w-full" />
             {attachments.map((attachment) => (
               <button
                 key={attachment.name}
                 type="button"
                 onClick={() => setSelectedAttachment(attachment.name)}
-                className={`absolute h-[5.77%] w-[20.16%] rounded-[8px] ${selectedAttachment === attachment.name ? 'ring-2 ring-[#8f40d4] ring-offset-2' : ''}`}
+                className={`absolute h-[7.46%] w-[20.16%] rounded-[8px] ${selectedAttachment === attachment.name ? 'ring-2 ring-[#8f40d4] ring-offset-2' : ''}`}
                 style={{ left: attachment.left, top: attachment.top }}
                 aria-label={`Preview ${attachment.name}`}
               />
             ))}
-            <div className="pointer-events-none absolute left-[5.24%] top-[17.31%] flex h-[16.1%] w-[89.52%] items-end p-3">
+            <div className="pointer-events-none absolute left-[5.24%] top-[22.39%] flex h-[20.82%] w-[89.52%] items-end p-3">
               <span className="rounded bg-white/90 px-2 py-1 text-xs font-semibold text-[#181f25] shadow-sm">{selectedAttachment}</span>
             </div>
-            <fieldset className="absolute left-[5.24%] top-[77.5%] w-[89.52%] space-y-1 border-0 p-0" aria-label="Recovery request verification">
-              <label className="flex h-9 cursor-pointer items-center gap-3 rounded-[4px] bg-[#f5f6f7] px-4 text-[11px] font-medium text-[#181f25]">
+          </div>
+          <div className="px-6 pb-5">
+            <h2 className="mb-4 text-sm font-bold">Reviewer verification</h2>
+            <p className="mb-2 text-[11px] text-[#71787d]">Recovery request:</p>
+            <fieldset className="space-y-1 border-0 p-0" aria-label="Recovery request verification">
+              <label className={`flex min-h-9 cursor-pointer items-center gap-3 px-3 text-[11px] font-medium leading-[14px] ${checkedItems.identity ? 'bg-[#f0ddff]' : 'bg-[#f5f6f7]'}`}>
                 <input type="checkbox" checked={checkedItems.identity} onChange={() => toggleCheck('identity')} className="h-4 w-4 shrink-0 accent-[#8f40d4]" />
                 ID document in the recovery request is authentic and not expired
               </label>
-              <label className="flex h-9 cursor-pointer items-center gap-3 rounded-[4px] bg-[#f5f6f7] px-4 text-[11px] font-medium text-[#181f25]">
+              <label className={`flex min-h-9 cursor-pointer items-center gap-3 px-3 text-[11px] font-medium leading-[14px] ${checkedItems.selfie ? 'bg-[#f0ddff]' : 'bg-[#f5f6f7]'}`}>
                 <input type="checkbox" checked={checkedItems.selfie} onChange={() => toggleCheck('selfie')} className="h-4 w-4 shrink-0 accent-[#8f40d4]" />
                 Selfie matches the photo on the ID document
               </label>
-              <label className="flex h-9 cursor-pointer items-center gap-3 rounded-[4px] bg-[#f5f6f7] px-4 text-[11px] font-medium text-[#181f25]">
+              <label className={`flex min-h-9 cursor-pointer items-center gap-3 px-3 text-[11px] font-medium leading-[14px] ${checkedItems.differentPhotos ? 'bg-[#f0ddff]' : 'bg-[#f5f6f7]'}`}>
                 <input type="checkbox" checked={checkedItems.differentPhotos} onChange={() => toggleCheck('differentPhotos')} className="h-4 w-4 shrink-0 accent-[#8f40d4]" />
                 The selfie and the ID document photo are not using the same photo
               </label>
-              <label className="flex h-9 cursor-pointer items-center gap-3 rounded-[4px] bg-[#f5f6f7] px-4 text-[11px] font-medium text-[#181f25]">
+              <label className={`flex min-h-9 cursor-pointer items-center gap-3 px-3 text-[11px] font-medium leading-[14px] ${checkedItems.recovery ? 'bg-[#f0ddff]' : 'bg-[#f5f6f7]'}`}>
                 <input type="checkbox" checked={checkedItems.recovery} onChange={() => toggleCheck('recovery')} className="h-4 w-4 shrink-0 accent-[#8f40d4]" />
                 All recovery information matches the ID document
               </label>
             </fieldset>
-            <button type="button" onClick={() => setFlow('deny')} className="absolute left-[5.24%] top-[93.08%] h-[1.9%] w-[43.95%] rounded-[8px]" aria-label="Deny application" />
-            <button type="button" onClick={() => setFlow('find-account')} className="absolute left-[50.8%] top-[93.08%] h-[1.9%] w-[43.95%] rounded-[8px]" aria-label="Find account" />
+            <p className="mt-3 text-[11px] leading-[14px] text-[#858b90]">Ensure the recovery application is valid before moving on to potential matches.</p>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => setIsDenialFormOpen(true)} disabled={!hasVerification} className={`h-9 rounded-[8px] text-[11px] font-semibold ${hasVerification ? 'bg-[#f9dce1] text-[#c64d63]' : 'bg-[#dfe2e4] text-[#858b90]'}`}>Deny application</button>
+              <button type="button" className="h-9 rounded-[8px] bg-[#dfe2e4] text-[11px] font-semibold text-[#858b90]">Find account <span aria-hidden="true">→</span></button>
+            </div>
+            {isDenialFormOpen && (
+              <div className="mt-4">
+                <label htmlFor="denial-reason" className="mb-2 block text-[11px] text-[#71787d]">Reason for denial (required)</label>
+                <textarea id="denial-reason" value={denialReason} onChange={(event) => setDenialReason(event.target.value)} placeholder="Message here" className="h-20 w-full resize-none rounded-[8px] border border-[#dfe2e4] bg-[#f7f8f9] p-3 text-sm outline-none placeholder:text-[#858b90] focus:border-[#8f40d4]" />
+                <p className="mt-1 text-[11px] text-[#858b90]">This message will be sent to the user</p>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => setIsDenialFormOpen(false)} className="h-9 rounded-[8px] bg-[#f5f6f7] text-[11px] font-semibold">Back</button>
+                  <button type="button" disabled={!denialReason.trim()} className={`h-9 rounded-[8px] text-[11px] font-semibold ${denialReason.trim() ? 'bg-[#f7475c] text-white' : 'bg-[#dfe2e4] text-[#858b90]'}`}>Deny application</button>
+                </div>
+              </div>
+            )}
+            <div className="mt-4 flex justify-end">
+              <button type="button" onClick={onClose} className="h-8 min-w-28 rounded-[8px] bg-[#f5f6f7] px-5 text-[11px] font-semibold">Close</button>
+            </div>
           </div>
-        )}
+        </div>
       </section>
     </div>
   );
