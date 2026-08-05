@@ -31,6 +31,7 @@ const MOCK_POTENTIAL_MATCHES = [
 
 function MockRecoveryPanel({ onClose }) {
   const [selectedAttachment, setSelectedAttachment] = useState('Profile photo');
+  const [selectedPotentialAttachment, setSelectedPotentialAttachment] = useState('Profile photo');
   const [isDenialFormOpen, setIsDenialFormOpen] = useState(false);
   const [denialReason, setDenialReason] = useState('');
   const [checkedItems, setCheckedItems] = useState({ identity: false, selfie: false, differentPhotos: false, recovery: false });
@@ -45,6 +46,14 @@ function MockRecoveryPanel({ onClose }) {
     { name: 'Selfie', left: '68.15%', top: '6.57%' },
     { name: 'Proof of address', left: '5.24%', top: '14.33%' },
     { name: 'Recovery code', left: '26.21%', top: '14.33%' },
+  ];
+  const potentialAttachments = [
+    { name: 'Profile photo', tone: 'from-[#bac2c6] to-[#e5e8e9]' },
+    { name: 'Identity document, front', tone: 'from-[#d9d0c4] to-[#f1ece6]' },
+    { name: 'Identity document, back', tone: 'from-[#c7d2d7] to-[#edf1f2]' },
+    { name: 'Selfie', tone: 'from-[#d7c8bf] to-[#f3eeea]' },
+    { name: 'Proof of address', tone: 'from-[#cdd2cc] to-[#f0f2ef]' },
+    { name: 'Recovery code', tone: 'from-[#c7c9d1] to-[#eeeff2]' },
   ];
   const toggleCheck = (key) => setCheckedItems((current) => ({ ...current, [key]: !current[key] }));
   const hasVerification = Object.values(checkedItems).some(Boolean);
@@ -180,8 +189,23 @@ function MockRecoveryPanel({ onClose }) {
                   <div className="text-[11px]"><p className="text-[#858b90]">Digital ID</p><p className="font-bold text-sm">{selectedMatch.digitalId}</p><p className="mt-2 text-[#858b90]">registered at {selectedMatch.registered}</p><p className="mt-1 text-[#858b90]">Status: <span className="ml-1 rounded bg-[#d8eeeb] px-2 py-0.5 font-semibold text-[#24766d]">Active</span></p></div>
                 </div>
                 <p className="mb-2 mt-4 text-[10px] text-[#858b90]">Attachments:</p>
-                <div className="grid grid-cols-4 gap-1.5">{Array.from({ length: 6 }, (_, index) => <div key={index} className="flex aspect-square items-center justify-center rounded-[4px] bg-[#dfe2e4] text-[9px] text-[#858b90]">[Attach.]</div>)}</div>
-                <div className="mt-2 flex h-40 items-center justify-center rounded-[8px] bg-[#d0d4d6] text-[10px] text-[#71787d]">[Attachment preview]</div>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {potentialAttachments.map((attachment) => (
+                    <button
+                      key={attachment.name}
+                      type="button"
+                      onClick={() => setSelectedPotentialAttachment(attachment.name)}
+                      className={`aspect-square overflow-hidden rounded-[4px] bg-gradient-to-br ${attachment.tone} p-0 text-left ${selectedPotentialAttachment === attachment.name ? 'ring-2 ring-[#8f40d4] ring-offset-1' : ''}`}
+                      aria-label={`Preview ${attachment.name}`}
+                    >
+                      <span className="flex h-full items-end bg-white/20 p-2 text-[9px] font-medium text-[#4f565b]">[Attachment]</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="relative mt-2 flex h-40 items-center justify-center overflow-hidden rounded-[8px] bg-gradient-to-br from-[#c6cdd0] to-[#eef0f1] text-[10px] font-medium text-[#4f565b]">
+                  <span>[Attachment]</span>
+                  <span className="absolute bottom-2 left-2 rounded bg-white/85 px-2 py-1 text-[9px] font-semibold text-[#181f25]">{selectedPotentialAttachment}</span>
+                </div>
               </section>
 
               <section className="rounded-[10px] bg-[#f5f6f7] p-3">
@@ -212,7 +236,7 @@ function MockRecoveryPanel({ onClose }) {
                 <p className="mb-2 mt-3 text-[10px] text-[#858b90]">ID:</p>
                 <div className="space-y-1">
                   <label className="flex min-h-9 items-center gap-2 bg-[#f5f6f7] px-2 text-[10px] text-[#4f565b]"><input type="checkbox" className="h-3.5 w-3.5 shrink-0 accent-[#8f40d4]" />ID document in the recovery request belongs to THIS account owner</label>
-                  <label className="flex min-h-9 items-center gap-2 bg-[#f0ddff] px-2 text-[10px] text-[#4f565b]"><input type="checkbox" checked readOnly className="h-3.5 w-3.5 shrink-0 accent-[#8f40d4]" />All recovery information matches THIS account</label>
+                  <label className="flex min-h-9 items-center gap-2 bg-[#f5f6f7] px-2 text-[10px] text-[#4f565b]"><input type="checkbox" className="h-3.5 w-3.5 shrink-0 accent-[#8f40d4]" />All recovery information matches THIS account</label>
                   <label className="flex min-h-9 items-center gap-2 bg-[#f5f6f7] px-2 text-[10px] text-[#4f565b]"><input type="checkbox" className="h-3.5 w-3.5 shrink-0 accent-[#8f40d4]" />Selfie matches the photo(s) on THIS digital ID</label>
                 </div>
                 <label htmlFor="potential-audit-note" className="mb-1 mt-4 block text-[10px] text-[#858b90]">Audit note (optional)</label>
