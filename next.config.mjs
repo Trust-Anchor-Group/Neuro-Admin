@@ -19,7 +19,9 @@ const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
   images: {
-    dangerouslyAllowSVG: true,
+    // Trusted local SVG assets are served directly. Do not let the optimizer
+    // fetch or process remote/generated SVG content.
+    dangerouslyAllowSVG: false,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
