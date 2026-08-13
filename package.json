@@ -2,11 +2,15 @@
   "name": "neuro-admin",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
+    "test": "node --test tests/*.test.mjs",
     "test:send-notification": "node scripts/test-send-notification.mjs"
   },
   "dependencies": {
@@ -15,7 +19,7 @@
     "@mui/icons-material": "^6.4.5",
     "@mui/material": "^6.4.5",
     "@mui/x-date-pickers": "^7.27.0",
-    "@sentry/nextjs": "^10.49.0",
+    "@sentry/nextjs": "^10.69.0",
     "@tanstack/react-table": "^8.21.2",
     "@tiptap/core": "^2.26.1",
     "@tiptap/extension-heading": "^2.23.0",
@@ -36,7 +40,7 @@
     "mapbox-gl": "^3.9.3",
     "markdown-it": "^14.2.0",
     "material-react-table": "^3.2.0",
-    "next": "^16.2.6",
+    "next": "^16.3.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
@@ -45,23 +49,20 @@
     "react-world-flags": "^1.6.0",
     "recharts": "^2.15.0",
     "set-cookie-parser": "^2.7.1",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.3",
     "use-debounce": "^10.0.4",
     "uuid": "^14.0.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
     "eslint": "^9",
-    "eslint-config-next": "^16.2.6",
-    "postcss": "^8.5.14",
+    "eslint-config-next": "^16.3.0",
+    "postcss": "^8.5.25",
     "tailwindcss": "^3.4.1"
   },
   "overrides": {
     "@babel/core": "^7.29.7",
     "react-world-flags": {
-      "svgo": ">=3.3.3"
-    },
-    "postcss": "$postcss",
-    "fast-uri": "^3.1.2"
+      "svgo": "^4.0.2"
+    }
   }
 }

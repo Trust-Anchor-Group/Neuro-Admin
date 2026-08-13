@@ -11,7 +11,8 @@ import {
   MdDocumentScanner,
   MdOutlineStorage,
   MdLockOutline,
-  MdDescription
+  MdDescription,
+  MdLocalParking
 } from 'react-icons/md';
 import Navbar from '@/components/shared/Navbar';
 import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
@@ -36,6 +37,17 @@ const LandingServices = (t) => ([
     iconColor: 'text-[#8B5CF6]',
     iconBg: 'bg-[#F3E8FF]',
     href: '/neuro-assets',
+    status: t?.landing?.status?.active,
+    locked: false,
+    newTab: false,
+  },
+  {
+    title: 'Parklet',
+    description: 'Granska Parklet-organisationer och parkeringsomr\u00e5den',
+    icon: MdLocalParking,
+    iconColor: 'text-[#8B5CF6]',
+    iconBg: 'bg-[#F3E8FF]',
+    href: '/parklet',
     status: t?.landing?.status?.active,
     locked: false,
     newTab: false,
