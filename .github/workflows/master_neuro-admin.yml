@@ -1,4 +1,4 @@
-name: Build and deploy Next.js 15 app to Azure Web App - Neuro-Admin
+name: Build and deploy Next.js app to Azure Web App - Neuro-Admin
 
 on:
   push:
@@ -6,9 +6,13 @@ on:
       - master
       - dev
       - staging
+
   workflow_dispatch:
 
 jobs:
+  # ============================================================
+  # BUILD
+  # ============================================================
   build:
     runs-on: ubuntu-latest
 
@@ -19,11 +23,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22.x'
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build app
         env:
@@ -41,55 +45,175 @@ jobs:
 
         run: npm run build
 
-      - name: Prepare deployment package
+      # ----------------------------------------------------------
+      # Verify that Next.js actually generated standalone output.
+      # ----------------------------------------------------------
+      - name: Verify standalone build
         run: |
+          set -euo pipefail
+
+          echo "=== Verify Next.js standalone output ==="
+
+          test -d .next/standalone
+          test -f .next/standalone/server.js
+          test -d .next/standalone/node_modules
+
+          echo "Standalone server exists."
+
+          echo "=== Installed Next.js version ==="
+          node -p "require('./node_modules/next/package.json').version"
+
+          echo "=== Generated standalone server ==="
+          ls -lah .next/standalone/server.js
+
+          echo "=== Generated standalone directory ==="
+          ls -lah .next/standalone
+
+      # ----------------------------------------------------------
+      # Build the actual Azure deployment artifact.
+      #
+      # IMPORTANT:
+      # We use .next/standalone from THIS build.
+      # We do NOT use the old repository root server.js.
+      # ----------------------------------------------------------
+      - name: Prepare standalone deployment package
+        run: |
+          set -euo pipefail
+
+          rm -rf deploy
+          rm -f release.zip
+          rm -f release-files.txt
+
           mkdir -p deploy
-          cp -r .next deploy/.next
-          cp -r node_modules deploy/node_modules
-          cp -r public deploy/public
-          cp package.json deploy/
-          cp package-lock.json deploy/
-          cp server.js deploy/ || echo "⚠️ server.js NOT found!"
-          echo "Final deploy folder structure:"
-          ls -la deploy
+
+          echo "=== Copy standalone application ==="
+
+          cp -a .next/standalone/. deploy/
+
+          # Next standalone does not copy public automatically.
+          if [ -d public ]; then
+            cp -a public deploy/public
+          fi
+
+          # Next standalone does not copy .next/static automatically.
+          mkdir -p deploy/.next
+          cp -a .next/static deploy/.next/static
+
+          echo "=== Deployment package root ==="
+          ls -lah deploy
+
+          echo "=== Verify deployment server ==="
+          test -f deploy/server.js
+          ls -lah deploy/server.js
+
+          echo "=== Verify deployment Next.js runtime ==="
+          test -f deploy/node_modules/next/package.json
+          node -p "require('./deploy/node_modules/next/package.json').version"
+
+          echo "=== Verify static assets ==="
+          test -d deploy/.next/static
+
+          echo "=== Verify public directory ==="
+          if [ -d deploy/public ]; then
+            echo "public directory present"
+          else
+            echo "No public directory in project"
+          fi
+
+          echo "=== Creating release.zip ==="
+
           cd deploy
-          zip -r ../release.zip .
+          zip -qr ../release.zip .
+          cd ..
+
+          echo "=== ZIP created ==="
+          ls -lh release.zip
+
+          # IMPORTANT:
+          # Write ZIP listing to a file instead of:
+          #
+          # unzip | grep | head
+          #
+          # because set -o pipefail caused the previous Broken pipe.
+          unzip -Z1 release.zip > release-files.txt
+
+          echo "=== First 100 files inside ZIP ==="
+          sed -n '1,100p' release-files.txt
+
+          echo "=== Verify ROOT server.js exists ==="
+          grep -Fx 'server.js' release-files.txt
+
+          echo "=== Verify Next.js package exists ==="
+          grep -Fx 'node_modules/next/package.json' release-files.txt
+
+          echo "=== Verify Next static directory exists ==="
+          grep -E '^\.next/static/' release-files.txt > /dev/null
+
+          echo "=== Critical deployment files verified ==="
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: node-app
           path: release.zip
+          if-no-files-found: error
 
+
+  # ============================================================
+  # DEVELOPMENT
+  # ============================================================
   deploy-dev:
     runs-on: ubuntu-latest
     needs: build
+
     if: github.ref == 'refs/heads/dev'
+
     environment:
       name: Development
 
     strategy:
       fail-fast: false
+
       matrix:
         app:
           - name: 'Neuro-Admin'
             slot: 'dev'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_DEV'
+
           - name: 'w-neuro-admin'
             slot: 'dev'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_W_DEV'
 
     steps:
-      - name: Download artifact
+      - name: Download deployment artifact
         uses: actions/download-artifact@v4
         with:
           name: node-app
 
-      - name: Unzip artifact
-        run: unzip release.zip -d deploy
+      - name: Verify deployment artifact
+        run: |
+          set -euo pipefail
 
-      - name: Debug deployed files
-        run: ls -la ./deploy
+          test -f release.zip
+
+          echo "=== Artifact ==="
+          ls -lh release.zip
+
+          unzip -Z1 release.zip > release-files.txt
+
+          echo "=== First 100 artifact files ==="
+          sed -n '1,100p' release-files.txt
+
+          echo "=== Verify root server.js ==="
+          grep -Fx 'server.js' release-files.txt
+
+          echo "=== Verify Next.js runtime ==="
+          grep -Fx 'node_modules/next/package.json' release-files.txt
+
+          echo "=== Verify static assets ==="
+          grep -E '^\.next/static/' release-files.txt > /dev/null
+
+          echo "=== DEV artifact verified ==="
 
       - name: Deploy to Azure Web App (DEV) with slot
         if: ${{ matrix.app.slot != '' }}
@@ -97,26 +221,35 @@ jobs:
         with:
           app-name: ${{ matrix.app.name }}
           slot-name: ${{ matrix.app.slot }}
-          package: ./deploy
+          package: ./release.zip
           publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
+          clean: true
 
       - name: Deploy to Azure Web App (DEV) without slot
         if: ${{ matrix.app.slot == '' }}
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ matrix.app.name }}
-          package: ./deploy
+          package: ./release.zip
           publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
+          clean: true
 
+
+  # ============================================================
+  # STAGING
+  # ============================================================
   deploy-staging:
     runs-on: ubuntu-latest
     needs: build
+
     if: github.ref == 'refs/heads/staging'
+
     environment:
       name: Staging
 
     strategy:
       fail-fast: false
+
       matrix:
         app:
           - name: 'Neuro-Admin'
@@ -124,16 +257,35 @@ jobs:
             publishProfileSecret: 'AZURE_NEURO_ADMIN_STAGING'
 
     steps:
-      - name: Download artifact
+      - name: Download deployment artifact
         uses: actions/download-artifact@v4
         with:
           name: node-app
 
-      - name: Unzip artifact
-        run: unzip release.zip -d deploy
+      - name: Verify deployment artifact
+        run: |
+          set -euo pipefail
 
-      - name: Debug deployed files
-        run: ls -la ./deploy
+          test -f release.zip
+
+          echo "=== Artifact ==="
+          ls -lh release.zip
+
+          unzip -Z1 release.zip > release-files.txt
+
+          echo "=== First 100 artifact files ==="
+          sed -n '1,100p' release-files.txt
+
+          echo "=== Verify root server.js ==="
+          grep -Fx 'server.js' release-files.txt
+
+          echo "=== Verify Next.js runtime ==="
+          grep -Fx 'node_modules/next/package.json' release-files.txt
+
+          echo "=== Verify static assets ==="
+          grep -E '^\.next/static/' release-files.txt > /dev/null
+
+          echo "=== STAGING artifact verified ==="
 
       - name: Deploy to Azure Web App (STAGING) with slot
         if: ${{ matrix.app.slot != '' }}
@@ -141,55 +293,87 @@ jobs:
         with:
           app-name: ${{ matrix.app.name }}
           slot-name: ${{ matrix.app.slot }}
-          package: ./deploy
+          package: ./release.zip
           publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
+          clean: true
 
       - name: Deploy to Azure Web App (STAGING) without slot
         if: ${{ matrix.app.slot == '' }}
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ matrix.app.name }}
-          package: ./deploy
+          package: ./release.zip
           publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
+          clean: true
 
+
+  # ============================================================
+  # PRODUCTION
+  # ============================================================
   deploy-prod:
     runs-on: ubuntu-latest
     needs: build
+
     if: github.ref == 'refs/heads/master'
+
     environment:
       name: Production
 
     strategy:
       fail-fast: false
+
       matrix:
         app:
           - name: 'Neuro-Admin'
             slot: 'Production'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_PROD'
+
           - name: 'Innova'
             slot: ''
             publishProfileSecret: 'AZURE_NEURO_ADMIN_INNOVA_PROD'
+
           - name: 'athletsandyou-neuro-admin'
             slot: ''
             publishProfileSecret: 'AZURE_NEURO_ADMIN_ATHLETSANDYOU_PROD'
+
           - name: 'parklet-neuro-admin'
             slot: ''
             publishProfileSecret: 'AZURE_NEURO_ADMIN_PARKLET_PROD'
+
           - name: 'w-neuro-admin'
             slot: 'Production'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_W_PROD'
 
     steps:
-      - name: Download artifact
+      - name: Download deployment artifact
         uses: actions/download-artifact@v4
         with:
           name: node-app
 
-      - name: Unzip artifact
-        run: unzip release.zip -d deploy
+      - name: Verify deployment artifact
+        run: |
+          set -euo pipefail
 
-      - name: Debug deployed files
-        run: ls -la ./deploy
+          test -f release.zip
+
+          echo "=== Artifact ==="
+          ls -lh release.zip
+
+          unzip -Z1 release.zip > release-files.txt
+
+          echo "=== First 100 artifact files ==="
+          sed -n '1,100p' release-files.txt
+
+          echo "=== Verify root server.js ==="
+          grep -Fx 'server.js' release-files.txt
+
+          echo "=== Verify Next.js runtime ==="
+          grep -Fx 'node_modules/next/package.json' release-files.txt
+
+          echo "=== Verify static assets ==="
+          grep -E '^\.next/static/' release-files.txt > /dev/null
+
+          echo "=== PROD artifact verified ==="
 
       - name: Deploy to Azure Web App (PROD) with slot
         if: ${{ matrix.app.slot != '' }}
@@ -197,13 +381,15 @@ jobs:
         with:
           app-name: ${{ matrix.app.name }}
           slot-name: ${{ matrix.app.slot }}
-          package: ./deploy
+          package: ./release.zip
           publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
+          clean: true
 
       - name: Deploy to Azure Web App (PROD) without slot
         if: ${{ matrix.app.slot == '' }}
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ matrix.app.name }}
-          package: ./deploy
+          package: ./release.zip
           publish-profile: ${{ secrets[matrix.app.publishProfileSecret] }}
+          clean: true
