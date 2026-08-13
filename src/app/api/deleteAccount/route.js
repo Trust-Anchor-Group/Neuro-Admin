@@ -1,44 +1,25 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
+import { buildNeuronHeaders, readNeuronResponseBody } from '@/lib/neuronUpstream';
 
 export async function POST(request) {
-
     const requestData = await request.json();
-    const clientCookie = request.headers.get('Cookie');
-
-    const { host } = config.api.agent;
-    const url = `https://${host}/DeleteAccount`;
-
+    const activeContext = await getActiveNeuronContext(request);
+    const url = `https://${activeContext.host}/DeleteAccount`;
     const accountName = requestData.accountName;
-    // 
-
-    console.log(accountName)
-    console.log(url)
 
     try {
-
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain; charset=utf-8',
-                'Cookie': clientCookie
-            },
-            credentials: 'include',
+            headers: buildNeuronHeaders({
+                upstreamCookieHeader: activeContext.upstreamCookieHeader,
+                contentType: 'text/plain; charset=utf-8',
+                accept: null,
+            }),
             body: accountName,
-            mode: 'cors'
         });
-        console.log(response)
 
-
-
-        const contentType = response.headers.get('content-type');
-        let data;
-
-        if (contentType.includes('text/plain; charset=utf-8')) {
-            data = await response.json();
-        } else {
-            data = await response.text();
-        }
+        const { body: data } = await readNeuronResponseBody(response);
 
         if (!response.ok) {
             return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${data}`)), {

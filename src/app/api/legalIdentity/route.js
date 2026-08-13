@@ -1,85 +1,67 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { fetchActiveNeuronJson } from '@/lib/neuronUpstream';
 
 export async function POST(request) {
     const requestData = await request.json();
     const { legalIdentity } = requestData;
-    const clientCookie = request.headers.get('Cookie');
     const decodedUserId = decodeURIComponent(legalIdentity);
-    const { host } = config.api.agent;
-    const url = `https://${host}/legalIdentity.ws`;
 
     const payload = { id: decodedUserId };
     console.log('LegalId Fetch', payload);
 
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Cookie': clientCookie,
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify(payload),
-            mode: 'cors'
+        const { response, body } = await fetchActiveNeuronJson(request, {
+            path: '/legalIdentity.ws',
+            payload,
         });
 
-        const contentType = response.headers.get('content-type');
-        let data;
         let filterData;
 
-        if (contentType.includes('application/json')) {
-            data = await response.json();
-            console.log('Legal Identity Data', data);
+        if (body && typeof body === 'object') {
+            console.log('Legal Identity Data', body);
 
             filterData = {
-                Id: data.id,
-                account: data.account,
-                created: data.created,
-                state: data.state,
-                attachments: Array.isArray(data.attachments)
-                    ? data.attachments.map(a => ({
-                        data: a.data,
-                        fileName: a.FileName
+                Id: body.id,
+                account: body.account,
+                created: body.created,
+                state: body.state,
+                attachments: Array.isArray(body.attachments)
+                    ? body.attachments.map((attachment) => ({
+                        data: attachment.data,
+                        fileName: attachment.FileName
                     }))
                     : [],
                 properties: {
-                    // Personuppgifter
-                    FIRST: data.properties.FIRST,
-                    LAST: data.properties.LAST,
-                    PNR: data.properties.PNR,
-                    ADDR: data.properties.ADDR,
-                    ZIP: data.properties.ZIP,
-                    CITY: data.properties.CITY,
-                    REGION: data.properties.REGION,
-                    COUNTRY: data.properties.COUNTRY,
-                    EMAIL: data.properties.EMAIL,
-                    PHONE: data.properties.PHONE,
-                    DOB: data.properties.DOB,
-                    SPORT: data.properties.SPORT,
-                    SPORTINGLICENSE: data.properties.SPORTINGLICENSE,
-                    SPORTASSOCIATION: data.properties.SPORTASSOCIATION,
-
-                    // Företagsuppgifter
-                    ORGNAME: data.properties.ORGNAME,
-                    ORGNR: data.properties.ORGNR,
-                    ORGADDR: data.properties.ORGADDR,
-                    ORGADDR2: data.properties.ORGADDR2,
-                    ORGAREA: data.properties.ORGAREA,
-                    ORGCITY: data.properties.ORGCITY,
-                    ORGZIP: data.properties.ORGZIP,
-                    ORGREGION: data.properties.ORGREGION,
-                    ORGCOUNTRY: data.properties.ORGCOUNTRY,
-                    ORGROLE: data.properties.ORGROLE
+                    FIRST: body.properties?.FIRST,
+                    LAST: body.properties?.LAST,
+                    PNR: body.properties?.PNR,
+                    ADDR: body.properties?.ADDR,
+                    ZIP: body.properties?.ZIP,
+                    CITY: body.properties?.CITY,
+                    REGION: body.properties?.REGION,
+                    COUNTRY: body.properties?.COUNTRY,
+                    EMAIL: body.properties?.EMAIL,
+                    PHONE: body.properties?.PHONE,
+                    DOB: body.properties?.DOB,
+                    SPORT: body.properties?.SPORT,
+                    SPORTINGLICENSE: body.properties?.SPORTINGLICENSE,
+                    SPORTASSOCIATION: body.properties?.SPORTASSOCIATION,
+                    ORGNAME: body.properties?.ORGNAME,
+                    ORGNR: body.properties?.ORGNR,
+                    ORGADDR: body.properties?.ORGADDR,
+                    ORGADDR2: body.properties?.ORGADDR2,
+                    ORGAREA: body.properties?.ORGAREA,
+                    ORGCITY: body.properties?.ORGCITY,
+                    ORGZIP: body.properties?.ORGZIP,
+                    ORGREGION: body.properties?.ORGREGION,
+                    ORGCOUNTRY: body.properties?.ORGCOUNTRY,
+                    ORGROLE: body.properties?.ORGROLE
                 }
             };
-        } else {
-            data = await response.text();
         }
 
         if (!response.ok) {
-            return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${data}`)), {
+            return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${body}`)), {
                 status: response.status,
                 headers: { 'Content-Type': 'application/json' }
             });

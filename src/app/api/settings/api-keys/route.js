@@ -1,42 +1,20 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { fetchActiveNeuronJson } from '@/lib/neuronUpstream';
 
 export async function POST(request) {
     try {
         const requestData = await request.json();
         const { maxCount, offset } = requestData;
-        const clientCookie = request.headers.get("Cookie");
-
-        const { host } = config.api.agent;
-        const url = `https://${host}/ApiKeys.ws`;
 
         const payload = {
             maxCount,
             offset: offset || 0,
         };
 
-        console.log("Request Payload:", payload);
-
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Cookie": clientCookie,
-                "Accept": "application/json"
-            },
-            credentials: "include",
-            body: JSON.stringify(payload),
-            mode: "cors"
+        const { response, body: data } = await fetchActiveNeuronJson(request, {
+            path: '/ApiKeys.ws',
+            payload,
         });
-
-        const contentType = response.headers.get("content-type");
-        let data;
-
-        if (contentType && contentType.includes("application/json")) {
-            data = await response.json();
-        } else {
-            data = await response.text();
-        }
 
         if (!response.ok) {
             return new Response(

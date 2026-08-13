@@ -1,34 +1,42 @@
-// /app/api/agent/quicklogin/route.ts
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import config from '@/config/config';
+import setCookie from 'set-cookie-parser';
+import { getActiveNeuronContext, setNeuronSessionCookies } from '@/lib/neuronSessionContext';
+import { readNeuronResponseBody } from '@/lib/neuronUpstream';
 
-export async function POST() {
-  const { host } = config.api.agent;
-  const url = `https://${host}/Agent/Account/QuickLogin`;
-
-  // Hämta klientens kopierade sessions-cookie (lagrad på er domän)
-  const cookieStore = await cookies();
-  const sess = cookieStore.get('HttpSessionID')?.value;
-  if (!sess) {
+export async function POST(request) {
+  const activeContext = await getActiveNeuronContext(request);
+  if (!activeContext.sessionCookieValue) {
     return NextResponse.json({ error: 'No session' }, { status: 401 });
   }
 
-  const resp = await fetch(url, {
+  const resp = await fetch(`https://${activeContext.host}/Agent/Account/QuickLogin`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      // Skicka Neuron-sessionen vidare till Neuron:
-      'Cookie': `HttpSessionID=${encodeURIComponent(sess)}`
+      'Cookie': activeContext.upstreamCookieHeader,
     },
     body: JSON.stringify({ seconds: 3600 }),
   });
 
-  const data = await resp.json().catch(() => ({}));
+  const { body: data } = await readNeuronResponseBody(resp);
   if (!resp.ok) {
     return NextResponse.json({ error: data?.error ?? 'QuickLogin failed' }, { status: resp.status });
   }
 
-  // Förväntat svar: { jwt, userName, expires }
-  return NextResponse.json(data, { status: 200 });
+  const response = NextResponse.json(data, { status: 200 });
+  const setCookieHeader = resp.headers.get('set-cookie');
+
+  if (setCookieHeader) {
+    const parsed = setCookie.parse(setCookieHeader, { decodeValues: false, map: true });
+    const sessionCookie = parsed.HttpSessionID?.value;
+    if (sessionCookie) {
+      await setNeuronSessionCookies(response, {
+        host: activeContext.host,
+        sessionCookieValue: sessionCookie,
+        activate: true,
+      });
+    }
+  }
+
+  return response;
 }
