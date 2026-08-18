@@ -1,6 +1,18 @@
 import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
 
+function formatDateOfBirth(properties) {
+    if (properties.DOB || !properties.BDAY || !properties.BMONTH || !properties.BYEAR) {
+        return properties.DOB;
+    }
+
+    const day = String(properties.BDAY).padStart(2, '0');
+    const month = String(properties.BMONTH).padStart(2, '0');
+    const year = String(properties.BYEAR);
+
+    return `${year}-${month}-${day}`;
+}
+
 export async function POST(request) {
     const requestData = await request.json();
     const { legalIdentity } = requestData;
@@ -33,11 +45,19 @@ export async function POST(request) {
             data = await response.json();
             console.log('Legal Identity Data', data);
 
+            const properties = data.properties || {};
+
             filterData = {
                 Id: data.id,
                 account: data.account,
                 created: data.created,
+                updated: data.updated,
                 state: data.state,
+                provider: data.provider,
+                from: data.from,
+                to: data.to,
+                nrPeerReviews: data.nrPeerReviews,
+                version: data.version,
                 attachments: Array.isArray(data.attachments)
                     ? data.attachments.map(a => ({
                         data: a.data,
@@ -45,33 +65,8 @@ export async function POST(request) {
                     }))
                     : [],
                 properties: {
-                    // Personuppgifter
-                    FIRST: data.properties.FIRST,
-                    LAST: data.properties.LAST,
-                    PNR: data.properties.PNR,
-                    ADDR: data.properties.ADDR,
-                    ZIP: data.properties.ZIP,
-                    CITY: data.properties.CITY,
-                    REGION: data.properties.REGION,
-                    COUNTRY: data.properties.COUNTRY,
-                    EMAIL: data.properties.EMAIL,
-                    PHONE: data.properties.PHONE,
-                    DOB: data.properties.DOB,
-                    SPORT: data.properties.SPORT,
-                    SPORTINGLICENSE: data.properties.SPORTINGLICENSE,
-                    SPORTASSOCIATION: data.properties.SPORTASSOCIATION,
-
-                    // Företagsuppgifter
-                    ORGNAME: data.properties.ORGNAME,
-                    ORGNR: data.properties.ORGNR,
-                    ORGADDR: data.properties.ORGADDR,
-                    ORGADDR2: data.properties.ORGADDR2,
-                    ORGAREA: data.properties.ORGAREA,
-                    ORGCITY: data.properties.ORGCITY,
-                    ORGZIP: data.properties.ORGZIP,
-                    ORGREGION: data.properties.ORGREGION,
-                    ORGCOUNTRY: data.properties.ORGCOUNTRY,
-                    ORGROLE: data.properties.ORGROLE
+                    ...properties,
+                    DOB: formatDateOfBirth(properties)
                 }
             };
         } else {
