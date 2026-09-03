@@ -282,6 +282,9 @@ const pt = {
       neuroMonitor: {
         description: 'Monitoramento de ativos e processos'
       },
+      neuroStatistics: {
+        description: 'Análise e relatórios estatísticos'
+      },
       neuroPayments: {
         description: 'Monitoramento e gestão de pagamentos'
       },

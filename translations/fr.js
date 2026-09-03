@@ -277,6 +277,7 @@ const fr = {
       neuroAccess: { description: 'Gestion des identités et des accès' },
       neuroCarbon: { description: 'Gestion de la compensation carbone' },
       neuroMonitor: { description: 'Surveillance des actifs et des processus' },
+      neuroStatistics: { description: 'Analyse et rapports statistiques' },
       neuroPayments: { description: 'Surveillance et gestion des paiements' },
       neuroLeasing: { description: 'Portail de gestion de leasing' },
       neuronManagement: { description: 'Console de gestion des serveurs' },
