@@ -1,36 +1,15 @@
 import ResponseModel from "@/models/ResponseModel";
-import config from '@/config/config';
-import { cookies } from "next/headers";
+import { fetchActiveNeuronJson } from '@/lib/neuronUpstream';
 
 export async function GET(req) {
-
-    const cookieStore = await cookies();
-    const clientCookieObject = cookieStore.get('HttpSessionID');
-    const clientCookie = clientCookieObject
-        ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
-        : null;
-
     try {
-        const { host } = config.api.agent;
-        const url = `https://${host}/LegalIdentities.ws`;
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Cookie': clientCookie,
-                'Accept': 'application/json',
+        const { response, body: responseData } = await fetchActiveNeuronJson(req, {
+            path: '/LegalIdentities.ws',
+            payload: {
+                maxCount: 10,
+                offset: 0,
             },
-            body: JSON.stringify({
-                'maxCount': 10,
-                'offset': 0
-            })
         });
-
-        const contentType = response.headers.get('content-type');
-        const responseData = contentType.includes('application/json')
-            ? await response.json()
-            : await response.text();
 
         if (!response.ok) {
             return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${responseData}`)), {
@@ -49,7 +28,6 @@ export async function GET(req) {
         });
 
     } catch (error) {
-
         const statusCode = error.statusCode || 500;
         const message = error.message || 'Internal Server Error';
         return new Response(JSON.stringify(new ResponseModel(statusCode, message)), {
@@ -60,6 +38,4 @@ export async function GET(req) {
         }
         );
     }
-
-
 }

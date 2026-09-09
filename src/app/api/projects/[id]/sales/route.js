@@ -1,5 +1,5 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 
 function buildUrl(base, route) {
   return `${base.replace(/\/$/, "")}${route}`;
@@ -47,13 +47,14 @@ export async function GET(request, context) {
       });
     }
 
-    const { host } = config.api.agent;
+    const activeContext = await getActiveNeuronContext(request);
+    const { host } = activeContext;
     const baseUrl = `https://${host}`;
     const requestUrl = new URL(request.url);
     const upstreamBase = buildUrl(baseUrl, adminPath(`/project/${projectId}/sales`));
     const url = appendQuery(upstreamBase, requestUrl.searchParams);
 
-    const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
+    const cookieHeader = activeContext.upstreamCookieHeader || "";
     const headers = {
       Accept: "application/json",
       ...(cookieHeader ? { Cookie: cookieHeader } : {}),

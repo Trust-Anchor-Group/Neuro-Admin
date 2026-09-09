@@ -2,6 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useLanguage, content } from "../../../../../context/LanguageContext";
 import KYCSettings from "@/components/settings/kyc/KYCSettings";
 import APIKeys from "@/components/settings/apiKey/APIKeys";
@@ -11,6 +12,7 @@ export default function SettingsPageClient() {
   const router = useRouter();
   const [tab, setTab] = useState("kyc");
   const [hideKyc, setHideKyc] = useState('')
+  const debugEnabled = process.env.NEXT_PUBLIC_NEURON_SWITCH_DEBUG === 'true';
   const { language } = useLanguage();
   const t = content?.[language]?.SettingsPageClient || {};
 
@@ -52,6 +54,21 @@ export default function SettingsPageClient() {
       <div className="mt-6 bg-[var(--brand-background)] shadow-md rounded-lg">
         {tab === "kyc" && hideKyc !== 'kikkin.tagroot.io' ? <KYCSettings /> : <APIKeys />}
       </div>
+
+      {debugEnabled ? (
+        <div className="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+          <p className="font-medium">Neuron switch debug mode is enabled.</p>
+          <p className="mt-1">
+            Use the temporary debug flow to validate source session, target session cookie continuity, and target JWT conversion before making production auth changes.
+          </p>
+          <Link
+            href="/neuro-access/settings/neuron-switch-debug"
+            className="mt-3 inline-flex rounded-md bg-amber-900 px-3 py-2 font-medium text-white hover:bg-amber-800"
+          >
+            Open Neuron switch debug page
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1,17 +1,21 @@
-import { cookies } from 'next/headers';
 import setCookie from 'set-cookie-parser';
 import { NextResponse } from 'next/server';
 import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import {
+    getActiveNeuronContext,
+    getDefaultNeuronHost,
+    setNeuronSessionCookies,
+    setNeuronSwitchSourceHost,
+} from '@/lib/neuronSessionContext';
 
 export async function POST(request) {
 
     const requestData = await request.json();
     const { agentApiTimeout, serviceId, tab, mode, purpose } = requestData;
 
-    // Access incoming request cookies
-    const cookieStore = await cookies();
-    const { host } = config.api.agent;
+    const activeContext = serviceId ? await getActiveNeuronContext(request) : null;
+    const host = activeContext?.host || getDefaultNeuronHost() || config.api.agent.host;
     const url = `https://${host}/QuickLogin`;
 
     const payload = {
@@ -22,22 +26,14 @@ export async function POST(request) {
     };
 
     let clientCookie;
-    if (serviceId) {
-        const clientCookieObject = cookieStore.get('HttpSessionID');
-
-        clientCookie = clientCookieObject
-            ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
-            : null;
-    }
+    if (serviceId) clientCookie = activeContext?.upstreamCookieHeader || null;
 
     try {
-
-        // Send request to external service
         const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                ...(serviceId ? { 'Cookie': clientCookie } : {})
+                ...(serviceId && clientCookie ? { 'Cookie': clientCookie } : {})
             },
             body: JSON.stringify(payload),
         });
@@ -46,7 +42,6 @@ export async function POST(request) {
         const data = contentType?.includes('application/json')
             ? await response.json()
             : await response.text();
-        console.log(data)
         const nextRes = NextResponse.json(
             new ResponseModel(
                 response.ok ? 200 : response.status,
@@ -67,12 +62,12 @@ export async function POST(request) {
                 const sessionCookie = parsedCookies['HttpSessionID'];
 
                 if (sessionCookie) {
-                    nextRes.cookies.set('HttpSessionID', sessionCookie.value, {
-                        httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
-                        sameSite: 'lax',
-                        path: '/',
+                    await setNeuronSessionCookies(nextRes, {
+                        host,
+                        sessionCookieValue: sessionCookie.value,
+                        activate: true,
                     });
+                    setNeuronSwitchSourceHost(nextRes, host);
                 }
             }
 

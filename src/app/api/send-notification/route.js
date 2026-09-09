@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { hasSessionCookie, sendIdentityNotificationEmail, VALID_IDENTITY_ACTIONS } from '@/lib/server/identityNotifications';
-import { resolveAgentHost } from '@/lib/agentHost';
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 
 function hasValidTestSecret(req) {
   const configuredSecret = process.env.NOTIFICATION_TEST_SECRET?.trim();
@@ -36,7 +36,7 @@ export async function POST(req) {
       );
     }
 
-    const neuronHost = resolveAgentHost(req.headers);
+    const neuronHost = (await getActiveNeuronContext(req)).host;
     const result = await sendIdentityNotificationEmail({ action, user, reason, neuronHost });
 
     if (!result.success) {

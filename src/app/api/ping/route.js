@@ -1,40 +1,20 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
+import { buildNeuronHeaders, readNeuronResponseBody } from '@/lib/neuronUpstream';
 
 export async function POST(request) {
-    const clientCookie = request.headers.get('Cookie');
-    const { host } = config.api.agent;
-    const url = `https://${host}/Ping`;
+    const activeContext = await getActiveNeuronContext(request);
+    const url = `https://${activeContext.host}/Ping`;
 
     try {
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Cookie': clientCookie,
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            mode: 'cors'
+            headers: buildNeuronHeaders({
+                upstreamCookieHeader: activeContext.upstreamCookieHeader,
+            }),
         });
 
-        console.log(response);
-
-        let data;
-        const contentType = response.headers.get('content-type') || "";
-
-        if (contentType.includes('application/json')) {
-            try {
-                data = await response.json();
-            } catch (jsonError) {
-                data = "Invalid JSON response";
-            }
-        } else if (contentType.includes('text')) {
-            data = await response.text();
-        } else {
-            data = "Unknown response format";
-        }
-        console.log(data)
+        const { body: data } = await readNeuronResponseBody(response);
 
         if (!response.ok) {
             return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${data}`)), {

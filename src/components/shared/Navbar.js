@@ -10,6 +10,7 @@ import { fetchUserImage } from '@/utils/fetchUserImage'
 import { useLanguage } from '../../../context/LanguageContext'
 import { applyBrandTheme, getInitialMode, toggleMode } from '../../utils/brandTheme';
 import { Sun, Moon, CircleUserRound, } from 'lucide-react'
+import NeuronSwitchControl from './NeuronSwitchControl';
 
 function renderFlagLabel(countryCode, text) {
   return (
@@ -157,6 +158,7 @@ const Navbar = ({ neuroLogo }) => {
       )}
     </div>
     <div className="flex items-center gap-4 mr-6 py-4">
+      <NeuronSwitchControl variant="navbar" />
       <button
         onClick={() => setMode(prev => toggleMode(prev))}
         className="p-2 rounded-full border border-[var(--brand-border)] transition"

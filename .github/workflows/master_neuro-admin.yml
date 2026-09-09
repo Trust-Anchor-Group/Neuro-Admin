@@ -183,6 +183,10 @@ jobs:
           - name: 'w-neuro-admin'
             slot: 'dev'
             publishProfileSecret: 'AZURE_NEURO_ADMIN_W_DEV'
+          
+          - name: 'parklet-neuro-admin'
+            slot: 'dev'
+            publishProfileSecret: 'AZURE_NEURO_ADMIN_PARKLET_DEV'
 
     steps:
       - name: Download deployment artifact

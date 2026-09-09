@@ -1,6 +1,6 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
 import { IMAGE_PROFILES, mapOptimizationError, optimizeImageFormData } from "@/lib/server/imageOptimization";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 
 export const runtime = "nodejs";
 
@@ -59,7 +59,8 @@ export async function POST(request, context) {
       });
     }
 
-    const { host } = config.api.agent;
+    const activeContext = await getActiveNeuronContext(request);
+    const { host } = activeContext;
     const baseUrl = `https://${host}`;
     const url = buildUrl(baseUrl, adminPath(`/issuer/${issuerId}/localization/profilePhoto`));
 
@@ -75,7 +76,7 @@ export async function POST(request, context) {
       });
     }
 
-    const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
+    const cookieHeader = activeContext.upstreamCookieHeader || "";
     const headers = {
       Accept: "application/json",
       ...(cookieHeader ? { Cookie: cookieHeader } : {}),
