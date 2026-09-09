@@ -12,7 +12,7 @@ function isEmptyValue(value) {
 function resolveValue(item, user) {
   const value = item.key.split('.').reduce((obj, keyPart) => obj && obj[keyPart], user)
 
-  if (item.key.includes('created') && value) {
+  if ((item.kind === 'timestamp' || item.key.includes('created')) && value) {
     return dateConverter(value)
   }
 
@@ -88,7 +88,7 @@ export const MapOutInput = ({
             <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--brand-text-secondary)]/85">
               {item.label}
             </dt>
-            <dd className="mt-2 min-w-0 text-[15px] leading-6 text-[var(--brand-text-color)] whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
+            <dd className="mt-2 min-w-0 text-[15px] leading-6 text-[var(--brand-text-color)] whitespace-pre-wrap [overflow-wrap:anywhere]">
               {renderInteractiveValue(item, item.value)}
             </dd>
           </div>
