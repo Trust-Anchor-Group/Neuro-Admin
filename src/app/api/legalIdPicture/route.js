@@ -1,5 +1,5 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 
 export async function POST(request) {
     console.log("Request received")
@@ -12,7 +12,8 @@ export async function POST(request) {
         dimension = requestData.dimension;
     }
 
-    const { host } = config.api.agent;
+    const activeContext = await getActiveNeuronContext(request);
+    const { host } = activeContext;
     const url = `https://${host}/QuickLogin/Session/${host}/Attachments/${legalId}?Width=${dimension}&Height=${dimension}`;
 
     try {
@@ -20,7 +21,8 @@ export async function POST(request) {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                ...(activeContext.upstreamCookieHeader ? { Cookie: activeContext.upstreamCookieHeader } : {}),
             }
         });
 

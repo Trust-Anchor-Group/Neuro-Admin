@@ -1,11 +1,11 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { fetchActiveNeuronJson } from '@/lib/neuronUpstream';
 
 export async function GET(request, context) {
   try {
     const { id } = await context.params;
     const decodedId = decodeURIComponent(Array.isArray(id) ? id[0] : id);
-    const tokenIdParam = decodedId; // Use full id with domain, as Neuron expects
+    const tokenIdParam = decodedId;
     if (!tokenIdParam) {
       return new Response(
         JSON.stringify(new ResponseModel(400, "tokenId is required.")),
@@ -13,28 +13,10 @@ export async function GET(request, context) {
       );
     }
 
-    const clientCookie = request.headers.get("cookie") || request.headers.get("Cookie") || "";
-    const { host } = config.api.agent;
-    const url = `https://${host}/nex-api/getTokenDetails.ws`;
-
-    const payload = { tokenId: tokenIdParam };
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        ...(clientCookie ? { Cookie: clientCookie } : {}),
-      },
-      body: JSON.stringify(payload),
-      credentials: "include",
-      mode: "cors",
+    const { response, body: data } = await fetchActiveNeuronJson(request, {
+      path: '/nex-api/getTokenDetails.ws',
+      payload: { tokenId: tokenIdParam },
     });
-
-    const contentType = response.headers.get("content-type") || "";
-    const data = contentType.includes("application/json")
-      ? await response.json()
-      : await response.text();
 
     if (!response.ok) {
       return new Response(
@@ -68,27 +50,10 @@ export async function POST(request) {
       );
     }
 
-    const clientCookie = request.headers.get("cookie") || request.headers.get("Cookie") || "";
-    const { host } = config.api.agent;
-    const url = `https://${host}/nex-api/getTokenDetails.ws`;
-    const payload = { tokenId };
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        ...(clientCookie ? { Cookie: clientCookie } : {}),
-      },
-      body: JSON.stringify(payload),
-      credentials: "include",
-      mode: "cors",
+    const { response, body: data } = await fetchActiveNeuronJson(request, {
+      path: '/nex-api/getTokenDetails.ws',
+      payload: { tokenId },
     });
-
-    const contentType = response.headers.get("content-type") || "";
-    const data = contentType.includes("application/json")
-      ? await response.json()
-      : await response.text();
 
     if (!response.ok) {
       return new Response(

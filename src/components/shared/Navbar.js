@@ -10,29 +10,28 @@ import { fetchUserImage } from '@/utils/fetchUserImage'
 import { useLanguage } from '../../../context/LanguageContext'
 import { applyBrandTheme, getInitialMode, toggleMode } from '../../utils/brandTheme';
 import { Sun, Moon, CircleUserRound, } from 'lucide-react'
+import NeuronSwitchControl from './NeuronSwitchControl';
 
+function renderFlagLabel(countryCode, text) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className={`fi fi-${countryCode}`} aria-hidden="true" />
+      <span>{text}</span>
+    </span>
+  )
+}
 
 const Navbar = ({ neuroLogo }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [user, setUser] = useState(null)
   const [avatarUrl, setAvatarUrl] = useState('')
   const [mode, setMode] = useState('light')
+  const [activeHost, setActiveHost] = useState('')
   const router = useRouter()
   const isFetchingRef = useRef(false)
   const hideTimeoutRef = useRef(null)
   const { language, setLanguage, content } = useLanguage()
   const t = content?.[language] || {}
-
-  // Language selection data (recomputed when language changes so current is first)
-  const renderFlagLabel = useMemo(
-    () => (countryCode, text) => (
-      <span className="flex items-center gap-2">
-        <span className={`fi fi-${countryCode}`} aria-hidden="true" />
-        <span>{text}</span>
-      </span>
-    ),
-    [],
-  )
 
   const usLabelText = 'English (US)'
   const ptLabelText = `Portugu${String.fromCharCode(234)}s (BR)`
@@ -44,7 +43,7 @@ const Navbar = ({ neuroLogo }) => {
       { value: 'pt', label: renderFlagLabel('br', ptLabelText) },
       { value: 'fr', label: renderFlagLabel('fr', frLabelText) },
     ],
-    [renderFlagLabel, ptLabelText, frLabelText],
+    [ptLabelText, frLabelText],
   )
 
   const currentLanguage = useMemo(() => baseLangOptions.find(o => o.value === language), [language, baseLangOptions])
@@ -70,7 +69,7 @@ const Navbar = ({ neuroLogo }) => {
           if (imageUrl) {
             setAvatarUrl(imageUrl)
           } else {
-            const fallback = `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(
+            const fallback = `https://api.dicebear.com/8.x/pixel-art/png?seed=${encodeURIComponent(
               parsedUser.name || 'defaultUser'
             )}`
             setAvatarUrl(fallback)
@@ -82,15 +81,29 @@ const Navbar = ({ neuroLogo }) => {
     } finally {
       isFetchingRef.current = false
     }
+    setActiveHost(sessionStorage.getItem('AgentAPI.Host') || '')
     const initialMode = getInitialMode()
     setMode(initialMode)
   }, [])
 
   useEffect(() => {
     // Apply theme when mode changes
-    const host = sessionStorage.getItem('AgentAPI.Host') || ''
-    applyBrandTheme(host, mode)
-  }, [mode])
+    applyBrandTheme(activeHost, mode)
+  }, [activeHost, mode])
+
+  useEffect(() => {
+    const handleHostChange = (event) => {
+      const nextHost = typeof event?.detail === 'string'
+        ? event.detail
+        : sessionStorage.getItem('AgentAPI.Host') || ''
+      setActiveHost(nextHost)
+    }
+
+    window.addEventListener('neuron-host-changed', handleHostChange)
+    return () => {
+      window.removeEventListener('neuron-host-changed', handleHostChange)
+    }
+  }, [])
 
   const filterRef = useRef(null)
 
@@ -145,6 +158,7 @@ const Navbar = ({ neuroLogo }) => {
       )}
     </div>
     <div className="flex items-center gap-4 mr-6 py-4">
+      <NeuronSwitchControl variant="navbar" />
       <button
         onClick={() => setMode(prev => toggleMode(prev))}
         className="p-2 rounded-full border border-[var(--brand-border)] transition"

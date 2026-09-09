@@ -1,25 +1,18 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
 import { hasNotificationRecipient, hasSessionCookie, sendIdentityNotificationEmail, VALID_IDENTITY_ACTIONS } from "@/lib/server/identityNotifications";
-import { resolveAgentHost } from "@/lib/agentHost";
+import { buildNeuronHeaders, readNeuronResponseBody } from '@/lib/neuronUpstream';
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 
-async function fetchNotificationUser({ id, host, clientCookie }) {
+async function fetchNotificationUser({ id, host, upstreamCookieHeader }) {
     const response = await fetch(`https://${host}/legalIdentity.ws`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Cookie': clientCookie,
-            'Accept': 'application/json'
-        },
-        credentials: 'include',
+        headers: buildNeuronHeaders({
+            upstreamCookieHeader,
+        }),
         body: JSON.stringify({ id }),
-        mode: 'cors'
     });
 
-    const contentType = response.headers.get('content-type') || '';
-    const body = contentType.includes('application/json')
-        ? await response.json()
-        : await response.text();
+    const { body } = await readNeuronResponseBody(response);
 
     if (!response.ok) {
         throw new Error(`Failed to fetch notification recipient: ${typeof body === 'string' ? body : JSON.stringify(body)}`);
@@ -42,7 +35,8 @@ export async function POST(request) {
     try {
         const requestData = await request.json();
         const { id, state, user, reason, sendNotification = false } = requestData;
-        const clientCookie = request.headers.get('Cookie') || '';
+        const activeContext = await getActiveNeuronContext(request);
+        const clientCookie = activeContext.upstreamCookieHeader || '';
 
         if (!hasSessionCookie(clientCookie)) {
             return new Response(JSON.stringify(new ResponseModel(401, 'Authentication required')), {
@@ -72,7 +66,7 @@ export async function POST(request) {
         }
 
         const decodedUserId = decodeURIComponent(id);
-        const dynamicHost = resolveAgentHost(request.headers) || config.api.agent.host;
+        const dynamicHost = activeContext.host;
         const url = `https://${dynamicHost}/LegalIdentityStateChanged`;
         console.info('[identity-status] received state change request', {
             id: decodedUserId,
@@ -89,23 +83,14 @@ export async function POST(request) {
 
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Cookie': clientCookie
-            },
-            credentials: 'include',
+            headers: buildNeuronHeaders({
+                upstreamCookieHeader: clientCookie,
+                accept: null,
+            }),
             body: JSON.stringify(payload),
-            mode: 'cors'
         });
 
-        const contentType = response.headers.get('content-type') || '';
-        let data;
-
-        if (contentType.includes('application/json')) {
-            data = await response.json();
-        } else {
-            data = await response.text();
-        }
+        const { body: data } = await readNeuronResponseBody(response);
 
         if (!response.ok) {
             return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${data}`)), {
@@ -125,7 +110,7 @@ export async function POST(request) {
                     : await fetchNotificationUser({
                         id: decodedUserId,
                         host: dynamicHost,
-                        clientCookie,
+                        upstreamCookieHeader: clientCookie,
                     });
 
                 notification = await sendIdentityNotificationEmail({

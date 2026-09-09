@@ -1,4 +1,4 @@
-name: Generate Release Notes for Next.js 15
+name: Generate Release Notes for Next.js
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
     - name: Install Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'  # Specify the Node.js version compatible with Next.js 15
+        node-version: '20.x'  # Matches the minimum runtime line required by Next.js and sharp
         cache: 'npm'  # Cache npm dependencies for faster builds
 
     - name: Verify tag push

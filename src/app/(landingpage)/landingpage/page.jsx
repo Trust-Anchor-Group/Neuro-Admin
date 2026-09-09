@@ -11,11 +11,13 @@ import {
   MdDocumentScanner,
   MdOutlineStorage,
   MdLockOutline,
-  MdDescription
+  MdDescription,
+  MdLocalParking
 } from 'react-icons/md';
 import Navbar from '@/components/shared/Navbar';
 import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
 import SessionPing from "@/components/SessionPing"
+import NeuronSwitchControl from '@/components/shared/NeuronSwitchControl';
 
 // SERVICES LIST
 const LandingServices = (t) => ([
@@ -36,6 +38,17 @@ const LandingServices = (t) => ([
     iconColor: 'text-[#8B5CF6]',
     iconBg: 'bg-[#F3E8FF]',
     href: '/neuro-assets',
+    status: t?.landing?.status?.active,
+    locked: false,
+    newTab: false,
+  },
+  {
+    title: 'Parklet',
+    description: 'Granska Parklet-organisationer och parkeringsomr\u00e5den',
+    icon: MdLocalParking,
+    iconColor: 'text-[#8B5CF6]',
+    iconBg: 'bg-[#F3E8FF]',
+    href: '/parklet',
     status: t?.landing?.status?.active,
     locked: false,
     newTab: false,
@@ -68,6 +81,17 @@ const LandingServices = (t) => ([
     iconColor: 'text-[#8B5CF6]',
     iconBg: 'bg-[#F3E8FF]',
     href: 'https://neuro-exchange.com/pri/dashboard/',
+    status: t?.landing?.status?.learnMore,
+    locked: false,
+    newTab: true,
+  },
+  {
+    title: 'Neuro-Statistics',
+    description: t?.landing?.services?.neuroStatistics?.description,
+    icon: MdOutlineTimeline,
+    iconColor: 'text-[#8B5CF6]',
+    iconBg: 'bg-[#F3E8FF]',
+    href: 'https://zealous-desert-018fac303.7.azurestaticapps.net/',
     status: t?.landing?.status?.learnMore,
     locked: false,
     newTab: true,
@@ -131,9 +155,8 @@ export default function LandingPage() {
 
   // Apply brand theme when mode changes
   useEffect(() => {
-    const h = sessionStorage.getItem('AgentAPI.Host') || '';
-    applyBrandTheme(h, mode);
-  }, [mode]);
+    applyBrandTheme(host, mode);
+  }, [host, mode]);
 
   // Listen for global mode change events (dispatched by toggle in Navbar)
   useEffect(() => {
@@ -146,6 +169,21 @@ export default function LandingPage() {
     return () => {
       window.removeEventListener('ui-mode-changed', handler);
       window.removeEventListener('storage', handler);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleHostChange = (event) => {
+      const nextHost = typeof event?.detail === 'string'
+        ? event.detail
+        : sessionStorage.getItem('AgentAPI.Host') || '';
+      setHost(nextHost);
+      setBrand(getBrandConfig(nextHost));
+    };
+
+    window.addEventListener('neuron-host-changed', handleHostChange);
+    return () => {
+      window.removeEventListener('neuron-host-changed', handleHostChange);
     };
   }, []);
 
@@ -193,17 +231,7 @@ export default function LandingPage() {
 
               {/* Destination Card */}
               <div className="rounded-[16px] bg-[var(--brand-navbar)] shadow-[inset_0_0_10px_rgba(24, 31, 37, 0.10)] px-[24px] py-[20px]">
-                <label className="text-[14px] text-[var(--brand-text-secondary)] font-medium block mb-2">
-                  {t?.landing?.labels?.destination || 'Destination'}
-                </label>
-                <div className="relative">
-                  <select className="w-full appearance-none rounded-[8px] cursor-pointer bg-[var(--brand-navbar)] py-[12px] px-[16px] text-[16px] text-[var(--brand-text)] border-2 border-[var(--brand-border)] font-medium focus:outline-none">
-                    <option>{(t?.landing?.labels?.main || 'Main')} - {host}</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-4 flex items-center text-gray-600 text-sm pointer-events-none">
-                    ▼
-                  </div>
-                </div>
+                <NeuronSwitchControl />
               </div>
             </div>
 
@@ -227,7 +255,7 @@ export default function LandingPage() {
                     className={`group relative rounded-[16px] border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-[24px] w-full h-[240px] flex flex-col justify-between transition duration-200 ${item.locked ? 'opacity-50 hover:opacity-100 ' : 'hover:shadow-md'
                       }`}
                   >
-                    {(item.title === 'Neuro-Monitor') && (
+                    {(item.title === 'Neuro-Monitor' || item.title === 'Neuro-Statistics') && (
                       <div className="absolute top-0 right-0 overflow-hidden w-[150px] h-[150px]">
                         <div className="absolute -right-[40px] top-[20px] w-[150px] bg-[#8F40D4] text-white text-[12px] font-bold text-center transform rotate-45  shadow-md">
                           BETA

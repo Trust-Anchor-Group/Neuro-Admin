@@ -1,55 +1,35 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { fetchActiveNeuronJson } from '@/lib/neuronUpstream';
 
 export async function POST(request) {
-
     const requestData = await request.json();
     const { userName } = requestData;
-    const clientCookie = request.headers.get('Cookie');
-
-    const { host } = config.api.agent;
-    const url = `https://${host}/account.ws`;
 
     const payload = {
         userName
     };
 
-
     try {
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Cookie': clientCookie,
-                'Accept': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify(payload),
-            mode: 'cors'
+        const { response, body } = await fetchActiveNeuronJson(request, {
+            path: '/account.ws',
+            payload,
         });
 
+        let filteredData;
 
-        const contentType = response.headers.get('content-type');
-        let data;
-        let filteredData
-
-        if (contentType.includes('application/json')) {
-            data = await response.json();
+        if (body && typeof body === 'object' && body.account) {
             filteredData = {
-                country:data.account.country,
-                firstName:data.account.firstName,
-                lastNames:data.account.lastNames,
-                eMail:data.account.eMail,
-                userName:data.account.userName,
-                created:data.account.created
-            }
-        } else {
-            data = await response.text();
+                country: body.account.country,
+                firstName: body.account.firstName,
+                lastNames: body.account.lastNames,
+                eMail: body.account.eMail,
+                userName: body.account.userName,
+                created: body.account.created
+            };
         }
 
         if (!response.ok) {
-            return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${data}`)), {
+            return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${body}`)), {
                 status: response.status,
                 headers: {
                     'Content-Type': 'application/json'
@@ -57,7 +37,7 @@ export async function POST(request) {
             });
         }
 
-        return new Response(JSON.stringify(new ResponseModel(200, 'Account returned', {data:filteredData})), {
+        return new Response(JSON.stringify(new ResponseModel(200, 'Account returned', { data: filteredData })), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',

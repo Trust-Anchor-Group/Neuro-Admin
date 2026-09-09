@@ -284,6 +284,9 @@ const en = {
       neuroMonitor: {
         description: 'Asset and process monitoring'
       },
+      neuroStatistics: {
+        description: 'Statistical analysis and reporting'
+      },
       neuroPayments: {
         description: 'Payment monitoring and management'
       },

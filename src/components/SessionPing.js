@@ -63,6 +63,22 @@ export default function SessionPing() {
     }, 25 * 60 * 1000); // 25 min inactivity
   };
 
+  // Handle logout button or timer end
+  async function handleLogout() {
+    await fetch("/api/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    clearInterval(countdownIntervalRef.current);
+    setShowModal(false);
+    setCountdown(60);
+
+    router.push('/login');
+  }
+
   // Countdown effect for modal
   useEffect(() => {
     if (showModal) {
@@ -89,22 +105,6 @@ export default function SessionPing() {
     setShowModal(false);
     setCountdown(60);
     resetInactivityTimer();
-  };
-
-  // Handle logout button or timer end
-  const handleLogout = async () => {
-    const res = await fetch("/api/logout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
-    clearInterval(countdownIntervalRef.current);
-    setShowModal(false);
-    setCountdown(60);
-
-    router.push('/login');
   };
 
   // Listen for user activity and session ping only when modal is not shown

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { FaCheckCircle, FaExclamationCircle, FaExclamationTriangle } from "react-icons/fa";
+import { Plus, X } from "lucide-react";
 import KYCSettingsPreview from './KYCSettingsPreview';
 import { useLanguage, content } from '../../../../context/LanguageContext';
 
@@ -14,6 +15,7 @@ export default function KYCSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [isCustomFieldsOpen, setIsCustomFieldsOpen] = useState(false);
   const dismissTimerRef = useRef(null);
 
   const loadErrorMsg = t?.messages?.loadError || "Failed to load KYC settings.";
@@ -97,6 +99,19 @@ export default function KYCSettings() {
     };
   }, [message.text]);
 
+  useEffect(() => {
+    if (!isCustomFieldsOpen) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsCustomFieldsOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isCustomFieldsOpen]);
+
   const toggleSetting = (key) => {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -168,7 +183,8 @@ export default function KYCSettings() {
   }, [settings, originalSettings, t]);
 
 	return (
-		<div className="flex flex-col lg:flex-row lg:items-stretch gap-8">
+		<div className="relative">
+			<div className="flex flex-col lg:flex-row lg:items-stretch gap-8">
 		    <div className="bg-[var(--brand-navbar)] w-full lg:w-[50%] rounded-2xl p-6">
 				{/* LEFT: Existing settings UI */}
 				<div className="flex-1 min-w-0">
@@ -236,24 +252,34 @@ export default function KYCSettings() {
 							</section>
 
 							{/* Buttons */}
-							<div className="flex justify-end mt-8 gap-3">
+							<div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 								<button
-									onClick={() => setSettings(JSON.parse(originalSettings))}
-									className="px-4 py-2 text-sm font-medium border border-[var(--brand-border)] rounded-md text-[var(--brand-text)] hover:bg-[var(--brand-hover)]"
+									type="button"
+									onClick={() => setIsCustomFieldsOpen(true)}
+									className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-purple-700 lg:w-auto"
 								>
-									{t?.buttons?.reset || 'Reset changes'}
+									<Plus className="h-4 w-4" />
+									Create custom fields
 								</button>
-								<button
-									onClick={saveSettings}
-									disabled={JSON.stringify(settings) === originalSettings || saving}
-									className={`px-5 py-2 text-sm font-semibold rounded-md ${
-										JSON.stringify(settings) === originalSettings || saving
-											? "bg-purple-300 cursor-not-allowed"
-											: "bg-purple-600 hover:bg-purple-700 text-white"
-									}`}
-								>
-									{t?.buttons?.save || 'Save settings'}
-								</button>
+								<div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+									<button
+										onClick={() => setSettings(JSON.parse(originalSettings))}
+										className="px-4 py-2 text-sm font-medium border border-[var(--brand-border)] rounded-md text-[var(--brand-text)] hover:bg-[var(--brand-hover)]"
+									>
+										{t?.buttons?.reset || 'Reset changes'}
+									</button>
+									<button
+										onClick={saveSettings}
+										disabled={JSON.stringify(settings) === originalSettings || saving}
+										className={`px-5 py-2 text-sm font-semibold rounded-md ${
+											JSON.stringify(settings) === originalSettings || saving
+												? "bg-purple-300 cursor-not-allowed"
+												: "bg-purple-600 hover:bg-purple-700 text-white"
+										}`}
+									>
+										{t?.buttons?.save || 'Save settings'}
+									</button>
+								</div>
 							</div>
 						</>
 					) : (
@@ -280,6 +306,42 @@ export default function KYCSettings() {
 					loading={loading}
 				/>
 			</div>
+		</div>
+
+			{isCustomFieldsOpen && (
+				<div className="absolute inset-0 z-20 overflow-hidden rounded-2xl">
+					<button
+						type="button"
+						aria-label="Close custom fields panel"
+						className="absolute inset-0 h-full w-full bg-white/55 backdrop-blur-[2px]"
+						onClick={() => setIsCustomFieldsOpen(false)}
+					/>
+					<aside
+						className="absolute inset-y-0 right-0 flex w-1/2 min-w-1/2 max-w-none flex-col border-l border-[var(--brand-border)] bg-white shadow-2xl"
+						role="dialog"
+						aria-modal="true"
+						aria-label="Custom KYC Fields"
+					>
+						<div className="flex items-center justify-between border-b border-[var(--brand-border)] px-6 py-5">
+							<div>
+								<h3 className="text-2xl font-bold text-[var(--brand-text)]">Custom KYC Fields</h3>
+								<p className="mt-1 text-sm text-gray-500">
+									Configure custom fields for the verification flow.
+								</p>
+							</div>
+							<button
+								type="button"
+								onClick={() => setIsCustomFieldsOpen(false)}
+								className="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-[var(--brand-text)]"
+								aria-label="Close custom fields panel"
+							>
+								<X className="h-5 w-5" />
+							</button>
+						</div>
+						<div className="flex-1 bg-white" />
+					</aside>
+				</div>
+			)}
 		</div>
 	);
 }

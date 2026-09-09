@@ -30,8 +30,6 @@ export const DisplayDetailsAsset = ({
   const t = content[language];
   const [selectedImage, setSelectedImage] = useState(null);
 
-  if (!userData) return <p>{t?.displayDetails?.noData || 'No data available'}</p>;
-
   const openPreview = (image) => setSelectedImage(image);
   const closePreview = () => setSelectedImage(null);
 
@@ -49,6 +47,9 @@ export const DisplayDetailsAsset = ({
       'mateo.lab.tagroot.io'
     );
   }, []);
+
+  if (!userData) return <p>{t?.displayDetails?.noData || 'No data available'}</p>;
+
   // Helper to resolve image paths (assuming images are in public root or a specific folder)
   // If your images are in public/images/, change the return to `/images/${src}`
   const getImagePath = (src) => {

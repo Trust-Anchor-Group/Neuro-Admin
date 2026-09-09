@@ -1,5 +1,5 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 
 function buildUrl(base, route) {
   return `${base.replace(/\/$/, "")}${route}`;
@@ -33,11 +33,12 @@ async function handleResourceRequest(request, context, method) {
       });
     }
 
-    const { host } = config.api.agent;
+    const activeContext = await getActiveNeuronContext(request);
+    const { host } = activeContext;
     const baseUrl = `https://${host}`;
     const url = buildUrl(baseUrl, adminPath(`/project/${id}/localization/resource`));
 
-    const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
+    const cookieHeader = activeContext.upstreamCookieHeader || "";
     const headers = method === "DELETE"
       ? {
           Accept: "application/json",

@@ -1,13 +1,9 @@
-import { cookies } from 'next/headers';
 import setCookie from 'set-cookie-parser';
 import { NextResponse } from 'next/server';
-import config from '@/config/config';
 import ResponseModel from '@/models/ResponseModel';
+import { getActiveNeuronContext, setNeuronSessionCookies } from '@/lib/neuronSessionContext';
+import { readNeuronResponseBody } from '@/lib/neuronUpstream';
 
-// POST /api/auth/refresh
-// Forwards a refresh request to upstream Agent API: /Agent/Account/Refresh
-// Body: { seconds?: number } (defaults to 3600)
-// Passes through Authorization header (if provided) and HttpSessionID cookie.
 export async function POST(request) {
   let seconds = 3600;
   try {
@@ -15,24 +11,17 @@ export async function POST(request) {
       const body = await request.json();
       if (body?.seconds && Number.isFinite(body.seconds)) seconds = body.seconds;
     }
-  } catch (e) {
-    // Ignore malformed body; keep default seconds
+  } catch {
   }
 
-  const { host } = config.api.agent;
-  const url = `https://${host}/Agent/Account/Refresh`;
-
+  const activeContext = await getActiveNeuronContext(request);
+  const url = `https://${activeContext.host}/Agent/Account/Refresh`;
   const authHeader = request.headers.get('authorization');
-
-  // Session cookie from incoming request (if present)
-  const cookieStore = await cookies();
-  const sessionCookieObj = cookieStore.get('HttpSessionID');
-  const sessionCookie = sessionCookieObj ? `HttpSessionID=${encodeURIComponent(sessionCookieObj.value)}` : null;
 
   const headers = {
     'Content-Type': 'application/json',
-    ...(authHeader ? { 'Authorization': authHeader } : {}),
-    ...(sessionCookie ? { 'Cookie': sessionCookie } : {})
+    ...(authHeader ? { Authorization: authHeader } : {}),
+    ...(activeContext.upstreamCookieHeader ? { Cookie: activeContext.upstreamCookieHeader } : {})
   };
 
   try {
@@ -40,11 +29,9 @@ export async function POST(request) {
       method: 'POST',
       headers,
       body: JSON.stringify({ seconds }),
-      // no need for credentials; cookie manually forwarded
     });
 
-    const contentType = upstreamRes.headers.get('content-type');
-    const data = contentType?.includes('application/json') ? await upstreamRes.json() : await upstreamRes.text();
+    const { body: data } = await readNeuronResponseBody(upstreamRes);
 
     const nextRes = NextResponse.json(
       new ResponseModel(
@@ -55,17 +42,15 @@ export async function POST(request) {
       { status: upstreamRes.ok ? 200 : upstreamRes.status }
     );
 
-    // Propagate updated session cookie if upstream issued one
     const setCookieHeader = upstreamRes.headers.get('set-cookie');
     if (setCookieHeader) {
       const parsed = setCookie.parse(setCookieHeader, { decodeValues: false, map: true });
       const newSession = parsed['HttpSessionID'];
       if (newSession) {
-        nextRes.cookies.set('HttpSessionID', newSession.value, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-          path: '/',
+        await setNeuronSessionCookies(nextRes, {
+          host: activeContext.host,
+          sessionCookieValue: newSession.value,
+          activate: true,
         });
       }
     }

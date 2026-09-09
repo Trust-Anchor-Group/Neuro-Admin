@@ -1,38 +1,23 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
+import { buildNeuronHeaders, readNeuronResponseBody } from '@/lib/neuronUpstream';
 
 export async function POST(request) {
-    const clientCookie = request.headers.get("Cookie");
-    const { host } = config.api.agent;
-    const url = `https://${host}/logout`;
+    const activeContext = await getActiveNeuronContext(request);
+    const url = `https://${activeContext.host}/logout`;
 
     try {
         const response = await fetch(url, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Cookie": clientCookie,
-                "Accept": "application/json"
-            },
-            credentials: "include",
-            mode: "cors",
+            headers: buildNeuronHeaders({
+                upstreamCookieHeader: activeContext.upstreamCookieHeader,
+            }),
             redirect: "manual"
         });
 
         console.log("Upstream logout status:", response.status);
 
-        let data = null;
-        const contentType = response.headers.get("content-type") || "";
-
-        if (contentType.includes("application/json")) {
-            try {
-                data = await response.json();
-            } catch {
-                data = null; 
-            }
-        } else if (contentType.includes("text")) {
-            data = await response.text();
-        }
+        const { body: data } = await readNeuronResponseBody(response);
 
         if (response.status === 200 || response.status === 303) {
             return new Response(

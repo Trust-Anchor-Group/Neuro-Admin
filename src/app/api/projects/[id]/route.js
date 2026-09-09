@@ -1,5 +1,5 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 
 function buildUrl(base, route) {
   return `${base.replace(/\/$/, "")}${route}`;
@@ -15,8 +15,8 @@ function getIdFromParams(params) {
   return raw ? decodeURIComponent(raw) : "";
 }
 
-function makeHeaders(request, hasBody = false) {
-  const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
+function makeHeaders(activeContext, hasBody = false) {
+  const cookieHeader = activeContext.upstreamCookieHeader || "";
   return {
     ...(hasBody ? { "Content-Type": "application/json" } : {}),
     Accept: "application/json",
@@ -25,9 +25,10 @@ function makeHeaders(request, hasBody = false) {
 }
 
 async function proxyRequest({ request, method, id, body }) {
-  const { host } = config.api.agent;
+  const activeContext = await getActiveNeuronContext(request);
+  const { host } = activeContext;
   const baseUrl = `https://${host}`;
-  const headers = makeHeaders(request, method !== "GET");
+  const headers = makeHeaders(activeContext, method !== "GET");
   const url = buildUrl(baseUrl, adminPath(`/project/${id}`));
 
   const response = await fetch(url, {

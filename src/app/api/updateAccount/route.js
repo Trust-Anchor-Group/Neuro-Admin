@@ -1,41 +1,27 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
+import { buildNeuronHeaders, readNeuronResponseBody } from '@/lib/neuronUpstream';
 
 export async function POST(request) {
-
     const requestData = await request.json();
-    const { UserName, Password, EMail, PhoneNr, Enabled} = requestData;
-    const clientCookie = request.headers.get('Cookie');
-    const { host } = config.api.agent;
-    const url = `https://${host}/UpdateAccount`;
+    const { UserName, Password, EMail, PhoneNr, Enabled } = requestData;
+    const activeContext = await getActiveNeuronContext(request);
+    const url = `https://${activeContext.host}/UpdateAccount`;
 
     const payload = `UserName=${encodeURIComponent(UserName)}&Password=${encodeURIComponent(Password)}&EMail=${encodeURIComponent(EMail)}&PhoneNr=${encodeURIComponent(PhoneNr)}&Enabled=${encodeURIComponent(Enabled)}&FtpRootFolder=&FtpMaxStorage=`;
 
-    
-    console.log(payload)
-
     try {
-
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Cookie': clientCookie
-            },
-            credentials: 'include',
-            body: JSON.stringify(payload),
-            mode: 'cors'
+            headers: buildNeuronHeaders({
+                upstreamCookieHeader: activeContext.upstreamCookieHeader,
+                contentType: 'application/x-www-form-urlencoded',
+                accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            }),
+            body: payload,
         });
 
-        const contentType = response.headers.get('content-type');
-        let data;
-
-        if (contentType.includes('application/json')) {
-            data = await response.json();
-        } else {
-            data = await response.text();
-        }
+        const { body: data } = await readNeuronResponseBody(response);
 
         if (!response.ok) {
             return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${data}`)), {

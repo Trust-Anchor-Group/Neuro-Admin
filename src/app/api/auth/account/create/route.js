@@ -1,8 +1,8 @@
 import { createHmac, randomBytes } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import setCookie from 'set-cookie-parser';
-import { resolveAgentHost } from '@/lib/agentHost';
 import ResponseModel from '@/models/ResponseModel';
+import { setNeuronSessionCookies } from '@/lib/neuronSessionContext';
 
 const DEFAULT_SECONDS = 3600;
 const MIN_SECONDS = 1;
@@ -83,7 +83,7 @@ function propagateAlternativeHeaders(response, alternativeNames) {
     }
 }
 
-function propagateSessionCookie(upstreamResponse, response) {
+async function propagateSessionCookie(upstreamResponse, response, host) {
     const setCookieHeader = upstreamResponse.headers.get('set-cookie');
     if (!setCookieHeader) return;
 
@@ -94,12 +94,10 @@ function propagateSessionCookie(upstreamResponse, response) {
     const sessionCookie = parsedCookies.HttpSessionID;
 
     if (!sessionCookie) return;
-
-    response.cookies.set('HttpSessionID', sessionCookie.value, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
+    await setNeuronSessionCookies(response, {
+        host,
+        sessionCookieValue: sessionCookie.value,
+        activate: true,
     });
 }
 
@@ -196,7 +194,7 @@ export async function POST(request) {
         );
 
         propagateAlternativeHeaders(nextResponse, alternativeNames);
-        propagateSessionCookie(upstreamResponse, nextResponse);
+        await propagateSessionCookie(upstreamResponse, nextResponse, host);
 
         return nextResponse;
     } catch (error) {

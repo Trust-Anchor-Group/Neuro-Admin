@@ -1,13 +1,11 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
+import { buildNeuronHeaders, readNeuronResponseBody } from '@/lib/neuronUpstream';
 
 export async function POST(request) {
-
     const requestData = await request.json();
-    const clientCookie = request.headers.get('Cookie');
-
-    const { host } = config.api.agent;
-    const url = `https://${host}/CreateAccount`;
+    const activeContext = await getActiveNeuronContext(request);
+    const url = `https://${activeContext.host}/CreateAccount`;
 
     const queryString = new URLSearchParams({
         UserName: requestData.UserName,
@@ -15,36 +13,19 @@ export async function POST(request) {
         EMail: requestData.EMail,
         PhoneNr: requestData.PhoneNr
       }).toString();
-      
-    // state can be set to Created, Approved, Rejected, Obsoleted, or Compromised
-
-    console.log(queryString)
-    console.log(url)
 
     try {
-
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Cookie': clientCookie
-            },
-            credentials: 'include',
+            headers: buildNeuronHeaders({
+                upstreamCookieHeader: activeContext.upstreamCookieHeader,
+                contentType: 'application/x-www-form-urlencoded',
+                accept: null,
+            }),
             body: queryString,
-            mode: 'cors'
         });
-        console.log(response)
 
-
-
-        const contentType = response.headers.get('content-type');
-        let data;
-
-        if (contentType.includes('application/x-www-form-urlencoded')) {
-            data = await response.json();
-        } else {
-            data = await response.text();
-        }
+        const { body: data } = await readNeuronResponseBody(response);
 
         if (!response.ok) {
             return new Response(JSON.stringify(new ResponseModel(response.status, `Error: ${data}`)), {
