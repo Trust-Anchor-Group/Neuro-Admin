@@ -7,6 +7,9 @@ const backendHost =
   "mateo.lab.tagroot.io";
 
 const nextConfig = {
+  turbopack: {
+    root: process.cwd(),
+  },
   async redirects() {
     return [
       {

@@ -138,7 +138,14 @@ export default function DetailPageContent() {
 
     const fieldsToShowMetadata = [
         { label: t?.Identity?.labels?.idStatus || "ID status", key: "state" },
-        { label: t?.Identity?.labels?.idCreated || "ID created", key: "created" },
+        { label: t?.Identity?.labels?.idCreated || "ID created", key: "created", kind: "timestamp" },
+        { label: "Last updated", key: "updated", kind: "timestamp" },
+        { label: "Valid from", key: "from", kind: "timestamp" },
+        { label: "Valid to", key: "to", kind: "timestamp" },
+        { label: "Provider", key: "provider" },
+        { label: "Identity version", key: "version" },
+        { label: "Peer reviews", key: "nrPeerReviews" },
+        { label: "Legal identity ID", key: "Id", span: "full" },
     ]
 
     const fieldsToShow = [
