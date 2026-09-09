@@ -1,6 +1,6 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
 import { IMAGE_PROFILES, mapOptimizationError, optimizeImageFormData } from "@/lib/server/imageOptimization";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 
 export const runtime = "nodejs";
 
@@ -36,11 +36,12 @@ async function handleImageRequest(request, context, method) {
       });
     }
 
-    const { host } = config.api.agent;
+    const activeContext = await getActiveNeuronContext(request);
+    const { host } = activeContext;
     const baseUrl = `https://${host}`;
     const url = buildUrl(baseUrl, adminPath(`/project/${id}/localization/image`));
 
-    const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
+    const cookieHeader = activeContext.upstreamCookieHeader || "";
     const headers = method === "DELETE"
       ? {
           Accept: "application/json",

@@ -24,6 +24,7 @@ import {
   getNeuronSwitchEndpointDefinition,
   getNeuronSwitchEndpointDiagnostics,
 } from '@/lib/neuronSwitchEndpoints';
+import { setNeuronSessionCookies } from '@/lib/neuronSessionContext';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,6 +41,9 @@ const ACTION_ALIASES = {
   continue: 'continue',
   continuafterapproval: 'continue',
   'continue-after-approval': 'continue',
+  activateproduction: 'activate-production',
+  'activate-production': 'activate-production',
+  'use-target-in-app': 'activate-production',
   testtargetsession: 'continue',
   'test-target-session': 'continue',
   targetsession: 'continue',
@@ -145,6 +149,7 @@ export async function POST(request) {
 
   try {
     let result;
+    let productionActivation = null;
 
     if (transportMode === 'browser-direct') {
       result = buildBrowserDirectBlockedResult({
@@ -239,6 +244,36 @@ export async function POST(request) {
         sourceSessionCookieValue,
         apiTrace,
       });
+    } else if (action === 'activate-production') {
+      assertHost(targetHost, 'targetHost');
+
+      result = await runTargetSessionProof({
+        switchAttemptId,
+        logs,
+        targetHost,
+        hostUsed: targetHost,
+        targetScriptPath,
+        targetSessionCookieName,
+        storedTargetSessionCookie,
+        sourceSessionCookieValue,
+        apiTrace,
+      });
+
+      if (result.ok) {
+        productionActivation = {
+          host: targetHost,
+          sessionCookieValue: storedTargetSessionCookie,
+        };
+        result = {
+          ...result,
+          diagnosis: 'The verified target session is now the active Neuro Admin session. Reload Neuro Access to fetch data from the target Neuron.',
+          recommendation: 'Use the Neuro Access menu. Its API requests now use the selected target host and its per-host session cookie.',
+          summary: {
+            ...result.summary,
+            productionActivated: true,
+          },
+        };
+      }
     } else if (action === 'convert-target') {
       assertHost(targetHost, 'targetHost');
 
@@ -394,6 +429,14 @@ export async function POST(request) {
       steps: result.steps || [result.step],
       logs,
     }, { status: result.httpStatus || 200 });
+
+    if (productionActivation) {
+      await setNeuronSessionCookies(response, {
+        host: productionActivation.host,
+        sessionCookieValue: productionActivation.sessionCookieValue,
+        activate: true,
+      });
+    }
 
     applyCookieWrites(response, cookieWrites);
     return response;

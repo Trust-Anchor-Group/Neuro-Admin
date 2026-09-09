@@ -1,5 +1,5 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 
 function buildUrl(base, route) {
   return `${base.replace(/\/$/, "")}${route}`;
@@ -32,11 +32,12 @@ export async function GET(request, context) {
       });
     }
 
-    const { host } = config.api.agent;
+    const activeContext = await getActiveNeuronContext(request);
+    const { host } = activeContext;
     const baseUrl = `https://${host}`;
     const url = buildUrl(baseUrl, adminPath(`/issuer/${issuerId}/user`));
 
-    const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
+    const cookieHeader = activeContext.upstreamCookieHeader || "";
     const headers = {
       Accept: "application/json",
       ...(cookieHeader ? { Cookie: cookieHeader } : {}),
@@ -86,7 +87,8 @@ export async function POST(request, context) {
       });
     }
 
-    const { host } = config.api.agent;
+    const activeContext = await getActiveNeuronContext(request);
+    const { host } = activeContext;
     const baseUrl = `https://${host}`;
     const url = buildUrl(baseUrl, adminPath(`/issuer/${issuerId}/user`));
 
@@ -97,7 +99,7 @@ export async function POST(request, context) {
       body = {};
     }
 
-    const cookieHeader = request.headers.get("cookie") || request.headers.get("Cookie") || "";
+    const cookieHeader = activeContext.upstreamCookieHeader || "";
     const headers = {
       Accept: "application/json",
       "Content-Type": "application/json",

@@ -5,7 +5,11 @@ import {
   getSwitchCookieOptions,
   getSwitchLegalIdCookieName,
 } from '@/lib/neuronSwitchProduction';
-import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
+import {
+  getActiveNeuronContext,
+  getCurrentNeuronSummary,
+  getNeuronSessionCookieValue,
+} from '@/lib/neuronSessionContext';
 
 export async function POST(request) {
   try {
@@ -15,29 +19,47 @@ export async function POST(request) {
       : '';
     const switchAttemptId = requestedAttemptId || createSwitchAttemptId();
     const activeContext = await getActiveNeuronContext(request);
+    const sourceJwt = typeof requestBody?.sourceJwt === 'string' && requestBody.sourceJwt.trim()
+      ? requestBody.sourceJwt.trim()
+      : null;
 
-    if (!activeContext.sessionCookieValue) {
+    const currentSummary = await getCurrentNeuronSummary(request);
+    const sourceHost = currentSummary.sourceHost || activeContext.host;
+    const storedSourceSession = currentSummary.sourceHost
+      ? await getNeuronSessionCookieValue(currentSummary.sourceHost)
+      : activeContext.sessionCookieValue;
+    const sourceSessionCookieValue = storedSourceSession || (
+      sourceHost === activeContext.host ? activeContext.sessionCookieValue : null
+    );
+
+    if (!sourceSessionCookieValue) {
       return NextResponse.json(
         {
-          error: 'No active source session is available.',
+          error: `The source session for ${sourceHost} is unavailable or expired. Reconnect to that Neuron with Neuro-Access, then retry.`,
           status: 'SOURCE_SESSION_MISSING',
+          sourceHost,
+          activeHost: activeContext.host,
         },
         { status: 401 },
       );
     }
 
     const responseInfo = await callAgentJson({
-      host: activeContext.host,
+      host: sourceHost,
       path: '/Agent/Account/PrepareRemoteQuickLogin',
       payload: {},
-      sessionCookieValue: activeContext.sessionCookieValue,
+      bearerToken: sourceJwt,
+      sessionCookieValue: sourceSessionCookieValue,
     });
 
     if (!responseInfo.ok || !responseInfo.body?.legalId) {
       return NextResponse.json(
         {
           error: responseInfo.errorBody || 'PrepareRemoteQuickLogin failed.',
-          sourceHost: activeContext.host,
+          status: responseInfo.httpStatus === 401
+            ? 'SOURCE_SESSION_EXPIRED'
+            : 'SOURCE_PREPARE_FAILED',
+          sourceHost,
           responseKeys: responseInfo.responseKeys,
         },
         { status: responseInfo.httpStatus || 502 },
@@ -47,7 +69,7 @@ export async function POST(request) {
     const response = NextResponse.json(
       {
         switchAttemptId,
-        sourceHost: activeContext.host,
+        sourceHost,
         status: 'PREPARE_REMOTE_OK',
       },
       { status: 200 },

@@ -1,16 +1,19 @@
-import { cookies } from 'next/headers';
 import setCookie from 'set-cookie-parser';
 import { NextResponse } from 'next/server';
 import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
-import { getActiveNeuronContext, getDefaultNeuronHost, setNeuronSessionCookies } from '@/lib/neuronSessionContext';
+import {
+    getActiveNeuronContext,
+    getDefaultNeuronHost,
+    setNeuronSessionCookies,
+    setNeuronSwitchSourceHost,
+} from '@/lib/neuronSessionContext';
 
 export async function POST(request) {
 
     const requestData = await request.json();
     const { agentApiTimeout, serviceId, tab, mode, purpose } = requestData;
 
-    const cookieStore = await cookies();
     const activeContext = serviceId ? await getActiveNeuronContext(request) : null;
     const host = activeContext?.host || getDefaultNeuronHost() || config.api.agent.host;
     const url = `https://${host}/QuickLogin`;
@@ -23,13 +26,7 @@ export async function POST(request) {
     };
 
     let clientCookie;
-    if (serviceId) {
-        const clientCookieObject = cookieStore.get('HttpSessionID');
-
-        clientCookie = clientCookieObject
-            ? `HttpSessionID=${encodeURIComponent(clientCookieObject.value)}`
-            : null;
-    }
+    if (serviceId) clientCookie = activeContext?.upstreamCookieHeader || null;
 
     try {
         const response = await fetch(url, {
@@ -70,6 +67,7 @@ export async function POST(request) {
                         sessionCookieValue: sessionCookie.value,
                         activate: true,
                     });
+                    setNeuronSwitchSourceHost(nextRes, host);
                 }
             }
 

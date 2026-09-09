@@ -7,6 +7,7 @@ import { validateHost } from '@/lib/agentHost';
 
 export const ACTIVE_NEURON_HOST_COOKIE = 'neuro-admin-active-neuron-host';
 export const NEURON_SESSION_HOSTS_COOKIE = 'neuro-admin-neuron-session-hosts';
+export const NEURON_SWITCH_SOURCE_HOST_COOKIE = 'neuro-admin-neuron-switch-source-host';
 export const LEGACY_HTTP_SESSION_COOKIE = 'HttpSessionID';
 
 const PER_HOST_SESSION_COOKIE_PREFIX = 'neuro-admin-neuron-session-';
@@ -90,7 +91,8 @@ export async function getStoredNeuronSessionHosts() {
 export async function getActiveNeuronContext(request, options = {}) {
   const cookieStore = await cookies();
   const defaultHost = getDefaultNeuronHost();
-  const allowedHosts = normalizeAllowedHosts(options.allowedHosts);
+  const storedSessionHosts = await getStoredNeuronSessionHosts();
+  const allowedHosts = normalizeAllowedHosts(options.allowedHosts, storedSessionHosts);
   const activeHostCookieValue = normalizeNeuronHost(cookieStore.get(ACTIVE_NEURON_HOST_COOKIE)?.value || '');
 
   let host = activeHostCookieValue || defaultHost;
@@ -128,15 +130,38 @@ export async function getCurrentNeuronSummary(request, options = {}) {
   const activeContext = await getActiveNeuronContext(request, options);
   const defaultHost = getDefaultNeuronHost();
   const storedHosts = await getStoredNeuronSessionHosts();
+  const cookieStore = await cookies();
+  const sourceHost = normalizeNeuronHost(
+    cookieStore.get(NEURON_SWITCH_SOURCE_HOST_COOKIE)?.value || '',
+  );
+  const sourceSessionCookieValue = sourceHost
+    ? cookieStore.get(getNeuronSessionCookieName(sourceHost))?.value || ''
+    : activeContext.sessionCookieValue || '';
 
   return {
     activeHost: activeContext.host,
     defaultHost,
+    sourceHost: sourceHost || null,
+    hasSourceSession: Boolean(sourceSessionCookieValue),
+    canStartRemoteLogin: Boolean(sourceSessionCookieValue),
     hasActiveSession: Boolean(activeContext.sessionCookieValue),
     availableStoredSessions: storedHosts,
     activeHostCookieExists: activeContext.activeHostCookieExists,
     sessionSource: activeContext.sessionSource,
   };
+}
+
+export function setNeuronSwitchSourceHost(response, host) {
+  const normalizedHost = normalizeNeuronHost(host);
+  if (!normalizedHost) return;
+
+  response.cookies.set(NEURON_SWITCH_SOURCE_HOST_COOKIE, normalizedHost, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: COOKIE_MAX_AGE_SECONDS,
+  });
 }
 
 export async function setNeuronSessionCookies(response, { host, sessionCookieValue, activate = false }) {
@@ -178,6 +203,7 @@ export async function clearNeuronSessionCookies(response, options = {}) {
     });
     response.cookies.set(NEURON_SESSION_HOSTS_COOKIE, '', baseDeleteOptions);
     response.cookies.set(ACTIVE_NEURON_HOST_COOKIE, '', baseDeleteOptions);
+    response.cookies.set(NEURON_SWITCH_SOURCE_HOST_COOKIE, '', baseDeleteOptions);
     response.cookies.set(LEGACY_HTTP_SESSION_COOKIE, '', baseDeleteOptions);
     return;
   }
@@ -204,8 +230,8 @@ export async function clearNeuronSessionCookies(response, options = {}) {
   }
 }
 
-function normalizeAllowedHosts(allowedHosts = []) {
-  const fallbackHosts = getConfiguredNeuronHosts();
+function normalizeAllowedHosts(allowedHosts = [], storedSessionHosts = []) {
+  const fallbackHosts = [...getConfiguredNeuronHosts(), ...storedSessionHosts];
   const source = Array.isArray(allowedHosts) && allowedHosts.length ? allowedHosts : fallbackHosts;
   return [...new Set(source.map((value) => normalizeNeuronHost(value)).filter((host) => validateHost(host)))];
 }

@@ -27,10 +27,12 @@ export async function GET(request) {
       debugEnabled
         ? payload
         : {
-            activeHost: payload.activeHost,
-            defaultHost: payload.defaultHost,
-            references: payload.references,
-          },
+          activeHost: payload.activeHost,
+          defaultHost: payload.defaultHost,
+          references: payload.references,
+          sourceHost: payload.sourceHost,
+          canStartRemoteLogin: payload.canStartRemoteLogin,
+        },
       { status: 200 },
     );
   } catch (error) {

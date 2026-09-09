@@ -8,6 +8,7 @@ import {
   getActiveNeuronContext,
   getConfiguredNeuronHosts,
   getCurrentNeuronSummary,
+  getNeuronSessionCookieValue,
   getStoredNeuronSessionHosts,
   isNeuronHostAllowed,
   normalizeNeuronHost,
@@ -42,14 +43,19 @@ export function getSwitchTargetHostCookieName(attemptId) {
 
 export async function getNeuronReferences(request) {
   const activeContext = await getActiveNeuronContext(request);
+  const currentSummary = await getCurrentNeuronSummary(request);
+  const sourceHost = currentSummary.sourceHost || activeContext.host;
+  const sourceSessionCookieValue = currentSummary.sourceHost
+    ? await getNeuronSessionCookieValue(currentSummary.sourceHost)
+    : activeContext.sessionCookieValue;
   const storedSessionHosts = await getStoredNeuronSessionHosts();
   const configuredHosts = getConfiguredNeuronHosts();
 
   let remoteHosts = [];
   let remoteReferencesDebug = {
     called: false,
-    sourceHost: activeContext.host,
-    hasSourceSession: Boolean(activeContext.sessionCookieValue),
+    sourceHost,
+    hasSourceSession: Boolean(sourceSessionCookieValue),
     status: null,
     ok: false,
     responseBody: null,
@@ -58,13 +64,13 @@ export async function getNeuronReferences(request) {
     attempts: [],
   };
 
-  if (activeContext.sessionCookieValue) {
+  if (sourceSessionCookieValue) {
     remoteReferencesDebug.called = true;
     const responseInfo = await callAgentJson({
-      host: activeContext.host,
+      host: sourceHost,
       path: '/Agent/Account/RemoteReferences',
       payload: {},
-      sessionCookieValue: activeContext.sessionCookieValue,
+      sessionCookieValue: sourceSessionCookieValue,
     });
 
     remoteReferencesDebug.attempts.push({
@@ -89,31 +95,40 @@ export async function getNeuronReferences(request) {
     }
   }
 
-  const allowedHosts = [...new Set([activeContext.host, ...configuredHosts, ...remoteHosts].filter(Boolean))];
-  const currentSummary = await getCurrentNeuronSummary(request, { allowedHosts });
+  const allowedHosts = [...new Set([
+    activeContext.host,
+    ...configuredHosts,
+    ...remoteHosts,
+    ...storedSessionHosts,
+  ].filter(Boolean))];
+  const refreshedSummary = await getCurrentNeuronSummary(request, { allowedHosts });
   const fallbackReason = !remoteHosts.length && remoteReferencesDebug.called && !remoteReferencesDebug.ok
     ? 'REMOTE_REFERENCES_FAILED_USING_FALLBACK_HOSTS'
     : null;
 
   return {
-    activeHost: currentSummary.activeHost,
-    defaultHost: currentSummary.defaultHost,
+    activeHost: refreshedSummary.activeHost,
+    defaultHost: refreshedSummary.defaultHost,
     references: allowedHosts.map((host) => ({
       host,
       label: host,
-      description: host === currentSummary.defaultHost ? 'Default configured Neuron' : 'Remote Neuron',
-      isActive: host === currentSummary.activeHost,
+      description: host === refreshedSummary.defaultHost ? 'Default configured Neuron' : 'Remote Neuron',
+      isActive: host === refreshedSummary.activeHost,
       hasStoredSession: storedSessionHosts.includes(host),
     })),
+    sourceHost: refreshedSummary.sourceHost,
+    hasSourceSession: refreshedSummary.hasSourceSession,
+    canStartRemoteLogin: refreshedSummary.canStartRemoteLogin,
     debug: remoteReferencesDebug,
     fallbackReason,
   };
 }
 
-export async function callAgentJson({ host, path, payload, sessionCookieValue }) {
+export async function callAgentJson({ host, path, payload, bearerToken, sessionCookieValue }) {
   const headers = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
+    ...(bearerToken ? { Authorization: `Bearer ${bearerToken}` } : {}),
     ...(sessionCookieValue ? { Cookie: buildUpstreamCookieHeader(sessionCookieValue) } : {}),
   };
 

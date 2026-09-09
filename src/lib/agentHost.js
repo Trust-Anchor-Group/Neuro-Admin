@@ -42,6 +42,12 @@ export function resolveAgentHost(headersLike) {
 
     const cookieHeader = typeof headersLike?.get === 'function' ? headersLike.get('cookie') : headersLike?.cookie || '';
     if (cookieHeader) {
+      const activeHostMatch = cookieHeader.match(/(?:^|;\s*)neuro-admin-active-neuron-host=([^;]+)/);
+      if (activeHostMatch) {
+        const h = normalizeHost(decodeURIComponent(activeHostMatch[1]));
+        if (isAllowedAgentHost(h) || isPersistedSessionHost(cookieHeader, h)) return h;
+      }
+
       const m = cookieHeader.match(/(?:^|; )agent-host=([^;]+)/);
       if (m) {
         const h = normalizeHost(decodeURIComponent(m[1]));
@@ -53,5 +59,17 @@ export function resolveAgentHost(headersLike) {
   } catch {
     const fallbackHost = normalizeHost(process.env.AGENT_HOST);
     return isAllowedAgentHost(fallbackHost) ? fallbackHost : undefined;
+  }
+}
+
+function isPersistedSessionHost(cookieHeader, host) {
+  const match = cookieHeader.match(/(?:^|;\s*)neuro-admin-neuron-session-hosts=([^;]+)/);
+  if (!match) return false;
+
+  try {
+    const hosts = JSON.parse(decodeURIComponent(match[1]));
+    return Array.isArray(hosts) && hosts.map(normalizeHost).includes(host);
+  } catch {
+    return false;
   }
 }

@@ -17,8 +17,6 @@ import {
 import Navbar from '@/components/shared/Navbar';
 import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
 import SessionPing from "@/components/SessionPing"
-import NeuronSwitchLandingPanel from '@/components/debug/NeuronSwitchLandingPanel';
-import { isNeuronSwitchDebugEnabled } from '@/lib/neuronSwitchDebug';
 import NeuronSwitchControl from '@/components/shared/NeuronSwitchControl';
 
 // SERVICES LIST
@@ -126,7 +124,6 @@ const getBrandConfig = (host) => {
 };
 
 export default function LandingPage() {
-  const debugEnabled = isNeuronSwitchDebugEnabled();
   const [host, setHost] = useState('');
   const [mode, setMode] = useState('light');
   const { language } = useLanguage();
@@ -224,7 +221,6 @@ export default function LandingPage() {
               {/* Destination Card */}
               <div className="rounded-[16px] bg-[var(--brand-navbar)] shadow-[inset_0_0_10px_rgba(24, 31, 37, 0.10)] px-[24px] py-[20px]">
                 <NeuronSwitchControl />
-                {debugEnabled ? <NeuronSwitchLandingPanel /> : null}
               </div>
             </div>
 

@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import setCookie from 'set-cookie-parser';
-import { getActiveNeuronContext, setNeuronSessionCookies } from '@/lib/neuronSessionContext';
+import {
+  getActiveNeuronContext,
+  setNeuronSessionCookies,
+  setNeuronSwitchSourceHost,
+} from '@/lib/neuronSessionContext';
 import { readNeuronResponseBody } from '@/lib/neuronUpstream';
 
 export async function POST(request) {
@@ -24,6 +28,7 @@ export async function POST(request) {
   }
 
   const response = NextResponse.json(data, { status: 200 });
+  setNeuronSwitchSourceHost(response, activeContext.host);
   const setCookieHeader = resp.headers.get('set-cookie');
 
   if (setCookieHeader) {

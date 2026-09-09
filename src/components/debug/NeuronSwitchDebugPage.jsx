@@ -147,7 +147,7 @@ export default function NeuronSwitchDebugPage() {
             <div>
               <h1 className="text-3xl font-semibold">Neuron Switch Debug</h1>
               <p className="mt-2 max-w-3xl text-sm text-[var(--brand-text-secondary)]">
-                This page is debug-only. It keeps the source session, target session, and target JWT separate so the switching flow can be proven without changing production auth behavior.
+                This page is debug-only. It keeps the source session, target session, and target JWT separate while the switching flow is proven. After approval, you can explicitly activate the verified target session for Neuro Admin.
               </p>
             </div>
             <button
@@ -229,6 +229,9 @@ export default function NeuronSwitchDebugPage() {
                 </ActionButton>
                 <ActionButton disabled={isLoading} onClick={() => runAction('continue')}>
                   After approval: test target session
+                </ActionButton>
+                <ActionButton disabled={isLoading} onClick={() => runAction('activate-production')}>
+                  Use target in Neuro Admin
                 </ActionButton>
                 <ActionButton disabled={isLoading} onClick={() => runAction('convert-target')}>
                   Optional diagnostics: convert target session to JWT

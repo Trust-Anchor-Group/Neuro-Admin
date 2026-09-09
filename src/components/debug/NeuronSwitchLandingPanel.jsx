@@ -133,7 +133,7 @@ export default function NeuronSwitchLandingPanel() {
       <div className="flex flex-col gap-2">
         <p className="text-[13px] font-semibold text-amber-900">Neuron switch test</p>
         <p className="text-[12px] leading-[1.5] text-amber-900/90">
-          Debug-only. This runs Peter&apos;s session-cookie flow from the same destination area on the landing page without changing production auth behavior.
+          Debug-only diagnostics keep the source and target sessions separate. After the target session passes, use the activation button to make that verified session active for the Neuro Access application.
         </p>
       </div>
 
@@ -169,6 +169,9 @@ export default function NeuronSwitchLandingPanel() {
         </ActionButton>
         <ActionButton disabled={isLoading || targetRequired} onClick={() => runAction('continue')}>
           After approval: test target session
+        </ActionButton>
+        <ActionButton disabled={isLoading || targetRequired} onClick={() => runAction('activate-production')}>
+          Use target in Neuro Access
         </ActionButton>
         <ActionButton disabled={isLoading || targetRequired} onClick={() => runAction('convert-target')}>
           Optional: convert target session to JWT

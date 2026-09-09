@@ -1,7 +1,7 @@
 'use client';
 
-import { startTransition, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { getNeuronSwitchClientSnapshot } from '@/lib/neuronSwitchClient';
 
 const WAITING_STATUS = 'WAITING_FOR_APPROVAL';
 const TARGET_SESSION_AVAILABLE = 'TARGET_SESSION_AVAILABLE';
@@ -13,13 +13,46 @@ function syncActiveHost(host) {
   window.dispatchEvent(new CustomEvent('neuron-host-changed', { detail: host }));
 }
 
-function getReferenceLabel(reference) {
+function getReferenceLabel(reference, activeHost) {
   if (!reference) return '';
-  return `${reference.host} - ${reference.hasStoredSession ? 'Session available' : 'Login required'}`;
+  if (reference.accessStatus === 'unavailable') {
+    return `${reference.host} - No admin access`;
+  }
+  const state = reference.host === activeHost
+    ? 'Current session'
+    : reference.hasStoredSession
+      ? 'Session available'
+      : 'Login required';
+  return `${reference.host} - ${state}`;
+}
+
+function getSwitchErrorMessage(payload, fallback, currentHost) {
+  const rawMessage = payload?.error || fallback;
+  if (payload?.status === 'SOURCE_SESSION_MISSING' && payload?.sourceHost) {
+    return `Your source session on ${payload.sourceHost} is unavailable or expired. Reconnect to it with Neuro-Access, then retry.`;
+  }
+  if (payload?.status === 'SOURCE_SESSION_EXPIRED' && payload?.sourceHost) {
+    return `The source session on ${payload.sourceHost} has expired. Reconnect to it with Neuro-Access, then retry.`;
+  }
+  if (payload?.status === 'TARGET_SESSION_ACTIVATION_FAILED' && payload?.targetHost) {
+    return `Administrator access could not be verified on ${payload.targetHost}. You may not have an admin role there, or the target session has expired.`;
+  }
+  if (/unauthorized access prohibited|unauthorized/i.test(String(rawMessage))) {
+    return `The source Neuron${currentHost ? ` (${currentHost})` : ''} did not accept the current session. Log out and log in again with Neuro-Access, then retry.`;
+  }
+  return rawMessage;
+}
+
+function normalizeManualHost(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .split('/')[0]
+    .split(':')[0];
 }
 
 export default function NeuronSwitchControl({ variant = 'panel' }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState(null);
   const [references, setReferences] = useState([]);
@@ -29,8 +62,12 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
   const [fallbackReason, setFallbackReason] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [manualHost, setManualHost] = useState('');
+  const [manualHostError, setManualHostError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sourceHost, setSourceHost] = useState('');
+  const [canStartRemoteLogin, setCanStartRemoteLogin] = useState(true);
 
   const isNavbar = variant === 'navbar';
   const selectedReference = references.find((reference) => reference.host === selectedHost) || null;
@@ -62,6 +99,8 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
       setCurrent(currentPayload);
       setReferences(Array.isArray(referencesPayload.references) ? referencesPayload.references : []);
       setFallbackReason(referencesPayload.fallbackReason || '');
+      setSourceHost(currentPayload.sourceHost || referencesPayload.sourceHost || '');
+      setCanStartRemoteLogin(currentPayload.canStartRemoteLogin !== false && referencesPayload.canStartRemoteLogin !== false);
       syncActiveHost(currentPayload.activeHost);
 
       const nextSelectedHost = selectedHost
@@ -90,7 +129,9 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
 
     setIsSubmitting(true);
     setError('');
-    setMessage('');
+    setMessage(sourceHost && sourceHost !== current?.activeHost
+      ? `Preparing remote login using your source session on ${sourceHost}...`
+      : `Preparing remote login from ${current?.activeHost || 'the current Neuron'}...`);
 
     try {
       const prepareResponse = await fetch('/api/neuron-switch/prepare', {
@@ -98,12 +139,14 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({}),
+          body: JSON.stringify({
+            sourceJwt: getNeuronSwitchClientSnapshot().sourceJwt || '',
+          }),
       });
       const preparePayload = await prepareResponse.json();
 
       if (!prepareResponse.ok) {
-        throw new Error(preparePayload?.error || 'Failed to prepare remote quick login.');
+        throw new Error(getSwitchErrorMessage(preparePayload, 'Failed to prepare remote quick login.', current?.activeHost));
       }
 
       const nextAttemptId = preparePayload.switchAttemptId;
@@ -123,7 +166,7 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
       const triggerPayload = await triggerResponse.json();
 
       if (!triggerResponse.ok) {
-        throw new Error(triggerPayload?.error || 'Failed to trigger remote quick login.');
+        throw new Error(getSwitchErrorMessage(triggerPayload, 'Failed to trigger remote quick login.', current?.activeHost));
       }
 
       setWorkflow(triggerPayload);
@@ -165,7 +208,14 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
       const activatePayload = await activateResponse.json();
 
       if (!activateResponse.ok) {
-        throw new Error(activatePayload?.error || 'Target Accounts.ws activation failed.');
+        if (activatePayload?.status === 'TARGET_SESSION_ACTIVATION_FAILED') {
+          setReferences((previousReferences) => previousReferences.map((reference) => (
+            reference.host === selectedHost
+              ? { ...reference, accessStatus: 'unavailable' }
+              : reference
+          )));
+        }
+        throw new Error(getSwitchErrorMessage(activatePayload, 'Target Accounts.ws activation failed.', selectedHost));
       }
 
       if (activatePayload.status !== SCRIPT_SESSION_SUCCESS) {
@@ -176,8 +226,9 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
       setWorkflow(activatePayload);
       setMessage(`Connected to ${activatePayload.activeHost}. All admin data now uses this Neuron.`);
       setOpen(false);
-      await loadState();
-      startTransition(() => router.refresh());
+      // Client-side pages keep their own data-fetching state. A full reload makes
+      // every page fetch again with the newly activated host/session pair.
+      window.location.reload();
     } catch (activateError) {
       setError(activateError.message || 'Failed to activate the selected Neuron.');
     } finally {
@@ -229,6 +280,25 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
     }
   }
 
+  function handleAddManualHost() {
+    const normalizedHost = normalizeManualHost(manualHost);
+    setManualHostError('');
+
+    if (!normalizedHost) {
+      setManualHostError('Enter a Neuron hostname.');
+      return;
+    }
+
+    const matchingReference = references.find((reference) => reference.host === normalizedHost);
+    if (!matchingReference) {
+      setManualHostError('This Neuron is not in the server-approved list. Add it to NEURON_SWITCH_ALLOWED_HOSTS first.');
+      return;
+    }
+
+    setSelectedHost(normalizedHost);
+    setManualHost('');
+  }
+
   function renderPanel() {
     return (
       <div className="w-full rounded-[14px] border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-4 shadow-sm">
@@ -254,6 +324,22 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
             : 'All admin data and actions are sent to the selected Neuron session.'}
         </p>
 
+        <div className="mt-3 rounded-md bg-[var(--brand-background)] px-3 py-2 text-xs text-[var(--brand-text-secondary)]">
+          Your current login is the source Neuron. Select another Neuron below to request remote access; after approval, the admin data will move to that Neuron.
+        </div>
+
+        {sourceHost && current?.activeHost !== sourceHost && canStartRemoteLogin ? (
+          <div className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-900">
+            You are currently using a remote session on <strong>{current?.activeHost}</strong>. New login requests will use your stored source session on <strong>{sourceHost}</strong> automatically.
+          </div>
+        ) : null}
+
+        {sourceHost && !canStartRemoteLogin ? (
+          <div className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-900">
+            Your stored source session on <strong>{sourceHost}</strong> is unavailable. Reconnect to that Neuron with Neuro-Access before starting a new login.
+          </div>
+        ) : null}
+
         <label className="mt-4 block text-xs font-medium text-[var(--brand-text-secondary)]">
           Destination
         </label>
@@ -265,16 +351,55 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
         >
           {references.map((reference) => (
             <option key={reference.host} value={reference.host}>
-              {getReferenceLabel(reference)}
+              {getReferenceLabel(reference, current?.activeHost)}
             </option>
           ))}
         </select>
 
+        <div className="mt-3 flex flex-wrap gap-2">
+          <input
+            value={manualHost}
+            onChange={(event) => {
+              setManualHost(event.target.value);
+              setManualHostError('');
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') handleAddManualHost();
+            }}
+            placeholder="Specific approved host"
+            aria-label="Specific approved Neuron host"
+            className="min-w-[220px] flex-1 rounded-[10px] border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm text-[var(--brand-text)] outline-none"
+            disabled={isLoading || isSubmitting}
+          />
+          <button
+            type="button"
+            onClick={handleAddManualHost}
+            disabled={isLoading || isSubmitting || !manualHost.trim()}
+            className="rounded-md border border-[var(--brand-border)] px-3 py-2 text-xs font-semibold text-[var(--brand-text)] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Add host
+          </button>
+        </div>
+
+        {manualHostError ? (
+          <p className="mt-2 text-xs text-red-700">{manualHostError}</p>
+        ) : null}
+
         {selectedReference ? (
           <p className="mt-2 text-xs text-[var(--brand-text-secondary)]">
-            {selectedReference.hasStoredSession ? 'Session available' : 'Login required'}
+            {selectedReference.host === current?.activeHost
+              ? 'This is the Neuron you are currently logged into.'
+              : selectedReference.accessStatus === 'unavailable'
+                ? 'Administrator access could not be verified on this Neuron.'
+              : selectedReference.hasStoredSession
+                ? 'A previously approved session is available. You can use it directly.'
+                : 'Start login to send an approval request to Neuro-Access.'}
           </p>
         ) : null}
+
+        <p className="mt-2 text-[11px] text-[var(--brand-text-secondary)]">
+          The list contains configured and previously discovered Neurons. Administrator access is verified when you connect.
+        </p>
 
         {fallbackReason ? (
           <div className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-900">
@@ -286,10 +411,17 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
           <button
             type="button"
             onClick={handleStartLogin}
-            disabled={isLoading || isSubmitting || !selectedHost}
-            className="rounded-md bg-[var(--brand-text)] px-3 py-2 text-xs font-semibold text-[var(--brand-navbar)] disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={isLoading || isSubmitting || !selectedHost || selectedHost === current?.activeHost || !canStartRemoteLogin}
+            className="rounded-md px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+            style={{ backgroundColor: '#A160E8', color: '#FFFFFF' }}
           >
-            {isSubmitting ? 'Working...' : 'Start login'}
+            {selectedHost === current?.activeHost
+              ? 'Already connected'
+              : !canStartRemoteLogin
+                ? 'Reconnect source session'
+                : isSubmitting
+                  ? 'Working...'
+                  : 'Start login'}
           </button>
 
           {showContinue ? (
@@ -325,6 +457,18 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
             </button>
           ) : null}
         </div>
+
+        {workflow?.status === WAITING_STATUS ? (
+          <div className="mt-4 rounded-md bg-blue-50 px-3 py-2 text-xs text-blue-900">
+            Approval requested for <strong>{workflow.targetHost}</strong>. Approve it in Neuro-Access, then return here and click Continue.
+          </div>
+        ) : null}
+
+        {workflow?.status === TARGET_SESSION_AVAILABLE ? (
+          <div className="mt-4 rounded-md bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
+            Approval received for <strong>{workflow.targetHost}</strong>. Click Continue to activate that Neuron.
+          </div>
+        ) : null}
 
         {message ? (
           <div className="mt-4 rounded-md bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
