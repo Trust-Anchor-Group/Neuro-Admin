@@ -17,6 +17,7 @@ import {
 import Navbar from '@/components/shared/Navbar';
 import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
 import SessionPing from "@/components/SessionPing"
+import NeuronSwitchControl from '@/components/shared/NeuronSwitchControl';
 
 // SERVICES LIST
 const LandingServices = (t) => ([
@@ -154,9 +155,8 @@ export default function LandingPage() {
 
   // Apply brand theme when mode changes
   useEffect(() => {
-    const h = sessionStorage.getItem('AgentAPI.Host') || '';
-    applyBrandTheme(h, mode);
-  }, [mode]);
+    applyBrandTheme(host, mode);
+  }, [host, mode]);
 
   // Listen for global mode change events (dispatched by toggle in Navbar)
   useEffect(() => {
@@ -169,6 +169,21 @@ export default function LandingPage() {
     return () => {
       window.removeEventListener('ui-mode-changed', handler);
       window.removeEventListener('storage', handler);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleHostChange = (event) => {
+      const nextHost = typeof event?.detail === 'string'
+        ? event.detail
+        : sessionStorage.getItem('AgentAPI.Host') || '';
+      setHost(nextHost);
+      setBrand(getBrandConfig(nextHost));
+    };
+
+    window.addEventListener('neuron-host-changed', handleHostChange);
+    return () => {
+      window.removeEventListener('neuron-host-changed', handleHostChange);
     };
   }, []);
 
@@ -216,17 +231,7 @@ export default function LandingPage() {
 
               {/* Destination Card */}
               <div className="rounded-[16px] bg-[var(--brand-navbar)] shadow-[inset_0_0_10px_rgba(24, 31, 37, 0.10)] px-[24px] py-[20px]">
-                <label className="text-[14px] text-[var(--brand-text-secondary)] font-medium block mb-2">
-                  {t?.landing?.labels?.destination || 'Destination'}
-                </label>
-                <div className="relative">
-                  <select className="w-full appearance-none rounded-[8px] cursor-pointer bg-[var(--brand-navbar)] py-[12px] px-[16px] text-[16px] text-[var(--brand-text)] border-2 border-[var(--brand-border)] font-medium focus:outline-none">
-                    <option>{(t?.landing?.labels?.main || 'Main')} - {host}</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-4 flex items-center text-gray-600 text-sm pointer-events-none">
-                    ▼
-                  </div>
-                </div>
+                <NeuronSwitchControl />
               </div>
             </div>
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { resolveAgentHost } from '@/lib/agentHost';
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 import ResponseModel from '@/models/ResponseModel';
 
 function getOptionalString(value) {
@@ -36,7 +37,10 @@ export async function POST(request) {
 
     const eMail = getRequiredString(requestData?.eMail ?? requestData?.EMail);
     const code = getCode(requestData?.code ?? requestData?.Code);
-    const host = resolveAgentHost(request.headers);
+    const activeContext = await getActiveNeuronContext(request);
+    const host = activeContext.sessionCookieValue
+        ? activeContext.host
+        : resolveAgentHost(request.headers);
 
     if (!eMail || code === null) {
         return NextResponse.json(

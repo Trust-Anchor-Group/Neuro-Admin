@@ -1,11 +1,12 @@
-import config from "@/config/config";
 import ResponseModel from "@/models/ResponseModel";
+import { getActiveNeuronContext } from '@/lib/neuronSessionContext';
 
 export async function POST(request) {
     try {
         const requestData = await request.json();
-        const clientCookie = request.headers.get("Cookie");
-        const { host } = config.api.agent;
+        const activeContext = await getActiveNeuronContext(request);
+        const { host } = activeContext;
+        const clientCookie = activeContext.upstreamCookieHeader;
         const url = `https://${host}/Settings/PeerReview`;
 
         const payload = {

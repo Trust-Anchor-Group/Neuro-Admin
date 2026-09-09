@@ -45,6 +45,7 @@ export default function QuickLogin({
   const [success, setSuccess] = useState(false);
   const [serviceId, setServiceId] = useState('');
   const serviceIdRef = useRef(serviceId);
+  const displayIntervalRef = useRef(null);
 
   useEffect(() => {
     serviceIdRef.current = serviceId;
@@ -53,8 +54,6 @@ export default function QuickLogin({
   useEffect(() => {
     setTabId(TabID);
   }, []);
-
-  let displayInterval = null;
 
   const webSocketEventHandler = () => {
     const protocol = 'https:';
@@ -200,13 +199,16 @@ export default function QuickLogin({
   useEffect(() => {
     if (active) {
       webSocketEventHandler();
-      displayInterval = setInterval(() => {
+      displayIntervalRef.current = setInterval(() => {
         displayQuickLogin();
       }, 2000);
     }
 
     return () => {
-      if (displayInterval) clearInterval(displayInterval);
+      if (displayIntervalRef.current) {
+        clearInterval(displayIntervalRef.current);
+        displayIntervalRef.current = null;
+      }
     };
   }, [active]);
 
