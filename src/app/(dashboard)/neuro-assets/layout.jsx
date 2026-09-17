@@ -18,6 +18,7 @@ export default function NeuroAssetsLayout({ children }) {
       subItems: [
         { label: tAssetMenu?.issuer || "Issuer", href: "/neuro-assets/issuer" },
         { label: tAssetMenu?.Projects || "Projects", href: "/neuro-assets/Tokens" },
+        { label: tAssetMenu?.orders || "Orders", href: "/neuro-assets/Orders" },
         { label: tAssetMenu?.Sales || "Sales", href: "/neuro-assets/Sales" },
       ],
     },
