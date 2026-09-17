@@ -6,23 +6,16 @@ import Link from "next/link";
 import { useLanguage, content } from "../../../../../context/LanguageContext";
 import KYCSettings from "@/components/settings/kyc/KYCSettings";
 import APIKeys from "@/components/settings/apiKey/APIKeys";
+import { useActiveAdminHost } from '@/lib/activeAdminHost';
 
 export default function SettingsPageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [tab, setTab] = useState("kyc");
-  const [hideKyc, setHideKyc] = useState('')
+  const activeAdminHost = useActiveAdminHost();
   const debugEnabled = process.env.NEXT_PUBLIC_NEURON_SWITCH_DEBUG === 'true';
   const { language } = useLanguage();
   const t = content?.[language]?.SettingsPageClient || {};
-
-  useEffect(() => {
-      const storedUser = sessionStorage.getItem("AgentAPI.Host");
-      if (storedUser) {   
-        setHideKyc(storedUser)
-      }
-  }, [])
-  
 
   useEffect(() => {
     const urlTab = searchParams.get("tab");
@@ -35,7 +28,7 @@ export default function SettingsPageClient() {
 
       <div className="flex border-b border-[var(--brand-border)]">
         {
-          hideKyc !== 'kikkin.tagroot.io' &&
+          activeAdminHost !== 'kikkin.tagroot.io' &&
           <button
           className={`px-4 py-2 text-lg font-medium ${tab === "kyc" ? "border-b-2 border-blue-500 text-blue-500" : "text-gray-500"}`}
           onClick={() => router.push("/neuro-access/settings?tab=kyc")}
@@ -52,7 +45,7 @@ export default function SettingsPageClient() {
       </div>
 
       <div className="mt-6 bg-[var(--brand-background)] shadow-md rounded-lg">
-        {tab === "kyc" && hideKyc !== 'kikkin.tagroot.io' ? <KYCSettings /> : <APIKeys />}
+        {tab === "kyc" && activeAdminHost !== 'kikkin.tagroot.io' ? <KYCSettings /> : <APIKeys />}
       </div>
 
       {debugEnabled ? (

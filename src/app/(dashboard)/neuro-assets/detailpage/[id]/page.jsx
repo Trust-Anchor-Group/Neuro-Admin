@@ -14,6 +14,7 @@ import { updateProject as updateProjectFlow } from '@/lib/projectWizard';
 import { listIssuers, listIssuerLocalizations, uploadIssuerProfilePhoto } from '@/lib/projectAdmin';
 import { MEDIA_RULES, validateFileSize, validateImageFile } from '@/lib/mediaValidation';
 import { mapBackendValidationError } from '@/lib/backendValidation';
+import { useActiveAdminHost } from '@/lib/activeAdminHost';
 
 // Hooks & Data
 import { useLanguage, content as translations } from '../../../../../../context/LanguageContext';
@@ -202,21 +203,12 @@ const DetailPageAssets = () => {
     return id || '';
   }, [id]);
 
-  const backendHost = useMemo(() => {
-    const storedHost = typeof window !== 'undefined'
-      ? String(sessionStorage.getItem('AgentAPI.Host') || '').trim()
-      : '';
-
-    const sanitizedStoredHost = storedHost.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
-    if (sanitizedStoredHost) return sanitizedStoredHost;
-
-    return process.env.NEXT_PUBLIC_AGENT_HOST || process.env.AGENT_HOST || 'mateo.lab.tagroot.io';
-  }, []);
+  const backendHost = useActiveAdminHost();
   const resolveBackendAssetUrl = useCallback((rawUrl) => {
     const value = String(rawUrl || '').trim();
     if (!value) return '';
     if (/^https?:\/\//i.test(value)) return value;
-    if (value.startsWith('/nex-resources/')) return `https://${backendHost}${value}`;
+    if (value.startsWith('/nex-resources/')) return backendHost ? `https://${backendHost}${value}` : value;
     return value.startsWith('/') ? value : `/${value}`;
   }, [backendHost]);
 

@@ -2,16 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { getNeuronSwitchClientSnapshot } from '@/lib/neuronSwitchClient';
+import { syncActiveAdminHost } from '@/lib/activeAdminHost';
 
 const WAITING_STATUS = 'WAITING_FOR_APPROVAL';
 const TARGET_SESSION_AVAILABLE = 'TARGET_SESSION_AVAILABLE';
 const SCRIPT_SESSION_SUCCESS = 'END_TO_END_SWITCH_WORKS_WITH_SCRIPT_SESSION';
-
-function syncActiveHost(host) {
-  if (!host) return;
-  sessionStorage.setItem('AgentAPI.Host', host);
-  window.dispatchEvent(new CustomEvent('neuron-host-changed', { detail: host }));
-}
 
 function getReferenceLabel(reference, activeHost) {
   if (!reference) return '';
@@ -101,7 +96,7 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
       setFallbackReason(referencesPayload.fallbackReason || '');
       setSourceHost(currentPayload.sourceHost || referencesPayload.sourceHost || '');
       setCanStartRemoteLogin(currentPayload.canStartRemoteLogin !== false && referencesPayload.canStartRemoteLogin !== false);
-      syncActiveHost(currentPayload.activeHost);
+      syncActiveAdminHost(currentPayload.activeHost);
 
       const nextSelectedHost = selectedHost
         && referencesPayload.references?.some((reference) => reference.host === selectedHost)
@@ -222,7 +217,7 @@ export default function NeuronSwitchControl({ variant = 'panel' }) {
         throw new Error('The selected Neuron was not activated.');
       }
 
-      syncActiveHost(activatePayload.activeHost);
+      syncActiveAdminHost(activatePayload.activeHost);
       setWorkflow(activatePayload);
       setMessage(`Connected to ${activatePayload.activeHost}. All admin data now uses this Neuron.`);
       setOpen(false);
