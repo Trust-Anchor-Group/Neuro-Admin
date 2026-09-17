@@ -18,6 +18,7 @@ import Navbar from '@/components/shared/Navbar';
 import { useLanguage, content as i18nContent } from '../../../../context/LanguageContext'
 import SessionPing from "@/components/SessionPing"
 import NeuronSwitchControl from '@/components/shared/NeuronSwitchControl';
+import { useActiveAdminHost } from '@/lib/activeAdminHost';
 
 // SERVICES LIST
 const LandingServices = (t) => ([
@@ -38,6 +39,17 @@ const LandingServices = (t) => ([
     iconColor: 'text-[#8B5CF6]',
     iconBg: 'bg-[#F3E8FF]',
     href: '/neuro-assets',
+    status: t?.landing?.status?.active,
+    locked: false,
+    newTab: false,
+  },
+  {
+    title: 'Neuro-Reports',
+    description: 'Discover and run reports for the active Neuron.',
+    icon: MdDescription,
+    iconColor: 'text-[#8B5CF6]',
+    iconBg: 'bg-[#F3E8FF]',
+    href: '/reports',
     status: t?.landing?.status?.active,
     locked: false,
     newTab: false,
@@ -135,23 +147,22 @@ const getBrandConfig = (host) => {
 };
 
 export default function LandingPage() {
-  const [host, setHost] = useState('');
+  const host = useActiveAdminHost();
   const [mode, setMode] = useState('light');
   const { language } = useLanguage();
   const t = i18nContent[language];
   const services = LandingServices(t);
   const [brand, setBrand] = useState({ logo: '/NeuroLogo.svg', name: 'Neuro Admin' });
 
-  // Initial load: host + initial mode
+  // Initial load: initial mode
   useEffect(() => {
-    const storedHost = sessionStorage.getItem('AgentAPI.Host');
-    if (storedHost) {
-      setHost(storedHost);
-      setBrand(getBrandConfig(storedHost));
-    }
     const initial = getInitialMode();
     setMode(initial);
   }, []);
+
+  useEffect(() => {
+    setBrand(getBrandConfig(host));
+  }, [host]);
 
   // Apply brand theme when mode changes
   useEffect(() => {
@@ -169,21 +180,6 @@ export default function LandingPage() {
     return () => {
       window.removeEventListener('ui-mode-changed', handler);
       window.removeEventListener('storage', handler);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleHostChange = (event) => {
-      const nextHost = typeof event?.detail === 'string'
-        ? event.detail
-        : sessionStorage.getItem('AgentAPI.Host') || '';
-      setHost(nextHost);
-      setBrand(getBrandConfig(nextHost));
-    };
-
-    window.addEventListener('neuron-host-changed', handleHostChange);
-    return () => {
-      window.removeEventListener('neuron-host-changed', handleHostChange);
     };
   }, []);
 

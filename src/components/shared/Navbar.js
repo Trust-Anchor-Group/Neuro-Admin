@@ -11,6 +11,7 @@ import { useLanguage } from '../../../context/LanguageContext'
 import { applyBrandTheme, getInitialMode, toggleMode } from '../../utils/brandTheme';
 import { Sun, Moon, CircleUserRound, } from 'lucide-react'
 import NeuronSwitchControl from './NeuronSwitchControl';
+import { clearActiveAdminHost, useActiveAdminHost } from '@/lib/activeAdminHost';
 
 function renderFlagLabel(countryCode, text) {
   return (
@@ -26,7 +27,7 @@ const Navbar = ({ neuroLogo }) => {
   const [user, setUser] = useState(null)
   const [avatarUrl, setAvatarUrl] = useState('')
   const [mode, setMode] = useState('light')
-  const [activeHost, setActiveHost] = useState('')
+  const activeHost = useActiveAdminHost()
   const router = useRouter()
   const isFetchingRef = useRef(false)
   const hideTimeoutRef = useRef(null)
@@ -81,7 +82,6 @@ const Navbar = ({ neuroLogo }) => {
     } finally {
       isFetchingRef.current = false
     }
-    setActiveHost(sessionStorage.getItem('AgentAPI.Host') || '')
     const initialMode = getInitialMode()
     setMode(initialMode)
   }, [])
@@ -90,20 +90,6 @@ const Navbar = ({ neuroLogo }) => {
     // Apply theme when mode changes
     applyBrandTheme(activeHost, mode)
   }, [activeHost, mode])
-
-  useEffect(() => {
-    const handleHostChange = (event) => {
-      const nextHost = typeof event?.detail === 'string'
-        ? event.detail
-        : sessionStorage.getItem('AgentAPI.Host') || ''
-      setActiveHost(nextHost)
-    }
-
-    window.addEventListener('neuron-host-changed', handleHostChange)
-    return () => {
-      window.removeEventListener('neuron-host-changed', handleHostChange)
-    }
-  }, [])
 
   const filterRef = useRef(null)
 
@@ -135,6 +121,7 @@ const Navbar = ({ neuroLogo }) => {
 
       await fetch('/api/auth/logout', { method: 'GET' })
 
+      clearActiveAdminHost()
       sessionStorage.removeItem('neuroUser')
       setUser(null)
 

@@ -9,6 +9,7 @@ import {
   updateIssuerLocalization,
   uploadIssuerProfilePhoto,
 } from "@/lib/projectAdmin";
+import { useActiveAdminHost } from '@/lib/activeAdminHost';
 
 const parseApiArray = (payload) => {
   const candidates = [
@@ -82,15 +83,8 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
   const [issuerLogoFile, setIssuerLogoFile] = useState(null);
   const [issuerValidationError, setIssuerValidationError] = useState("");
   const [feedback, setFeedback] = useState({ type: "", message: "" });
-  const [agentHost, setAgentHost] = useState("AGENT_HOST");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const host = sessionStorage.getItem("AgentAPI.Host") || "AGENT_HOST";
-    setAgentHost(host);
-  }, []);
-
-  const subjectSuffix = useMemo(() => `@${agentHost}`, [agentHost]);
+  const activeAdminHost = useActiveAdminHost();
+  const subjectSuffix = useMemo(() => activeAdminHost ? `@${activeAdminHost}` : '', [activeAdminHost]);
   const resolvedSubject = useMemo(() => {
     const cleanUsername = String(newUsername || "").trim();
     return cleanUsername ? `${cleanUsername}${subjectSuffix}` : "";
@@ -115,18 +109,12 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
     if (!value) return "";
     if (/^https?:\/\//i.test(value)) return value;
 
-    const normalizedAgentHost = String(agentHost || "").replace(/^https?:\/\//i, "").replace(/\/+$/, "");
-    const fallbackHost = process.env.NEXT_PUBLIC_AGENT_HOST || process.env.AGENT_HOST || "mateo.lab.tagroot.io";
-    const host = normalizedAgentHost && normalizedAgentHost !== "AGENT_HOST"
-      ? normalizedAgentHost
-      : fallbackHost;
-
     if (value.startsWith("/nex-resources/")) {
-      return `https://${host}${value}`;
+      return activeAdminHost ? `https://${activeAdminHost}${value}` : value;
     }
 
     return value.startsWith("/") ? value : `/${value}`;
-  }, [agentHost]);
+  }, [activeAdminHost]);
 
   const resolveIssuerLogoFromLocalization = useCallback((localization) => {
     const candidates = [
@@ -760,14 +748,14 @@ export default function IssuerAccountsManager({ initialIssuerId = "" }) {
             <button
               type="button"
               onClick={handleAddUser}
-              disabled={!issuerId || !isValidUsername(newUsername) || assignedUsernameSet.has(String(newUsername || "").trim()) || isSubmitting || isIssuerActionBusy}
+              disabled={!issuerId || !activeAdminHost || !isValidUsername(newUsername) || assignedUsernameSet.has(String(newUsername || "").trim()) || isSubmitting || isIssuerActionBusy}
               className="inline-flex min-w-[180px] items-center justify-center gap-2 rounded-xl bg-[var(--brand-button)] px-4 py-2 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? <FiLoader className="animate-spin" /> : <FiUserPlus />}
               Add User
             </button>
           </div>
-          <p className="mt-2 text-xs text-[var(--brand-text-secondary)]">Final subject: {resolvedSubject || `username${subjectSuffix}`}</p>
+          <p className="mt-2 text-xs text-[var(--brand-text-secondary)]">Final subject: {resolvedSubject || (subjectSuffix ? `username${subjectSuffix}` : 'Loading active Neuron...')}</p>
 
           {feedback.message ? (
             <p className={`mt-3 text-sm ${feedback.type === "error" ? "text-rose-500" : "text-emerald-500"}`}>

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { clearActiveAdminHost } from '@/lib/activeAdminHost';
 
 function InactivityModal({ countdown, onContinue, onLogout }) {
   return (
@@ -72,6 +73,7 @@ export default function SessionPing() {
       },
       credentials: "include",
     });
+    clearActiveAdminHost();
     clearInterval(countdownIntervalRef.current);
     setShowModal(false);
     setCountdown(60);

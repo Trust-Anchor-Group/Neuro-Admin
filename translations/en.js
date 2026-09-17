@@ -367,6 +367,7 @@ const en = {
   },
   AssetMenu:{
     title: 'Assets',
+    orders: 'Orders',
     carbonCredit: 'Carbon Credit',
     clients: 'Clients',
     Tokens: 'Tokens',
