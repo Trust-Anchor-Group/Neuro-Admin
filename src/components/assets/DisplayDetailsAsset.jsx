@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { MapOutInput } from '../shared/MapOutInput';
 import { useLanguage, content } from '../../../context/LanguageContext'; 
+import { useActiveAdminHost } from '@/lib/activeAdminHost';
 
 export const DisplayDetailsAsset = ({
   userData,
@@ -33,20 +34,7 @@ export const DisplayDetailsAsset = ({
   const openPreview = (image) => setSelectedImage(image);
   const closePreview = () => setSelectedImage(null);
 
-  const backendHost = useMemo(() => {
-    const storedHost = typeof window !== 'undefined'
-      ? String(sessionStorage.getItem('AgentAPI.Host') || '').trim()
-      : '';
-
-    const sanitizedStoredHost = storedHost.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
-    if (sanitizedStoredHost) return sanitizedStoredHost;
-
-    return (
-      process.env.NEXT_PUBLIC_AGENT_HOST ||
-      process.env.AGENT_HOST ||
-      'mateo.lab.tagroot.io'
-    );
-  }, []);
+  const backendHost = useActiveAdminHost();
 
   if (!userData) return <p>{t?.displayDetails?.noData || 'No data available'}</p>;
 
@@ -61,7 +49,7 @@ export const DisplayDetailsAsset = ({
     }
 
     if (value.startsWith('/nex-resources/')) {
-      return `https://${backendHost}${value}`;
+      return backendHost ? `https://${backendHost}${value}` : value;
     }
 
     return value.startsWith('/') ? value : `/${value}`;

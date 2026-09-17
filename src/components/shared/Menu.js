@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { applyBrandTheme, getInitialMode, toggleMode } from '../../utils/brandTheme';
 import { useLanguage, content } from '../../../context/LanguageContext';
+import { useActiveAdminHost } from '@/lib/activeAdminHost';
 
 const getBrandConfig = (host) => {
   const lowerHost = host?.toLowerCase() || '';
@@ -34,7 +35,7 @@ const Menu = ({ menuItems }) => {
   const [hoveredItem, setHoveredItem] = useState(null);
   const [mode, setMode] = useState('light');
   const [isClient, setIsClient] = useState(false);
-  const [host, setHost] = useState('');
+  const host = useActiveAdminHost();
   const filterRef = useRef(null);
   const hideTimeoutRef = useRef(null);
   const { language } = useLanguage();
@@ -51,8 +52,6 @@ const Menu = ({ menuItems }) => {
 
   useEffect(() => {
     setIsClient(true);
-    const storedHost = sessionStorage.getItem('AgentAPI.Host');
-    if (storedHost) setHost(storedHost);
     const initial = getInitialMode();
     setMode(initial);
   }, []);

@@ -1,7 +1,7 @@
 "use client";
 import Menu from "@/components/shared/Menu";
 import Navbar from "@/components/shared/Navbar";
-import { MdOutlineDocumentScanner, MdOutlineSettings } from "react-icons/md";
+import { MdOutlineDocumentScanner, MdOutlineSettings, MdDescription } from "react-icons/md";
 import { useLanguage, content } from '../../../../context/LanguageContext'
 
 export default function DashboardLayout({ children }) {
@@ -9,6 +9,7 @@ export default function DashboardLayout({ children }) {
   const t = content[language];
 
   const menuItems = [
+    { title: 'Reports', icon: <MdDescription size={20} />, href: '/reports' },
     {
       title: t?.menu?.access || 'Access',
       icon: <MdOutlineDocumentScanner size={20} />,

@@ -46,6 +46,8 @@ export default function QuickLogin({
   const [serviceId, setServiceId] = useState('');
   const serviceIdRef = useRef(serviceId);
   const displayIntervalRef = useRef(null);
+  const loginSocketRef = useRef(null);
+  const quickLoginActiveRef = useRef(false);
 
   useEffect(() => {
     serviceIdRef.current = serviceId;
@@ -56,14 +58,22 @@ export default function QuickLogin({
   }, []);
 
   const webSocketEventHandler = () => {
+    if (!quickLoginActiveRef.current) return;
+
     const protocol = 'https:';
     const uri = `${protocol}//${neuron}/ClientEventsWS`;
 
     let socket = new WebSocket(uri, ['ls']);
+    loginSocketRef.current = socket;
     let pingTimer = null;
     let closed = false;
 
     socket.onopen = () => {
+      if (!quickLoginActiveRef.current) {
+        socket.close();
+        return;
+      }
+
       console.log('[WebSocket] Connected.');
       socket.send(
         JSON.stringify({
@@ -108,7 +118,7 @@ export default function QuickLogin({
     };
 
     const reconnect = () => {
-      if (!closed) {
+      if (!closed && quickLoginActiveRef.current) {
         console.log('[WebSocket] Reconnecting...');
         setTimeout(webSocketEventHandler, 5000);
       }
@@ -197,6 +207,7 @@ export default function QuickLogin({
   };
 
   useEffect(() => {
+    quickLoginActiveRef.current = active;
     if (active) {
       webSocketEventHandler();
       displayIntervalRef.current = setInterval(() => {
@@ -205,10 +216,16 @@ export default function QuickLogin({
     }
 
     return () => {
+      quickLoginActiveRef.current = false;
       if (displayIntervalRef.current) {
         clearInterval(displayIntervalRef.current);
         displayIntervalRef.current = null;
       }
+      const socket = loginSocketRef.current;
+      if (socket && socket.readyState !== WebSocket.CLOSED) {
+        socket.close(1000, 'Quick login finished.');
+      }
+      loginSocketRef.current = null;
     };
   }, [active]);
 

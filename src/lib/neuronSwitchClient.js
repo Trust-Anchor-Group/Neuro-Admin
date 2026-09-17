@@ -1,3 +1,5 @@
+import { getActiveAdminHost } from '@/lib/activeAdminHost';
+
 export function createNeuronSwitchAttemptId() {
   return crypto.randomUUID().toLowerCase();
 }
@@ -14,25 +16,26 @@ export function getNeuronSwitchTabId() {
 }
 
 export function getCurrentNeuronHost() {
+  return getActiveAdminHost();
+}
+
+export function getAgentApiHost() {
   if (typeof window === 'undefined') return '';
-
-  const storedHost = sessionStorage.getItem('AgentAPI.Host');
-  if (storedHost) return storedHost;
-
-  const metaHost = document.querySelector('meta[name="NEURON"]')?.getAttribute('content');
-  return metaHost || '';
+  return sessionStorage.getItem('AgentAPI.Host') || '';
 }
 
 export function getNeuronSwitchClientSnapshot() {
   if (typeof window === 'undefined') {
     return {
       activeHost: '',
+      agentHost: '',
       sourceJwt: '',
     };
   }
 
   return {
     activeHost: getCurrentNeuronHost(),
+    agentHost: getAgentApiHost(),
     sourceJwt: sessionStorage.getItem('AgentAPI.Token') || '',
   };
 }

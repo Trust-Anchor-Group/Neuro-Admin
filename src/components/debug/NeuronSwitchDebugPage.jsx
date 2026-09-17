@@ -265,7 +265,8 @@ export default function NeuronSwitchDebugPage() {
             <div className="rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-6 shadow-sm">
               <h2 className="text-xl font-semibold">Client Snapshot</h2>
               <dl className="mt-4 space-y-3 text-sm">
-                <SnapshotRow label="AgentAPI.Host" value={clientSnapshot?.activeHost || 'Not set'} />
+                <SnapshotRow label="Active Admin host" value={clientSnapshot?.activeHost || 'Not set'} />
+                <SnapshotRow label="AgentAPI.Host" value={clientSnapshot?.agentHost || 'Not set'} />
                 <SnapshotRow label="AgentAPI.Token exists" value={clientSnapshot?.sourceJwt ? 'true' : 'false'} />
                 <SnapshotRow label="Browser cookie access" value="HttpOnly Neuron session cookie is not readable in browser JS" />
                 <SnapshotRow label="Selected transport" value={transportMode} />
