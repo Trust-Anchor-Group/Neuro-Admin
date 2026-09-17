@@ -12,23 +12,6 @@ function firstValue(order, keys, fallback = '-') {
   return fallback;
 }
 
-function formatDate(value) {
-  if (value === null || value === undefined || value === '') return '-';
-  const numeric = Number(value);
-  const date = Number.isFinite(numeric)
-    ? new Date(numeric < 1e12 ? numeric * 1000 : numeric)
-    : new Date(value);
-  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
-}
-
-function formatMoney(order) {
-  const value = firstValue(order, ['paying_price_display', 'total_display'], '');
-  if (value) return String(value);
-  const amount = firstValue(order, ['paying_price', 'total_price', 'total', 'amount'], '-');
-  const currency = firstValue(order, ['currency', 'paying_currency'], '');
-  return currency ? `${amount} ${String(currency).toUpperCase()}` : String(amount);
-}
-
 async function readPayload(response) {
   return await response.json().catch(() => null);
 }
@@ -145,11 +128,11 @@ export default function OffchainOrdersPage() {
             <tr>
               <th className="px-4 py-3">Order</th>
               <th className="px-4 py-3">Project</th>
-              <th className="px-4 py-3">Buyer</th>
-              <th className="px-4 py-3">Quantity</th>
-              <th className="px-4 py-3">Total</th>
-              <th className="px-4 py-3">Created</th>
-              <th className="px-4 py-3">Payment</th>
+              <th className="px-4 py-3">Token amount</th>
+              <th className="px-4 py-3">Payment method</th>
+              <th className="px-4 py-3">Legal ID</th>
+              <th className="px-4 py-3">Email</th>
+              <th className="px-4 py-3">Payment status</th>
               <th className="px-4 py-3 text-right">Action</th>
             </tr>
           </thead>
@@ -161,20 +144,23 @@ export default function OffchainOrdersPage() {
             ) : orders.map((order, index) => {
               const orderId = getAdminOrderId(order);
               const paid = isAdminOrderPaid(order);
-              const buyerName = firstValue(order, ['full_name', 'buyer_name', 'buyerName', 'email'], 'Unknown buyer');
-              const buyerDetail = firstValue(order, ['email', 'buyer_legal_id', 'buyerLegalId'], '');
-              const project = firstValue(order?.extra || {}, ['project_name', 'projectName'], firstValue(order, ['project_name', 'projectName', 'project_id', 'projectId']));
+              const projectId = firstValue(order, ['project_id', 'projectId']);
+              const tokenAmount = firstValue(order, ['token_amount', 'tokenAmount']);
+              const paymentMethod = firstValue(order, ['payment_method', 'paymentMethod']);
+              const legalId = firstValue(order, ['legal_id', 'legalId']);
+              const email = firstValue(order, ['email']);
+              const paymentStatus = firstValue(order, ['payment_status', 'paymentStatus', 'status'], paid ? 'Paid' : 'Unpaid');
               return (
                 <tr key={orderId || `order-${index}`} className="border-t border-[var(--brand-border)] hover:bg-[var(--brand-hover)]/40">
                   <td className="px-4 py-3 font-mono text-xs">{orderId || '-'}</td>
-                  <td className="px-4 py-3">{String(project)}</td>
-                  <td className="px-4 py-3"><span className="block font-medium">{String(buyerName)}</span>{buyerDetail && buyerDetail !== buyerName ? <span className="block text-xs text-[var(--brand-text-secondary)]">{String(buyerDetail)}</span> : null}</td>
-                  <td className="px-4 py-3">{String(firstValue(order, ['token_count', 'tokenCount', 'quantity', 'amount']))}</td>
-                  <td className="px-4 py-3">{formatMoney(order)}</td>
-                  <td className="px-4 py-3">{formatDate(firstValue(order, ['created', 'created_at', 'createdAt', 'created_date'], ''))}</td>
+                  <td className="px-4 py-3 font-mono text-xs">{String(projectId)}</td>
+                  <td className="px-4 py-3">{String(tokenAmount)}</td>
+                  <td className="px-4 py-3">{String(paymentMethod)}</td>
+                  <td className="px-4 py-3 font-mono text-xs">{String(legalId)}</td>
+                  <td className="px-4 py-3">{String(email)}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${paid ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'}`}>
-                      {paid ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock3 className="h-3.5 w-3.5" />}{paid ? 'Paid' : 'Pending'}
+                      {paid ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock3 className="h-3.5 w-3.5" />}{String(paymentStatus)}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
