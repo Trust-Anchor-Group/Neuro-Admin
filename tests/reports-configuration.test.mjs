@@ -10,6 +10,10 @@ test('resolves explicit Reports JIDs by active admin host without inferring host
   assert.equal(resolveReportsJid('b.example.test', raw), 'reports-b@tagroot.io');
   assert.equal(resolveReportsJid('c.example.test', raw), '');
   assert.equal(resolveReportsJid('athletesandyou.tagroot.io', raw), 'athletesandyou.eu.id.tagroot.io@eu.id.tagroot.io');
+  assert.equal(resolveReportsJid('br.id.tagroot.io'), 'br@sa.id.tagroot.io');
+  assert.equal(resolveReportsJid('se.id.tagroot.io'), 'se@eu.id.tagroot.io');
+  assert.equal(resolveReportsJid('parklet.tagroot.io'), 'parklet.tagroot.io@se.id.tagroot.io');
+  assert.equal(resolveReportsJid('innova.tagroot.io'), 'innova@sa.id.tagroot.io');
   assert.equal(getReportsJidMap(raw)['a.example.test'], 'reports-a@tagroot.io');
 });
 
