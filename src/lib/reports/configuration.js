@@ -20,6 +20,10 @@ function parseMap(rawValue) {
 }
 
 const KNOWN_REPORTS_JID_MAP = {
+  'br.id.tagroot.io': 'br@sa.id.tagroot.io',
+  'se.id.tagroot.io': 'se@eu.id.tagroot.io',
+  'parklet.tagroot.io': 'parklet.tagroot.io@se.id.tagroot.io',
+  'innova.tagroot.io': 'innova@sa.id.tagroot.io',
   'lab.tagroot.io': 'lab.tagroot.io@tagroot.io',
   'athletesandyou.tagroot.io': 'athletesandyou.eu.id.tagroot.io@eu.id.tagroot.io',
 };
