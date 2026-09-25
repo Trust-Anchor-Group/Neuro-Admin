@@ -23,10 +23,13 @@ function apiMessage(payload, fallback) {
 
 export default function OffchainOrdersPage() {
   const [orders, setOrders] = useState([]);
+  const [projectNames, setProjectNames] = useState({});
+  const [contractStatusDrafts, setContractStatusDrafts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [markingOrderId, setMarkingOrderId] = useState('');
+  const [savingContractOrderId, setSavingContractOrderId] = useState('');
   const mutationRef = useRef(false);
 
   const loadOrders = useCallback(async () => {
@@ -41,7 +44,41 @@ export default function OffchainOrdersPage() {
       });
       const payload = await readPayload(response);
       if (!response.ok) throw new Error(apiMessage(payload, `Failed to load orders (${response.status}).`));
-      setOrders(unwrapAdminOrders(payload));
+      const loadedOrders = unwrapAdminOrders(payload);
+      setOrders(loadedOrders);
+      setContractStatusDrafts(Object.fromEntries(loadedOrders.map((order) => [
+        getAdminOrderId(order), String(order?.contract_status ?? order?.contractStatus ?? ''),
+      ])));
+
+      const projectIds = [...new Set(loadedOrders
+        .map((order) => String(order?.project_id ?? order?.projectId ?? '').trim())
+        .filter(Boolean))];
+      const projectEntries = await Promise.all(projectIds.map(async (projectId) => {
+        try {
+          const projectResponse = await fetch(`/api/projects?projectId=${encodeURIComponent(projectId)}`, {
+            method: 'GET',
+            headers: { Accept: 'application/json' },
+            credentials: 'include',
+            cache: 'no-store',
+          });
+          if (!projectResponse.ok) return [projectId, projectId];
+          const projectPayload = await readPayload(projectResponse);
+          const project = projectPayload?.data?.data?.data
+            ?? projectPayload?.data?.data
+            ?? projectPayload?.data
+            ?? projectPayload;
+          const name = project?.localization?.title
+            || project?.title
+            || project?.token?.project_label
+            || project?.token?.friendly_name
+            || project?.project_name
+            || project?.projectName;
+          return [projectId, name ? String(name) : projectId];
+        } catch {
+          return [projectId, projectId];
+        }
+      }));
+      setProjectNames(Object.fromEntries(projectEntries));
     } catch (requestError) {
       setError(requestError?.message || 'Failed to load off-chain orders.');
     } finally {
@@ -84,6 +121,35 @@ export default function OffchainOrdersPage() {
     }
   };
 
+  const updateContractStatus = async (order) => {
+    const orderId = getAdminOrderId(order);
+    const contractStatus = String(contractStatusDrafts[orderId] ?? '').trim();
+    if (!orderId || !contractStatus || mutationRef.current) return;
+
+    mutationRef.current = true;
+    setSavingContractOrderId(orderId);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch(`/api/orders/${encodeURIComponent(orderId)}/contract-status`, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ contract_status: contractStatus }),
+      });
+      const payload = await readPayload(response);
+      if (!response.ok) throw new Error(apiMessage(payload, `Failed to update contract status (${response.status}).`));
+
+      await loadOrders();
+      setNotice(`Contract status for order ${orderId} was updated.`);
+    } catch (requestError) {
+      setError(requestError?.message || 'Failed to update contract status.');
+    } finally {
+      mutationRef.current = false;
+      setSavingContractOrderId('');
+    }
+  };
+
   const cards = [
     { label: 'All orders', value: orders.length, Icon: ShoppingCart, className: 'text-blue-600 bg-blue-100' },
     { label: 'Awaiting payment', value: pendingCount, Icon: Clock3, className: 'text-amber-600 bg-amber-100' },
@@ -100,7 +166,7 @@ export default function OffchainOrdersPage() {
         <button
           type="button"
           onClick={loadOrders}
-          disabled={loading || Boolean(markingOrderId)}
+          disabled={loading || Boolean(markingOrderId) || Boolean(savingContractOrderId)}
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-4 py-2 text-sm font-semibold disabled:opacity-50"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -133,18 +199,21 @@ export default function OffchainOrdersPage() {
               <th className="px-4 py-3">Legal ID</th>
               <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Payment status</th>
+              <th className="px-4 py-3">Contract status</th>
               <th className="px-4 py-3 text-right">Action</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-[var(--brand-text-secondary)]">Loading off-chain orders...</td></tr>
+              <tr><td colSpan={9} className="px-4 py-12 text-center text-[var(--brand-text-secondary)]">Loading off-chain orders...</td></tr>
             ) : orders.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-[var(--brand-text-secondary)]">No off-chain orders found.</td></tr>
+              <tr><td colSpan={9} className="px-4 py-12 text-center text-[var(--brand-text-secondary)]">No off-chain orders found.</td></tr>
             ) : orders.map((order, index) => {
               const orderId = getAdminOrderId(order);
               const paid = isAdminOrderPaid(order);
               const projectId = firstValue(order, ['project_id', 'projectId']);
+              const contractStatus = String(order?.contract_status ?? order?.contractStatus ?? '');
+              const contractStatusDraft = contractStatusDrafts[orderId] ?? contractStatus;
               const tokenAmount = firstValue(order, ['token_amount', 'tokenAmount']);
               const paymentMethod = firstValue(order, ['payment_method', 'paymentMethod']);
               const legalId = firstValue(order, ['legal_id', 'legalId']);
@@ -153,7 +222,7 @@ export default function OffchainOrdersPage() {
               return (
                 <tr key={orderId || `order-${index}`} className="border-t border-[var(--brand-border)] hover:bg-[var(--brand-hover)]/40">
                   <td className="px-4 py-3 font-mono text-xs">{orderId || '-'}</td>
-                  <td className="px-4 py-3 font-mono text-xs">{String(projectId)}</td>
+                  <td className="px-4 py-3">{projectNames[String(projectId)] || String(projectId)}</td>
                   <td className="px-4 py-3">{String(tokenAmount)}</td>
                   <td className="px-4 py-3">{String(paymentMethod)}</td>
                   <td className="px-4 py-3 font-mono text-xs">{String(legalId)}</td>
@@ -163,12 +232,34 @@ export default function OffchainOrdersPage() {
                       {paid ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock3 className="h-3.5 w-3.5" />}{String(paymentStatus)}
                     </span>
                   </td>
+                  <td className="px-4 py-3">
+                    <div className="flex min-w-52 items-center gap-2">
+                      <input
+                        type="text"
+                        value={contractStatusDraft}
+                        onChange={(event) => setContractStatusDrafts((current) => ({
+                          ...current,
+                          [orderId]: event.target.value,
+                        }))}
+                        aria-label={`Contract status for order ${orderId}`}
+                        className="min-w-0 flex-1 rounded-md border border-[var(--brand-border)] bg-[var(--brand-background)] px-2 py-1.5 text-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => updateContractStatus(order)}
+                        disabled={!isAdminOrderId(orderId) || !contractStatusDraft.trim() || contractStatusDraft.trim() === contractStatus || Boolean(savingContractOrderId) || Boolean(markingOrderId)}
+                        className="rounded-md border border-[var(--brand-border)] px-2 py-1.5 text-xs font-semibold disabled:opacity-50"
+                      >
+                        {savingContractOrderId === orderId ? 'Saving...' : 'Save'}
+                      </button>
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-right">
                     {paid ? <span className="text-xs text-[var(--brand-text-secondary)]">Settled</span> : (
                       <button
                         type="button"
                         onClick={() => markPaid(order)}
-                        disabled={!isAdminOrderId(orderId) || Boolean(markingOrderId)}
+                        disabled={!isAdminOrderId(orderId) || Boolean(markingOrderId) || Boolean(savingContractOrderId)}
                         className="rounded-lg bg-[var(--brand-button)] px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
                       >
                         {markingOrderId === orderId ? 'Marking paid...' : 'Mark as paid'}
