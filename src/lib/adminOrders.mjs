@@ -22,6 +22,9 @@ export function isAdminOrderPaid(order) {
 
 export function unwrapAdminOrders(payload) {
   const candidates = [
+    payload?.data?.data?.data,
+    payload?.data?.data?.orders,
+    payload?.data?.data?.items,
     payload?.data?.data,
     payload?.data?.orders,
     payload?.data?.items,
