@@ -4,7 +4,10 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import {
+  getAdminContractStatusHistory,
   getAdminOrderId,
+  getAdminOrderHistory,
+  getAdminOrderTimestamp,
   isAdminOrderId,
   isAdminOrderPaid,
   unwrapAdminOrders,
@@ -12,6 +15,31 @@ import {
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readProjectFile = (relativePath) => readFile(path.join(projectRoot, relativePath), 'utf8');
+
+test('reads order and status timestamps from Innova history snapshots', () => {
+  const order = {
+    order_id: '243f2b8f-f4ac-4abe-8f33-cc14bf73ce0f',
+    payment_status: 'Paid',
+    contract_status: 'ContractSent',
+    history: [
+      { payment_status: 'Unpaid', contract_status: 'NotCreated', created: 1790583117 },
+      { payment_status: 'Unpaid', contract_status: 'ContractSent', created: 1790583118 },
+      { payment_status: 'Paid', contract_status: 'ContractSent', created: 1790583127 },
+    ],
+  };
+
+  assert.equal(getAdminOrderTimestamp(order), 1790583117);
+  assert.deepEqual(getAdminOrderHistory(order), [
+    { paymentStatus: 'Unpaid', contractStatus: 'NotCreated', timestamp: 1790583117 },
+    { paymentStatus: 'Unpaid', contractStatus: 'ContractSent', timestamp: 1790583118 },
+    { paymentStatus: 'Paid', contractStatus: 'ContractSent', timestamp: 1790583127 },
+  ]);
+  assert.deepEqual(getAdminContractStatusHistory(order), [
+    { status: 'NotCreated', timestamp: 1790583117 },
+    { status: 'ContractSent', timestamp: 1790583118 },
+    { status: 'ContractSent', timestamp: 1790583127 },
+  ]);
+});
 
 test('normalizes supported Innova order envelopes and payment fields', () => {
   const id = '243f2b8f-f4ac-4abe-8f33-cc14bf73ce0f';

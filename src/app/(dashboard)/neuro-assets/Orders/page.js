@@ -5,7 +5,7 @@ import { CheckCircle2, ChevronDown, CircleDollarSign, Clock3, FileClock, Refresh
 import {
   ADMIN_CONTRACT_STATUSES,
   getAdminContractStatus,
-  getAdminContractStatusHistory,
+  getAdminOrderHistory,
   getAdminOrderId,
   getAdminOrderTimestamp,
   isAdminOrderId,
@@ -225,7 +225,7 @@ export default function OffchainOrdersPage() {
               const projectId = firstValue(order, ['project_id', 'projectId']);
               const contractStatus = getAdminContractStatus(order);
               const contractStatusDraft = contractStatusDrafts[orderId] ?? contractStatus;
-              const contractHistory = getAdminContractStatusHistory(order);
+              const orderHistory = getAdminOrderHistory(order);
               const tokenAmount = firstValue(order, ['token_amount', 'tokenAmount']);
               const paymentMethod = firstValue(order, ['payment_method', 'paymentMethod']);
               const legalId = firstValue(order, ['legal_id', 'legalId']);
@@ -291,24 +291,28 @@ export default function OffchainOrdersPage() {
                         <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold">
                           <span className="flex items-center gap-2">
                           <FileClock className="h-4 w-4 text-[var(--brand-text-secondary)]" />
-                          Contract history <span className="font-normal text-[var(--brand-text-secondary)]">({contractHistory.length} {contractHistory.length === 1 ? 'event' : 'events'})</span>
+                          Order history <span className="font-normal text-[var(--brand-text-secondary)]">({orderHistory.length} {orderHistory.length === 1 ? 'event' : 'events'})</span>
                           </span>
                           <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
                         </summary>
-                        {contractHistory.length ? (
+                        {orderHistory.length ? (
                           <ol className="mt-4 space-y-3 pl-1">
-                            {contractHistory.map((event, eventIndex) => (
-                              <li key={`${event.status}-${eventIndex}`} className="flex gap-3">
+                            {orderHistory.map((event, eventIndex) => (
+                              <li key={`${event.timestamp}-${eventIndex}`} className="flex gap-3">
                                 <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--brand-accent)]" />
                                 <div className="min-w-0">
-                                  <p className="text-sm font-medium">{formatStatusLabel(event.status)}</p>
+                                  <p className="text-sm font-medium">
+                                    Payment: {event.paymentStatus || 'Unknown'}
+                                    {' · '}
+                                    Contract: {event.contractStatus ? formatStatusLabel(event.contractStatus) : 'Unknown'}
+                                  </p>
                                   <p className="mt-0.5 text-xs text-[var(--brand-text-secondary)]">{formatTimestamp(event.timestamp)}</p>
                                 </div>
                               </li>
                             ))}
                           </ol>
                         ) : (
-                          <p className="mt-3 text-sm text-[var(--brand-text-secondary)]">No contract status history was returned for this order.</p>
+                          <p className="mt-3 text-sm text-[var(--brand-text-secondary)]">No order history was returned for this order.</p>
                         )}
                       </details>
                     </article>

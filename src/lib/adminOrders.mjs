@@ -32,6 +32,10 @@ export function getAdminOrderTimestamp(order) {
     ?? order?.creationDate
     ?? order?.date
     ?? order?.time
+    ?? (Array.isArray(order?.history)
+      ? order.history.find((event) => event?.created != null || event?.timestamp != null)?.created
+        ?? order.history.find((event) => event?.created != null || event?.timestamp != null)?.timestamp
+      : null)
     ?? null;
 }
 
@@ -42,6 +46,7 @@ const HISTORY_FIELDS = [
   'contractStatusEvents',
   'contract_history',
   'contractHistory',
+  'history',
   'status_history',
   'statusHistory',
 ];
@@ -82,6 +87,7 @@ function normalizeHistoryEvent(value, fallbackStatus = '') {
       ?? value.changedAt
       ?? value.updated_at
       ?? value.updatedAt
+      ?? value.created
       ?? value.status_timestamp
       ?? value.statusTimestamp
       ?? value.changed_on
@@ -145,6 +151,24 @@ export function getAdminContractStatusHistory(order) {
   }
 
   return [];
+}
+
+export function getAdminOrderHistory(order) {
+  if (!Array.isArray(order?.history)) return [];
+
+  return order.history
+    .filter((event) => event && typeof event === 'object' && !Array.isArray(event))
+    .map((event) => ({
+      paymentStatus: event.payment_status ?? event.paymentStatus ?? null,
+      contractStatus: event.contract_status ?? event.contractStatus ?? null,
+      timestamp: event.created
+        ?? event.timestamp
+        ?? event.created_at
+        ?? event.createdAt
+        ?? event.updated_at
+        ?? event.updatedAt
+        ?? null,
+    }));
 }
 
 export function isAdminOrderPaid(order) {
