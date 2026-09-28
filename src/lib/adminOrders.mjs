@@ -39,6 +39,32 @@ export function getAdminOrderTimestamp(order) {
     ?? null;
 }
 
+function timestampToMilliseconds(value) {
+  if (value === null || value === undefined || value === '') return null;
+
+  const numeric = typeof value === 'number'
+    || (typeof value === 'string' && /^-?\d+(\.\d+)?$/.test(value.trim()));
+  const milliseconds = numeric
+    ? Number(value) * (Number(value) < 1e12 && Number(value) > -1e12 ? 1000 : 1)
+    : Date.parse(value);
+
+  return Number.isFinite(milliseconds) ? milliseconds : null;
+}
+
+export function sortAdminOrdersLatestFirst(orders) {
+  if (!Array.isArray(orders)) return [];
+
+  return orders
+    .map((order, index) => ({ order, index, timestamp: timestampToMilliseconds(getAdminOrderTimestamp(order)) }))
+    .sort((left, right) => {
+      if (left.timestamp === null && right.timestamp === null) return left.index - right.index;
+      if (left.timestamp === null) return 1;
+      if (right.timestamp === null) return -1;
+      return right.timestamp - left.timestamp || left.index - right.index;
+    })
+    .map(({ order }) => order);
+}
+
 const HISTORY_FIELDS = [
   'contract_status_history',
   'contractStatusHistory',

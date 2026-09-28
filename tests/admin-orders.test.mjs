@@ -10,6 +10,7 @@ import {
   getAdminOrderTimestamp,
   isAdminOrderId,
   isAdminOrderPaid,
+  sortAdminOrdersLatestFirst,
   unwrapAdminOrders,
 } from '../src/lib/adminOrders.mjs';
 
@@ -39,6 +40,19 @@ test('reads order and status timestamps from Innova history snapshots', () => {
     { status: 'ContractSent', timestamp: 1790583118 },
     { status: 'ContractSent', timestamp: 1790583127 },
   ]);
+});
+
+test('sorts orders newest-first using top-level or history timestamps', () => {
+  const orders = [
+    { order_id: 'older', history: [{ created: 1790583117 }] },
+    { order_id: 'untimestamped', history: [] },
+    { order_id: 'newest', created_at: '2026-09-28T10:00:00Z' },
+  ];
+
+  assert.deepEqual(
+    sortAdminOrdersLatestFirst(orders).map((order) => order.order_id),
+    ['newest', 'older', 'untimestamped'],
+  );
 });
 
 test('normalizes supported Innova order envelopes and payment fields', () => {
