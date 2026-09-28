@@ -10,6 +10,7 @@ import {
   getAdminOrderTimestamp,
   isAdminOrderId,
   isAdminOrderPaid,
+  sortAdminOrdersLatestFirst,
   unwrapAdminOrders,
 } from '@/lib/adminOrders.mjs';
 
@@ -70,7 +71,7 @@ export default function OffchainOrdersPage() {
       });
       const payload = await readPayload(response);
       if (!response.ok) throw new Error(apiMessage(payload, `Failed to load orders (${response.status}).`));
-      const loadedOrders = unwrapAdminOrders(payload);
+      const loadedOrders = sortAdminOrdersLatestFirst(unwrapAdminOrders(payload));
       setOrders(loadedOrders);
       setContractStatusDrafts(Object.fromEntries(loadedOrders.map((order) => [
         getAdminOrderId(order), getAdminContractStatus(order),
