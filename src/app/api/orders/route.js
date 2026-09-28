@@ -15,6 +15,17 @@ function jsonResponse(status, message, data = null) {
   });
 }
 
+function logUpstreamOrdersResponse(status, body) {
+  if (process.env.DEBUG_ADMIN_ORDERS !== 'true') return;
+
+  // The payload can contain customer email addresses and legal IDs. Keep the
+  // complete response available for diagnosis only when explicitly enabled.
+  console.info('[admin-orders] Upstream order-list response', {
+    status,
+    body,
+  });
+}
+
 export async function GET(request) {
   try {
     const activeContext = await getActiveNeuronContext(request);
@@ -29,6 +40,7 @@ export async function GET(request) {
       cache: 'no-store',
     });
     const body = await readBody(response);
+    logUpstreamOrdersResponse(response.status, body);
 
     if (!response.ok) {
       const upstreamMessage = typeof body === 'string' ? body : body?.message;
