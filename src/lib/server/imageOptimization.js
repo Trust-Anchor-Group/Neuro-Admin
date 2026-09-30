@@ -125,6 +125,11 @@ export async function optimizeImageFormData(incomingFormData, profile = IMAGE_PR
     }
   }
 
+  const uploadImage = nextFormData.get("upload_image");
+  if (uploadImage instanceof File && uploadImage.type) {
+    nextFormData.set("upload_image_ContentType", uploadImage.type);
+  }
+
   return nextFormData;
 }
 
