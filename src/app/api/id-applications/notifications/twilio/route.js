@@ -12,7 +12,9 @@ export async function POST(request) {
     if (!validTwilioSignature(callbackUrl, params, request.headers.get('x-twilio-signature'), process.env.TWILIO_AUTH_TOKEN) ||
         params.get('AccountSid') !== process.env.TWILIO_ACCOUNT_SID) return new Response(null, { status: 403 });
     const id = url.searchParams.get('id'), attemptId = url.searchParams.get('attempt');
-    if (!validAlertId(id) || !validAttemptId(attemptId)) return new Response(null, { status: 400 });
+    const recipient = url.searchParams.get('recipient');
+    if (!validAlertId(id) || !validAttemptId(attemptId) || (recipient !== null && !validAlertId(recipient))) return new Response(null, { status: 400 });
+    const jobKey = recipient === null ? 'whatsapp' : `whatsapp:${recipient}`;
     const status = params.get('MessageStatus');
     const state = ['delivered', 'read'].includes(status) ? 'delivered'
       : ['failed', 'undelivered'].includes(status) ? 'delivery_failed'
@@ -20,7 +22,7 @@ export async function POST(request) {
     const providerId = params.get('MessageSid');
     if (state && /^(SM|MM)[a-f0-9]{32}$/i.test(providerId || '')) {
       const code = params.get('ErrorCode');
-      await recordDelivery(id, 'whatsapp', { attemptId, providerId, state,
+      await recordDelivery(id, jobKey, { attemptId, providerId, state,
         error: /^\d+$/.test(code || '') ? `twilio_${code}` : state === 'delivery_failed' ? 'twilio_delivery_failed' : '' });
     }
     return new Response(null, { status: 204 });

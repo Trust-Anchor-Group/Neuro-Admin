@@ -1,4 +1,5 @@
-const whatsappNumber = (value) => /^whatsapp:\+[1-9]\d{6,14}$/.test(value || '');
+import { configuredWhatsappRecipients, MAX_WHATSAPP_RECIPIENTS, whatsappNumber } from './whatsapp.mjs';
+import { whatsappJobKey } from './notifications.mjs';
 const emailAddress = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value || '');
 
 export function inboxUrl(config) {
@@ -9,7 +10,7 @@ export function inboxUrl(config) {
   } catch { return ''; }
 }
 
-export function notificationConfigError(channel, config, env = process.env) {
+export function notificationConfigError(channel, config, env = process.env, recipient) {
   if (!inboxUrl(config)) return 'public_origin_not_configured';
   if (channel === 'email') {
     if (config.emailEnabled === false) return 'email_disabled';
@@ -18,8 +19,17 @@ export function notificationConfigError(channel, config, env = process.env) {
   } else {
     if (!config.whatsappEnabled) return 'whatsapp_disabled';
     if (!/^AC[a-f0-9]{32}$/i.test(env.TWILIO_ACCOUNT_SID || '') || !env.TWILIO_AUTH_TOKEN ||
-        !whatsappNumber(env.TWILIO_WHATSAPP_FROM) || !whatsappNumber(env.TWILIO_WHATSAPP_TO)) return 'twilio_not_configured';
+        !whatsappNumber(env.TWILIO_WHATSAPP_FROM)) return 'twilio_not_configured';
     if (env.TWILIO_WHATSAPP_CONTENT_SID && !/^HX[a-f0-9]{32}$/i.test(env.TWILIO_WHATSAPP_CONTENT_SID)) return 'twilio_template_invalid';
+    const recipients = configuredWhatsappRecipients(config, env);
+    if (recipient !== undefined) {
+      if (!whatsappNumber(recipient)) return 'whatsapp_recipient_invalid';
+      if (!recipients.includes(recipient)) return 'whatsapp_recipient_removed';
+    } else {
+      if (!recipients.length) return 'whatsapp_recipients_not_configured';
+      if (recipients.length > MAX_WHATSAPP_RECIPIENTS) return 'whatsapp_recipient_limit_exceeded';
+      if (!recipients.every(whatsappNumber)) return 'whatsapp_recipient_invalid';
+    }
   }
   return '';
 }
@@ -30,8 +40,11 @@ export function notificationText(alert, config) {
 }
 
 export async function sendNotification(channel, alert, config, attempt, fetchImpl = fetch, env = process.env) {
-  const error = notificationConfigError(channel, config, env);
+  const recipient = channel === 'whatsapp' ? (attempt.recipient ?? config.legacyWhatsappRecipient ?? env.TWILIO_WHATSAPP_TO) : undefined;
+  const error = notificationConfigError(channel, config, env, recipient);
   if (error) return { state: 'rejected', error };
+  if (channel === 'whatsapp' && (!whatsappNumber(recipient) ||
+      (attempt.jobKey?.startsWith('whatsapp:') && attempt.jobKey !== whatsappJobKey(recipient)))) return { state: 'rejected', error: 'whatsapp_recipient_invalid' };
   let url, options;
   if (channel === 'email') {
     url = 'https://api.sendgrid.com/v3/mail/send';
@@ -47,9 +60,13 @@ export async function sendNotification(channel, alert, config, attempt, fetchImp
     };
   } else {
     url = `https://api.twilio.com/2010-04-01/Accounts/${env.TWILIO_ACCOUNT_SID}/Messages.json`;
+    const callback = new URL(`${new URL(config.publicOrigin).origin}/api/id-applications/notifications/twilio`);
+    callback.searchParams.set('id', alert.id);
+    callback.searchParams.set('attempt', attempt.attemptId);
+    if (attempt.jobKey?.startsWith('whatsapp:')) callback.searchParams.set('recipient', attempt.jobKey.slice('whatsapp:'.length));
     const body = new URLSearchParams({
-      From: env.TWILIO_WHATSAPP_FROM, To: env.TWILIO_WHATSAPP_TO,
-      StatusCallback: `${new URL(config.publicOrigin).origin}/api/id-applications/notifications/twilio?id=${alert.id}&attempt=${attempt.attemptId}`,
+      From: env.TWILIO_WHATSAPP_FROM, To: recipient,
+      StatusCallback: callback.href,
     });
     if (env.TWILIO_WHATSAPP_CONTENT_SID) {
       body.set('ContentSid', env.TWILIO_WHATSAPP_CONTENT_SID);

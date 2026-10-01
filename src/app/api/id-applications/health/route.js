@@ -17,6 +17,7 @@ export async function GET(request) {
   const notifications = Object.fromEntries(['email', 'whatsapp'].map((channel) => [channel, {
     enabled: channel === 'email' ? config.emailEnabled : config.whatsappEnabled,
     configurationError: notificationConfigError(channel, config),
+    ...(channel === 'whatsapp' ? { recipientCount: config.whatsappRecipients.length } : {}),
   }]));
   const ready = storage && (process.env.ID_ALERT_RECEIVER_ENABLED !== 'true' || (lease.active && lease.connected));
   return NextResponse.json({ ready, storage, receiver, lease, discovery: config.discovery, eventIds: [...config.eventIds], notifications }, { status: ready ? 200 : 503, headers: { 'Cache-Control': 'no-store' } });

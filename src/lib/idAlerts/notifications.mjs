@@ -1,15 +1,44 @@
 import { createHash } from 'node:crypto';
+import { MAX_WHATSAPP_RECIPIENTS, whatsappNumber } from './whatsapp.mjs';
 
 export const CHANNELS = ['email', 'whatsapp'];
 export const SEND_LEASE_MS = 120000;
 export const MAX_ATTEMPTS = 12;
 export const recipientHash = (value) => createHash('sha256').update(value.trim().toLowerCase()).digest('hex');
+export const whatsappJobKey = (recipient) => `whatsapp:${recipientHash(recipient)}`;
+export const notificationChannel = (key) => key.startsWith('whatsapp:') ? 'whatsapp' : key;
+export const validNotificationKey = (key) => CHANNELS.includes(key) || /^whatsapp:[a-f0-9]{64}$/.test(key || '');
+const newJob = (enabled) => ({ state: enabled ? 'pending' : 'disabled', attempts: 0, lastError: '', nextAttemptAt: '' });
+
+function recipientJobs(recipients) {
+  return Object.fromEntries(recipients.map((recipient) => [whatsappJobKey(recipient), { ...newJob(true), recipient }]));
+}
 
 export function initialNotifications(config = {}) {
-  return Object.fromEntries(CHANNELS.map((channel) => [channel, {
-    state: (channel === 'email' ? config.emailEnabled !== false : config.whatsappEnabled === true) ? 'pending' : 'disabled',
-    attempts: 0, lastError: '', nextAttemptAt: '',
-  }]));
+  const jobs = { email: newJob(config.emailEnabled !== false), whatsapp: newJob(config.whatsappEnabled === true) };
+  if (config.whatsappEnabled && Array.isArray(config.whatsappRecipients)) {
+    if (config.whatsappRecipients.length && config.whatsappRecipients.length <= MAX_WHATSAPP_RECIPIENTS) {
+      delete jobs.whatsapp;
+      Object.assign(jobs, recipientJobs(config.whatsappRecipients));
+    } else jobs.whatsapp.recipientSelectionPending = true;
+  }
+  return jobs;
+}
+
+export function prepareRecipientJobs(jobs, config = {}) {
+  const legacy = jobs.whatsapp;
+  if (!legacy) return jobs;
+  // Only a job explicitly created without an audience may acquire one later.
+  // Historical accepted/disabled single-recipient alerts never fan out.
+  if (legacy.recipientSelectionPending && config.whatsappEnabled && config.whatsappRecipients?.length &&
+      config.whatsappRecipients.length <= MAX_WHATSAPP_RECIPIENTS) {
+    const { whatsapp, ...rest } = jobs;
+    return { ...rest, ...recipientJobs(config.whatsappRecipients) };
+  }
+  if (!legacy.recipient && !legacy.recipientSelectionPending && ['pending', 'retry', 'blocked'].includes(legacy.state) && config.legacyWhatsappRecipient) {
+    return { ...jobs, whatsapp: { ...legacy, recipient: config.legacyWhatsappRecipient } };
+  }
+  return jobs;
 }
 
 // Old 'sent' means provider acceptance, not delivery. Never replay historical sends.
@@ -46,7 +75,9 @@ export function publicAlert(alert) {
     'claimedBy', 'claimedAt', 'acknowledgedBy', 'acknowledgedAt', 'handledBy', 'handledAt', 'auditTrail'];
   const safe = Object.fromEntries(fields.filter((key) => alert[key] !== undefined).map((key) => [key, alert[key]]));
   safe.message = 'Legal Identity application registered.';
-  safe.notifications = Object.fromEntries(Object.entries(alert.notifications || legacyNotifications(alert)).map(([channel, job]) => [channel, {
+  safe.notifications = Object.fromEntries(Object.entries(alert.notifications || legacyNotifications(alert)).map(([key, job]) => [key, {
+    channel: notificationChannel(key),
+    recipientLabel: job.recipient ? (whatsappNumber(job.recipient) ? `…${job.recipient.slice(-4)}` : 'Invalid recipient') : '',
     state: job.state, attempts: job.attempts, lastError: job.lastError || '',
     nextAttemptAt: job.nextAttemptAt || '', acceptedAt: job.acceptedAt || '', deliveredAt: job.deliveredAt || '',
   }]));

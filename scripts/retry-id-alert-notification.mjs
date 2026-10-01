@@ -2,10 +2,11 @@
 // existing Azure Table connection in the process environment; prints no secrets.
 import { retryNotification } from '../src/lib/idAlerts/store.mjs';
 import { validAlertId } from '../src/lib/idAlerts/webhooks.mjs';
+import { validNotificationKey } from '../src/lib/idAlerts/notifications.mjs';
 
 const [id, channel, operatorId, confirmation] = process.argv.slice(2);
-if (!validAlertId(id) || !['email', 'whatsapp'].includes(channel) || !operatorId || confirmation !== '--confirmed-not-delivered') {
-  console.error('Usage: node scripts/retry-id-alert-notification.mjs <alert-id> <email|whatsapp> <operator-id> --confirmed-not-delivered');
+if (!validAlertId(id) || !validNotificationKey(channel) || !operatorId || confirmation !== '--confirmed-not-delivered') {
+  console.error('Usage: node scripts/retry-id-alert-notification.mjs <alert-id> <email|whatsapp|whatsapp:recipient-hash> <operator-id> --confirmed-not-delivered');
   process.exitCode = 1;
 } else {
   try {

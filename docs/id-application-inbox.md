@@ -12,9 +12,9 @@
 | Neuron | Stable ID | Customer | Sender bare JID | State |
 | --- | --- | --- | --- | --- |
 | Lab Neuron | `lab-neuron` | `lab-test` | `lab.tagroot.io@tagroot.io` | Configured; real event and operator flow confirmed by user |
-| BR ID Neuron | `br-id-neuron` | `br` | **Unverified** (`br@sa.id.tagroot.io` is the displayed account only) | Pending sender verification, filter setup, registry entry and live test |
+| BR ID Neuron | `br-id-neuron` | `br` | `br@sa.id.tagroot.io` (verified main gateway sniffer) | Registered in dev; pending filtered sink and live acceptance |
 
-The BR website is `br.id.tagroot.io`. A website domain or displayed connection account is not sufficient evidence to add a sender. Do not enable BR until its actual outgoing XMPP identity is verified.
+The BR website is `br.id.tagroot.io`. Its outgoing identity was independently verified by the user from the main gateway sniffer's `from` and publisher before registration. A website domain or displayed account label alone remains insufficient evidence for other sources.
 
 ## Processing, storage, and privacy
 
@@ -36,7 +36,7 @@ The [Neuron XMPP sink](https://github.com/PeterWaher/IoTGateway/blob/master/Even
 
 ### Notifications and retries
 
-Each new alert atomically contains independent email/WhatsApp jobs. The existing 30-second timer processes up to 100 actionable alerts per scan. Azure ETag claims prevent two workers sending the same attempt. Human status changes, worker updates and callbacks use the same ETag, so they preserve each other's state. Provider calls are never made inside XMPP ingestion.
+Each new alert atomically contains an email job and one WhatsApp job per configured individual recipient. The existing 30-second timer processes up to 100 actionable alerts per scan. Azure ETag claims prevent two workers sending the same recipient attempt. Human status changes, worker updates and callbacks use the same ETag, so they preserve each other's state. Provider calls are never made inside XMPP ingestion.
 
 | State | Meaning/action |
 | --- | --- |
@@ -58,7 +58,7 @@ After checking provider activity and confirming **no delivery**, an administrato
 node scripts/retry-id-alert-notification.mjs <64-hex-alert-id> email <operator-id> --confirmed-not-delivered
 ```
 
-Use `whatsapp` for that channel. Load `ID_ALERT_STORAGE_CONNECTION_STRING` and `ID_ALERT_TABLE` securely into the process environment; do not paste the connection into shell commands or commits. The action is audited. Requeue is refused if any email recipient already has a recorded delivery, to avoid resending to them. Resolve partial delivery individually through provider operations.
+For a team WhatsApp job, use its exact `whatsapp:<recipient-hash>` key from the authenticated alert detail API. `whatsapp` remains valid for legacy single-recipient jobs. A retry targets only that member; accepted/delivered jobs cannot be requeued. Load `ID_ALERT_STORAGE_CONNECTION_STRING` and `ID_ALERT_TABLE` securely into the process environment; do not paste the connection into shell commands or commits. The action is audited. Requeue is refused if any email recipient already has a recorded delivery, to avoid resending to them. Resolve partial email delivery individually through provider operations.
 
 ## Azure dev configuration
 
@@ -90,12 +90,13 @@ Resource group/app: `Neuro-Admin`; slot: `dev`; table: `IdApplicationAlerts` in 
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | Twilio account credentials, kept in App Settings |
 | `TWILIO_WHATSAPP_FROM` | Sandbox's sender as `whatsapp:+E164`; use Console's actual value |
 | `TWILIO_WHATSAPP_TO` | Consenting operator's joined sandbox number as `whatsapp:+E164` |
+| `ID_ALERT_WHATSAPP_RECIPIENTS` | Preferred comma-separated individual recipients, each `whatsapp:+E164`. Overrides `TWILIO_WHATSAPP_TO` when present, including when explicitly empty. Up to 20 unique recipients. |
 | `TWILIO_WHATSAPP_CONTENT_SID` | Empty for dev freeform within service window; approved `HX...` Content SID for production |
 
 Current registry:
 
 ```json
-[{"id":"lab-neuron","name":"Lab Neuron","jid":"lab.tagroot.io@tagroot.io","customerId":"lab-test","enabled":true}]
+[{"id":"lab-neuron","name":"Lab Neuron","jid":"lab.tagroot.io@tagroot.io","customerId":"lab-test","enabled":true},{"id":"br-id-neuron","name":"BR ID Neuron","jid":"br@sa.id.tagroot.io","customerId":"br","enabled":true}]
 ```
 
 Operators are authorized for all sources in this central inbox. Separate deployments/tables are required for teams that must not share customer access.
@@ -124,6 +125,32 @@ The signed webhook setup is described in [SendGrid's official documentation](htt
 6. Verify WhatsApp `delivered` in alert details and receipt on the phone. `provider_http_400_code_63016` generally indicates a closed service window/template requirement; check Twilio's message error details. Do not repeatedly submit applications to troubleshoot credentials.
 
 The sandbox supports only its predefined templates outside the service window. These do not match this operational message; use the open service window for dev. See [Twilio sandbox documentation](https://www.twilio.com/docs/whatsapp/sandbox).
+
+### Individual team distribution
+
+Set `ID_ALERT_WHATSAPP_RECIPIENTS` as a slot-specific App Setting on Neuro-Admin dev:
+
+```text
+whatsapp:+<member-1>,whatsapp:+<member-2>,whatsapp:+<member-3>
+```
+
+Use real international E.164 numbers without spaces. Every dev recipient must join this sandbox and open their own 24-hour window. Production recipients must opt in; use the approved Content SID outside the service window. When the new setting is absent, `TWILIO_WHATSAPP_TO` remains the backward-compatible recipient. When present but empty, it does not silently fall back to the old number.
+
+Addresses are trimmed, normalized and deduplicated. Each new alert snapshots its audience into jobs keyed `whatsapp:<SHA-256-of-recipient>`, with separate attempt IDs, message SIDs, retries, errors and callback states. Private storage contains the operator delivery address; normal APIs/UI show only its last four digits. Invalid addresses block their own jobs while valid members and email continue. Removing a member from the current list pauses that member's unsent/retry jobs. Adding/reordering members never expands historical alerts or replays accepted messages. An alert initially created with no usable audience can acquire its first audience after configuration is corrected.
+
+V1 supports at most 20 unique team recipients to keep the jobs within Azure Table's property limit. An excessive list produces an explicit configuration error and a blocked WhatsApp placeholder, while email and inbox persistence continue; it is never silently truncated.
+
+Each message supplies its own callback, including the recipient hash:
+
+```text
+https://dev.neuro.services/api/id-applications/notifications/twilio?id=<alert-id>&attempt=<attempt-id>&recipient=<recipient-hash>
+```
+
+No manual Sandbox Status Callback URL is required. Old callbacks without `recipient` continue to resolve their legacy job. Signatures cover the entire URL and body. A callback cannot change another member's job because both recipient key and attempt ID must match.
+
+Live team acceptance requires at least two opted-in recipients: one fresh application, one delivery per member, and exactly one inbox alert. Automated/provider-stub tests cover isolated failure and retry; they do not count as live delivery to a second phone.
+
+For BR acceptance, native-group research and the source rollout checklist, see [ID Neuron rollout](id-neuron-rollout.md).
 
 ### Later production sender
 

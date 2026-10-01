@@ -106,7 +106,7 @@ export default function IdInboxPage() {
           <p className="mt-4 whitespace-pre-wrap break-words text-sm">{detail.message}</p>
           <dl className="mt-4 text-sm space-y-2">
             {Object.entries(detail.notifications || {}).map(([channel, job]) => <div key={channel}>
-              <dt className="font-semibold capitalize">{channel}</dt>
+              <dt className="font-semibold capitalize">{job.channel || channel}{job.recipientLabel && ` ${job.recipientLabel}`}</dt>
               <dd>{job.state.replaceAll('_', ' ')} · Attempts: {job.attempts}
                 {job.lastError && <span> · {job.lastError}</span>}
                 {job.nextAttemptAt && <span> · Next attempt: {time(job.nextAttemptAt)}</span>}

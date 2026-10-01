@@ -1,4 +1,5 @@
 import { readRegistry } from './domain.mjs';
+import { readWhatsappRecipients } from './whatsapp.mjs';
 
 const csv = (value) => String(value || '').split(',').map((item) => item.trim()).filter(Boolean);
 
@@ -14,6 +15,8 @@ export function getIdAlertConfig(env = process.env) {
     operatorEmails: [...new Set(csv(env.ID_ALERT_OPERATOR_EMAILS).map((email) => email.toLowerCase()))],
     emailEnabled: env.ID_ALERT_EMAIL_ENABLED !== 'false',
     whatsappEnabled: env.ID_ALERT_WHATSAPP_ENABLED === 'true',
+    whatsappRecipients: readWhatsappRecipients(env),
+    legacyWhatsappRecipient: String(env.TWILIO_WHATSAPP_TO || '').trim().toLowerCase(),
     publicOrigin: env.ID_ALERT_PUBLIC_ORIGIN || '',
     receiverJid: env.ID_ALERT_XMPP_JID || '',
   };

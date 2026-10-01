@@ -1,7 +1,9 @@
 import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac, generateKeyPairSync, sign } from 'node:crypto';
-import { applyDelivery, initialNotifications, legacyNotifications, notificationDue, notificationFailure, publicAlert, recipientHash } from '../src/lib/idAlerts/notifications.mjs';
+import { applyDelivery, initialNotifications, legacyNotifications, notificationDue, notificationFailure, publicAlert, recipientHash, whatsappJobKey } from '../src/lib/idAlerts/notifications.mjs';
+import { getIdAlertConfig } from '../src/lib/idAlerts/config.mjs';
+import { MAX_WHATSAPP_RECIPIENTS } from '../src/lib/idAlerts/whatsapp.mjs';
 import { notificationStore, conditionalTransition } from '../src/lib/idAlerts/store.mjs';
 import { transition } from '../src/lib/idAlerts/domain.mjs';
 import { deliverPendingNotifications } from '../src/lib/idAlerts/notificationWorker.mjs';
@@ -214,4 +216,134 @@ test('SendGrid verification binds timestamp and exact raw bytes; body size is bo
   assert.equal(validSendGridSignature(body, timestamp, signature, 'invalid'), false);
   assert.equal((await limitedBody(new Request('https://example.com', { method: 'POST', body: 'abc' }), 3)).toString(), 'abc');
   await assert.rejects(limitedBody(new Request('https://example.com', { method: 'POST', body: 'abcd' }), 3), { statusCode: 413 });
+});
+
+const team = ['whatsapp:+15550003333', 'whatsapp:+15550004444'];
+const teamConfig = { ...config, whatsappRecipients: team };
+const teamStore = (cfg = teamConfig) => memoryStore({ ...fixture(), notifications: initialNotifications(cfg) });
+
+test('team configuration takes precedence, deduplicates addresses, and supports the old single recipient', () => {
+  assert.deepEqual(getIdAlertConfig(env).whatsappRecipients, [env.TWILIO_WHATSAPP_TO]);
+  assert.deepEqual(getIdAlertConfig({ ...env, ID_ALERT_WHATSAPP_RECIPIENTS: ` ${team[0]},${team[1]},${team[0].toUpperCase()}, ` }).whatsappRecipients, team);
+  assert.deepEqual(getIdAlertConfig({ ...env, ID_ALERT_WHATSAPP_RECIPIENTS: '' }).whatsappRecipients, []);
+  assert.equal(Object.keys(initialNotifications(teamConfig)).length, 3);
+  assert.equal(initialNotifications(teamConfig).whatsapp, undefined);
+});
+
+test('concurrent team workers isolate recipient failure, retries, and accepted sends', async () => {
+  const store = teamStore();
+  const sent = [];
+  const send = async (channel, _alert, _config, attempt) => {
+    sent.push(attempt.recipient || channel);
+    return attempt.recipient === team[0] && attempt.attempts === 1
+      ? { state: 'rejected', error: 'provider_http_429' } : { state: 'accepted', providerId: attempt.attemptId };
+  };
+  await Promise.all([deliverPendingNotifications(store, teamConfig, () => true, send), deliverPendingNotifications(store, teamConfig, () => true, send)]);
+  assert.equal(store.jobs()[whatsappJobKey(team[0])].state, 'retry');
+  assert.equal(store.jobs()[whatsappJobKey(team[1])].state, 'accepted');
+  store.setJob(whatsappJobKey(team[0]), { nextAttemptAt: '' });
+  await deliverPendingNotifications(store, teamConfig, () => true, send);
+  await deliverPendingNotifications(store, teamConfig, () => true, send);
+  assert.equal(sent.filter(value => value === team[0]).length, 2);
+  assert.equal(sent.filter(value => value === team[1]).length, 1);
+  assert.equal(sent.filter(value => value === 'email').length, 1);
+});
+
+test('a malformed team member blocks only that recipient and does not lose the alert', async () => {
+  const cfg = { ...teamConfig, whatsappRecipients: ['invalid', ...team] };
+  const store = teamStore(cfg);
+  const sent = [];
+  await deliverPendingNotifications(store, cfg, () => true, async (channel, _alert, _config, attempt) => {
+    sent.push(attempt.recipient || channel); return { state: 'accepted', providerId: attempt.attemptId };
+  });
+  assert.equal(store.row().status, 'new');
+  assert.equal(store.jobs()[whatsappJobKey('invalid')].state, 'blocked');
+  assert.deepEqual(sent, ['email', ...team]);
+});
+
+test('team callbacks cannot update another recipient, reverse delivery, or overwrite human actions', async () => {
+  const store = teamStore();
+  const keyA = whatsappJobKey(team[0]), keyB = whatsappJobKey(team[1]);
+  await Promise.all([store.claimNotification(fixture().id, keyA, teamConfig), store.claimNotification(fixture().id, keyB, teamConfig)]);
+  const a = store.jobs()[keyA], b = store.jobs()[keyB];
+  await store.recordDelivery(fixture().id, keyB, { attemptId: a.attemptId, state: 'delivered', providerId: 'a' });
+  assert.equal(store.jobs()[keyB].state, 'sending');
+  await conditionalTransition(store.client, fixture().id, 'acknowledge', 'operator', transition);
+  await store.recordDelivery(fixture().id, keyA, { attemptId: a.attemptId, state: 'delivered', providerId: 'a' });
+  await store.finishNotification(fixture().id, keyA, a.attemptId, { state: 'accepted', providerId: 'a' });
+  await store.recordDelivery(fixture().id, keyB, { attemptId: b.attemptId, state: 'delivery_failed', providerId: 'b', error: 'twilio_63016' });
+  assert.equal(store.row().claimedBy, 'operator');
+  assert.equal(store.jobs()[keyA].state, 'delivered');
+  assert.equal(store.jobs()[keyB].state, 'delivery_failed');
+  await store.retryNotification(fixture().id, keyB, 'operator');
+  assert.equal(store.jobs()[keyB].recipient, team[1]);
+  assert.equal(store.jobs()[keyA].state, 'delivered');
+  await assert.rejects(store.retryNotification(fixture().id, keyA, 'operator'), /cannot be retried/);
+});
+
+test('team audience is fixed per alert; removals pause pending sends and additions do not replay history', async () => {
+  const store = teamStore();
+  const cfg = { ...teamConfig, whatsappRecipients: [team[1], 'whatsapp:+15550005555'] };
+  const sent = [];
+  await deliverPendingNotifications(store, cfg, () => true, async (channel, _alert, _config, attempt) => {
+    sent.push(attempt.recipient || channel); return { state: 'accepted', providerId: attempt.attemptId };
+  });
+  assert.deepEqual(sent, ['email', team[1]]);
+  assert.equal(store.jobs()[whatsappJobKey(team[0])].lastError, 'whatsapp_recipient_removed');
+  assert.equal(Object.keys(store.jobs()).length, 3);
+  const historical = memoryStore();
+  historical.setJob('email', { state: 'accepted' });
+  historical.setJob('whatsapp', { state: 'delivered', attempts: 1 });
+  await deliverPendingNotifications(historical, teamConfig, () => true, async () => assert.fail('no retroactive team send'));
+  assert.equal(Object.keys(historical.jobs()).length, 2);
+});
+
+test('missing or excessive initial audience preserves the inbox and can acquire a configured audience once', async () => {
+  for (const recipients of [[], Array.from({ length: MAX_WHATSAPP_RECIPIENTS + 1 }, (_, i) => `whatsapp:+1555${String(i).padStart(7, '0')}`)]) {
+    const cfg = { ...teamConfig, whatsappRecipients: recipients };
+    const store = teamStore(cfg);
+    await deliverPendingNotifications(store, cfg, () => true, async (channel) => {
+      assert.equal(channel, 'email'); return { state: 'accepted', providerId: 'email' };
+    });
+    assert.equal(store.jobs().whatsapp.state, 'blocked');
+    assert.equal(store.row().status, 'new');
+    const sent = [];
+    await deliverPendingNotifications(store, teamConfig, () => true, async (_channel, _alert, _config, attempt) => {
+      sent.push(attempt.recipient); return { state: 'accepted', providerId: attempt.attemptId };
+    });
+    assert.deepEqual(sent, team);
+    assert.equal(store.jobs().whatsapp, undefined);
+  }
+});
+
+test('each WhatsApp request targets its snapshot and carries its recipient-specific signed callback URL', async () => {
+  for (const recipient of team) {
+    const jobKey = whatsappJobKey(recipient);
+    const result = await sendNotification('whatsapp', fixture(), teamConfig, { recipient, jobKey, attemptId: '12345678-1234-1234-1234-123456789abc' }, async (_url, options) => {
+      const body = new URLSearchParams(options.body);
+      assert.equal(body.get('To'), recipient);
+      assert.equal(new URL(body.get('StatusCallback')).searchParams.get('recipient'), recipientHash(recipient));
+      assert.equal(body.get('StatusCallback').includes(recipient), false);
+      assert.equal(body.get('Body').includes('PRIVATE-'), false);
+      return Response.json({ sid: `SM${'2'.repeat(32)}` }, { status: 201 });
+    }, env);
+    assert.equal(result.state, 'accepted');
+  }
+  const safe = publicAlert({ ...fixture(), notifications: initialNotifications(teamConfig) });
+  assert.equal(JSON.stringify(safe).includes(team[0]), false);
+  assert.equal(safe.notifications[whatsappJobKey(team[0])].recipientLabel, '…3333');
+});
+
+test('uncertain recipient is held without blocking others and cannot be retried by normal worker scans', async () => {
+  const store = teamStore();
+  const sent = [];
+  const send = async (channel, _alert, _config, attempt) => {
+    sent.push(attempt.recipient || channel);
+    return attempt.recipient === team[0] ? { state: 'unknown', error: 'network_outcome_unknown' } : { state: 'accepted', providerId: attempt.attemptId };
+  };
+  await deliverPendingNotifications(store, teamConfig, () => true, send);
+  await deliverPendingNotifications(store, teamConfig, () => true, send);
+  assert.deepEqual(sent, ['email', ...team]);
+  assert.equal(store.jobs()[whatsappJobKey(team[0])].state, 'unknown');
+  assert.equal(store.jobs()[whatsappJobKey(team[1])].state, 'accepted');
 });

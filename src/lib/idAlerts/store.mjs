@@ -1,7 +1,7 @@
 import { TableClient } from '@azure/data-tables';
 import { randomUUID } from 'node:crypto';
 import { acquireReceiverLease, readReceiverLease, renewReceiverLease, releaseReceiverLease } from './lease.mjs';
-import { aggregateNotifications, applyDelivery, CHANNELS, legacyNotifications, notificationDue, publicAlert, recipientHash, SEND_LEASE_MS } from './notifications.mjs';
+import { aggregateNotifications, applyDelivery, legacyNotifications, notificationDue, prepareRecipientJobs, publicAlert, recipientHash, SEND_LEASE_MS, validNotificationKey } from './notifications.mjs';
 
 let clientPromise;
 
@@ -124,14 +124,15 @@ export async function mutateStoredAlert(client, id, change) {
 
 export function notificationStore(client) {
   const changeJob = (id, channel, change) => {
-    if (!CHANNELS.includes(channel)) throw new Error('Invalid notification channel');
+    if (!validNotificationKey(channel)) throw new Error('Invalid notification job');
     return mutateStoredAlert(client, id, (alert) => {
+      if (!alert.notifications[channel]) return null;
       const next = change(alert.notifications[channel]);
       return next ? { ...alert, notifications: { ...alert.notifications, [channel]: next } } : null;
     });
   };
   return {
-    prepareNotifications: (id) => mutateStoredAlert(client, id, (alert) => alert),
+    prepareNotifications: (id, config) => mutateStoredAlert(client, id, (alert) => ({ ...alert, notifications: prepareRecipientJobs(alert.notifications, config) })),
     claimNotification: (id, channel, config, now = Date.now()) => changeJob(id, channel, (job) => {
       if (!notificationDue(job, now) || job.state === 'sending') return null;
       return { ...job, state: 'sending', attempts: job.attempts + 1, attemptId: randomUUID(),
@@ -151,11 +152,13 @@ export function notificationStore(client) {
     }),
     recordDelivery: (id, channel, update) => changeJob(id, channel, (job) => applyDelivery(job, update)),
     retryNotification: (id, channel, operatorId) => mutateStoredAlert(client, id, (alert) => {
-      if (!CHANNELS.includes(channel)) throw new Error('Invalid notification channel');
+      if (!validNotificationKey(channel)) throw new Error('Invalid notification job');
       const job = alert.notifications[channel];
+      if (!job) throw new Error('Notification job not found');
       if (!['failed', 'delivery_failed', 'unknown', 'blocked', 'disabled'].includes(job.state)) throw new Error('Notification cannot be retried in this state');
       if (Object.values(job.deliveries || {}).includes('delivered')) throw new Error('Partial delivery: do not resend to recipients who already received it');
-      return { ...alert, notifications: { ...alert.notifications, [channel]: { state: 'pending', attempts: 0, nextAttemptAt: '', lastError: '' } },
+      return { ...alert, notifications: { ...alert.notifications, [channel]: { ...(job.recipient ? { recipient: job.recipient } : {}),
+        ...(job.recipientSelectionPending ? { recipientSelectionPending: true } : {}), state: 'pending', attempts: 0, nextAttemptAt: '', lastError: '' } },
         auditTrail: [...(alert.auditTrail || []), { action: `retry_${channel}_confirmed_not_delivered`, operatorId, at: new Date().toISOString() }] };
     }),
   };
