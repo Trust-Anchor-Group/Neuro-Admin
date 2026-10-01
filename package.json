@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=20.9.0"
   },
   "scripts": {
     "dev": "next dev --webpack",
@@ -14,7 +14,7 @@
     "test:send-notification": "node scripts/test-send-notification.mjs"
   },
   "dependencies": {
-    "@azure/monitor-opentelemetry": "1.19.0",
+    "@azure/data-tables": "^13.3.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.5",
@@ -29,6 +29,7 @@
     "@tiptap/pm": "3.31.3",
     "@tiptap/react": "3.31.3",
     "@tiptap/starter-kit": "3.31.3",
+    "@xmpp/client": "^0.14.0",
     "agent-api": "github:Trust-Anchor-Group/AgentApiJavascript#npm-package",
     "dayjs": "^1.11.13",
     "emailjs-com": "^3.2.0",
@@ -64,7 +65,7 @@
     "@babel/core": "^7.29.7",
     "@humanfs/node": "0.16.8",
     "browserslist": "4.28.9",
-    "fast-uri": "3.1.6",
+    "fast-uri": "3.1.7",
     "js-yaml": "4.3.2",
     "nanoid": "3.3.18",
     "postcss-selector-parser": "6.1.3",

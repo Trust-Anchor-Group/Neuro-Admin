@@ -16,6 +16,7 @@ export default function DashboardLayout({ children }) {
       href: '/neuro-access',
       subItems: [
         { label: t?.menu?.idApplications || 'ID applications', href: '/neuro-access/id-application' },
+        { label: 'Central ID inbox', href: '/neuro-access/id-inbox' },
         { label: t?.menu?.accounts || 'Accounts', href: '/neuro-access/account' },
       ],
     },
