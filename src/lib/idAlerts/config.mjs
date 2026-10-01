@@ -11,7 +11,10 @@ export function getIdAlertConfig(env = process.env) {
     legalIdentityRefTags: csv(env.ID_ALERT_LEGAL_ID_REF_TAGS),
     operatorIds: new Set(csv(env.ID_ALERT_OPERATOR_IDS)),
     debugOperatorIds: new Set(csv(env.ID_ALERT_DEBUG_OPERATOR_IDS)),
-    operatorEmails: csv(env.ID_ALERT_OPERATOR_EMAILS),
+    operatorEmails: [...new Set(csv(env.ID_ALERT_OPERATOR_EMAILS).map((email) => email.toLowerCase()))],
+    emailEnabled: env.ID_ALERT_EMAIL_ENABLED !== 'false',
+    whatsappEnabled: env.ID_ALERT_WHATSAPP_ENABLED === 'true',
+    publicOrigin: env.ID_ALERT_PUBLIC_ORIGIN || '',
     receiverJid: env.ID_ALERT_XMPP_JID || '',
   };
 }

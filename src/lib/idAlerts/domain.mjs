@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { initialNotifications } from './notifications.mjs';
 
 export const EVENT_NS = 'urn:xmpp:eventlog';
 const MAX_STANZA_BYTES = 48 * 1024;
@@ -87,14 +88,12 @@ export function normalizeAlert(event, neuron, config = {}) {
   const now = new Date().toISOString();
   return {
     id, sourceNeuronId: neuron.id, sourceNeuronName: neuron.name,
-    sourceJid: event.sourceJid, customerId: neuron.customerId,
+    sourceJid: bareJid(event.sourceJid), customerId: neuron.customerId,
     eventId: event.eventId, applicationRef, legalIdentityRef,
     eventTimestamp: event.timestamp, receivedAt: now, firstSeenAt: now,
     status: 'new', claimedBy: '', claimedAt: '', acknowledgedBy: '', acknowledgedAt: '', handledBy: '', handledAt: '',
-    message: event.message, type: event.type, level: event.level, actor: event.actor,
-    object: event.object, facility: event.facility, module: event.module,
-    tags: event.tags, rawEvent: event.rawEvent, rawStanza: event.rawStanza,
-    notificationState: 'pending', auditTrail: [],
+    message: 'Legal Identity application registered.',
+    notifications: initialNotifications(config), notificationState: 'pending', auditTrail: [],
   };
 }
 

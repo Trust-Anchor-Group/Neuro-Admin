@@ -12,11 +12,11 @@ const neuronA = { id: 'a', jid: 'events@a.example', name: 'Neuron A', customerId
 const neuronB = { id: 'b', jid: 'events@b.example', name: 'Neuron B', customerId: 'customer-b', enabled: true };
 const config = {
   receiverJid: 'inbox@central.example', neurons: [neuronA, neuronB],
-  eventIds: new Set(['ConfirmedLegalIdEvent']), discovery: true,
+  eventIds: new Set(['LegalIdRegistered']), discovery: true,
   applicationRefTags: ['ApplicationRef'], legalIdentityRefTags: ['LegalIdentityRef'],
 };
 
-function stanza(from, reference, eventId = 'ConfirmedLegalIdEvent') {
+function stanza(from, reference, eventId = 'LegalIdRegistered') {
   return xml('message', { from: `${from}/resource`, to: config.receiverJid, type: 'normal' },
     xml('log', { xmlns: NS, id: eventId, timestamp: '2026-09-29T09:00:00Z', type: 'Notice', level: 'Minor', module: 'LegalIdentity' },
       xml('message', {}, 'Application received'),
@@ -31,13 +31,12 @@ function fakeStore() {
     async markNeuronSeen() {},
     async saveDiscovery(event, neuron) { discovery.push({ event, neuron }); },
     async createAlert(alert) { if (alerts.has(alert.id)) return false; alerts.set(alert.id, alert); return true; },
-    async markNotified(id) { alerts.get(id).notificationState = 'sent'; },
   };
 }
 
 test('parses XEP-0337 fields, tags, raw event and exact sender', () => {
   const [event] = parseEventStanza(stanza(neuronA.jid, 'ref-1'), config.receiverJid);
-  assert.equal(event.eventId, 'ConfirmedLegalIdEvent');
+  assert.equal(event.eventId, 'LegalIdRegistered');
   assert.equal(event.sourceJid, 'events@a.example/resource');
   assert.equal(event.tags.ApplicationRef, 'ref-1');
   assert.match(event.rawStanza, /<log/);
@@ -54,26 +53,34 @@ test('rejects malformed and misaddressed messages and duplicate registry JIDs', 
   assert.throws(() => readRegistry(JSON.stringify([{ id: 'a', jid: neuronA.jid }, { id: 'b', jid: neuronA.jid }])));
 });
 
-test('two independent Neurons create distinct alerts and notify; retries deduplicate', async () => {
+test('two independent Neurons persist distinct alerts with notification jobs; retries deduplicate', async () => {
   const store = fakeStore();
-  const notified = [];
-  const notifier = { async notifyNewApplication(alert) { notified.push(alert.id); } };
-  await ingestStanza(stanza(neuronA.jid, 'same-ref'), config, store, notifier);
-  await ingestStanza(stanza(neuronB.jid, 'same-ref'), config, store, notifier);
-  await ingestStanza(stanza(neuronA.jid, 'same-ref'), config, store, notifier);
+  await ingestStanza(stanza(neuronA.jid, 'same-ref'), config, store);
+  await ingestStanza(stanza(neuronB.jid, 'same-ref'), config, store);
+  await ingestStanza(stanza(neuronA.jid, 'same-ref'), config, store);
   assert.equal(store.alerts.size, 2);
-  assert.equal(notified.length, 2);
+  assert.ok([...store.alerts.values()].every((alert) => alert.notifications.email.state === 'pending'));
   assert.deepEqual(new Set([...store.alerts.values()].map((alert) => alert.sourceNeuronId)), new Set(['a', 'b']));
   assert.ok([...store.alerts.values()].every((alert) => alert.status === 'new'));
 });
 
 test('unknown sender fails closed and unconfirmed EventId stays discovery only', async () => {
   const store = fakeStore();
-  const notifier = { async notifyNewApplication() { assert.fail('must not notify'); } };
-  await assert.rejects(ingestStanza(stanza('unknown@c.example', 'ref-1'), config, store, notifier));
-  await ingestStanza(stanza(neuronA.jid, 'ref-1', 'OtherEvent'), config, store, notifier);
+  await assert.rejects(ingestStanza(stanza('unknown@c.example', 'ref-1'), config, store));
+  await assert.rejects(ingestStanza(stanza(neuronA.jid, 'ref-1'), { ...config, neurons: [{ ...neuronA, enabled: false }] }, store));
+  for (const eventId of ['LegalIdUpdated', 'IdReviewPerformed', 'LoginSuccessful', 'FileNotFound', 'HoneyPot', 'NotImplementedException']) {
+    await ingestStanza(stanza(neuronA.jid, 'ref-1', eventId), config, store);
+  }
   assert.equal(store.alerts.size, 0);
-  assert.equal(store.discovery.length, 1);
+  assert.equal(store.discovery.length, 6);
+});
+
+test('diagnostic storage failure cannot prevent alert and notification persistence', async () => {
+  const store = fakeStore();
+  store.saveDiscovery = async () => { throw new Error('storage unavailable'); };
+  await ingestStanza(stanza(neuronA.jid, 'ref-diagnostic-failure'), config, store);
+  assert.equal(store.alerts.size, 1);
+  assert.equal([...store.alerts.values()][0].notifications.email.state, 'pending');
 });
 
 test('acknowledgement ownership and handled transitions', () => {
@@ -93,7 +100,7 @@ test('acknowledgement ownership and handled transitions', () => {
 test('simultaneous claims use ETag compare-and-swap so only one wins', async () => {
   const [event] = parseEventStanza(stanza(neuronA.jid, 'race-ref'), config.receiverJid);
   const alert = normalizeAlert(event, neuronA, config);
-  let stored = { ...alert, partitionKey: 'alerts', rowKey: alert.id, tags: '{}', auditTrail: '[]', etag: 'version-1' };
+  let stored = { ...alert, partitionKey: 'alerts', rowKey: alert.id, tags: '{}', notifications: JSON.stringify(alert.notifications), auditTrail: '[]', etag: 'version-1' };
   const client = {
     async getEntity() { return { ...stored }; },
     async updateEntity(entity, mode, options) {

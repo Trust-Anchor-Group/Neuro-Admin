@@ -9,7 +9,7 @@ export async function GET(request) {
     if (!await requireIdAlertOperator(request, { debug: true })) return reply({ error: 'Forbidden' }, 403);
     return reply({ events: await listDiscovery() });
   } catch (error) {
-    console.error('[id-alerts] discovery read failed', { error: error.message });
+    console.error('[id-alerts] discovery read failed', { name: error.name });
     return reply({ error: 'Discovery unavailable' }, 503);
   }
 }

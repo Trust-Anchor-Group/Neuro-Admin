@@ -23,6 +23,11 @@
 # production
 /build
 
+# Local deployment artifacts
+/.codex-deploy-*/
+/release*.zip
+/.next-build.log
+
 # misc
 .DS_Store
 *.pem

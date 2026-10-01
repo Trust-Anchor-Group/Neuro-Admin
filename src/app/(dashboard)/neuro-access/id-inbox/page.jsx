@@ -74,7 +74,7 @@ export default function IdInboxPage() {
     handled: alerts.filter((item) => item.status === 'handled' && new Date(item.handledAt).toDateString() === today).length,
   };
 
-  return <main className="p-8 text-[var(--brand-text)]">
+  return <main data-hj-suppress data-cs-mask data-sentry-block className="p-8 text-[var(--brand-text)]">
     <div className="flex items-start justify-between gap-4 flex-wrap">
       <div><h1 className="text-3xl font-bold">ID Applications</h1><p className="mt-1 text-sm">Alerts from configured ID Neurons. The existing Neuro Admin process handles approval.</p></div>
       <button className="border rounded px-3 py-2" onClick={loadDiscovery}>Event discovery</button>
@@ -102,19 +102,27 @@ export default function IdInboxPage() {
             <dt>EventId</dt><dd>{detail.eventId}</dd><dt>Application</dt><dd>{detail.applicationRef || '—'}</dd><dt>Legal identity</dt><dd>{detail.legalIdentityRef || '—'}</dd>
             <dt>Status</dt><dd className="uppercase">{detail.status}</dd><dt>Claimed by</dt><dd>{detail.claimedBy || detail.acknowledgedBy || '—'}</dd><dt>Claimed at</dt><dd>{time(detail.claimedAt || detail.acknowledgedAt)}</dd>
             <dt>Handled by</dt><dd>{detail.handledBy || '—'}</dd><dt>Handled at</dt><dd>{time(detail.handledAt)}</dd>
-            <dt>Type / level</dt><dd>{detail.type} / {detail.level}</dd><dt>Module</dt><dd>{detail.module || '—'}</dd><dt>Facility</dt><dd>{detail.facility || '—'}</dd>
           </dl>
           <p className="mt-4 whitespace-pre-wrap break-words text-sm">{detail.message}</p>
+          <dl className="mt-4 text-sm space-y-2">
+            {Object.entries(detail.notifications || {}).map(([channel, job]) => <div key={channel}>
+              <dt className="font-semibold capitalize">{channel}</dt>
+              <dd>{job.state.replaceAll('_', ' ')} · Attempts: {job.attempts}
+                {job.lastError && <span> · {job.lastError}</span>}
+                {job.nextAttemptAt && <span> · Next attempt: {time(job.nextAttemptAt)}</span>}
+                {job.deliveredAt && <span> · Delivered: {time(job.deliveredAt)}</span>}
+              </dd>
+            </div>)}
+          </dl>
           <div className="flex gap-2 mt-5">
             {detail.status === 'new' && <button disabled={busy} className="rounded bg-purple-700 text-white px-4 py-2 disabled:opacity-50" onClick={() => act('acknowledge')}>I&apos;m handling this</button>}
             {detail.status === 'acknowledged' && detail.acknowledgedBy === data?.operatorId && <button disabled={busy} className="rounded bg-green-700 text-white px-4 py-2 disabled:opacity-50" onClick={() => act('handle')}>Mark handled</button>}
           </div>
           {!!detail.auditTrail?.length && <details className="mt-5"><summary>Action history</summary><ul className="mt-2 text-sm">{detail.auditTrail.map((entry, index) => <li key={`${entry.at}-${index}`}>{entry.action} · {entry.operatorId} · {time(entry.at)}</li>)}</ul></details>}
-          {detail.rawEvent && <details className="mt-5"><summary>Raw event (restricted)</summary><pre className="mt-2 overflow-auto whitespace-pre-wrap break-all text-xs bg-gray-100 p-3">{detail.rawStanza}</pre></details>}
         </>}
       </section>
     </div>
-    {discovery && <section className="mt-6 rounded border bg-white p-5 text-gray-900"><h2 className="text-xl font-semibold">Recent discovery events</h2><p className="text-sm mb-3">Inspect a test application event and set ID_ALERT_EVENT_IDS to its confirmed EventId.</p>
+    {discovery && <section className="mt-6 rounded border bg-white p-5 text-gray-900"><h2 className="text-xl font-semibold">Recent discovery events</h2><p className="text-sm mb-3">Restricted troubleshooting data. Records are available for up to 24 hours.</p>
       {discovery.map((event) => <details key={event.rowKey} className="border-t py-3"><summary>{event.timestamp} · {event.sourceNeuronId} · {event.eventId || '(no EventId)'}</summary><pre className="overflow-auto whitespace-pre-wrap break-all text-xs bg-gray-100 p-3">{JSON.stringify(event, null, 2)}</pre></details>)}
     </section>}
   </main>;

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireIdAlertOperator, sameOrigin } from '@/lib/idAlerts/auth';
 import { updateAlertStatus } from '@/lib/idAlerts/store.mjs';
 import { transition } from '@/lib/idAlerts/domain.mjs';
+import { publicAlert } from '@/lib/idAlerts/notifications.mjs';
 
 export const runtime = 'nodejs';
 
@@ -19,11 +20,10 @@ export async function POST(request, { params }) {
     const result = await updateAlertStatus(id, action, operator.id, transition);
     if (result.outcome === 'missing') return reply({ error: 'Not found' }, 404);
     if (result.outcome === 'conflict') return reply({ error: 'This alert changed or belongs to another operator' }, 409);
-    const { rawEvent, rawStanza, tags, ...alert } = result.alert;
-    return reply({ alert });
+    return reply({ alert: publicAlert(result.alert) });
   } catch (error) {
     if (error instanceof SyntaxError) return reply({ error: 'Invalid JSON' }, 400);
-    console.error('[id-alerts] status change failed', { error: error.message });
+    console.error('[id-alerts] status change failed', { name: error.name });
     return reply({ error: 'Status change unavailable' }, 503);
   }
 }

@@ -3,7 +3,7 @@ import { client, xml } from '@xmpp/client';
 import { getIdAlertConfig } from './config.mjs';
 import { ingestStanza } from './ingest.mjs';
 import * as store from './store.mjs';
-import * as notifier from './notifier.mjs';
+import { deliverPendingNotifications } from './notificationWorker.mjs';
 
 const TICK_MS = 5000;
 const LEASE_MS = 30000;
@@ -18,9 +18,6 @@ export async function startReceiver() {
   if (controller) return controller;
   const config = getIdAlertConfig();
   if (!config.receiverJid || !config.neurons.length) throw new Error('XMPP JID and Neuron registry are required');
-  if (process.env.NODE_ENV === 'production' && config.eventIds.size && (!config.operatorEmails.length || !process.env.SENDGRID_API_KEY || !process.env.SENDGRID_FROM_EMAIL)) {
-    throw new Error('Operator email notification configuration is required');
-  }
   const service = process.env.ID_ALERT_XMPP_SERVICE || '';
   if (!/^(xmpp|xmpps|wss):\/\//i.test(service)) throw new Error('ID_ALERT_XMPP_SERVICE must use xmpp://, xmpps:// or wss://');
   const password = process.env.ID_ALERT_XMPP_PASSWORD;
@@ -33,6 +30,7 @@ export async function startReceiver() {
   let expiresAt = 0;
   let busy = false;
   let stopped = false;
+  let notificationsBusy = false;
   const ownsLease = () => !stopped && state.role === 'leader' && Date.now() < expiresAt;
 
   const stopConnection = async () => {
@@ -66,7 +64,7 @@ export async function startReceiver() {
       if (!stanza.is('message')) return;
       const processEvent = async (attempt = 0) => {
         if (!ownsLease()) throw new Error('Receiver lease expired');
-        try { return await ingestStanza(stanza, config, store, notifier); }
+        try { return await ingestStanza(stanza, config, store); }
         catch (error) {
           if (attempt >= 4 || /Unknown or disabled|Invalid|No XEP|addressed elsewhere|exceeds size|lease expired/.test(error.message)) throw error;
           await new Promise((resolve) => setTimeout(resolve, 1000 * 2 ** attempt));
@@ -76,20 +74,20 @@ export async function startReceiver() {
       void processEvent()
         .then((outcomes) => {
           state = { ...state, lastEventAt: new Date().toISOString() };
-          console.info('[id-alerts] event processed', { outcomes });
+          console.info('[id-alerts] event processed', { outcomes: outcomes.map(({ outcome, alertId }) => ({ outcome, alertId })) });
         })
         .catch((error) => console.warn('[id-alerts] event rejected or deferred', { name: error.name, statusCode: error.statusCode }));
     });
     void xmpp.start().catch((error) => console.error('[id-alerts] XMPP start failed', { name: error.name }));
     retryTimer = setInterval(async () => {
-      if (!ownsLease()) return;
+      if (!ownsLease() || notificationsBusy) return;
+      notificationsBusy = true;
       try {
-        for (const alert of await store.listPendingNotifications()) {
-          if (!ownsLease()) return;
-          try { await notifier.notifyNewApplication(alert, config); await store.markNotified(alert.id); }
-          catch (error) { console.error('[id-alerts] notification retry failed', { alertId: alert.id, name: error.name }); }
-        }
+        await deliverPendingNotifications(store, config, ownsLease);
       } catch (error) { console.error('[id-alerts] notification scan failed', { name: error.name }); }
+      finally { notificationsBusy = false; }
+      try { if (ownsLease()) await store.pruneDiscovery(); }
+      catch (error) { console.warn('[id-alerts] discovery retention deferred', { name: error.name }); }
     }, 30000);
   };
 

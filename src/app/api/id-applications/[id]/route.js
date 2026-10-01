@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireIdAlertOperator } from '@/lib/idAlerts/auth';
 import { getAlert } from '@/lib/idAlerts/store.mjs';
+import { publicAlert } from '@/lib/idAlerts/notifications.mjs';
 
 export const runtime = 'nodejs';
 
@@ -12,11 +13,9 @@ export async function GET(request, { params }) {
     if (!operator) return reply({ error: 'Forbidden' }, 403);
     const alert = await getAlert(id);
     if (!alert) return reply({ error: 'Not found' }, 404);
-    const debugOperator = await requireIdAlertOperator(request, { debug: true });
-    if (!debugOperator) { delete alert.rawEvent; delete alert.rawStanza; delete alert.tags; }
-    return reply({ alert });
+    return reply({ alert: publicAlert(alert) });
   } catch (error) {
-    console.error('[id-alerts] detail failed', { error: error.message });
+    console.error('[id-alerts] detail failed', { name: error.name });
     return reply({ error: 'Alert unavailable' }, 503);
   }
 }
