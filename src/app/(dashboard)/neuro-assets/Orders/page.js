@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CheckCircle2, ChevronDown, CircleDollarSign, Clock3, FileClock, RefreshCw, ShoppingCart } from 'lucide-react';
 import {
   ADMIN_CONTRACT_STATUSES,
+  formatAdminOrderPrice,
   getAdminContractStatus,
   getAdminOrderHistory,
   getAdminOrderId,
@@ -46,6 +47,12 @@ function formatStatusLabel(status) {
     ContractSent: 'Contract sent',
     Created: 'Created',
   })[status] || status;
+}
+
+function formatPaymentMethod(value) {
+  if (!value || value === '-') return 'Not provided';
+  if (String(value).toLowerCase() === 'manual_pix') return 'Manual PIX';
+  return String(value).replaceAll('_', ' ');
 }
 
 export default function OffchainOrdersPage() {
@@ -215,7 +222,14 @@ export default function OffchainOrdersPage() {
       {notice ? <p role="status" className="mb-4 rounded-lg border border-emerald-300/50 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-600">{notice}</p> : null}
       {error ? <p role="alert" className="mb-4 rounded-lg border border-rose-300/50 bg-rose-500/10 px-4 py-3 text-sm text-rose-600">{error}</p> : null}
 
-      <div className="space-y-4">
+      <section aria-label="Orders" className="space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-semibold">Orders</h2>
+            <p className="text-sm text-[var(--brand-text-secondary)]">Payment, contract, and price in one place.</p>
+          </div>
+          <span className="text-sm text-[var(--brand-text-secondary)]">{orders.length} {orders.length === 1 ? 'order' : 'orders'}</span>
+        </div>
         {loading ? (
           <div className="rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-4 py-12 text-center text-sm text-[var(--brand-text-secondary)]">Loading off-chain orders...</div>
         ) : orders.length === 0 ? (
@@ -232,28 +246,37 @@ export default function OffchainOrdersPage() {
               const legalId = firstValue(order, ['legal_id', 'legalId']);
               const email = firstValue(order, ['email']);
               const paymentStatus = firstValue(order, ['payment_status', 'paymentStatus', 'status'], paid ? 'Paid' : 'Unpaid');
+              const formattedPrice = formatAdminOrderPrice(order);
               return (
-                    <article key={orderId || `order-${index}`} className="rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-4 shadow-sm sm:p-5">
-                      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                    <article key={orderId || `order-${index}`} className="rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5">
+                      <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
-                            <h2 className="text-lg font-semibold">{projectNames[String(projectId)] || String(projectId)}</h2>
-                            <span className="rounded-full bg-[var(--brand-navbar)] px-2.5 py-1 text-xs font-medium">{String(tokenAmount)} tokens</span>
+                            <h3 className="text-base font-semibold sm:text-lg">{projectNames[String(projectId)] || String(projectId)}</h3>
+                            <span className="rounded-full border border-[var(--brand-border)] px-2.5 py-1 text-xs font-medium">{String(tokenAmount)} tokens</span>
                             <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${paid ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'}`}>
                               {paid ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock3 className="h-3.5 w-3.5" />}{String(paymentStatus)}
                             </span>
                           </div>
                           <p className="mt-1 break-all font-mono text-xs text-[var(--brand-text-secondary)]">Order {orderId || '-'}</p>
 
-                          <dl className="mt-4 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2 2xl:grid-cols-4">
+                          <dl className="mt-5 grid gap-x-6 gap-y-4 border-t border-[var(--brand-border)] pt-4 text-sm sm:grid-cols-2">
                             <div className="min-w-0"><dt className="text-xs text-[var(--brand-text-secondary)]">Buyer email</dt><dd className="break-all font-medium">{String(email)}</dd></div>
                             <div className="min-w-0"><dt className="text-xs text-[var(--brand-text-secondary)]">Legal ID</dt><dd className="break-all font-mono text-xs">{String(legalId)}</dd></div>
-                            <div><dt className="text-xs text-[var(--brand-text-secondary)]">Payment method</dt><dd className="font-medium">{String(paymentMethod)}</dd></div>
+                            <div><dt className="text-xs text-[var(--brand-text-secondary)]">Payment method</dt><dd className="font-medium">{formatPaymentMethod(paymentMethod)}</dd></div>
                             <div><dt className="text-xs text-[var(--brand-text-secondary)]">Order timestamp</dt><dd className="font-medium">{formatTimestamp(getAdminOrderTimestamp(order))}</dd></div>
                           </dl>
                         </div>
 
-                        <div className="w-full rounded-lg border border-[var(--brand-border)] bg-[var(--brand-navbar)] p-3 xl:max-w-md">
+                        <div className="w-full rounded-xl border border-[var(--brand-border)] bg-[var(--brand-background)] p-4 xl:max-w-sm">
+                          <div className="mb-4 border-b border-[var(--brand-border)] pb-4">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]">Order price</p>
+                            {formattedPrice ? (
+                              <p className="mt-1 text-2xl font-semibold tabular-nums">{formattedPrice}</p>
+                            ) : (
+                              <p className="mt-1 text-sm font-medium text-[var(--brand-text-secondary)]" title="This order has no usable price and currency from the API">Price unavailable</p>
+                            )}
+                          </div>
                           <label htmlFor={`contract-status-${orderId}`} className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[var(--brand-text-secondary)]">Contract status</label>
                           <div className="flex flex-col gap-2 sm:flex-row">
                             <select
@@ -261,7 +284,7 @@ export default function OffchainOrdersPage() {
                               value={contractStatusDraft}
                               onChange={(event) => setContractStatusDrafts((current) => ({ ...current, [orderId]: event.target.value }))}
                               disabled={Boolean(savingContractOrderId) || Boolean(markingOrderId)}
-                              className="min-w-0 flex-1 rounded-md border border-[var(--brand-border)] bg-[var(--brand-background)] px-3 py-2 text-sm"
+                              className="min-w-0 flex-1 rounded-md border border-[var(--brand-border)] bg-[var(--brand-navbar)] px-3 py-2 text-sm"
                             >
                               {ADMIN_CONTRACT_STATUSES.map((status) => <option key={status} value={status}>{formatStatusLabel(status)}</option>)}
                             </select>
@@ -319,7 +342,7 @@ export default function OffchainOrdersPage() {
                     </article>
               );
         })}
-      </div>
+      </section>
     </div>
   );
 }

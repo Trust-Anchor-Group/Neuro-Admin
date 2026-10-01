@@ -209,6 +209,21 @@ export function isAdminOrderPaid(order) {
   return ['paid', 'completed', 'settled'].includes(status);
 }
 
+export function formatAdminOrderPrice(order) {
+  const rawPrice = order?.price;
+  const currency = String(order?.currency ?? '').trim().toUpperCase();
+  if (rawPrice === null || rawPrice === undefined || (typeof rawPrice === 'string' && !rawPrice.trim()) || !/^[A-Z]{3}$/.test(currency)) return null;
+
+  const price = Number(rawPrice);
+  if (!Number.isFinite(price)) return null;
+
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+    currencyDisplay: 'code',
+  }).format(price);
+}
+
 export function unwrapAdminOrders(payload) {
   const candidates = [
     payload?.data?.data?.data,
