@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import {
+  formatAdminOrderPrice,
   getAdminContractStatusHistory,
   getAdminOrderId,
   getAdminOrderHistory,
@@ -16,6 +17,19 @@ import {
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readProjectFile = (relativePath) => readFile(path.join(projectRoot, relativePath), 'utf8');
+
+test('formats the order price with its own currency and leaves legacy missing currency unavailable', () => {
+  const orders = unwrapAdminOrders({ data: { data: [
+    { order_id: 'new', price: 108, currency: 'eur', token_amount: 1 },
+    { order_id: 'old', price: 0, currency: '', token_amount: 3 },
+  ] } });
+
+  assert.equal(formatAdminOrderPrice(orders[0]).replace(/\s/g, ' '), 'EUR 108.00');
+  assert.equal(formatAdminOrderPrice(orders[1]), null);
+  assert.equal(formatAdminOrderPrice({ price: 0, currency: 'eur' }).replace(/\s/g, ' '), 'EUR 0.00');
+  assert.equal(formatAdminOrderPrice({ price: ' ', currency: 'eur' }), null);
+  assert.equal(formatAdminOrderPrice({ price: 'invalid', currency: 'eur' }), null);
+});
 
 test('reads order and status timestamps from Innova history snapshots', () => {
   const order = {
